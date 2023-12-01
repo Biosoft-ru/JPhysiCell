@@ -57,8 +57,8 @@ public class Tutorial1
     private static int sinkAgentsNumber = 500;
     private static double agentRadius = 5;
     private static boolean generateAtSlice = true; //create agents only at slice we watch
-    private static int agentSecretionRate = 30;//10;
-    private static double agentUptakeRate = 4;//0.8;
+	private static int agentSecretionRate = 10;
+	private static double agentUptakeRate = 0.8;
 
     //Simulation options
     private static double tMax = 10;
