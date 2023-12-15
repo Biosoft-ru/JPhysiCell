@@ -333,7 +333,7 @@ public class BasicAgent
 
     public double[] nearest_gradient(int substrate_index)
     {
-        return microenvironment.gradient_vector( currentVoxelIndex )[substrate_index];
+        return null;///microenvironment.gradient_vector( currentVoxelIndex )[substrate_index];
     }
 
 }
