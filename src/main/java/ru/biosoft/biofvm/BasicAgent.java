@@ -3,6 +3,8 @@ package ru.biosoft.biofvm;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.biosoft.biofvm.cell.CellContainer;
+
 /*
 #############################################################################
 # If you use BioFVM in your project, please cite BioFVM and the version     #
@@ -63,33 +65,33 @@ public class BasicAgent
     public double volume;
     public double radius; //we consider agents to be balls
     boolean volumeChanged;
-    int currentVoxelIndex;
+    public int currentVoxelIndex;
 
-    double[] sourceSinkTemp1;
-    double[] sourceSinkTemp2;
+    public double[] sourceSinkTemp1;
+    public double[] sourceSinkTemp2;
     double[] sourceSinkExport1;
     double[] sourceSinkExport2;
-    double[] previous_velocity;
+    protected double[] previous_velocity;
 
     double[] substrateChange;
-    boolean isActive;
+    protected boolean isActive;
 
     public double[] secretionRates;
     public double[] saturationDensities;
     public double[] uptakeRates;
-    double[] netExportRates;
+    public double[] netExportRates;
 
-    int ID;
-    int index;
-    int type;
-    private String tag;
+    public int ID;
+    public int index;
+    public int type;
+    public String tag;
 
-    double[] position;
-    double[] velocity;
+    public double[] position;
+    public double[] velocity;
 
-    double[] internalizedSubstrates;
-    double[] fraction_released_at_death;
-    double[] fraction_transferred_when_ingested;
+    public double[] internalizedSubstrates;
+    public double[] fraction_released_at_death;
+    public double[] fraction_transferred_when_ingested;
 
     public BasicAgent()
     {
@@ -149,7 +151,7 @@ public class BasicAgent
         return assignPosition( newPosition[0], newPosition[1], newPosition[2] );
     }
 
-    boolean assignPosition(double x, double y, double z) throws Exception
+    public boolean assignPosition(double x, double y, double z) throws Exception
     {
         if( !getMicroenvironment().mesh.isPositionValid( x, y, z ) )
             throw new IllegalArgumentException( "Error: the new position for agent " + ID + " is invalid: " + x + "," + y + "," + "z" );
@@ -164,7 +166,7 @@ public class BasicAgent
         return true;
     }
 
-    void updateVoxelIndex()
+    protected void updateVoxelIndex()
     {
         if( !getMicroenvironment().mesh.isPositionValid( position[0], position[1], position[2] ) )
         {
@@ -200,7 +202,7 @@ public class BasicAgent
         return;
     }
 
-    Microenvironment getMicroenvironment()
+    public Microenvironment getMicroenvironment()
     {
         return microenvironment;
     }
@@ -286,4 +288,52 @@ public class BasicAgent
         }
         return;
     }
+
+    public CellContainer get_container()
+    {
+        return null;//TODO: implement
+    }
+
+    public void release_internalized_substrates()
+    {
+        Microenvironment pS = Microenvironment.get_default_microenvironment(); 
+        
+        // change in total in voxel: 
+        // total_ext = total_ext + fraction*total_internal 
+        // total_ext / vol_voxel = total_ext / vol_voxel + fraction*total_internal / vol_voxel 
+        // density_ext += fraction * total_internal / vol_volume 
+        
+        // std::cout << "\t\t\t" << (*pS)(current_voxel_index) << "\t\t\t" << std::endl; 
+//        *internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
+//        *internalized_substrates *= *fraction_released_at_death;  // what fraction is released? 
+        
+        VectorUtil.div( internalizedSubstrates, pS.voxels(currentVoxelIndex).volume );// turn to density 
+        VectorUtil.prod( internalizedSubstrates, fraction_released_at_death );// what fraction is released? 
+        // release this amount into the environment 
+        
+        //        pS.get( currentVoxelIndex ) += internalized_substrates;
+        //        (*pS)(current_voxel_index) += *internalized_substrates; 
+        VectorUtil.sum( pS.get( currentVoxelIndex ), internalizedSubstrates );
+        // zero out the now-removed substrates 
+        internalizedSubstrates = new double[internalizedSubstrates.length];
+        //        internalized_substrates->assign( internalized_substrates->size() , 0.0 ); 
+        
+        return; 
+    }
+
+    public void set_total_volume(double volume)
+    {
+
+    }
+
+    public int get_current_mechanics_voxel_index()
+    {
+        return -1;
+    }
+
+    public double[] nearest_gradient(int substrate_index)
+    {
+        return microenvironment.gradient_vector( currentVoxelIndex )[substrate_index];
+    }
+
 }

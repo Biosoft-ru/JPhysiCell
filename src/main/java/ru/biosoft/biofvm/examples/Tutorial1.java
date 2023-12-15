@@ -79,10 +79,10 @@ public class Tutorial1
 
         Microenvironment m = new Microenvironment();
         m.name = "substrate scale";
-        m.set_density( 0, "substrate1", "dimensionless" );
-        m.spatial_units = "microns";
+        m.setDensity( 0, "substrate1", "dimensionless" );
+        m.spatialUnits = "microns";
         m.mesh.units = "microns";
-        m.time_units = "minutes";
+        m.timeUnits = "minutes";
 
         m.resize_space_uniform( 0, size, 0, size, 0, size, cellSize );
         m.displayInformation();

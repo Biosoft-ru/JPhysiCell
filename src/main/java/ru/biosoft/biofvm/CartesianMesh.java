@@ -54,7 +54,7 @@ public class CartesianMesh extends GeneralMesh
     double[] x_coordinates;
     double[] y_coordinates;
     double[] z_coordinates;
-    int[][] moore_connected_voxel_indices = new int[0][]; // Keeps the list of voxels in the Moore nighborhood
+    public int[][] moore_connected_voxel_indices = new int[0][]; // Keeps the list of voxels in the Moore nighborhood
     double dx;
     double dy;
     double dz;
@@ -480,7 +480,8 @@ public class CartesianMesh extends GeneralMesh
         return;
     }
 
-    void resize(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end, double dx_new, double dy_new,
+    public void resize(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end, double dx_new,
+            double dy_new,
             double dz_new)
     {
         dx = dx_new;
@@ -632,7 +633,7 @@ public class CartesianMesh extends GeneralMesh
         resize( x_start, x_end, y_start, y_end, z_start, z_end, dx_new, dx_new, dx_new );
     }
 
-    int nearest_voxel_index(double[] position)
+    public int nearest_voxel_index(double[] position)
     {
         int i = (int)Math.floor( ( position[0] - bounding_box[0] ) / dx );
         int j = (int)Math.floor( ( position[1] - bounding_box[1] ) / dy );

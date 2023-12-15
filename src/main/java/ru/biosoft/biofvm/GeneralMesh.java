@@ -66,7 +66,7 @@ public class GeneralMesh
 
     //    std::vector<Voxel> voxels;
     //    std::vector<Voxel_Face> voxel_faces;
-    Voxel[] voxels;
+    public Voxel[] voxels;
     VoxelFace[] voxel_faces;
 
     // each voxel[k] has a list of connected voxels -- helpful for some numerical methods 
@@ -111,7 +111,7 @@ public class GeneralMesh
         units = "none";
     }
 
-    boolean isPositionValid(double x, double y, double z)
+    public boolean isPositionValid(double x, double y, double z)
     {
         if( x < bounding_box[mesh_min_x_index] || x > bounding_box[mesh_max_x_index] )
             return false;

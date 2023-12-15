@@ -831,6 +831,20 @@ public class VectorUtil
         return Arrays.copyOf( v, size );
     }
 
+    public static double[] resize(double[] v, int size, double val)
+    {
+        if( v == null )
+            return new double[size];
+        if( size <= v.length )
+            return Arrays.copyOf( v, size );
+        double[] result = new double[size];
+        System.arraycopy( v, size, result, 0, size );
+        for( int i = v.length; i < size; i++ )
+            result[i] = val;
+        return result;
+
+    }
+
     public static int[][] resize(int[][] v, int size)
     {
         if( v == null || v.length == 0 )

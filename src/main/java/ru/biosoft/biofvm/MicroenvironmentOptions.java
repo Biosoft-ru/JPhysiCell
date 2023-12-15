@@ -83,12 +83,12 @@ public class MicroenvironmentOptions
 
     double[] initial_condition_vector = new double[0];
 
-    boolean simulate_2D;
+    public boolean simulate_2D;
     double[] X_range;
     double[] Y_range;
     double[] Z_range;
 
-    boolean calculate_gradients;
+    public boolean calculate_gradients;
 
     boolean use_oxygen_as_first_field;
 

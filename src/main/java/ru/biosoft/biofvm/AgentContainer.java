@@ -53,23 +53,23 @@ public class AgentContainer
     {
     }
 
-    void register_agent(BasicAgent agent)
+    public void register_agent(BasicAgent agent)
     {
     }
 
-    void remove_agent(BasicAgent agent)
+    public void remove_agent(BasicAgent agent)
     {
     }
-    void add_agent_to_outer_voxel(BasicAgent agent)
+    public void add_agent_to_outer_voxel(BasicAgent agent)
     {
     }
-    void remove_agent_from_voxel(BasicAgent agent, int voxel_index)
+    public void remove_agent_from_voxel(BasicAgent agent, int voxel_index)
     {
     }
-    void add_agent_to_voxel(BasicAgent agent, int voxel_index)
+    public void add_agent_to_voxel(BasicAgent agent, int voxel_index)
     {
     }
-    void update_all_cells(double dt)
+    public void update_all_cells(double dt)
     {
     }
 }

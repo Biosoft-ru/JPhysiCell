@@ -176,14 +176,14 @@ public class Microenvironment
 
     /*! The mesh for the diffusing quantities */
     public CartesianMesh mesh;
-    AgentContainer agent_container = new AgentContainer();
-    public String spatial_units;
-    public String time_units;
+    public AgentContainer agent_container = new AgentContainer();
+    public String spatialUnits;
+    public String timeUnits;
     public String name;
     //
     //        // diffusing entities 
     //        std::vector< std::string > density_names;
-    String[] density_names;
+    public String[] density_names;
     //        std::vector< std::string > density_units; 
     String[] density_units;
     //     
@@ -210,8 +210,8 @@ public class Microenvironment
 
 
         name = "unnamed";
-        spatial_units = "none";
-        time_units = "none";
+        spatialUnits = "none";
+        timeUnits = "none";
 
         bulk_source_sink_solver_setup_done = false;
         thomas_setup_done = false;
@@ -512,7 +512,7 @@ public class Microenvironment
         return mesh.nearest_voxel_index( position );
     }
 
-    public void set_density(int index, String name, String units)
+    public void setDensity(int index, String name, String units)
     {
         // fix in PhysiCell preview November 2017 
         if( index == 0 )
@@ -542,10 +542,11 @@ public class Microenvironment
     public void resize_space_uniform(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end,
             double dx_new)
     {
-        resize_space( x_start, x_end, y_start, y_end, z_start, z_end, dx_new, dx_new, dx_new );
+        resizeSpace( x_start, x_end, y_start, y_end, z_start, z_end, dx_new, dx_new, dx_new );
     }
 
-    void resize_space(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end, double x_nodes,
+	public void resizeSpace(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end,
+			double x_nodes,
             double y_nodes, double z_nodes)
     {
         //        temporary_density_vectors1.assign( mesh.voxels.size() , zero ); 
@@ -614,11 +615,11 @@ public class Microenvironment
             sb.append( "   " + density_names[i] + ":" + "\n" );
             sb.append( "     units: " + density_units[i] + "\n" );
             sb.append( "     diffusion coefficient: " + diffusion_coefficients[i] );
-            sb.append( " " + spatial_units + "^2 / " + time_units + "\n" );
+            sb.append( " " + spatialUnits + "^2 / " + timeUnits + "\n" );
             sb.append( "     decay rate: " + decay_rates[i] );
-            sb.append( " " + time_units + "^-1" + "\n" );
+            sb.append( " " + timeUnits + "^-1" + "\n" );
             sb.append( "     diffusion length scale: " + Math.sqrt( diffusion_coefficients[i] / ( 1e-12 + decay_rates[i] ) ) );
-            sb.append( " " + spatial_units + "\n" );
+            sb.append( " " + spatialUnits + "\n" );
             //            sb.append( "     initial condition: " + options.initial_condition_vector[i] );
             sb.append( " " + density_units[i] + "\n" );
             sb.append( "     boundary condition: " + options.Dirichlet_condition_vector[i] );
@@ -637,4 +638,182 @@ public class Microenvironment
 
         return sb.toString();
     }
+
+    public int find_density_index(String name)
+    {
+        for( int i = 0; i < density_names.length; i++ )
+        {
+            if( density_names[i] == name )
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void compute_all_gradient_vectors(  )
+    {
+         double two_dx = mesh.dx; 
+         double two_dy = mesh.dy; 
+         double two_dz = mesh.dz; 
+         boolean gradient_constants_defined = false; 
+        if( gradient_constants_defined == false )
+        {
+            two_dx *= 2.0; 
+            two_dy *= 2.0; 
+            two_dz *= 2.0;
+            gradient_constants_defined = true; 
+        }
+        
+//        #pragma omp parallel for 
+        for(  int k=0; k < mesh.z_coordinates.length ; k++ )
+        {
+            for(  int j=0; j < mesh.y_coordinates.length ; j++ )
+            {
+                // endcaps 
+                for(  int q=0; q < number_of_densities() ; q++ )
+                {
+                    int i = 0; 
+                    int n = voxel_index(i,j,k);
+                    // x-derivative of qth substrate at voxel n
+                    gradient_vectors[n][q][0] = p_density_vectors[n + thomas_i_jump][q];
+                    gradient_vectors[n][q][0] -= p_density_vectors[n][q];
+                    gradient_vectors[n][q][0] /= mesh.dx; 
+                    
+                    gradient_vector_computed[n] = true; 
+                }
+                for(  int q=0; q < number_of_densities() ; q++ )
+                {
+                    int i = mesh.x_coordinates.length-1; 
+                    int n = voxel_index(i,j,k);
+                    // x-derivative of qth substrate at voxel n
+                    gradient_vectors[n][q][0] = ( p_density_vectors )[n][q];
+                    gradient_vectors[n][q][0] -= ( p_density_vectors )[n - thomas_i_jump][q];
+                    gradient_vectors[n][q][0] /= mesh.dx; 
+                    
+                    gradient_vector_computed[n] = true; 
+                }
+                
+                for(  int i=1; i < mesh.x_coordinates.length-1 ; i++ )
+                {
+                    for(  int q=0; q < number_of_densities() ; q++ )
+                    {
+                        int n = voxel_index(i,j,k);
+                        // x-derivative of qth substrate at voxel n
+                        gradient_vectors[n][q][0] = ( p_density_vectors )[n + thomas_i_jump][q];
+                        gradient_vectors[n][q][0] -= ( p_density_vectors )[n - thomas_i_jump][q];
+                        gradient_vectors[n][q][0] /= two_dx; 
+                        
+                        gradient_vector_computed[n] = true; 
+                    }
+                }
+                
+            }
+        }
+        
+//        #pragma omp parallel for 
+        for(  int k=0; k < mesh.z_coordinates.length ; k++ )
+        {
+            for(  int i=0; i < mesh.x_coordinates.length ; i++ )
+            {
+                // endcaps 
+                for(  int q=0; q < number_of_densities() ; q++ )
+                {
+                    int j = 0; 
+                    int n = voxel_index(i,j,k);
+                    // x-derivative of qth substrate at voxel n
+                    gradient_vectors[n][q][1] = ( p_density_vectors )[n + thomas_j_jump][q];
+                    gradient_vectors[n][q][1] -= ( p_density_vectors )[n][q];
+                    gradient_vectors[n][q][1] /= mesh.dy; 
+                    
+                    gradient_vector_computed[n] = true; 
+                }
+                for(  int q=0; q < number_of_densities() ; q++ )
+                {
+                    int j = mesh.y_coordinates.length-1; 
+                    int n = voxel_index(i,j,k);
+                    // x-derivative of qth substrate at voxel n
+                    gradient_vectors[n][q][1] = ( p_density_vectors )[n][q];
+                    gradient_vectors[n][q][1] -= ( p_density_vectors )[n - thomas_j_jump][q];
+                    gradient_vectors[n][q][1] /= mesh.dy; 
+                    
+                    gradient_vector_computed[n] = true; 
+                }       
+                
+                for(  int j=1; j < mesh.y_coordinates.length-1 ; j++ )
+                {
+                    for(  int q=0; q < number_of_densities() ; q++ )
+                    {
+                        int n = voxel_index(i,j,k);
+                        // y-derivative of qth substrate at voxel n
+                        gradient_vectors[n][q][1] = ( p_density_vectors )[n + thomas_j_jump][q];
+                        gradient_vectors[n][q][1] -= ( p_density_vectors )[n - thomas_j_jump][q];
+                        gradient_vectors[n][q][1] /= two_dy; 
+                        gradient_vector_computed[n] = true; 
+                    }
+                }
+                
+            }
+        }
+        
+        // don't bother computing z component if there is no z-directoin 
+        if( mesh.z_coordinates.length == 1 )
+        { return; }
+
+//        #pragma omp parallel for 
+        for(  int j=0; j < mesh.y_coordinates.length ; j++ )
+        {
+            for(  int i=0; i < mesh.x_coordinates.length ; i++ )
+            {
+                // endcaps 
+                for(  int q=0; q < number_of_densities() ; q++ )
+                {
+                    int k = 0; 
+                    int n = voxel_index(i,j,k);
+                    // x-derivative of qth substrate at voxel n
+                    gradient_vectors[n][q][2] = ( p_density_vectors )[n + thomas_k_jump][q];
+                    gradient_vectors[n][q][2] -= ( p_density_vectors )[n][q];
+                    gradient_vectors[n][q][2] /= mesh.dz; 
+                    
+                    gradient_vector_computed[n] = true; 
+                }
+                for(  int q=0; q < number_of_densities() ; q++ )
+                {
+                    int k = mesh.z_coordinates.length-1; 
+                    int n = voxel_index(i,j,k);
+                    // x-derivative of qth substrate at voxel n
+                    gradient_vectors[n][q][2] = ( p_density_vectors )[n][q];
+                    gradient_vectors[n][q][2] -= ( p_density_vectors )[n - thomas_k_jump][q];
+                    gradient_vectors[n][q][2] /= mesh.dz; 
+                    
+                    gradient_vector_computed[n] = true; 
+                }           
+                
+                for(  int k=1; k < mesh.z_coordinates.length-1 ; k++ )
+                {
+                    for(  int q=0; q < number_of_densities() ; q++ )
+                    {
+                        int n = voxel_index(i,j,k);
+                        // y-derivative of qth substrate at voxel n
+                        gradient_vectors[n][q][2] = ( p_density_vectors )[n + thomas_k_jump][q];
+                        gradient_vectors[n][q][2] -= ( p_density_vectors )[n - thomas_k_jump][q];
+                        gradient_vectors[n][q][2] /= two_dz; 
+                        gradient_vector_computed[n] = true; 
+                    }
+                }
+                
+            }
+        }
+    }
+
+    public double[] nearest_density_vector(double[] position)
+    {
+        return ( p_density_vectors )[mesh.nearest_voxel_index( position )];
+    }
+
+    public double[] nearest_density_vector(int voxel_index)
+    {
+        return ( p_density_vectors )[voxel_index];
+    }
+
 }
