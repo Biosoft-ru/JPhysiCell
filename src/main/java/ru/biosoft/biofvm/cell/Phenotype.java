@@ -1,5 +1,7 @@
 package ru.biosoft.biofvm.cell;
 
+import ru.biosoft.biofvm.Microenvironment;
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -71,7 +73,7 @@ public class Phenotype implements Cloneable
     boolean flagged_for_division;
     boolean flagged_for_removal;
 
-    public Cycle cycle = new Cycle();
+    public CycleModel cycle = new CycleModel();
     public Death death = new Death();
     public Volume volume = new Volume();
     public Geometry geometry = new Geometry();
@@ -86,9 +88,29 @@ public class Phenotype implements Cloneable
     // then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
     public Intracellular intracellular = new Intracellular();
 
-    public void sync_to_functions(CellFunctions functions)
+    public void sync(CellFunctions functions)
     {
-        cycle.sync_to_cycle_model( functions.cycle_model );
+        cycle = functions.cycleModel;
+    }
+
+    /**
+     * Synchronize all parts with microenvironment (densities)  
+     */
+    public void sync(Microenvironment m)
+    {
+        motility.sync( m );
+        secretion.sync( m );
+        molecular.sync( m );
+    }
+
+    /**
+     * Synchronize all parts with Cell Definitions  
+     */
+    public void sync()
+    {
+        cell_interactions.sync_to_cell_definitions();
+        cell_transformations.sync_to_cell_definitions();
+        mechanics.sync_to_cell_definitions();
     }
 
     public Phenotype()
@@ -108,14 +130,14 @@ public class Phenotype implements Cloneable
         result.flagged_for_removal = flagged_for_removal;
         result.cycle = cycle.clone();
         result.death = death.clone();
-        result.volume = volume.clone();//
-        result.geometry = geometry.clone();//
-        result.mechanics = mechanics.clone();//
-        result.motility = motility.clone();//
-        result.secretion = secretion.clone();//
-        result.molecular = molecular.clone();//
-        result.cell_interactions = cell_interactions.clone();//
-        result.cell_transformations = cell_transformations.clone();//
+        result.volume = volume.clone();
+        result.geometry = geometry.clone();
+        result.mechanics = mechanics.clone();
+        result.motility = motility.clone();
+        result.secretion = secretion.clone();
+        result.molecular = molecular.clone();
+        result.cell_interactions = cell_interactions.clone();
+        result.cell_transformations = cell_transformations.clone();
         if( intracellular != null )
         result.intracellular = intracellular.clone();//
         //        flagged_for_division = p.flagged_for_division;

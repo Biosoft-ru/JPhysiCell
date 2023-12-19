@@ -1,10 +1,5 @@
 package ru.biosoft.biofvm.cell;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import ru.biosoft.biofvm.BasicAgent;
 import ru.biosoft.biofvm.Microenvironment;
 import ru.biosoft.biofvm.VectorUtil;
@@ -78,56 +73,53 @@ import ru.biosoft.biofvm.cell.CellFunctions.instantiate_cell;
 */
 public class Cell extends BasicAgent
 {
-    public static Map<String, Integer> cell_definition_indices_by_name = new HashMap<>();
-    public static Map<Integer, Integer> cell_definition_indices_by_type = new HashMap<>();
-    public static List<CellDefinition> cell_definitions_by_index = new ArrayList<>();
-    public static Map<Integer, CellDefinition> cell_definitions_by_type = new HashMap<>();
-
     CellContainer container;
-    int current_mechanics_voxel_index;
+    int currentMechanicsVoxelIndex;
     int updated_current_mechanics_voxel_index; // keeps the updated voxel index for later adjusting of current voxel index
 
     String type_name;
 
+    CellDefinition definition;
     CustomCellData custom_data;// = new CustomCellData();
     CellParameters parameters;// = new CellParameters();
-    CellFunctions functions;// = new CellFunctions();
+    public CellFunctions functions;// = new CellFunctions();
 
     CellState state = new CellState();
     public Phenotype phenotype;// = new Phenotype();
-    public boolean is_out_of_domain;
-    boolean is_movable;
+    public boolean isOutOfDomain;
+    boolean isMovable;
     double[] displacement; // this should be moved to state, or made private
 
-    public Cell()
+    public Cell(CellDefinition cd, Microenvironment m)
     {
-        // use the cell defaults; 
-        type = StandardModels.cellDefaults.type;
-        type_name = StandardModels.cellDefaults.name;
-        custom_data = StandardModels.cellDefaults.custom_data;
-        parameters = StandardModels.cellDefaults.parameters.clone();
-        functions = StandardModels.cellDefaults.functions;
-        phenotype = StandardModels.cellDefaults.phenotype.clone();
-        phenotype.molecular.sync_to_cell( this );
-
+        super( m );
+        type = cd.type;
+        type_name = cd.name;
+        custom_data = cd.custom_data;
+        parameters = cd.parameters.clone();
+        functions = cd.functions;
+        phenotype = cd.phenotype.clone();
+        phenotype.molecular.sync( this );
+        phenotype.cycle = functions.cycleModel.clone();
+        this.definition = cd;
         // cell state should be fine by the default constructor 
-        current_mechanics_voxel_index = -1;
+        currentMechanicsVoxelIndex = -1;
         updated_current_mechanics_voxel_index = 0;
 
-        is_movable = true;
-        is_out_of_domain = false;
-        displacement = new double[3];//.resize( 3, 0.0 ); // state? 
+        isMovable = true;
+        isOutOfDomain = false;
+        displacement = new double[3];// state? 
 
         assign_orientation();
         container = null;
-        set_total_volume( phenotype.volume.total );
+        setTotalVolume( phenotype.volume.total );
     }
 
     @Override
     public CellContainer get_container()
     {
         if( container == null )
-            container = (CellContainer)getMicroenvironment().agent_container;
+            container = (CellContainer)getMicroenvironment().agentContainer;
         return container;
     }
 
@@ -142,9 +134,9 @@ public class Cell extends BasicAgent
     }
 
     @Override
-    public void set_total_volume(double volume)
+    public void setTotalVolume(double volume)
     {
-        super.set_total_volume( volume );
+        super.setTotalVolume( volume );
 
         // If the new volume is significantly different than the 
         // current total volume, adjust all the sub-volumes 
@@ -219,26 +211,22 @@ public class Cell extends BasicAgent
     @Override
     public int get_current_mechanics_voxel_index()
     {
-        return current_mechanics_voxel_index;
+        return currentMechanicsVoxelIndex;
     }
 
-    public static Cell createCell()
+    public static Cell createCell(CellDefinition cd, Microenvironment m, double[] position)
     {
-        return createCell( null );
+        return createCell( null, cd, m, position );
     }
 
-    public static Cell createCell(instantiate_cell custom_instantiate)
+    public static Cell createCell(instantiate_cell custom_instantiate, CellDefinition cd, Microenvironment m, double[] position)
     {
-        Cell pNew = custom_instantiate == null ? new Cell() : custom_instantiate.execute();
-        BasicAgent.allBasicAgents.add( pNew );
-        pNew.index = BasicAgent.allBasicAgents.size() - 1;
-        // new usability enhancements in May 2017 
-        if( Microenvironment.get_default_microenvironment() != null )
-            pNew.registerMicroenvironment( Microenvironment.get_default_microenvironment() );
-
-        // All the phenotype and other data structures are already set 
-        // by virtue of the default Cell constructor. 
-        pNew.set_total_volume( pNew.phenotype.volume.total );
+        Cell pNew = custom_instantiate == null ? new Cell( cd, m ) : custom_instantiate.execute();
+        pNew.index = m.getAgentsCount();
+        pNew.registerMicroenvironment( m );
+        // All the phenotype and other data structures are already set by virtue of the default Cell constructor. 
+        pNew.setTotalVolume( pNew.phenotype.volume.total );
+        pNew.assignPosition( position );
         return pNew;
     }
 
@@ -269,7 +257,7 @@ public class Cell extends BasicAgent
 
         // new AUgust 2017
         //        if( MicroenvironmentOptions.default_microenvironment_options.simulate_2D == true )
-        if( Microenvironment.get_default_microenvironment().options.simulate_2D )
+        if( microenvironment.options.simulate_2D )
         {
             velocity[2] = 0.0;
         }
@@ -282,7 +270,7 @@ public class Cell extends BasicAgent
         // if(sqrt(dist(old_position, position))>3* phenotype.geometry.radius)
         // std::cout<<sqrt(dist(old_position, position))<<"old_position: "<<old_position<<", new position: "<< position<<", velocity: "<<velocity<<", previous_velocity: "<< previous_velocity<<std::endl;
 
-        previous_velocity = velocity;
+        previous_velocity = velocity.clone();
 
         velocity[0] = 0;
         velocity[1] = 0;
@@ -295,52 +283,48 @@ public class Cell extends BasicAgent
         {
             updated_current_mechanics_voxel_index = -1;
 
-            is_out_of_domain = true;
+            isOutOfDomain = true;
             isActive = false;
-            is_movable = false;
+            isMovable = false;
         }
         return;
     }
 
-    void delete_cell(int index)
+    public static void delete_cell(Cell cell)
     {
         //  std::cout << __FUNCTION__ << " " << (*all_cells)[index] 
         //  << " " << (*all_cells)[index]->type_name << std::endl; 
 
-        Cell pDeleteMe = (Cell)BasicAgent.allBasicAgents.get( index );
+        //        Cell pDeleteMe = (Cell)BasicAgent.allBasicAgents.get( index );
         //        System.out.println( "Died " );
         // release any attached cells (as of 1.7.2 release)
-        pDeleteMe.remove_all_attached_cells();
+        cell.remove_all_attached_cells();
         // 1.11.0 
-        pDeleteMe.remove_all_spring_attachments();
+        cell.remove_all_spring_attachments();
 
         // released internalized substrates (as of 1.5.x releases)
-        pDeleteMe.release_internalized_substrates();
+        cell.release_internalized_substrates();
 
         // performance goal: don't delete in the middle -- very expensive reallocation
         // alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
 
         // move last item to index location 
         //        BasicAgent.allBasicAgents.remove( index );
-        BasicAgent last = BasicAgent.allBasicAgents.get( BasicAgent.allBasicAgents.size() - 1 );
-        last.index = index;
-        BasicAgent.allBasicAgents.set( index, last );
-        BasicAgent.allBasicAgents.remove( BasicAgent.allBasicAgents.size() - 1 );
+
+        //        BasicAgent last = BasicAgent.allBasicAgents.get( BasicAgent.allBasicAgents.size() - 1 );
+        //        last.index = index;
+        //        BasicAgent.allBasicAgents.set( index, last );
+        //        BasicAgent.allBasicAgents.remove( BasicAgent.allBasicAgents.size() - 1 );
         //        (*all_cells)[ (*all_cells).size()-1 ]->index=index;
         //        (*all_cells)[index] = (*all_cells)[ (*all_cells).size()-1 ];
         //        // shrink the vector
         //        (*all_cells).pop_back();    
 
         // deregister agent in from the agent container
-        pDeleteMe.get_container().remove_agent( pDeleteMe );
+        cell.getMicroenvironment().removeAgent( cell );
+        cell.get_container().remove_agent( cell );
         // de-allocate (delete) the cell; 
         //        delete pDeleteMe; 
-    }
-
-    void delete_cell(Cell pDelete)
-    {
-        delete_cell( pDelete.index );
-        return;
     }
 
     public Cell divide()
@@ -370,16 +354,6 @@ public class Cell extends BasicAgent
                 VectorUtil.prod( custom_data.vector_variables.get( nn ).value, 0.5 );
             }
         }
-
-        Cell child = createCell( functions.instantiate_cell );
-        child.copy_data( this );
-        child.copy_function_pointers( this );
-        child.parameters = parameters;
-
-        // evenly divide internalized substrates 
-        // if these are not actively tracked, they are zero anyway 
-        VectorUtil.prod( internalizedSubstrates, 0.5 );
-        child.internalizedSubstrates = internalizedSubstrates.clone();
 
         // The following is already performed by create_cell(). JULY 2017 ***
         // child->register_microenvironment( get_microenvironment() );
@@ -422,8 +396,16 @@ public class Cell extends BasicAgent
         //            rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;   
         //        rand_vec *= phenotype.geometry.radius;
         VectorUtil.prod( rand_vec, phenotype.geometry.radius );
+        double[] pos = VectorUtil.newSum( position, rand_vec );
+        Cell child = createCell( functions.instantiate_cell, definition, microenvironment, pos );
+        child.copy_data( this );
+        child.copy_function_pointers( this );
+        child.parameters = parameters;
 
-        child.assignPosition( position[0] + rand_vec[0], position[1] + rand_vec[1], position[2] + rand_vec[2] );
+        // evenly divide internalized substrates 
+        // if these are not actively tracked, they are zero anyway 
+        VectorUtil.prod( internalizedSubstrates, 0.5 );
+        child.internalizedSubstrates = internalizedSubstrates.clone();
 
         //change my position to keep the center of mass intact 
         // and then see if I need to update my voxel index
@@ -434,16 +416,16 @@ public class Cell extends BasicAgent
         //(If the child cell is outside of the boundaries, that has been taken care of in the assign_position function.)
         if( !get_container().underlying_mesh.isPositionValid( position[0], position[1], position[2] ) )
         {
-            is_out_of_domain = true;
+            isOutOfDomain = true;
             isActive = false;
-            is_movable = false;
+            isMovable = false;
         }
 
         update_voxel_in_container();
         phenotype.volume.divide();
         child.phenotype.volume.divide();
-        child.set_total_volume( child.phenotype.volume.total );//TODO: check
-        set_total_volume( phenotype.volume.total );
+        child.setTotalVolume( child.phenotype.volume.total );//TODO: check
+        setTotalVolume( phenotype.volume.total );
         child.phenotype = phenotype.clone();
 
         if( child.phenotype.intracellular != null )
@@ -633,8 +615,8 @@ public class Cell extends BasicAgent
                 get_container().add_agent_to_outer_voxel( this );
             }
             // std::cout<<"cell out of boundary..."<< __LINE__<<" "<<ID<<std::endl;
-            current_mechanics_voxel_index = -1;
-            is_out_of_domain = true;
+            currentMechanicsVoxelIndex = -1;
+            isOutOfDomain = true;
             isActive = false;
             return;
         }
@@ -649,7 +631,7 @@ public class Cell extends BasicAgent
                 container.remove_agent_from_voxel( this, get_current_mechanics_voxel_index() );
                 container.add_agent_to_voxel( this, updated_current_mechanics_voxel_index );
             }
-            current_mechanics_voxel_index = updated_current_mechanics_voxel_index;
+            currentMechanicsVoxelIndex = updated_current_mechanics_voxel_index;
         }
     }
 
@@ -659,7 +641,7 @@ public class Cell extends BasicAgent
         return assignPosition( new_position[0], new_position[1], new_position[2] );
     }
 
-    void setPrevious_velocity(double xV, double yV, double zV)
+    public void setPreviousVelocity(double xV, double yV, double zV)
     {
         previous_velocity[0] = xV;
         previous_velocity[1] = yV;
@@ -676,7 +658,7 @@ public class Cell extends BasicAgent
         // update microenvironment current voxel index
         updateVoxelIndex();
         // update current_mechanics_voxel_index
-        current_mechanics_voxel_index = get_container().underlying_mesh.nearest_voxel_index( position );
+        currentMechanicsVoxelIndex = get_container().underlying_mesh.nearest_voxel_index( position );
 
         // Since it is most likely our first position, we update the max_cell_interactive_distance_in_voxel
         // which was not initialized at cell creation
@@ -692,9 +674,9 @@ public class Cell extends BasicAgent
 
         if( !get_container().underlying_mesh.isPositionValid( x, y, z ) )
         {
-            is_out_of_domain = true;
+            isOutOfDomain = true;
             isActive = false;
-            is_movable = false;
+            isMovable = false;
             return false;
         }
         return true;
@@ -705,7 +687,7 @@ public class Cell extends BasicAgent
         // set the death data struture to the indicated death model 
         phenotype.death.trigger_death( death_model_index );
         // change the cycle model to the current death model 
-        phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() );
+        phenotype.cycle = phenotype.death.current_model();
 
         // turn off secretion, and reduce uptake by a factor of 10 
         phenotype.secretion.set_all_secretion_to_zero();
@@ -717,16 +699,15 @@ public class Cell extends BasicAgent
         functions.update_migration_bias = null;
 
         // make sure to run the death entry function 
-        if( phenotype.cycle.current_phase().entryFunction != null )
+        if( phenotype.cycle.data.currentPhase().entryFunction != null )
         {
-            phenotype.cycle.current_phase().entryFunction.execute( this, phenotype, 0.0 );
+            phenotype.cycle.data.currentPhase().entryFunction.execute( this, phenotype, 0.0 );
         }
     }
 
-    void add_potentials(Cell other_agent)
+    void add_potentials(Cell other)
     {
-        // if( this->ID == other_agent->ID )
-        if( this == other_agent )
+        if( this.ID == other.ID )
             return;
 
         /*
@@ -738,26 +719,22 @@ public class Cell extends BasicAgent
         // 12 uniform neighbors at a close packing distance, after dividing out all constants
         double simple_pressure_scale = 0.027288820670331; // 12 * (1 - sqrt(pi/(2*sqrt(3))))^2 
         // 9.820170012151277; // 12 * ( 1 - sqrt(2*pi/sqrt(3)))^2
-
         double distance = 0;
         for( int i = 0; i < 3; i++ )
         {
-            displacement[i] = position[i] - ( other_agent ).position[i];
+            displacement[i] = position[i] - other.position[i];
             distance += displacement[i] * displacement[i];
         }
         // Make sure that the distance is not zero
 
         distance = Math.max( Math.sqrt( distance ), 0.00001 );
-
+        //        double distance = Math.max( VectorUtil.dist( position, other.position ), 0.00001 );
         //Repulsive
-        double R = phenotype.geometry.radius + ( other_agent ).phenotype.geometry.radius;
-
-        double RN = phenotype.geometry.nuclear_radius + ( other_agent ).phenotype.geometry.nuclear_radius;
-        double temp_r, c;
+        double R = phenotype.geometry.radius + other.phenotype.geometry.radius;
+        //        double RN = phenotype.geometry.nuclear_radius + other.phenotype.geometry.nuclear_radius;
+        double temp_r;
         if( distance > R )
-        {
             temp_r = 0;
-        }
         // else if( distance < RN ) 
         // {
         // double M = 1.0; 
@@ -774,89 +751,49 @@ public class Cell extends BasicAgent
             state.simple_pressure += ( temp_r / simple_pressure_scale ); // New July 2017 
         }
 
+        Mechanics m1 = phenotype.mechanics;
+        Mechanics m2 = other.phenotype.mechanics;
         // August 2017 - back to the original if both have same coefficient 
-
-        double effective_repulsion = Math
-                .sqrt( phenotype.mechanics.cell_cell_repulsion_strength * other_agent.phenotype.mechanics.cell_cell_repulsion_strength );
+        double effective_repulsion = Math.sqrt( m1.cell_cell_repulsion_strength * m2.cell_cell_repulsion_strength );
         temp_r *= effective_repulsion;
 
-        // temp_r *= phenotype.mechanics.cell_cell_repulsion_strength; // original 
-        //////////////////////////////////////////////////////////////////
-
         // Adhesive
-        //double max_interactive_distance = parameters.max_interaction_distance_factor * phenotype.geometry.radius + 
-        //  (*other_agent).parameters.max_interaction_distance_factor * (*other_agent).phenotype.geometry.radius;
-
-        double max_interactive_distance = phenotype.mechanics.relative_maximum_adhesion_distance * phenotype.geometry.radius
-                + ( other_agent ).phenotype.mechanics.relative_maximum_adhesion_distance * ( other_agent ).phenotype.geometry.radius;
+        double max_interactive_distance = m1.relative_maximum_adhesion_distance * phenotype.geometry.radius
+                + m2.relative_maximum_adhesion_distance * other.phenotype.geometry.radius;
 
         if( distance < max_interactive_distance )
         {
             // double temp_a = 1 - distance/max_interactive_distance; 
-            double temp_a = -distance; // -d
-            temp_a /= max_interactive_distance; // -d/S
-            temp_a += 1.0; // 1 - d/S 
+            //            double temp_a = -distance; // -d
+            //            temp_a /= max_interactive_distance; // -d/S
+            //            temp_a += 1.0; // 1 - d/S
+            double temp_a = 1 - distance / max_interactive_distance;
             temp_a *= temp_a; // (1-d/S)^2 
             // temp_a *= phenotype.mechanics.cell_cell_adhesion_strength; // original 
 
             // August 2017 - back to the original if both have same coefficient 
-            // May 2022 - back to oriinal if both affinities are 1
-            int ii = find_cell_definition_index( this.type );
-            int jj = find_cell_definition_index( other_agent.type );
+            // May 2022 - back to original if both affinities are 1
+            int ii = type;//CellDefinition.getCellDefinition( type ).;
+            int jj = other.type;//find_cell_definition_index( other.type );
 
-            double adhesion_ii = phenotype.mechanics.cell_cell_adhesion_strength * phenotype.mechanics.cell_adhesion_affinities[jj];
-            double adhesion_jj = other_agent.phenotype.mechanics.cell_cell_adhesion_strength
-                    * other_agent.phenotype.mechanics.cell_adhesion_affinities[ii];
+            double adhesion_ii = m1.cell_cell_adhesion_strength * m1.cell_adhesion_affinities[jj];
+            double adhesion_jj = m2.cell_cell_adhesion_strength * m2.cell_adhesion_affinities[ii];
 
             // double effective_adhesion = sqrt( phenotype.mechanics.cell_cell_adhesion_strength * other_agent->phenotype.mechanics.cell_cell_adhesion_strength ); 
             double effective_adhesion = Math.sqrt( adhesion_ii * adhesion_jj );
             temp_a *= effective_adhesion;
-
             temp_r -= temp_a;
-
-            state.neighbors.add( other_agent );
-            //            state.neighbors.push_back(other_agent); // move here in 1.10.2 so non-adhesive cells also added. 
+            state.neighbors.add( other );// move here in 1.10.2 so non-adhesive cells also added. 
+            //            state.neighbors.push_back(other_agent); 
         }
-        /////////////////////////////////////////////////////////////////
         if( Math.abs( temp_r ) < 1e-16 )
             return;
-
         temp_r /= distance;
-        // for( int i = 0 ; i < 3 ; i++ ) 
-        // {
-        //  velocity[i] += displacement[i] * temp_r; 
-        // }
         VectorUtil.axpy( velocity, temp_r, displacement );
-        // state.neighbors.push_back(other_agent); // new 1.8.0
     }
 
-    int find_cell_definition_index(String search_string)
-    {
-        Integer result = cell_definition_indices_by_name.get( search_string );
-        return result != null ? result : -1;
-        //        auto search = cell_definition_indices_by_name.find( search_string );
-        //        // safety first! 
-        //        if( search != cell_definition_indices_by_name.end() )
-        //        {
-        //            // if the target is found, set the appropriate rate 
-        //            return search -> second;
-        //        }
-        //        return -1;
-    }
 
-    public static int find_cell_definition_index(int search_type)
-    {
-        Integer result = cell_definition_indices_by_type.get( search_type );
-        return result != null ? result : -1;
-        //        auto search = cell_definition_indices_by_type.find( search_type );
-        //        // safety first! 
-        //        if( search != cell_definition_indices_by_type.end() )
-        //        {
-        //            // if the target is found, set the appropriate rate 
-        //            return search -> second;
-        //        }
-        //        return -1;
-    }
+
 
     public void update_motility_vector(double dt_)
     {
@@ -1027,10 +964,10 @@ public class Cell extends BasicAgent
             pCell_to_eat.functions.contact_function = null;
 
             // should set volume fuction to NULL too! 
-            pCell_to_eat.functions.volume_update_function = null;
+            pCell_to_eat.functions.updateVolume = null;
 
             // set cell as unmovable and non-secreting 
-            pCell_to_eat.is_movable = false;
+            pCell_to_eat.isMovable = false;
             pCell_to_eat.isActive = false;
 
             // absorb all the volume(s)
@@ -1070,8 +1007,8 @@ public class Cell extends BasicAgent
             phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / ( phenotype.volume.nuclear_solid + 1e-16 );
 
             // update corresponding BioFVM parameters (self-consistency) 
-            set_total_volume( phenotype.volume.total );
-            pCell_to_eat.set_total_volume( 0.0 );
+            setTotalVolume( phenotype.volume.total );
+            pCell_to_eat.setTotalVolume( 0.0 );
 
             // absorb the internalized substrates 
 
@@ -1156,20 +1093,20 @@ public class Cell extends BasicAgent
             //            new_position /= total_volume; // (vol_B*x_B+vol_S*x_S)/(vol_B+vol_S);
             VectorUtil.div( new_position, total_volume );
 
-            double xL = Microenvironment.get_default_microenvironment().mesh.bounding_box[0];
-            double xU = Microenvironment.get_default_microenvironment().mesh.bounding_box[3];
+            double xL = microenvironment.mesh.boundingBox[0];
+            double xU = microenvironment.mesh.boundingBox[3];
 
-            double yL = Microenvironment.get_default_microenvironment().mesh.bounding_box[1];
-            double yU = Microenvironment.get_default_microenvironment().mesh.bounding_box[4];
+            double yL = microenvironment.mesh.boundingBox[1];
+            double yU = microenvironment.mesh.boundingBox[4];
 
-            double zL = Microenvironment.get_default_microenvironment().mesh.bounding_box[2];
-            double zU = Microenvironment.get_default_microenvironment().mesh.bounding_box[5];
+            double zL = microenvironment.mesh.boundingBox[2];
+            double zU = microenvironment.mesh.boundingBox[5];
 
             if( new_position[0] < xL || new_position[0] > xU || new_position[1] < yL || new_position[1] > yU || new_position[2] < zL
                     || new_position[2] > zU )
             {
                 System.out.println( "cell fusion at " + new_position + " violates domain bounds" );
-                System.out.println( Microenvironment.get_default_microenvironment().mesh.bounding_box );
+                System.out.println( microenvironment.mesh.boundingBox );
                 //                std::cout << "cell fusion at " << new_position << " violates domain bounds" << std::endl; 
                 //                std::cout << get_default_microenvironment().mesh.bounding_box << std::endl << std::endl; 
             }
@@ -1219,8 +1156,8 @@ public class Cell extends BasicAgent
             phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / ( phenotype.volume.nuclear_solid + 1e-16 );
 
             // update corresponding BioFVM parameters (self-consistency) 
-            set_total_volume( phenotype.volume.total );
-            pCell_to_fuse.set_total_volume( 0.0 );
+            setTotalVolume( phenotype.volume.total );
+            pCell_to_fuse.setTotalVolume( 0.0 );
 
             // absorb the internalized substrates 
 
@@ -1249,13 +1186,13 @@ public class Cell extends BasicAgent
             pCell_to_fuse.functions.custom_cell_rule = null;
             pCell_to_fuse.functions.updatePhenotype = null;
             pCell_to_fuse.functions.contact_function = null;
-            pCell_to_fuse.functions.volume_update_function = null;
+            pCell_to_fuse.functions.updateVolume = null;
 
             // remove all adhesions 
             // pCell_to_eat.remove_all_attached_cells();
 
             // set cell as unmovable and non-secreting 
-            pCell_to_fuse.is_movable = false;
+            pCell_to_fuse.isMovable = false;
             pCell_to_fuse.isActive = false;
 
         }
@@ -1271,20 +1208,15 @@ public class Cell extends BasicAgent
         // use the cell defaults; 
         type = cd.type;
         type_name = cd.name;
-
         custom_data = cd.custom_data;
         parameters = cd.parameters;
         functions = cd.functions;
-
         phenotype = cd.phenotype;
         // is_movable = true;
         // is_out_of_domain = false;
-
         // displacement.resize(3,0.0); // state? 
-
         assign_orientation();
-
-        set_total_volume( phenotype.volume.total );
+        setTotalVolume( phenotype.volume.total );
     }
 
     public void advance_bundled_phenotype_functions(double dt_)
@@ -1327,24 +1259,24 @@ public class Cell extends BasicAgent
         }
 
         // update volume 
-        if( functions.volume_update_function != null )
+        if( functions.updateVolume != null )
         {
-            functions.volume_update_function.execute( this, phenotype, dt_ );
+            functions.updateVolume.execute( this, phenotype, dt_ );
 
             // The following line is needed in every volume 
             // regulation method (it sets BioFVM total_volume)
 
-            set_total_volume( phenotype.volume.total );
+            setTotalVolume( phenotype.volume.total );
         }
 
         // update geometry
         phenotype.geometry.update( this, phenotype, dt_ );
 
         // check for new death events 
-        if( phenotype.death.check_for_death( dt_ ) == true )
+        if( phenotype.death.check_for_death( dt_ ) )
         {
             // if so, change the cycle model to the current death model 
-            phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() );
+            phenotype.cycle = phenotype.death.current_model();
 
             // also, turn off motility.
 
@@ -1357,14 +1289,14 @@ public class Cell extends BasicAgent
             phenotype.secretion.scale_all_uptake_by_factor( 0.10 );
 
             // make sure to run the death entry function 
-            if( phenotype.cycle.current_phase().entryFunction != null )
+            if( phenotype.cycle.currentPhase().entryFunction != null )
             {
-                phenotype.cycle.current_phase().entryFunction.execute( this, phenotype, dt_ );
+                phenotype.cycle.currentPhase().entryFunction.execute( this, phenotype, dt_ );
             }
         }
 
         // advance cycle model (for both cell cycle and death cycle models)
-        phenotype.cycle.advance_cycle( this, phenotype, dt_ );
+        phenotype.cycle.advance( this, phenotype, dt_ );
         if( phenotype.flagged_for_removal )
         {
             flag_for_removal();
@@ -1382,4 +1314,31 @@ public class Cell extends BasicAgent
     {
         return this.phenotype.geometry.radius;
     }
+
+    //TODO: move somewhere else
+    static boolean cell_definitions_by_name_constructed = false;
+
+    //    public static void build_cell_definitions_maps()
+    //    {
+    //        cell_definitions_by_name.clear();
+    //        cell_definitions_by_type.clear();
+    //        cell_definition_indices_by_name.clear();
+    //        cell_definition_indices_by_type.clear();
+    //        for( int n = 0; n < cell_definitions_by_index.size(); n++ )
+    //        {
+    //            CellDefinition pCD = cell_definitions_by_index.get( n );
+    //            cell_definitions_by_name.put( pCD.name, pCD );
+    //            cell_definitions_by_type.put( pCD.type, pCD );
+    //            cell_definition_indices_by_name.put( pCD.name, n );// = n;
+    //            cell_definition_indices_by_type.put( pCD.type, n );
+    //        }
+    //        cell_definitions_by_name_constructed = true;
+    //    }
+
+    @Deprecated
+    public double get_total_volume()
+    {
+        return phenotype.volume.total;
+    }
+
 }

@@ -96,45 +96,30 @@ public class Motility implements Cloneable
 
     public Motility()
     {
-        is_motile = false; 
-        
+        is_motile = false;
+
         persistence_time = 1.0;
         migration_speed = 1.0;
-        
-        migration_bias_direction = new double[3];//.resize( 3 , 0.0 ); 
-        migration_bias = 0.0; 
-            
-        restrict_to_2D = false; 
-        
+
+        migration_bias_direction = new double[3];
+        migration_bias = 0.0;
+
+        restrict_to_2D = false;
+
         // update_migration_bias_direction = NULL; 
-        
-        motility_vector = new double[3];//.resize( 3 , 0.0 ); 
-        
-        chemotaxis_index = 0; 
-        chemotaxis_direction = 1; 
-        
-        sync_to_current_microenvironment(); 
-        
-        return; 
+
+        motility_vector = new double[3];
+
+        chemotaxis_index = 0;
+        chemotaxis_direction = 1;
     }
 
-    void sync_to_current_microenvironment(  )
-    {
-        Microenvironment pMicroenvironment = Microenvironment.get_default_microenvironment(); 
-        if( pMicroenvironment != null )
-        { sync_to_microenvironment( pMicroenvironment ); } 
-        else
-        { 
-            chemotactic_sensitivities = VectorUtil.resize(chemotactic_sensitivities, 1, 0);
-        }
-//            chemotactic_sensitivities.resize( 1 , 0.0 ); }
-    }
 
-    void sync_to_microenvironment( Microenvironment pNew_Microenvironment )
+    void sync(Microenvironment m)
     {
-        chemotactic_sensitivities = VectorUtil.resize( chemotactic_sensitivities, pNew_Microenvironment.number_of_densities(), 0 );
+        chemotactic_sensitivities = VectorUtil.resize( chemotactic_sensitivities, m.number_of_densities(), 0 );
         //        chemotactic_sensitivities.resize( pNew_Microenvironment.number_of_densities() , 0.0 ); 
-        return; 
+        return;
     }
 
     //double is ref

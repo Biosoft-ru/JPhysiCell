@@ -475,6 +475,11 @@ public class VectorUtil
         return Math.sqrt( norm_squared( v ) );
     }
 
+    public static double dist(double[] p1, double[] p2)
+    {
+        return VectorUtil.norm( VectorUtil.newDiff( p1, p2 ) );
+    }
+
     //
     //double maxabs( const std::vector<double>& v )
     //{

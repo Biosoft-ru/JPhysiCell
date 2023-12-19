@@ -72,7 +72,6 @@ import ru.biosoft.biofvm.cell.CellFunctions.update_phenotype;
 */
 public class StandardModels
 {
-    public static CellDefinition cellDefaults = new CellDefinition();
     static boolean PhysiCell_standard_models_initialized = false;
     static boolean PhysiCell_standard_death_models_initialized = false;
     static boolean PhysiCell_standard_cycle_models_initialized = false;
@@ -88,62 +87,48 @@ public class StandardModels
     static DeathParameters necrosis_parameters = new DeathParameters();
 
     // new cycle models:
-
     static CycleModel flow_cytometry_cycle_model = new CycleModel();
     static CycleModel flow_cytometry_separated_cycle_model = new CycleModel();
 
-    public static void initialize_default_cell_definition() throws Exception
+    public static CellDefinition createDefaultCellDefinition(String name, Microenvironment m) throws Exception
     {
-        // If the standard models have not yet been created, do so now. 
-        create_standard_cycle_and_death_models();
+        CellDefinition result = new CellDefinition( m, name );
+        create_standard_cycle_and_death_models(); // If the standard models have not yet been created, do so now. 
 
-        // set the microenvironment pointer 
-        //        cell_defaults.pMicroenvironment = null;
-        //        if( BioFVM::get_default_microenvironment() != NULL )
-        cellDefaults.pMicroenvironment = Microenvironment.get_default_microenvironment();
-
-        // make sure phenotype.secretions are correctly sized 
-        cellDefaults.phenotype.secretion.sync_to_current_microenvironment();
-
-        // set up the default parameters 
-        cellDefaults.type = 0;
-        cellDefaults.name = "breast epithelium";
-        cellDefaults.parameters.pReference_live_phenotype = ( cellDefaults.phenotype );
+        result.parameters.pReference_live_phenotype = result.phenotype;
 
         // set up the default custom data 
         // the default Custom_Cell_Data constructor should take care of this
 
         // set up the default functions 
-        cellDefaults.functions.cycle_model = Ki67_advanced;
-        cellDefaults.functions.volume_update_function = new standard_volume_update_function();
-        cellDefaults.functions.update_migration_bias = null;
-        cellDefaults.functions.updatePhenotype = new update_cell_and_death_parameters_O2_based(); // NULL; 
-        cellDefaults.functions.custom_cell_rule = null;
-        cellDefaults.functions.updateVelocity = new standard_update_cell_velocity();
-        cellDefaults.functions.add_cell_basement_membrane_interactions = null;
-        cellDefaults.functions.calculate_distance_to_membrane = null;
-        cellDefaults.functions.set_orientation = null;
+        result.functions.cycleModel = Ki67_advanced;
+        result.functions.updateVolume = new standard_volume_update_function();
+        //        result.functions.update_migration_bias = null;
+        result.functions.updatePhenotype = new update_cell_and_death_parameters_O2_based();
+        //        result.functions.custom_cell_rule = null;
+        result.functions.updateVelocity = new standard_update_cell_velocity();
+        //        result.functions.add_cell_basement_membrane_interactions = null;
+        //        result.functions.calculate_distance_to_membrane = null;
+        //        result.functions.set_orientation = null;
         //        cell_defaults.functions.plot_agent_SVG = standard_agent_SVG;
         //        cell_defaults.functions.plot_agent_legend = standard_agent_legend;
 
         // add the standard death models to the default phenotype. 
-        cellDefaults.phenotype.death.add_death_model( 0.00319 / 60.0, apoptosis, apoptosis_parameters );
+        result.phenotype.death.add_death_model( 0.00319 / 60.0, apoptosis, apoptosis_parameters );
         // MCF10A, to get a 2% apoptotic index 
-        cellDefaults.phenotype.death.add_death_model( 0.0, necrosis, necrosis_parameters );
+        result.phenotype.death.add_death_model( 0.0, necrosis, necrosis_parameters );
 
         // set up the default phenotype (to be consistent with the default functions)
-        cellDefaults.phenotype.cycle.sync_to_cycle_model( cellDefaults.functions.cycle_model );
+        result.phenotype.cycle = result.functions.cycleModel;
 
         // set molecular defaults 
 
-        // new March 2022 : make sure Cell_Interactions and Cell_Transformations 
-        //                  are appropriately sized. Same on motiltiy. 
-        //                  The Cell_Definitions constructor doesn't catch 
-        //                  these for the cell_defaults 
-        cellDefaults.phenotype.cell_interactions.sync_to_cell_definitions();
-        cellDefaults.phenotype.cell_transformations.sync_to_cell_definitions();
-        cellDefaults.phenotype.motility.sync_to_current_microenvironment();
-        cellDefaults.phenotype.mechanics.sync_to_cell_definitions();
+        // new March 2022 : make sure Cell_Interactions and Cell_Transformations are appropriately sized. Same on motility. 
+        // The Cell_Definitions constructor doesn't catch these for the cell_defaults 
+        //        result.phenotype.cell_interactions.sync_to_cell_definitions();
+        //        result.phenotype.cell_transformations.sync_to_cell_definitions();
+        //        result.phenotype.mechanics.sync_to_cell_definitions();
+        return result;
     }
 
     static void create_standard_cycle_and_death_models() throws Exception
@@ -274,7 +259,7 @@ public class StandardModels
     {
         Ki67_advanced.code = PhysiCellConstants.advanced_Ki67_cycle_model;
         Ki67_advanced.name = "Ki67 (advanced)";
-        Ki67_advanced.data.time_units = "min";
+        Ki67_advanced.data.timeUnits = "min";
 
         Ki67_advanced.add_phase( PhysiCellConstants.Ki67_negative, "Ki67-" );
         Ki67_advanced.add_phase( PhysiCellConstants.Ki67_positive_premitotic, "Ki67+ (premitotic)" );
@@ -302,7 +287,7 @@ public class StandardModels
     {
         Ki67_basic.code = PhysiCellConstants.basic_Ki67_cycle_model;
         Ki67_basic.name = "Ki67 (basic)";
-        Ki67_basic.data.time_units = "min";
+        Ki67_basic.data.timeUnits = "min";
 
         Ki67_basic.add_phase( PhysiCellConstants.Ki67_negative, "Ki67-" );
         Ki67_basic.add_phase( PhysiCellConstants.Ki67_positive, "Ki67+" );
@@ -324,16 +309,10 @@ public class StandardModels
     {
         live.code = PhysiCellConstants.live_cells_cycle_model;
         live.name = "Live";
-
-        live.data.time_units = "min";
-
+        live.data.timeUnits = "min";
         live.add_phase( PhysiCellConstants.live, "Live" );
-
         live.phases.get( 0 ).divisionAtExit = true;
-
         live.add_phase_link( 0, 0, null );
-
-        //        live.transition_rate( 0, 0 ) = 0.0432 / 60.0; // MCF10A have ~0.04 1/hr net birth rate
         live.setTransitionRate( 0, 0, 0.0432 / 60.0 ); // MCF10A have ~0.04 1/hr net birth rate
         live.phases.get( 0 ).entryFunction = new PhaseEntry.StandardLivePhaseEntry();
     }
@@ -344,7 +323,7 @@ public class StandardModels
         flow_cytometry_cycle_model.code = PhysiCellConstants.flow_cytometry_cycle_model;
         flow_cytometry_cycle_model.name = "Flow cytometry model (basic)";
 
-        flow_cytometry_cycle_model.data.time_units = "min";
+        flow_cytometry_cycle_model.data.timeUnits = "min";
 
         flow_cytometry_cycle_model.add_phase( PhysiCellConstants.G0G1_phase, "G0/G1" );
         flow_cytometry_cycle_model.add_phase( PhysiCellConstants.S_phase, "S" );
@@ -374,13 +353,12 @@ public class StandardModels
         flow_cytometry_separated_cycle_model.code = PhysiCellConstants.flow_cytometry_separated_cycle_model;
         flow_cytometry_separated_cycle_model.name = "Flow cytometry model (separated)";
 
-        flow_cytometry_separated_cycle_model.data.time_units = "min";
+        flow_cytometry_separated_cycle_model.data.timeUnits = "min";
 
         flow_cytometry_separated_cycle_model.add_phase( PhysiCellConstants.G0G1_phase, "G0/G1" );
         flow_cytometry_separated_cycle_model.add_phase( PhysiCellConstants.S_phase, "S" );
         flow_cytometry_separated_cycle_model.add_phase( PhysiCellConstants.G2_phase, "G2" );
         flow_cytometry_separated_cycle_model.add_phase( PhysiCellConstants.M_phase, "M" );
-
 
         flow_cytometry_separated_cycle_model.phases.get( 3 ).divisionAtExit = true;
 
@@ -412,7 +390,7 @@ public class StandardModels
         cycling_quiescent.code = PhysiCellConstants.cycling_quiescent_model;
         cycling_quiescent.name = "Cycling-Quiescent model";
 
-        cycling_quiescent.data.time_units = "min";
+        cycling_quiescent.data.timeUnits = "min";
 
         cycling_quiescent.add_phase( PhysiCellConstants.quiescent, "Quiescent" );
         cycling_quiescent.add_phase( PhysiCellConstants.cycling, "Cycling" );
@@ -616,9 +594,7 @@ public class StandardModels
             // live_cells_cycle_model = 5; 
 
             if( phenotype.death.dead == true )
-            {
                 return;
-            }
 
             // set up shortcuts to find the Q and K(1) phases (assuming Ki67 basic or advanced model)
             boolean indices_initiated = false;
@@ -626,56 +602,53 @@ public class StandardModels
             int end_phase_index = 0; // K_phase_index;
             int necrosis_index = 0;
 
-            int oxygen_substrate_index = pCell.getMicroenvironment().find_density_index( "oxygen" );
+            int oxygen_substrate_index = pCell.getMicroenvironment().findDensityIndex( "oxygen" );
 
             if( indices_initiated == false )
             {
                 // Ki67 models
-
-                if( phenotype.cycle.model().code == PhysiCellConstants.advanced_Ki67_cycle_model
-                        || phenotype.cycle.model().code == PhysiCellConstants.basic_Ki67_cycle_model )
+                if( phenotype.cycle.code == PhysiCellConstants.advanced_Ki67_cycle_model
+                        || phenotype.cycle.code == PhysiCellConstants.basic_Ki67_cycle_model )
                 {
-                    start_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.Ki67_negative );
+                    start_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_negative );
                     necrosis_index = phenotype.death.find_death_model_index( PhysiCellConstants.necrosis_death_model );
 
-                    if( phenotype.cycle.model().code == PhysiCellConstants.basic_Ki67_cycle_model )
+                    if( phenotype.cycle.code == PhysiCellConstants.basic_Ki67_cycle_model )
                     {
-                        end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.Ki67_positive );
+                        end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_positive );
                         indices_initiated = true;
                     }
-                    if( phenotype.cycle.model().code == PhysiCellConstants.advanced_Ki67_cycle_model )
+                    if( phenotype.cycle.code == PhysiCellConstants.advanced_Ki67_cycle_model )
                     {
-                        end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.Ki67_positive_premitotic );
+                        end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
                         indices_initiated = true;
                     }
                 }
 
                 // live model 
-
-                if( phenotype.cycle.model().code == PhysiCellConstants.live_cells_cycle_model )
+                if( phenotype.cycle.code == PhysiCellConstants.live_cells_cycle_model )
                 {
-                    start_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.live );
+                    start_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.live );
                     necrosis_index = phenotype.death.find_death_model_index( PhysiCellConstants.necrosis_death_model );
-                    end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.live );
+                    end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.live );
                     indices_initiated = true;
                 }
 
                 // cytometry models 
-
-                if( phenotype.cycle.model().code == PhysiCellConstants.flow_cytometry_cycle_model
-                        || phenotype.cycle.model().code == PhysiCellConstants.flow_cytometry_separated_cycle_model )
+                if( phenotype.cycle.code == PhysiCellConstants.flow_cytometry_cycle_model
+                        || phenotype.cycle.code == PhysiCellConstants.flow_cytometry_separated_cycle_model )
                 {
-                    start_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.G0G1_phase );
+                    start_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.G0G1_phase );
                     necrosis_index = phenotype.death.find_death_model_index( PhysiCellConstants.necrosis_death_model );
-                    end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.S_phase );
+                    end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.S_phase );
                     indices_initiated = true;
                 }
 
-                if( phenotype.cycle.model().code == PhysiCellConstants.cycling_quiescent_model )
+                if( phenotype.cycle.code == PhysiCellConstants.cycling_quiescent_model )
                 {
-                    start_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.quiescent );
+                    start_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.quiescent );
                     necrosis_index = phenotype.death.find_death_model_index( PhysiCellConstants.necrosis_death_model );
-                    end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCellConstants.cycling );
+                    end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.cycling );
                     indices_initiated = true;
                 }
 
@@ -687,7 +660,7 @@ public class StandardModels
 
             // sample the microenvironment to get the pO2 value 
             double pO2 = ( pCell.nearest_density_vector() )[oxygen_substrate_index]; // PhysiCellConstants.oxygen_index]; 
-            int n = pCell.phenotype.cycle.current_phase_index();
+            int n = pCell.phenotype.cycle.data.currentPhaseIndex;
 
             // this multiplier is for linear interpolation of the oxygen value 
             double multiplier = 1.0;
@@ -737,22 +710,15 @@ public class StandardModels
     public static void standard_elastic_contact_function(Cell pC1, Phenotype p1, Cell pC2, Phenotype p2, double dt)
     {
         if( pC1.position.length != 3 || pC2.position.length != 3 )
-        {
             return;
-        }
 
         double[] displacement = VectorUtil.newDiff( pC2.position, pC1.position );
-
         // update May 2022 - effective adhesion 
-        int ii = Cell.find_cell_definition_index( pC1.type );
-        int jj = Cell.find_cell_definition_index( pC2.type );
-
+        int ii = pC1.type;
+        int jj = pC2.type;
         double adhesion_ii = pC1.phenotype.mechanics.attachment_elastic_constant * pC1.phenotype.mechanics.cell_adhesion_affinities[jj];
         double adhesion_jj = pC2.phenotype.mechanics.attachment_elastic_constant * pC2.phenotype.mechanics.cell_adhesion_affinities[ii];
-
         double effective_attachment_elastic_constant = Math.sqrt( adhesion_ii * adhesion_jj );
-
-        // axpy( &(pC1.velocity) , p1.mechanics.attachment_elastic_constant , displacement ); 
         VectorUtil.axpy( pC1.velocity, effective_attachment_elastic_constant, displacement );
     }
 
@@ -766,8 +732,8 @@ public class StandardModels
         double[] displacement = VectorUtil.newDiff( pC2.position, pC1.position );
 
         // update May 2022 - effective adhesion 
-        int ii = Cell.find_cell_definition_index( pC1.type );
-        int jj = Cell.find_cell_definition_index( pC2.type );
+        int ii = pC1.type;
+        int jj = pC2.type;
 
         double adhesion_ii = pC1.phenotype.mechanics.attachment_elastic_constant * pC1.phenotype.mechanics.cell_adhesion_affinities[jj];
         double adhesion_jj = pC2.phenotype.mechanics.attachment_elastic_constant * pC2.phenotype.mechanics.cell_adhesion_affinities[ii];
@@ -848,7 +814,7 @@ public class StandardModels
                 // live phagocytosis
                 // assume you can only phagocytose one at a time for now 
                 probability = phenotype.cell_interactions.live_phagocytosis_rate( type_name ) * dt; // s[type] * dt;  
-                if( PhysiCellUtilities.UniformRandom() < probability && phagocytosed == false )
+                if( PhysiCellUtilities.UniformRandom() < probability && !phagocytosed )
                 {
                     pCell.ingest_cell( pTarget );
                     phagocytosed = true;
@@ -863,7 +829,7 @@ public class StandardModels
 
                 probability = attack_ij * immunogenicity_ji * dt;
 
-                if( PhysiCellUtilities.UniformRandom() < probability && attacked == false )
+                if( PhysiCellUtilities.UniformRandom() < probability && !attacked )
                 {
                     pCell.attack_cell( pTarget, dt );
                     attacked = true;
@@ -872,7 +838,7 @@ public class StandardModels
                 // fusion 
                 // assume you can only fuse once cell at a time 
                 probability = phenotype.cell_interactions.fusion_rate( type_name ) * dt; // s[type] * dt;  
-                if( PhysiCellUtilities.UniformRandom() < probability && fused == false )
+                if( PhysiCellUtilities.UniformRandom() < probability && !fused )
                 {
                     pCell.fuse_cell( pTarget );
                     fused = true;
@@ -895,7 +861,7 @@ public class StandardModels
             if( PhysiCellUtilities.UniformRandom() <= probability )
             {
                 // std::cout << "Transforming from " << pCell->type_name << " to " << cell_definitions_by_index[i]->name << std::endl; 
-                pCell.convert_to_cell_definition( Cell.cell_definitions_by_index.get( i ) );
+                pCell.convert_to_cell_definition( CellDefinition.getCellDefinition( i ) );
                 return;
             }
         }

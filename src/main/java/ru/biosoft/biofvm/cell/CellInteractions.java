@@ -70,21 +70,12 @@ import ru.biosoft.biofvm.VectorUtil;
 */
 public class CellInteractions implements Cloneable
 {
-    // phagocytosis parameters (e.g., macrophages)
-    double dead_phagocytosis_rate;
-
-    double[] live_phagocytosis_rates;
-    // attack parameters (e.g., T cells)
-
-    double[] attack_rates;
-    // do I attack cell type j? 
-
-    double[] immunogenicities; // new! 
-    // how immnogenic am I to cell type j? 
-
+    double dead_phagocytosis_rate; // phagocytosis parameters (e.g., macrophages)
+    double[] live_phagocytosis_rates; // attack parameters (e.g., T cells)
+    double[] attack_rates; // do I attack cell type j? 
+    double[] immunogenicities; // how immnogenic am I to cell type j?  
     double damage_rate;
-    // cell fusion parameters 
-    double[] fusion_rates;
+    double[] fusion_rates; // cell fusion parameters 
 
     public CellInteractions()
     {
@@ -98,42 +89,37 @@ public class CellInteractions implements Cloneable
 
     void sync_to_cell_definitions()
     {
-        //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        int number_of_cell_defs = Cell.cell_definition_indices_by_name.size();
-        
-        if( live_phagocytosis_rates.length != number_of_cell_defs )
-        {
-            live_phagocytosis_rates = VectorUtil.resize( live_phagocytosis_rates, number_of_cell_defs );
-            attack_rates = VectorUtil.resize( attack_rates, number_of_cell_defs );
-            fusion_rates = VectorUtil.resize( fusion_rates, number_of_cell_defs );
-            immunogenicities = VectorUtil.resize( immunogenicities, number_of_cell_defs );
+        int cellDefCount = CellDefinition.getDefinitionsCount();
 
-            //            live_phagocytosis_rates.resize( number_of_cell_defs, 0.0); 
-            //            attack_rates.resize( number_of_cell_defs, 0.0); 
-            //            fusion_rates.resize( number_of_cell_defs, 0.0); 
-            //            immunogenicities.resize( number_of_cell_defs , 1.0 ); 
+        if( live_phagocytosis_rates.length != cellDefCount )
+        {
+            live_phagocytosis_rates = VectorUtil.resize( live_phagocytosis_rates, cellDefCount );
+            attack_rates = VectorUtil.resize( attack_rates, cellDefCount );
+            fusion_rates = VectorUtil.resize( fusion_rates, cellDefCount );
+            immunogenicities = VectorUtil.resize( immunogenicities, cellDefCount, 1 );
         }
     }
-    public double live_phagocytosis_rate(String type_name)
+
+    public double live_phagocytosis_rate(String name)
     {
-        int n = Cell.cell_definition_indices_by_name.get( type_name );
+        int n = CellDefinition.getCellDefinition( name ).type;
         return live_phagocytosis_rates[n];
     }
-    public double attack_rate(String type_name)
+    public double attack_rate(String name)
     {
-        int n = Cell.cell_definition_indices_by_name.get( type_name );
+        int n = CellDefinition.getCellDefinition( name ).type;
         return attack_rates[n];
     }
 
-    public double fusion_rate(String type_name)
+    public double fusion_rate(String name)
     {
-        int n = Cell.cell_definition_indices_by_name.get( type_name );
+        int n = CellDefinition.getCellDefinition( name ).type;
         return fusion_rates[n];
     }
 
-    public double immunogenicity(String type_name)
+    public double immunogenicity(String name)
     {
-        int n = Cell.cell_definition_indices_by_name.get( type_name );
+        int n = CellDefinition.getCellDefinition( name ).type;
         return immunogenicities[n];
     }
 

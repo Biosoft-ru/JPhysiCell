@@ -86,19 +86,14 @@ public class Death implements Cloneable
 
         dead = false;
         current_death_model_index = 0;
-
-        return;
     }
 
     int add_death_model(double rate, CycleModel pModel)
     {
-        //    rates.push_back( rate );
-        //    models.push_back( pModel ); 
         rates.add( rate );
         models.add( pModel );
         parameters.add( new DeathParameters() );
         //    parameters.resize( rates.size() ); //TODO:
-
         return rates.size() - 1;
     }
 
@@ -225,10 +220,10 @@ public class Death implements Cloneable
         {
             Death result = (Death)super.clone();
             result.rates = new ArrayList<>( rates );//this.rates  public List<Double> rates; 
-                    result.parameters = new ArrayList();
+            result.parameters = new ArrayList<>();
             for( int i = 0; i < parameters.size(); i++ )
                         result.parameters.add( parameters.get( i ).clone() );
-            result.models = new ArrayList();
+                    result.models = new ArrayList<>();
             for( int i = 0; i < models.size(); i++ )
                 result.models.add( models.get( i ).clone() );
             return result;

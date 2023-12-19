@@ -1,8 +1,5 @@
 package ru.biosoft.biofvm.cell;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import ru.biosoft.biofvm.VectorUtil;
 
 /*
@@ -97,8 +94,6 @@ public class Mechanics implements Cloneable
     double relative_detachment_distance;
     double maximum_attachment_rate;
 
-    public Map<String, Integer> cell_definition_indices_by_name = new HashMap<>();
-
     public Mechanics()
     {
         cell_cell_adhesion_strength = 0.4;
@@ -127,29 +122,23 @@ public class Mechanics implements Cloneable
         maximum_attachment_rate = 1.0;
     }
 
-    void sync_to_cell_definitions()
+    public void sync_to_cell_definitions()
     {
-        //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        int number_of_cell_defs = cell_definition_indices_by_name.size();
-
+        int number_of_cell_defs = CellDefinition.getDefinitionsCount();
         if( cell_adhesion_affinities.length != number_of_cell_defs )
-        {
             VectorUtil.resize( cell_adhesion_affinities, number_of_cell_defs, 1.0 );
-        }
     }
 
     double cell_adhesion_affinity(String type_name)
     {
-        //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        //        int n = cell_definition_indices_by_name[type_name];
-        int n = cell_definition_indices_by_name.get( type_name );
+        int n = CellDefinition.getCellDefinition( type_name ).type;
         return cell_adhesion_affinities[n];
     }
 
     void set_fully_heterotypic()
     {
         //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        int number_of_cell_defs = cell_definition_indices_by_name.size();
+        int number_of_cell_defs = CellDefinition.getDefinitionsCount();
         //        cell_adhesion_affinities.assign( number_of_cell_defs, 1.0);
         cell_adhesion_affinities = VectorUtil.assign( number_of_cell_defs, 1.0 );
     }
@@ -157,7 +146,7 @@ public class Mechanics implements Cloneable
     void set_fully_homotypic(Cell pC)
     {
         //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        int number_of_cell_defs = cell_definition_indices_by_name.size();
+        int number_of_cell_defs = CellDefinition.getDefinitionsCount();
         //        cell_adhesion_affinities.assign( number_of_cell_defs, 0.0);
         cell_adhesion_affinities = new double[number_of_cell_defs];
         // now find my type and set to 1 

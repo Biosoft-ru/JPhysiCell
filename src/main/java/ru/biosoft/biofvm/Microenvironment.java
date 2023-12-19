@@ -3,7 +3,8 @@ package ru.biosoft.biofvm;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
 #############################################################################
@@ -54,20 +55,35 @@ import java.util.List;
 */
 public class Microenvironment
 {
-    private static Microenvironment defaultMicroenvironment = null;
+    private Set<BasicAgent> agents = new HashSet<>();
 
-    public static void set_default_microenvironment(Microenvironment m)
+    public <T extends BasicAgent> Set<T> getAgents(T clazz)
     {
-        defaultMicroenvironment = m;
+        return (Set<T>)agents;
     }
 
-    public static Microenvironment get_default_microenvironment()
+    public Set<BasicAgent> getAgents()
     {
-        return defaultMicroenvironment;
+        return agents;
+    }
+
+    public void addAgent(BasicAgent agent)
+    {
+        agents.add( agent );
+    }
+
+    public void removeAgent(BasicAgent agent)
+    {
+        agents.remove( agent );
+    }
+
+    public int getAgentsCount()
+    {
+        return agents.size();
     }
 
     public MicroenvironmentOptions options;
-    DiffusionDecaySolver solver;
+    private DiffusionDecaySolver solver;
 
     public void setSolver(DiffusionDecaySolver solver)
     {
@@ -75,84 +91,51 @@ public class Microenvironment
     }
 
     /*! For internal use and accelerations in solvers */
-    //        std::vector< std::vector<double> > temporary_density_vectors1;
     double[][] temporary_density_vectors1;
     /*! For internal use and accelerations in solvers */
-    //        std::vector< std::vector<double> > temporary_density_vectors2; 
     double[][] temporary_density_vectors2;
     /*! for internal use in bulk source/sink solvers */
-    //        std::vector< std::vector<double> > bulk_source_sink_solver_temp1;
     double[][] bulk_source_sink_solver_temp1;
-    //        std::vector< std::vector<double> > bulk_source_sink_solver_temp2;
     double[][] bulk_source_sink_solver_temp2;
-    //        std::vector< std::vector<double> > bulk_source_sink_solver_temp3;
     double[][] bulk_source_sink_solver_temp3;
-    //        bool bulk_source_sink_solver_setup_done; 
     boolean bulk_source_sink_solver_setup_done;
 
     /*! stores pointer to current density solutions. Access via operator() functions. */
-    //        std::vector< std::vector<double> >* p_density_vectors;
-    double[][] p_density_vectors;
-
-    //        std::vector< std::vector<gradient> > gradient_vectors;
+    double[][] density;
     double[][][] gradient_vectors;
-    //        std::vector<bool> gradient_vector_computed; 
     boolean[] gradient_vector_computed;
 
     /*! helpful for solvers -- resize these whenever adding/removing substrates */
-    //        std::vector<double> one; 
     double[] one;
-    //        std::vector<double> zero;
     double[] zero;
-    //        std::vector<double> one_half; 
     double[] one_half;
-    //        std::vector<double> one_third; 
     double[] one_third;
 
     /*! for internal use in diffusion solvers : these make the solvers safe across microenvironments ""*/
-    //        std::vector< std::vector<double> > thomas_temp1; 
     double[][] thomas_temp1;
-    //        std::vector< std::vector<double> > thomas_temp2; 
     double[][] thomas_temp2;
-    //        std::vector<double> thomas_constant1x;
     double[] thomas_constant1x;
-    //        std::vector<double> thomas_constant1y; 
     double[] thomas_constant1y;
-    //        std::vector<double> thomas_constant1z;
     double[] thomas_constant1z;
-    //        std::vector<double> thomas_neg_constant1x; 
     double[] thomas_neg_constant1x;
-    //        std::vector<double> thomas_neg_constant1y; 
     double[] thomas_neg_constant1y;
-    //        std::vector<double> thomas_neg_constant1z;
     double[] thomas_neg_constant1z;
 
-    //        bool thomas_setup_done; 
     boolean thomas_setup_done;
     int thomas_i_jump;
     int thomas_j_jump;
     int thomas_k_jump;
-    //        std::vector<double> thomas_constant1; 
+
     double[] thomas_constant1;
-    //        std::vector<double> thomas_constant1a; 
     double[] thomas_constant1a;
-    //        std::vector<double> thomas_constant2;
     double[] thomas_constant2;
-    //        std::vector<double> thomas_constant3;
     double[] thomas_constant3;
-    //        std::vector<double> thomas_constant3a;
     double[] thomas_constant3a;
-    //        std::vector< std::vector<double> > thomas_denomx;
     double[][] thomas_denomx;
-    //        std::vector< std::vector<double> > thomas_cx;
     double[][] thomas_cx;
-    //        std::vector< std::vector<double> > thomas_denomy;
     double[][] thomas_denomy;
-    //        std::vector< std::vector<double> > thomas_cy;
     double[][] thomas_cy;
-    //        std::vector< std::vector<double> > thomas_denomz;
     double[][] thomas_denomz;
-    //        std::vector< std::vector<double> > thomas_cz;
     double[][] thomas_cz;
     boolean diffusion_solver_setup_done;
 
@@ -163,52 +146,41 @@ public class Microenvironment
     std::vector< std::vector<double> > dirichlet_value_vectors; 
     std::vector<bool> dirichlet_node_map; 
     */
-    //        std::vector< std::vector<double> > dirichlet_value_vectors; 
     double[][] dirichlet_value_vectors;
-    //        std::vector<bool> dirichlet_activation_vector; 
     boolean[] dirichlet_activation_vector;
-    /* new in Version 1.7.0 -- activation vectors can be specified 
-       on a voxel-by-voxel basis */
-
-    //        std::vector< std::vector<bool> > dirichlet_activation_vectors; 
+    /* new in Version 1.7.0 -- activation vectors can be specified on a voxel-by-voxel basis */
     boolean[][] dirichlet_activation_vectors;
-    //     public:
 
     /*! The mesh for the diffusing quantities */
     public CartesianMesh mesh;
-    public AgentContainer agent_container = new AgentContainer();
+    public AgentContainer agentContainer = new AgentContainer();
     public String spatialUnits;
     public String timeUnits;
     public String name;
-    //
-    //        // diffusing entities 
-    //        std::vector< std::string > density_names;
+
+    // diffusing entities 
     public String[] density_names;
-    //        std::vector< std::string > density_units; 
     String[] density_units;
-    //     
-    //        // coefficients 
-    //        std::vector< double > diffusion_coefficients; 
+
+    // coefficients 
     public double[] diffusion_coefficients;
-    //        std::vector< double > decay_rates; 
     public double[] decay_rates;
-    //        
-    //        std::vector< std::vector<double> > supply_target_densities_times_supply_rates; 
     double[][] supply_target_densities_times_supply_rates;
-    //        std::vector< std::vector<double> > supply_rates; 
     double[][] supply_rates;
-    //        std::vector< std::vector<double> > uptake_rates; 
     double[][] uptake_rates;
 
+    public Microenvironment(String name, double size, double nodeSize, String timeUnits, String spatialUnits)
+    {
+        this();
+        this.name = name;
+        resizeSpace( 0, size, 0, size, 0, size, nodeSize, nodeSize, nodeSize );
+        this.spatialUnits = spatialUnits;
+        this.timeUnits = timeUnits;
+        mesh.units = spatialUnits;
+    }
 
     public Microenvironment()
     {
-        if( defaultMicroenvironment == null )
-        {
-            defaultMicroenvironment = this;
-        }
-
-
         name = "unnamed";
         spatialUnits = "none";
         timeUnits = "none";
@@ -227,7 +199,7 @@ public class Microenvironment
 
         temporary_density_vectors1 = new double[mesh.voxels.length][1];
         temporary_density_vectors2 = new double[mesh.voxels.length][1];
-        p_density_vectors = temporary_density_vectors1;
+        density = temporary_density_vectors1;
 
         gradient_vectors = new double[mesh.voxels.length][1][3];
         //        gradient_vectors.resize( mesh.voxels.size() ); 
@@ -245,19 +217,9 @@ public class Microenvironment
 
         density_names = new String[] {"unnamed"};
         density_units = new String[] {"none"};
-        //        density_names.assign( 1, "unnamed" );
-        //        density_units.assign( 1, "none" );
-
-        //        diffusion_coefficients.assign( number_of_densities(), 0.0 );
-        //        decay_rates.assign( number_of_densities(), 0.0 );
+        ;
         diffusion_coefficients = new double[number_of_densities()];
         decay_rates = new double[number_of_densities()];
-
-        //        one_half = one;
-        //        one_half *= 0.5;
-        //        one_third = one;
-        //        one_third /= 3.0;
-
         one_half = new double[] {0.5};
         one_third = new double[] {1.0 / 3.0};
 
@@ -303,23 +265,19 @@ public class Microenvironment
 
     public double[] get(int n)
     {
-        return p_density_vectors[n];
+        return density[n];
     }
 
 
-    public void simulate_cell_sources_and_sinks(List<BasicAgent> basic_agent_list, double dt)
+    public void simulate_cell_sources_and_sinks(Set<BasicAgent> agents, double dt)
     {
-        for( int i = 0; i < basic_agent_list.size(); i++ )
-        {
-            basic_agent_list.get( i ).simulateSecretionUptake( this, dt );
-        }
-
-        return;
+        for( BasicAgent agent : agents )
+            agent.simulateSecretionUptake( this, dt );
     }
 
     public void simulate_cell_sources_and_sinks(double dt)
     {
-        simulate_cell_sources_and_sinks( BasicAgent.allBasicAgents, dt );
+        simulate_cell_sources_and_sinks( agents, dt );
     }
 
     public void simulate_diffusion_decay(double dt) throws Exception
@@ -350,7 +308,7 @@ public class Microenvironment
                     // if( dirichlet_activation_vector[j] == true )
                     if( dirichlet_activation_vectors[i][j] == true )
                     {
-                        density_vector( i )[j] = dirichlet_value_vectors[i][j];
+                        getDensity( i )[j] = dirichlet_value_vectors[i][j];
                     }
                 }
 
@@ -362,7 +320,7 @@ public class Microenvironment
     public void write_to_matlab(String filename)
     {
         int number_of_data_entries = mesh.voxels.length;
-        int size_of_each_datum = 3 + 1 + p_density_vectors[0].length;
+        int size_of_each_datum = 3 + 1 + density[0].length;
         File f = new File( filename );
         try (BufferedWriter bw = new BufferedWriter( new FileWriter( f ) ))
         {
@@ -376,9 +334,9 @@ public class Microenvironment
                 bw.append( String.valueOf( mesh.voxels[i].volume ) + "\t" );
 
                 // densities  
-                for( int j = 0; j < p_density_vectors[i].length; j++ )
+                for( int j = 0; j < density[i].length; j++ )
                 {
-                    bw.append( String.valueOf( p_density_vectors[i][j] ) + "\t" );
+                    bw.append( String.valueOf( density[i][j] ) + "\t" );
                 }
                 bw.append( "\n" );
             }
@@ -498,13 +456,13 @@ public class Microenvironment
     /*! access the density vector at  [ X(i),Y(j),Z(k) ] */
     double[] density_vector(int i, int j, int k)
     {
-        return p_density_vectors[voxel_index( i, j, k )];
+        return density[voxel_index( i, j, k )];
     }
 
     /*! access the density vector at [x,y,z](n) */
-    public double[] density_vector(int voxel_index)
+    public double[] getDensity(int voxel_index)
     {
-        return p_density_vectors[voxel_index];
+        return density[voxel_index];
     }
 
     int nearest_voxel_index(double[] position)
@@ -526,7 +484,7 @@ public class Microenvironment
 
     public int number_of_densities()
     {
-        return p_density_vectors[0].length;
+        return density[0].length;
     }
 
     public int number_of_voxels()
@@ -565,7 +523,7 @@ public class Microenvironment
         //        dirichlet_activation_vectors.assign( mesh.voxels.length , dirichlet_activation_vector );  
         mesh.resize( x_start, x_end, y_start, y_end, z_start, z_end, x_nodes, y_nodes, z_nodes );
         temporary_density_vectors1 = new double[mesh.voxels.length][zero.length];
-        p_density_vectors = temporary_density_vectors1;
+        density = temporary_density_vectors1;
         temporary_density_vectors2 = new double[mesh.voxels.length][zero.length];
         gradient_vectors = new double[mesh.voxels.length][number_of_densities()][3];
         gradient_vector_computed = new boolean[mesh.voxels.length];
@@ -595,7 +553,7 @@ public class Microenvironment
         //        dirichlet_activation_vectors.assign( mesh.voxels.length , dirichlet_activation_vector );
         mesh.resize( x_nodes, y_nodes, z_nodes );
         temporary_density_vectors1 = new double[mesh.voxels.length][];
-        p_density_vectors = temporary_density_vectors1;
+        density = temporary_density_vectors1;
         temporary_density_vectors2 = new double[mesh.voxels.length][];
         gradient_vectors = new double[mesh.voxels.length][number_of_densities()][3];
         gradient_vector_computed = new boolean[mesh.voxels.length];
@@ -639,7 +597,7 @@ public class Microenvironment
         return sb.toString();
     }
 
-    public int find_density_index(String name)
+    public int findDensityIndex(String name)
     {
         for( int i = 0; i < density_names.length; i++ )
         {
@@ -676,8 +634,8 @@ public class Microenvironment
                     int i = 0; 
                     int n = voxel_index(i,j,k);
                     // x-derivative of qth substrate at voxel n
-                    gradient_vectors[n][q][0] = p_density_vectors[n + thomas_i_jump][q];
-                    gradient_vectors[n][q][0] -= p_density_vectors[n][q];
+                    gradient_vectors[n][q][0] = density[n + thomas_i_jump][q];
+                    gradient_vectors[n][q][0] -= density[n][q];
                     gradient_vectors[n][q][0] /= mesh.dx; 
                     
                     gradient_vector_computed[n] = true; 
@@ -687,8 +645,8 @@ public class Microenvironment
                     int i = mesh.x_coordinates.length-1; 
                     int n = voxel_index(i,j,k);
                     // x-derivative of qth substrate at voxel n
-                    gradient_vectors[n][q][0] = ( p_density_vectors )[n][q];
-                    gradient_vectors[n][q][0] -= ( p_density_vectors )[n - thomas_i_jump][q];
+                    gradient_vectors[n][q][0] = ( density )[n][q];
+                    gradient_vectors[n][q][0] -= ( density )[n - thomas_i_jump][q];
                     gradient_vectors[n][q][0] /= mesh.dx; 
                     
                     gradient_vector_computed[n] = true; 
@@ -700,8 +658,8 @@ public class Microenvironment
                     {
                         int n = voxel_index(i,j,k);
                         // x-derivative of qth substrate at voxel n
-                        gradient_vectors[n][q][0] = ( p_density_vectors )[n + thomas_i_jump][q];
-                        gradient_vectors[n][q][0] -= ( p_density_vectors )[n - thomas_i_jump][q];
+                        gradient_vectors[n][q][0] = ( density )[n + thomas_i_jump][q];
+                        gradient_vectors[n][q][0] -= ( density )[n - thomas_i_jump][q];
                         gradient_vectors[n][q][0] /= two_dx; 
                         
                         gradient_vector_computed[n] = true; 
@@ -722,8 +680,8 @@ public class Microenvironment
                     int j = 0; 
                     int n = voxel_index(i,j,k);
                     // x-derivative of qth substrate at voxel n
-                    gradient_vectors[n][q][1] = ( p_density_vectors )[n + thomas_j_jump][q];
-                    gradient_vectors[n][q][1] -= ( p_density_vectors )[n][q];
+                    gradient_vectors[n][q][1] = ( density )[n + thomas_j_jump][q];
+                    gradient_vectors[n][q][1] -= ( density )[n][q];
                     gradient_vectors[n][q][1] /= mesh.dy; 
                     
                     gradient_vector_computed[n] = true; 
@@ -733,8 +691,8 @@ public class Microenvironment
                     int j = mesh.y_coordinates.length-1; 
                     int n = voxel_index(i,j,k);
                     // x-derivative of qth substrate at voxel n
-                    gradient_vectors[n][q][1] = ( p_density_vectors )[n][q];
-                    gradient_vectors[n][q][1] -= ( p_density_vectors )[n - thomas_j_jump][q];
+                    gradient_vectors[n][q][1] = ( density )[n][q];
+                    gradient_vectors[n][q][1] -= ( density )[n - thomas_j_jump][q];
                     gradient_vectors[n][q][1] /= mesh.dy; 
                     
                     gradient_vector_computed[n] = true; 
@@ -746,8 +704,8 @@ public class Microenvironment
                     {
                         int n = voxel_index(i,j,k);
                         // y-derivative of qth substrate at voxel n
-                        gradient_vectors[n][q][1] = ( p_density_vectors )[n + thomas_j_jump][q];
-                        gradient_vectors[n][q][1] -= ( p_density_vectors )[n - thomas_j_jump][q];
+                        gradient_vectors[n][q][1] = ( density )[n + thomas_j_jump][q];
+                        gradient_vectors[n][q][1] -= ( density )[n - thomas_j_jump][q];
                         gradient_vectors[n][q][1] /= two_dy; 
                         gradient_vector_computed[n] = true; 
                     }
@@ -771,8 +729,8 @@ public class Microenvironment
                     int k = 0; 
                     int n = voxel_index(i,j,k);
                     // x-derivative of qth substrate at voxel n
-                    gradient_vectors[n][q][2] = ( p_density_vectors )[n + thomas_k_jump][q];
-                    gradient_vectors[n][q][2] -= ( p_density_vectors )[n][q];
+                    gradient_vectors[n][q][2] = ( density )[n + thomas_k_jump][q];
+                    gradient_vectors[n][q][2] -= ( density )[n][q];
                     gradient_vectors[n][q][2] /= mesh.dz; 
                     
                     gradient_vector_computed[n] = true; 
@@ -782,8 +740,8 @@ public class Microenvironment
                     int k = mesh.z_coordinates.length-1; 
                     int n = voxel_index(i,j,k);
                     // x-derivative of qth substrate at voxel n
-                    gradient_vectors[n][q][2] = ( p_density_vectors )[n][q];
-                    gradient_vectors[n][q][2] -= ( p_density_vectors )[n - thomas_k_jump][q];
+                    gradient_vectors[n][q][2] = ( density )[n][q];
+                    gradient_vectors[n][q][2] -= ( density )[n - thomas_k_jump][q];
                     gradient_vectors[n][q][2] /= mesh.dz; 
                     
                     gradient_vector_computed[n] = true; 
@@ -795,8 +753,8 @@ public class Microenvironment
                     {
                         int n = voxel_index(i,j,k);
                         // y-derivative of qth substrate at voxel n
-                        gradient_vectors[n][q][2] = ( p_density_vectors )[n + thomas_k_jump][q];
-                        gradient_vectors[n][q][2] -= ( p_density_vectors )[n - thomas_k_jump][q];
+                        gradient_vectors[n][q][2] = ( density )[n + thomas_k_jump][q];
+                        gradient_vectors[n][q][2] -= ( density )[n - thomas_k_jump][q];
                         gradient_vectors[n][q][2] /= two_dz; 
                         gradient_vector_computed[n] = true; 
                     }
@@ -808,12 +766,12 @@ public class Microenvironment
 
     public double[] nearest_density_vector(double[] position)
     {
-        return ( p_density_vectors )[mesh.nearest_voxel_index( position )];
+        return ( density )[mesh.nearest_voxel_index( position )];
     }
 
     public double[] nearest_density_vector(int voxel_index)
     {
-        return ( p_density_vectors )[voxel_index];
+        return ( density )[voxel_index];
     }
 
 }

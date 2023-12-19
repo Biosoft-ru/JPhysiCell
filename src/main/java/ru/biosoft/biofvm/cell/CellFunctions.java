@@ -68,10 +68,10 @@ package ru.biosoft.biofvm.cell;
 */
 public class CellFunctions
 {
-    public CycleModel cycle_model;
+    public CycleModel cycleModel;
 
     instantiate_cell instantiate_cell;
-    volume_update_function volume_update_function;
+    public volume_update_function updateVolume;
     update_migration_bias update_migration_bias;
     custom_cell_rule custom_cell_rule;
     public update_phenotype updatePhenotype;

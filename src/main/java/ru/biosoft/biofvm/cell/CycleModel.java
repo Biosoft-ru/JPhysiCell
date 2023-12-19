@@ -84,7 +84,7 @@ public class CycleModel implements Cloneable
     List<Phase> phases;
     List<List<PhaseLink>> phase_links;
     int default_phase_index;
-    CycleData data; // this will be copied to individual cell agents 
+    public CycleData data; // this will be copied to individual cell agents 
 
     public CycleModel()
     {
@@ -95,6 +95,11 @@ public class CycleModel implements Cloneable
         data = new CycleData( this );// = this;
         code = PhysiCellConstants.custom_cycle_model;
         default_phase_index = 0;
+    }
+
+    public Phase currentPhase()
+    {
+        return phases.get( data.currentPhaseIndex );
     }
 
     public int add_phase(int code, String name)
@@ -125,7 +130,7 @@ public class CycleModel implements Cloneable
         return n;
     }
 
-    public int find_phase_index(int code)
+    public int findPhaseIndex(int code)
     {
         for( int i = 0; i < phases.size(); i++ )
         {
@@ -165,8 +170,8 @@ public class CycleModel implements Cloneable
             for( int k = 0; k < phase_links.get( i ).size(); k++ )
             {
                 int j = phase_links.get( i ).get( k ).endPhaseIndex;
-                sb.append( "\tPhase " + " (" + phases.get( j ).name + "( with rate " + data.transition_rates.get( i ).get( j ) + " "
-                        + data.time_units + "^-1; \n" );
+                sb.append( "\tPhase " + " (" + phases.get( j ).name + "( with rate " + data.transitionRates.get( i ).get( j ) + " "
+                        + data.timeUnits + "^-1; \n" );
             }
             sb.append( "\n" );
         }
@@ -191,11 +196,11 @@ public class CycleModel implements Cloneable
         return phase_links.get( start_index ).get( inverse_index_maps.get( start_index ).get( end_index ) );
     }
 
-    public void advance_model(Cell pCell, Phenotype phenotype, double dt)
+    public void advance(Cell pCell, Phenotype phenotype, double dt)
     {
-        int i = phenotype.cycle.data.current_phase_index;
+        int i = phenotype.cycle.data.currentPhaseIndex;
 
-        phenotype.cycle.data.elapsed_time_in_phase += dt;
+        phenotype.cycle.data.elapsedTimePhase += dt;
 
         // Evaluate each linked phase: advance to that phase IF probabiltiy is in the range, and if the arrest function (if any) is false 
         List<PhaseLink> links = phase_links.get( i );
@@ -204,7 +209,7 @@ public class CycleModel implements Cloneable
         {
             PhaseLink link = links.get( k );
             j = link.endPhaseIndex;
-            double transition_rate = phenotype.cycle.data.transition_rates.get( i ).get( k );
+            double transition_rate = phenotype.cycle.data.transitionRates.get( i ).get( k );
 
             // check for arrest. If arrested, skip to the next transition
             boolean transition_arrested = false;
@@ -218,7 +223,7 @@ public class CycleModel implements Cloneable
                 boolean continue_transition = false;
                 if( link.fixedDuration )
                 {
-                    if( phenotype.cycle.data.elapsed_time_in_phase > 1.0 / transition_rate )
+                    if( phenotype.cycle.data.elapsedTimePhase > 1.0 / transition_rate )
                     {
                         continue_transition = true;
                     }
@@ -252,8 +257,8 @@ public class CycleModel implements Cloneable
                         return;
                     }
                     // move to the next phase, and reset the elapsed time 
-                    phenotype.cycle.data.current_phase_index = j;
-                    phenotype.cycle.data.elapsed_time_in_phase = 0.0;
+                    phenotype.cycle.data.currentPhaseIndex = j;
+                    phenotype.cycle.data.elapsedTimePhase = 0.0;
 
                     // if the new phase has an entry function, execute it 
                     if( phases.get( j ).entryFunction != null )

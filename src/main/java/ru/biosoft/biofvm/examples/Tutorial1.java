@@ -1,18 +1,11 @@
 package ru.biosoft.biofvm.examples;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
-
 import ru.biosoft.biofvm.BasicAgent;
-import ru.biosoft.biofvm.ConstantCoefficientsLOD3D;
 import ru.biosoft.biofvm.Microenvironment;
-import ru.biosoft.biofvm.SimpleVisualizer;
 import ru.biosoft.biofvm.VectorUtil;
+import ru.biosoft.biofvm.Visualizer;
+import ru.biosoft.biofvm.Visualizer.Section;
+import ru.biosoft.biofvm.cell.PhysiCellUtilities;
 
 /*
 #############################################################################
@@ -57,52 +50,39 @@ public class Tutorial1
     private static int sinkAgentsNumber = 500;
     private static double agentRadius = 5;
     private static boolean generateAtSlice = true; //create agents only at slice we watch
-	private static int agentSecretionRate = 10;
-	private static double agentUptakeRate = 0.8;
+    private static int agentSecretionRate = 10;
+    private static double agentUptakeRate = 0.8;
 
     //Simulation options
     private static double tMax = 10;
     private static double dt = 0.01;
-    private static String resultPath = "C:/Users/Damag/BIOFVM/";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/Tutorial1";
     private static int zSlice = 500; //watch slice in the middle (for images)
-    private static boolean outputImages = true;
-    private static boolean outputGIF = true;
-    private static int imgTimeDelta = 10; // time delta between images
+    private static double outputInterval = 0.1; // time delta between images
     private static boolean outputTables = false;
 
-    private static ImageWriter writer;
-    private static ImageOutputStream ios;
+    static Visualizer visualizer = new Visualizer( resultPath, "Z5003", Section.Z, zSlice );
+    static
+    {
+        visualizer.setSaveImage( false );
+    }
 
     public static void main(String ... args) throws Exception
     {
         double timeStart = System.currentTimeMillis();
-
-        Microenvironment m = new Microenvironment();
-        m.name = "substrate scale";
+        Microenvironment m = new Microenvironment( "substrate scale", size, cellSize, "minutes", "microns" );
         m.setDensity( 0, "substrate1", "dimensionless" );
-        m.spatialUnits = "microns";
-        m.mesh.units = "microns";
-        m.timeUnits = "minutes";
-
-        m.resize_space_uniform( 0, size, 0, size, 0, size, cellSize );
-        m.displayInformation();
 
         //set initial density - more in the middle, gradually decrease
-        double[] center = new double[3];
-        center[0] = ( m.mesh.bounding_box[0] + m.mesh.bounding_box[3] ) / 2;
-        center[1] = ( m.mesh.bounding_box[1] + m.mesh.bounding_box[4] ) / 2;
-        center[2] = ( m.mesh.bounding_box[2] + m.mesh.bounding_box[5] ) / 2;
+        double[] center = PhysiCellUtilities.getCenter( m.mesh );
         double stddevSquared = size / cellSize;
         stddevSquared *= -stddevSquared;
         for( int i = 0; i < m.number_of_voxels(); i++ )
         {
             double[] displacement = VectorUtil.newDiff( m.voxels( i ).center, center );
             double coeff = VectorUtil.norm_squared( displacement ) / stddevSquared;
-            m.density_vector( i )[0] = Math.exp( coeff );
+            m.getDensity( i )[0] = Math.exp( coeff );
         }
-
-        // register the diffusion solver    
-        m.setSolver( new ConstantCoefficientsLOD3D() );
 
         // register substrates properties 
         m.diffusion_coefficients[0] = diffusionCoefficients; // microns^2 / min 
@@ -117,7 +97,7 @@ public class Tutorial1
             if( generateAtSlice )
                 pos[2] = zSlice; //keep agents at z slice
 
-            BasicAgent agentSource = BasicAgent.createBasicAgent();
+            BasicAgent agentSource = BasicAgent.createBasicAgent( m );
             agentSource.registerMicroenvironment( m );
             agentSource.assignPosition( pos );
             agentSource.setRadius( agentRadius );
@@ -133,7 +113,7 @@ public class Tutorial1
             if( generateAtSlice )
                 pos[2] = zSlice; //keep agents at z slice 
 
-            BasicAgent agentSink = BasicAgent.createBasicAgent();
+            BasicAgent agentSink = BasicAgent.createBasicAgent( m );
             agentSink.registerMicroenvironment( m );
             agentSink.assignPosition( pos );
             agentSink.setRadius( agentRadius );
@@ -145,53 +125,32 @@ public class Tutorial1
         //        for( int z = 0; z < 100; z++ )
         //            SimpleVisualizer.draw( m, z, 1000, 1000, resultPath + "/init_slice" + z + ".png" );
 
-        if( outputGIF )
-        {
-            writer = ImageIO.getImageWritersByFormatName( "GIF" ).next();
-            ios = ImageIO.createImageOutputStream( new File( resultPath + "/result.gif" ) );
-            writer.setOutput( ios );
-            writer.prepareWriteSequence( null );
-        }
+        //Simulation starts
+        visualizer.init();
 
         if( outputTables )
             m.write_to_matlab( resultPath + "/initial.txt" );
-        if( outputImages )
-        {
-            BufferedImage nextImg = SimpleVisualizer.draw( m, zSlice, 0, resultPath + "/initial.png" );
-            if( outputGIF )
-                writer.writeToSequence( new IIOImage( nextImg, null, null ), writer.getDefaultWriteParam() );
-        }
+
+        visualizer.saveResult( m, 0 );
         double t = 0.0;
-        int counter = 0;
-        //Simulation starts
+        double nextOutputTime = outputInterval;
         double timeSimulationStart = System.currentTimeMillis();
+        int counter = 0;
         while( t < tMax )
         {
             m.simulate_cell_sources_and_sinks( dt );
             m.simulate_diffusion_decay( dt );
             t += dt;
             counter++;
-
-            if( outputTables )
-                m.write_to_matlab( resultPath + "/step_" + counter + ".txt" );
-
-            if( outputImages && counter % imgTimeDelta == 0 )
+            if( Math.abs( t - nextOutputTime ) < 0.0001 )
             {
-                BufferedImage nextImg = SimpleVisualizer.draw( m, zSlice, Math.round( t * 100 ) / 100.0,
-                        resultPath + "/step_" + counter + ".png" );
-                if( outputGIF )
-                    writer.writeToSequence( new IIOImage( nextImg, null, null ), writer.getDefaultWriteParam() );
+                if( outputTables )
+                    m.write_to_matlab( resultPath + "/step_" + counter + ".txt" );
+                visualizer.saveResult( m, t );
+                nextOutputTime += outputInterval;
             }
         }
-
-        if( outputGIF )
-        {
-            writer.endWriteSequence();
-            writer.reset();
-            writer.dispose();
-            ios.flush();
-            ios.close();
-        }
+        visualizer.finish();
         double totalTime = ( System.currentTimeMillis() - timeStart ) / 1000;
         double simulationTime = ( System.currentTimeMillis() - timeSimulationStart ) / 1000;
         System.out.println( "Done! Elapsed time: " + totalTime + " s. Simulation time: " + simulationTime + " s." );

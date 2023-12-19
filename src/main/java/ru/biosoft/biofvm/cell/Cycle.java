@@ -66,39 +66,40 @@ package ru.biosoft.biofvm.cell;
 #                                                                             #
 ###############################################################################
 */
+@Deprecated
 public class Cycle implements Cloneable
 {
-    public CycleModel pCycle_Model;
+    public CycleModel cycleModel;
     public CycleData data = new CycleData( null );
 
     public Cycle()
     {
-        pCycle_Model = null;
+        cycleModel = null;
     }
 
-    public void advance_cycle(Cell pCell, Phenotype phenotype, double dt)
+    public void advance(Cell cell, Phenotype phenotype, double dt)
     {
-        pCycle_Model.advance_model( pCell, phenotype, dt );
+        cycleModel.advance( cell, phenotype, dt );
     }
 
     public CycleModel model()
     {
-        return pCycle_Model;
+        return cycleModel;
     }
 
-    public Phase current_phase()
+    public Phase currentPhase()
     {
-        return data.current_phase();
+        return data.currentPhase();
     }
 
-    public int current_phase_index()//int - ref
+    public int currentPhaseIndex()//int - ref
     {
-        return data.current_phase_index;
+        return data.currentPhaseIndex;
     }
 
-    public void sync_to_cycle_model(CycleModel cm)
+    public void sync(CycleModel cm)
     {
-        pCycle_Model = cm;
+        cycleModel = cm;
         data = cm.data;
     }
 
@@ -106,8 +107,8 @@ public class Cycle implements Cloneable
     public Cycle clone()
     {
         Cycle result = new Cycle();
-        result.pCycle_Model = this.pCycle_Model.clone();
-        result.data = result.pCycle_Model.data;
+        result.cycleModel = this.cycleModel.clone();
+        result.data = result.cycleModel.data;
         return result;
     }
 }

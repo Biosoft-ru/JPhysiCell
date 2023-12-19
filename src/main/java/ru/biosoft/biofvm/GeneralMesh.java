@@ -62,7 +62,7 @@ public class GeneralMesh
 
     // [xmin ymin zmin xmax ymax zmax ]
     //    std::vector<double>bounding_box;
-    public double[] bounding_box;
+    public double[] boundingBox;
 
     //    std::vector<Voxel> voxels;
     //    std::vector<Voxel_Face> voxel_faces;
@@ -88,13 +88,13 @@ public class GeneralMesh
     public GeneralMesh()
     {
         // x1, x2, y1, y2, z1, z2 
-        bounding_box = new double[6];//.assign(6,0.0); 
-        bounding_box[mesh_min_x_index] = -0.5;
-        bounding_box[mesh_min_y_index] = -0.5;
-        bounding_box[mesh_min_z_index] = -0.5;
-        bounding_box[mesh_max_x_index] = 0.5;
-        bounding_box[mesh_max_y_index] = 0.5;
-        bounding_box[mesh_max_z_index] = 0.5;
+        boundingBox = new double[6];//.assign(6,0.0); 
+        boundingBox[mesh_min_x_index] = -0.5;
+        boundingBox[mesh_min_y_index] = -0.5;
+        boundingBox[mesh_min_z_index] = -0.5;
+        boundingBox[mesh_max_x_index] = 0.5;
+        boundingBox[mesh_max_y_index] = 0.5;
+        boundingBox[mesh_max_z_index] = 0.5;
 
         voxels = new Voxel[1];//resize( 1 );
         voxel_faces = new VoxelFace[0];////.resize( 0 );
@@ -113,11 +113,11 @@ public class GeneralMesh
 
     public boolean isPositionValid(double x, double y, double z)
     {
-        if( x < bounding_box[mesh_min_x_index] || x > bounding_box[mesh_max_x_index] )
+        if( x < boundingBox[mesh_min_x_index] || x > boundingBox[mesh_max_x_index] )
             return false;
-        if( y < bounding_box[mesh_min_y_index] || y > bounding_box[mesh_max_y_index] )
+        if( y < boundingBox[mesh_min_y_index] || y > boundingBox[mesh_max_y_index] )
             return false;
-        if( z < bounding_box[mesh_min_z_index] || z > bounding_box[mesh_max_z_index] )
+        if( z < boundingBox[mesh_min_z_index] || z > boundingBox[mesh_max_z_index] )
             return false;
         return true;
     }
@@ -317,9 +317,9 @@ public class GeneralMesh
         sb.append( "\nMesh information: \n" );
         sb.append( "type: general mesh\n" );
         sb.append( "Domain: " );
-        sb.append( "[" + bounding_box[0] + "," + bounding_box[3] + "] " + units + " x \n" );
-        sb.append( "[" + bounding_box[1] + "," + bounding_box[4] + "] " + units + " x \n" );
-        sb.append( "[" + bounding_box[2] + "," + bounding_box[5] + "] " + units + "\n" );
+        sb.append( "[" + boundingBox[0] + "," + boundingBox[3] + "] " + units + " x \n" );
+        sb.append( "[" + boundingBox[1] + "," + boundingBox[4] + "] " + units + " x \n" );
+        sb.append( "[" + boundingBox[2] + "," + boundingBox[5] + "] " + units + "\n" );
         sb.append( "   voxels: " + voxels.length + "\n" );
         sb.append( "   voxel faces: " + voxel_faces.length + "\n" );
         sb.append( "   volume: " );

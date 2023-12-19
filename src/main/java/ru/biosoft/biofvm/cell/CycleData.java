@@ -79,39 +79,23 @@ public class CycleData
     //        std::vector< std::unordered_map<int,int> > inverse_index_maps; 
     //    List<Map<Integer, Integer>> inverse_index_maps;
 
-    private CycleModel pCycle_Model;
+    private CycleModel cycleModel;
 
-    String time_units;
+    String timeUnits;
 
-    //        std::vector< std::vector<double> > transition_rates; 
-    List<List<Double>> transition_rates;
+    List<List<Double>> transitionRates;
 
-    public int current_phase_index;
-    public double elapsed_time_in_phase;
+    public int currentPhaseIndex;
+    public double elapsedTimePhase;
 
     public CycleData(CycleModel model)
     {
-        //        inverse_index_maps = new ArrayList<>();//.resize(0); 
-        pCycle_Model = model;
-        time_units = "min";
-        transition_rates = new ArrayList<>();//.resize( 0 );
-        current_phase_index = 0;
-        elapsed_time_in_phase = 0.0;
+        cycleModel = model;
+        timeUnits = "min";
+        transitionRates = new ArrayList<>();
+        currentPhaseIndex = 0;
+        elapsedTimePhase = 0.0;
     }
-
-    //    private void resizeListMap(List<Map<Integer, Integer>> list, int n)
-    //    {
-    //        if( n < list.size() )
-    //        {
-    //            for( int i = n; i < list.size(); i++ )
-    //                list.remove( i );
-    //        }
-    //        else if( n > list.size() )
-    //        {
-    //            for( int i = 0; i < n - list.size(); i++ )
-    //                list.add( new HashMap<Integer, Integer>() );
-    //        }
-    //    }
 
     private void resizeListList(List<List<Double>> list, int n)
     {
@@ -143,30 +127,15 @@ public class CycleData
 
     public void sync_to_cycle_model()
     {
-        // make sure the inverse map is the right size 
-        int n = pCycle_Model.phases.size();
-        //        resizeListMap( inverse_index_maps, n );
-        resizeListList( transition_rates, n );
-        //            inverse_index_maps.resize( n );
-        // sync the inverse map to the cell cycle model by 
-        // querying the phase_links 
-        //            transition_rates.resize( n );
-        //        transition_rates.add( new ArrayList<Double>() );
-        // also make sure the transition_rates[] are the right size 
+        int n = cycleModel.phases.size();
+        resizeListList( transitionRates, n );
 
-        for( int i = 0; i < pCycle_Model.phase_links.size(); i++ )
+        for( int i = 0; i < cycleModel.phase_links.size(); i++ )
         {
-            //                inverse_index_maps[i].clear(); 
-            //            inverse_index_maps.get( i ).clear();
-            int size = pCycle_Model.phase_links.get( i ).size();
+            int size = cycleModel.phase_links.get( i ).size();
             for( int j = 0; j < size; j++ )
             {
-                //                    inverse_index_maps[i][pCycle_Model.phase_links[i][j].end_phase_index] = j;
-                //                    transition_rates[i].resize( pCycle_Model.phase_links[i].size() );
-                //j - index of phase_link
-                //                int end_index = pCycle_Model.phase_links.get( i ).get( j ).end_phase_index;
-                //                inverse_index_maps.get( i ).put( end_index, j );
-                List<Double> rates = transition_rates.get( i );
+                List<Double> rates = transitionRates.get( i );
                 resizeList( rates, size );
                 //                transition_rates.add( i, new ArrayList<Double>( pCycle_Model.phase_links.get( i ).size() ) );
             }
@@ -177,43 +146,43 @@ public class CycleData
     double transition_rate(int start_phase_index, int end_phase_index)
     {
         //            return transition_rates[ start_phase_index ][ inverse_index_maps[start_phase_index][end_phase_index] ];
-        int index = pCycle_Model.inverse_index_maps.get( start_phase_index ).get( end_phase_index );
-        return transition_rates.get( start_phase_index ).get( index );
+        int index = cycleModel.inverse_index_maps.get( start_phase_index ).get( end_phase_index );
+        return transitionRates.get( start_phase_index ).get( index );
 
     }
 
     public void setTransitionRate(int start_phase_index, int end_phase_index, double rate)
     {
-        int index = pCycle_Model.inverse_index_maps.get( start_phase_index ).get( end_phase_index );
-        transition_rates.get( start_phase_index ).set( index, rate );
+        int index = cycleModel.inverse_index_maps.get( start_phase_index ).get( end_phase_index );
+        transitionRates.get( start_phase_index ).set( index, rate );
     }
 
     //        double& Cycle_Data::exit_rate(int phase_index )
     double exit_rate(int phase_index)
     {
         //            return transition_rates[phase_index][0];
-        return transition_rates.get( phase_index ).get( 0 );
+        return transitionRates.get( phase_index ).get( 0 );
     }
     public void setExitRate(int phase_exit, double rate)
     {
-        transition_rates.get( phase_exit ).set( 0, rate );
+        transitionRates.get( phase_exit ).set( 0, rate );
     }
 
-    public Phase current_phase()
+    public Phase currentPhase()
     {
-        return pCycle_Model.phases.get( current_phase_index );
+        return cycleModel.phases.get( currentPhaseIndex );
     }
 
     public CycleData clone(CycleModel model)
     {
         CycleData result = new CycleData( model );
-        result.time_units = this.time_units;
-        result.current_phase_index = this.current_phase_index;
-        result.elapsed_time_in_phase = this.elapsed_time_in_phase;
-        result.transition_rates = new ArrayList<>();
-        for( int i = 0; i < transition_rates.size(); i++ )
+        result.timeUnits = this.timeUnits;
+        result.currentPhaseIndex = this.currentPhaseIndex;
+        result.elapsedTimePhase = this.elapsedTimePhase;
+        result.transitionRates = new ArrayList<>();
+        for( int i = 0; i < transitionRates.size(); i++ )
         {
-            result.transition_rates.add( new ArrayList<Double>( transition_rates.get( i ) ) );
+            result.transitionRates.add( new ArrayList<Double>( transitionRates.get( i ) ) );
         }
         return result;
     }

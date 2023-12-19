@@ -79,9 +79,9 @@ public class CartesianMesh extends GeneralMesh
         y_coordinates = new double[1];//.assign( 1 , 0.0 ); 
         z_coordinates = new double[1];//.assign( 1 , 0.0 ); 
 
-        dx = bounding_box[3] - bounding_box[0];
-        dy = bounding_box[4] - bounding_box[1];
-        dz = bounding_box[5] - bounding_box[2];
+        dx = boundingBox[3] - boundingBox[0];
+        dy = boundingBox[4] - boundingBox[1];
+        dz = boundingBox[5] - boundingBox[2];
 
 
         if( Math.abs( dx - dy ) > tolerance || Math.abs( dy - dz ) > tolerance || Math.abs( dx - dz ) > tolerance )
@@ -140,12 +140,12 @@ public class CartesianMesh extends GeneralMesh
             z_coordinates[i] = i * dz;
         }
 
-        bounding_box[0] = x_coordinates[0] - dx / 2.0;
-        bounding_box[3] = x_coordinates[x_coordinates.length - 1] + dx / 2.0;
-        bounding_box[1] = y_coordinates[0] - dy / 2.0;
-        bounding_box[4] = y_coordinates[y_coordinates.length - 1] + dy / 2.0;
-        bounding_box[2] = z_coordinates[0] - dz / 2.0;
-        bounding_box[5] = z_coordinates[z_coordinates.length - 1] + dz / 2.0;
+        boundingBox[0] = x_coordinates[0] - dx / 2.0;
+        boundingBox[3] = x_coordinates[x_coordinates.length - 1] + dx / 2.0;
+        boundingBox[1] = y_coordinates[0] - dy / 2.0;
+        boundingBox[4] = y_coordinates[y_coordinates.length - 1] + dy / 2.0;
+        boundingBox[2] = z_coordinates[0] - dz / 2.0;
+        boundingBox[5] = z_coordinates[z_coordinates.length - 1] + dz / 2.0;
 
         units = "none";
 
@@ -381,12 +381,12 @@ public class CartesianMesh extends GeneralMesh
             z_coordinates[i] = z_start + ( i + 0.5 ) * dz;
         }
 
-        bounding_box[0] = x_start;
-        bounding_box[3] = x_end;
-        bounding_box[1] = y_start;
-        bounding_box[4] = y_end;
-        bounding_box[2] = z_start;
-        bounding_box[5] = z_end;
+        boundingBox[0] = x_start;
+        boundingBox[3] = x_end;
+        boundingBox[1] = y_start;
+        boundingBox[4] = y_end;
+        boundingBox[2] = z_start;
+        boundingBox[5] = z_end;
 
         dV = dx * dy * dz;
         dS = dx * dy;
@@ -518,12 +518,12 @@ public class CartesianMesh extends GeneralMesh
             z_coordinates[i] = z_start + ( i + 0.5 ) * dz;
         }
 
-        bounding_box[0] = x_start;
-        bounding_box[3] = x_end;
-        bounding_box[1] = y_start;
-        bounding_box[4] = y_end;
-        bounding_box[2] = z_start;
-        bounding_box[5] = z_end;
+        boundingBox[0] = x_start;
+        boundingBox[3] = x_end;
+        boundingBox[1] = y_start;
+        boundingBox[4] = y_end;
+        boundingBox[2] = z_start;
+        boundingBox[5] = z_end;
 
         dV = dx * dy * dz;
         dS = dx * dy;
@@ -635,9 +635,9 @@ public class CartesianMesh extends GeneralMesh
 
     public int nearest_voxel_index(double[] position)
     {
-        int i = (int)Math.floor( ( position[0] - bounding_box[0] ) / dx );
-        int j = (int)Math.floor( ( position[1] - bounding_box[1] ) / dy );
-        int k = (int)Math.floor( ( position[2] - bounding_box[2] ) / dz );
+        int i = (int)Math.floor( ( position[0] - boundingBox[0] ) / dx );
+        int j = (int)Math.floor( ( position[1] - boundingBox[1] ) / dy );
+        int k = (int)Math.floor( ( position[2] - boundingBox[2] ) / dz );
         //  add some bounds checking -- truncate to inside the computational domain   
         if( i >= x_coordinates.length )
         {
@@ -673,9 +673,9 @@ public class CartesianMesh extends GeneralMesh
     {
         int[] out = new int[3];
 
-        out[0] = (int)Math.floor( ( position[0] - bounding_box[0] ) / dx );
-        out[1] = (int)Math.floor( ( position[1] - bounding_box[1] ) / dy );
-        out[2] = (int)Math.floor( ( position[2] - bounding_box[2] ) / dz );
+        out[0] = (int)Math.floor( ( position[0] - boundingBox[0] ) / dx );
+        out[1] = (int)Math.floor( ( position[1] - boundingBox[1] ) / dy );
+        out[2] = (int)Math.floor( ( position[2] - boundingBox[2] ) / dz );
 
         //  add some bounds checking -- truncate to inside the computational domain  
 
@@ -765,9 +765,9 @@ public class CartesianMesh extends GeneralMesh
             }
         }
         sb.append( "Domain: " );
-        sb.append( "[" + bounding_box[0] + "," + bounding_box[3] + "] " + units + " x " );
-        sb.append( "[" + bounding_box[1] + "," + bounding_box[4] + "] " + units + " x " );
-        sb.append( "[" + bounding_box[2] + "," + bounding_box[5] + "] " + units + "\n" );
+        sb.append( "[" + boundingBox[0] + "," + boundingBox[3] + "] " + units + " x " );
+        sb.append( "[" + boundingBox[1] + "," + boundingBox[4] + "] " + units + " x " );
+        sb.append( "[" + boundingBox[2] + "," + boundingBox[5] + "] " + units + "\n" );
         sb.append( "   resolution: dx = " + dx + " " + units );
         if( !uniform_mesh )
         {
@@ -778,7 +778,7 @@ public class CartesianMesh extends GeneralMesh
         sb.append( "   voxels: " + voxels.length + "\n" );
         sb.append( "   voxel faces: " + voxel_faces.length + "\n" );
         sb.append( "   volume: "
-                + ( bounding_box[3] - bounding_box[0] ) * ( bounding_box[4] - bounding_box[1] ) * ( bounding_box[5] - bounding_box[2] ) );
+                + ( boundingBox[3] - boundingBox[0] ) * ( boundingBox[4] - boundingBox[1] ) * ( boundingBox[5] - boundingBox[2] ) );
         sb.append( " cubic " + units + "\n" );
 
         return sb.toString();

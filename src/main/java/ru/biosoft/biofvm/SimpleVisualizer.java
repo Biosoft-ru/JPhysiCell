@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -132,7 +131,7 @@ public class SimpleVisualizer
         int width = (int) ( xCells * m.mesh.dx );
         int height = (int) ( yCells * m.mesh.dy );
         zCoord = (int) ( zCoord / m.mesh.dz );
-        double[][] p = m.p_density_vectors;
+        double[][] p = m.density;
         BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_RGB );
         Graphics g = img.getGraphics();
         drawDensity( xCells, yCells, (int)m.mesh.dx, (int)m.mesh.dy, p, zCoord, g );
@@ -161,9 +160,8 @@ public class SimpleVisualizer
 
     private static void drawAgents(Microenvironment m, Graphics g)
     {
-        List<BasicAgent> agents = BasicAgent.allBasicAgents;
         g.setColor( Color.black );
-        for( BasicAgent agent : agents )
+        for( BasicAgent agent : m.getAgents() )
         {
             String tag = agent.getTag();
             double[] position = agent.position;

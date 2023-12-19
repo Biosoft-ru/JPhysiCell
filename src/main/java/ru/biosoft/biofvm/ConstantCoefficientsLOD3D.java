@@ -61,7 +61,7 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
         xLength = m.mesh.x_coordinates.length;
         yLength = m.mesh.y_coordinates.length;
         zLength = m.mesh.z_coordinates.length;
-        density = m.p_density_vectors;
+        density = m.density;
 
         m.thomas_denomx = new double[xLength][];
         m.thomas_cx = new double[xLength][];

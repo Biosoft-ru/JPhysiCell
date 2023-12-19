@@ -1,8 +1,5 @@
 package ru.biosoft.biofvm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ru.biosoft.biofvm.cell.CellContainer;
 
 /*
@@ -54,11 +51,11 @@ import ru.biosoft.biofvm.cell.CellContainer;
 */
 public class BasicAgent
 {
-    public static List<BasicAgent> allBasicAgents = new ArrayList<>();
+    //    public static List<BasicAgent> allBasicAgents = new ArrayList<>();
 
     static int maxBasicAgentId = 0;
 
-    private Microenvironment microenvironment;
+    protected Microenvironment microenvironment;
     int selected_microenvironment;
 
     int current_microenvironment_voxel_index;
@@ -93,7 +90,7 @@ public class BasicAgent
     public double[] fraction_released_at_death;
     public double[] fraction_transferred_when_ingested;
 
-    public BasicAgent()
+    public BasicAgent(Microenvironment m)
     {
         //give the agent a unique ID  
         ID = maxBasicAgentId;
@@ -114,7 +111,7 @@ public class BasicAgent
         internalizedSubstrates = new double[0];// = new std::vector<double>(0); // 
         fraction_released_at_death = new double[0];// = new std::vector<double>(0); 
         fraction_transferred_when_ingested = new double[0];// = new std::vector<double>(0); 
-        registerMicroenvironment( Microenvironment.get_default_microenvironment() );
+        registerMicroenvironment( m );
 
         // these are done in register_microenvironment
         // //internalized_substrates.assign( get_default_microenvironment()->number_of_densities() , 0.0 ); 
@@ -162,7 +159,7 @@ public class BasicAgent
         updateVoxelIndex();
 
         // make sure the agent is not already registered
-        getMicroenvironment().agent_container.register_agent( this );
+        getMicroenvironment().agentContainer.register_agent( this );
         return true;
     }
 
@@ -180,7 +177,8 @@ public class BasicAgent
     public void registerMicroenvironment(Microenvironment microenvironment)
     {
         this.microenvironment = microenvironment;
-        double[] density = microenvironment.density_vector( 0 );
+        microenvironment.addAgent( this );
+        double[] density = microenvironment.getDensity( 0 );
         int length = density.length;
 
         secretionRates = VectorUtil.resize( secretionRates, length );
@@ -207,11 +205,11 @@ public class BasicAgent
         return microenvironment;
     }
 
-    public static BasicAgent createBasicAgent()
+    public static BasicAgent createBasicAgent(Microenvironment m)
     {
-        BasicAgent pNew = new BasicAgent();
-        allBasicAgents.add( pNew );
-        pNew.index = allBasicAgents.size() - 1;
+        BasicAgent pNew = new BasicAgent( m );
+        //        allBasicAgents.add( pNew );
+        pNew.index = m.getAgentsCount();
         return pNew;
     }
 
@@ -296,32 +294,32 @@ public class BasicAgent
 
     public void release_internalized_substrates()
     {
-        Microenvironment pS = Microenvironment.get_default_microenvironment(); 
-        
+        //        Microenvironment pS = Microenvironment.get_default_microenvironment(); 
+
         // change in total in voxel: 
         // total_ext = total_ext + fraction*total_internal 
         // total_ext / vol_voxel = total_ext / vol_voxel + fraction*total_internal / vol_voxel 
         // density_ext += fraction * total_internal / vol_volume 
-        
+
         // std::cout << "\t\t\t" << (*pS)(current_voxel_index) << "\t\t\t" << std::endl; 
-//        *internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
-//        *internalized_substrates *= *fraction_released_at_death;  // what fraction is released? 
-        
-        VectorUtil.div( internalizedSubstrates, pS.voxels(currentVoxelIndex).volume );// turn to density 
+        //        *internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
+        //        *internalized_substrates *= *fraction_released_at_death;  // what fraction is released? 
+
+        VectorUtil.div( internalizedSubstrates, microenvironment.voxels( currentVoxelIndex ).volume );// turn to density 
         VectorUtil.prod( internalizedSubstrates, fraction_released_at_death );// what fraction is released? 
         // release this amount into the environment 
-        
+
         //        pS.get( currentVoxelIndex ) += internalized_substrates;
         //        (*pS)(current_voxel_index) += *internalized_substrates; 
-        VectorUtil.sum( pS.get( currentVoxelIndex ), internalizedSubstrates );
+        VectorUtil.sum( microenvironment.get( currentVoxelIndex ), internalizedSubstrates );
         // zero out the now-removed substrates 
         internalizedSubstrates = new double[internalizedSubstrates.length];
         //        internalized_substrates->assign( internalized_substrates->size() , 0.0 ); 
-        
-        return; 
+
+        return;
     }
 
-    public void set_total_volume(double volume)
+    public void setTotalVolume(double volume)
     {
 
     }

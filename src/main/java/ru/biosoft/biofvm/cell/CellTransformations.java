@@ -80,7 +80,7 @@ public class CellTransformations implements Cloneable
 
     void sync_to_cell_definitions()
     {
-        int number_of_cell_defs = Cell.cell_definition_indices_by_name.size();
+        int number_of_cell_defs = CellDefinition.getDefinitionsCount();
 
         if( transformation_rates.length != number_of_cell_defs )
         {

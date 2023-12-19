@@ -68,20 +68,20 @@ package ru.biosoft.biofvm.cell;
 */
 public class Volume implements Cloneable
 {
-    double total;
-    double solid;
-    double fluid;
-    double fluid_fraction;
+    public double total;
+    public double solid;
+    public double fluid;
+    public double fluid_fraction;
 
-    double nuclear;
-    double nuclear_fluid;
-    double nuclear_solid;
+    public double nuclear;
+    public double nuclear_fluid;
+    public double nuclear_solid;
 
     double cytoplasmic;
-    double cytoplasmic_fluid;
-    double cytoplasmic_solid;
+    public double cytoplasmic_fluid;
+    public double cytoplasmic_solid;
 
-    double calcified_fraction;
+    public double calcified_fraction;
 
     double cytoplasmic_to_nuclear_ratio;
 

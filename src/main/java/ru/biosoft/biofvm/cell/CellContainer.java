@@ -80,7 +80,6 @@ public class CellContainer extends AgentContainer
 {
     Set<Cell> cells_ready_to_divide; // the index of agents ready to divide
     Set<Cell> cells_ready_to_die;
-    //    public static List<BasicAgent> allCells;
     int boundary_condition_for_pushed_out_agents; // what to do with pushed out cells
     boolean initialzed = false;
 
@@ -93,13 +92,11 @@ public class CellContainer extends AgentContainer
     double last_cell_cycle_time = 0.0;
     double last_mechanics_time = 0.0;
 
-    //    Cell[][] agent_grid;
     List<Set<Cell>> agent_grid;
     List<Set<Cell>> agents_in_outer_voxels;
 
     public CellContainer()
     {
-        //        allCells = BasicAgent.allBasicAgents;
         boundary_condition_for_pushed_out_agents = PhysiCellConstants.default_boundary_condition_for_pushed_out_agents;
         cells_ready_to_divide = new HashSet<>();
         cells_ready_to_die = new HashSet<>();
@@ -132,25 +129,16 @@ public class CellContainer extends AgentContainer
         //            agents_in_outer_voxels.resize(6);
 
     }
-    //     
-    //    void Cell_Container::update_all_cells(double t)
-    //    {
-    //        // update_all_cells(t, dt_settings.cell_cycle_dt_default, dt_settings.mechanics_dt_default);
-    //        
-    //        update_all_cells(t, phenotype_dt, mechanics_dt , diffusion_dt );
-    //        
-    //        return; 
-    //    }
-    //
-    public void update_all_cells(double t, double phenotype_dt_, double mechanics_dt_, double diffusion_dt_)
+
+    public void updateAllCells(Microenvironment m, double t, double phenotype_dt_, double mechanics_dt_, double diffusion_dt_)
     {
         // secretions and uptakes. Syncing with BioFVM is automated. 
         //            #pragma omp parallel for 
-        List<BasicAgent> agents = BasicAgent.allBasicAgents;
+        Set<BasicAgent> agents = m.getAgents();
         for( BasicAgent agent : agents )
         {
             Cell cell = (Cell)agent;
-            if( !cell.is_out_of_domain )
+            if( !cell.isOutOfDomain )
             {
                 cell.phenotype.secretion.advance( cell, cell.phenotype, diffusion_dt_ );
             }
@@ -166,7 +154,7 @@ public class CellContainer extends AgentContainer
         for( BasicAgent agent : agents )
         {
             Cell cell = (Cell)agent;
-            if( cell.is_out_of_domain == false && initialzed )
+            if( cell.isOutOfDomain == false && initialzed )
             {
 
                 if( cell.phenotype.intracellular != null && cell.phenotype.intracellular.need_update() )
@@ -196,12 +184,12 @@ public class CellContainer extends AgentContainer
             // new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
             // checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
             //                #pragma omp parallel for 
-            for( int i = 0; i < agents.size(); i++ )
+            for( BasicAgent agent : agents )
             {
-                Cell pC = (Cell)agents.get( i );
-                if( pC.is_out_of_domain == false )
+                Cell cell = (Cell)agent;
+                if( cell.isOutOfDomain == false )
                 {
-                    pC.advance_bundled_phenotype_functions( time_since_last_cycle );
+                    cell.advance_bundled_phenotype_functions( time_since_last_cycle );
                 }
             }
 
@@ -233,17 +221,18 @@ public class CellContainer extends AgentContainer
             // if we need gradients, compute them
             //                if( default_microenvironment_options.calculate_gradients ) 
             //                { microenvironment.compute_all_gradient_vectors();  }
-            if( Microenvironment.get_default_microenvironment().options.calculate_gradients )
-            {
-                Microenvironment.get_default_microenvironment().compute_all_gradient_vectors();
-            }
+            //            if( Microenvironment.get_default_microenvironment().options.calculate_gradients )
+            //            {
+            //                Microenvironment.get_default_microenvironment().compute_all_gradient_vectors();
+            //            }
+            //TOD: commented by now
             // end of new in Feb 2018 
             // perform interactions -- new in June 2020 
             //                #pragma omp parallel for 
             for( BasicAgent agent : agents )
             {
                 Cell cell = (Cell)agent;
-                if( cell.functions.contact_function != null && cell.is_out_of_domain == false )
+                if( cell.functions.contact_function != null && !cell.isOutOfDomain )
                 {
                     StandardModels.evaluate_interactions( cell, cell.phenotype, time_since_last_mechanics );
                 }
@@ -253,7 +242,7 @@ public class CellContainer extends AgentContainer
             for( BasicAgent agent : agents )
             {
                 Cell cell = (Cell)agent;
-                if( cell.functions.custom_cell_rule != null && cell.is_out_of_domain == false )
+                if( cell.functions.custom_cell_rule != null && !cell.isOutOfDomain )
                 {
                     cell.functions.custom_cell_rule.execute( cell, cell.phenotype, time_since_last_mechanics );
                 }
@@ -263,7 +252,7 @@ public class CellContainer extends AgentContainer
             for( BasicAgent agent : agents )
             {
                 Cell cell = (Cell)agent;
-                if( cell.functions.updateVelocity != null && cell.is_out_of_domain == false && cell.is_movable )
+                if( cell.functions.updateVelocity != null && !cell.isOutOfDomain && cell.isMovable )
                 {
                     cell.functions.updateVelocity.execute( cell, cell.phenotype, time_since_last_mechanics );
                 }
@@ -282,7 +271,7 @@ public class CellContainer extends AgentContainer
                 for( BasicAgent agent : agents )
                 {
                     Cell cell = (Cell)agent;
-                    if( cell.is_movable )
+                    if( cell.isMovable )
                     {
                         for( Cell pC1 : cell.state.spring_attachments )
                         {
@@ -329,7 +318,7 @@ public class CellContainer extends AgentContainer
             for( BasicAgent agent : agents )
             {
                 Cell cell = (Cell)agent;
-                if( cell.is_out_of_domain == false && cell.is_movable )
+                if( cell.isOutOfDomain == false && cell.isMovable )
                 {
                     cell.update_position( time_since_last_mechanics );
                 }
@@ -341,7 +330,7 @@ public class CellContainer extends AgentContainer
             for( BasicAgent agent : agents )
             {
                 Cell cell = (Cell)agent;
-                if( !cell.is_out_of_domain && cell.is_movable )
+                if( !cell.isOutOfDomain && cell.isMovable )
                     cell.update_voxel_in_container();
             }
             last_mechanics_time = t;
@@ -372,7 +361,7 @@ public class CellContainer extends AgentContainer
     {
         int escaping_face = find_escaping_face_index( agent );
         agents_in_outer_voxels.get( escaping_face ).add( (Cell)agent );//.push_back(agent);
-        ( (Cell)agent ).is_out_of_domain = true;
+        ( (Cell)agent ).isOutOfDomain = true;
         return;
     }
     //
@@ -412,27 +401,27 @@ public class CellContainer extends AgentContainer
 
     int find_escaping_face_index(BasicAgent agent)
     {
-        if( agent.position[0] <= agent.get_container().underlying_mesh.bounding_box[PhysiCellConstants.mesh_min_x_index] )
+        if( agent.position[0] <= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_min_x_index] )
         {
             return PhysiCellConstants.mesh_lx_face_index;
         }
-        if( agent.position[0] >= agent.get_container().underlying_mesh.bounding_box[PhysiCellConstants.mesh_max_x_index] )
+        if( agent.position[0] >= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_max_x_index] )
         {
             return PhysiCellConstants.mesh_ux_face_index;
         }
-        if( agent.position[1] <= agent.get_container().underlying_mesh.bounding_box[PhysiCellConstants.mesh_min_y_index] )
+        if( agent.position[1] <= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_min_y_index] )
         {
             return PhysiCellConstants.mesh_ly_face_index;
         }
-        if( agent.position[1] >= agent.get_container().underlying_mesh.bounding_box[PhysiCellConstants.mesh_max_y_index] )
+        if( agent.position[1] >= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_max_y_index] )
         {
             return PhysiCellConstants.mesh_uy_face_index;
         }
-        if( agent.position[2] <= agent.get_container().underlying_mesh.bounding_box[PhysiCellConstants.mesh_min_z_index] )
+        if( agent.position[2] <= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_min_z_index] )
         {
             return PhysiCellConstants.mesh_lz_face_index;
         }
-        if( agent.position[2] >= agent.get_container().underlying_mesh.bounding_box[PhysiCellConstants.mesh_max_z_index] )
+        if( agent.position[2] >= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_max_z_index] )
         {
             return PhysiCellConstants.mesh_uz_face_index;
         }
@@ -462,13 +451,13 @@ public class CellContainer extends AgentContainer
         //            } 
         //            return; 
     }
-    //
-    public static CellContainer create_cell_container_for_microenvironment(Microenvironment m, double mechanics_voxel_size)
+
+    public static CellContainer createCellContainer(Microenvironment m, double mechanicsVoxelSize)
     {
         CellContainer cellContainer = new CellContainer();
-        cellContainer.initialize( m.mesh.bounding_box[0], m.mesh.bounding_box[3], m.mesh.bounding_box[1], m.mesh.bounding_box[4],
-                m.mesh.bounding_box[2], m.mesh.bounding_box[5], mechanics_voxel_size );
-        m.agent_container = (AgentContainer)cellContainer;
+        cellContainer.initialize( m.mesh.boundingBox[0], m.mesh.boundingBox[3], m.mesh.boundingBox[1], m.mesh.boundingBox[4],
+                m.mesh.boundingBox[2], m.mesh.boundingBox[5], mechanicsVoxelSize );
+        m.agentContainer = (AgentContainer)cellContainer;
         return cellContainer;
     }
 }

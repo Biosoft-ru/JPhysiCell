@@ -2,6 +2,7 @@ package ru.biosoft.biofvm.cell;
 
 import ru.biosoft.biofvm.BasicAgent;
 import ru.biosoft.biofvm.Microenvironment;
+import ru.biosoft.biofvm.VectorUtil;
 
 /*
 ###############################################################################
@@ -71,116 +72,72 @@ import ru.biosoft.biofvm.Microenvironment;
 */
 public class Secretion implements Cloneable
 {
-    Microenvironment pMicroenvironment;
+    double[] secretionRates;
+    public double[] uptakeRates;
+    double[] saturationDensities;
+    double[] netExportRates;
 
-    double[] secretion_rates;
-    public double[] uptake_rates;
-    double[] saturation_densities;
-    double[] net_export_rates;
-
-    public Secretion()
+    public void sync(Microenvironment m)
     {
-        pMicroenvironment = Microenvironment.get_default_microenvironment();
-
-        sync_to_current_microenvironment();
+        int size = m.number_of_densities();
+        secretionRates = VectorUtil.resize( secretionRates, size );//new double[m.number_of_densities()];//.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
+        uptakeRates = VectorUtil.resize( uptakeRates, size );//.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
+        saturationDensities = VectorUtil.resize( saturationDensities, size );//.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
+        netExportRates = VectorUtil.resize( netExportRates, size );//.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
     }
 
-    public void sync_to_current_microenvironment()
-    {
-        if( pMicroenvironment != null )
-        {
-            sync_to_microenvironment( pMicroenvironment );
-        }
-        else
-        {
-            secretion_rates = new double[0];
-            uptake_rates = new double[0];
-            saturation_densities = new double[0];
-            net_export_rates = new double[0];
-        }
-    }
-
-    public void sync_to_microenvironment(Microenvironment pNew_Microenvironment)
-    {
-        pMicroenvironment = pNew_Microenvironment;
-
-        secretion_rates = new double[pMicroenvironment.number_of_densities()];//.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
-        uptake_rates = new double[pMicroenvironment.number_of_densities()];//.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
-        saturation_densities = new double[pMicroenvironment.number_of_densities()];//.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
-        net_export_rates = new double[pMicroenvironment.number_of_densities()];//.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
-    }
-
-    public void advance(BasicAgent pCell, Phenotype phenotype, double dt)
+    public void advance(BasicAgent cell, Phenotype phenotype, double dt)
     {
         // if this phenotype is not associated with a cell, exit 
-        if( pCell == null )
+        if( cell == null )
             return;
 
-        // if there is no microenvironment, attempt to sync. 
-        if( pMicroenvironment == null )
-        {
-            // first, try the cell's microenvironment
-            if( pCell.getMicroenvironment() != null )
-            {
-                sync_to_microenvironment( pCell.getMicroenvironment() );
-            }
-            // otherwise, try the default microenvironment
-            else
-            {
-                sync_to_microenvironment( Microenvironment.get_default_microenvironment() );
-            }
-
-            // if we've still failed, return. 
-            if( pMicroenvironment == null )
-                return;
-        }
-
         // make sure the associated cell has the correct rate vectors 
-        if( pCell.secretionRates != secretion_rates )
+        if( cell.secretionRates != secretionRates )
         {
-            pCell.secretionRates = secretion_rates;
-            pCell.uptakeRates = uptake_rates;
-            pCell.saturationDensities = saturation_densities;
-            pCell.netExportRates = net_export_rates;
-            pCell.set_total_volume( phenotype.volume.total );
-            pCell.setUptakeConstants( dt );
+            cell.secretionRates = secretionRates;
+            cell.uptakeRates = uptakeRates;
+            cell.saturationDensities = saturationDensities;
+            cell.netExportRates = netExportRates;
+            cell.setTotalVolume( phenotype.volume.total );
+            cell.setUptakeConstants( dt );
         }
 
         // now, call the BioFVM secretion/uptake function 
-        pCell.simulateSecretionUptake( pMicroenvironment, dt );
+        cell.simulateSecretionUptake( cell.getMicroenvironment(), dt );
     }
 
     public void set_all_secretion_to_zero()
     {
-        for( int i = 0; i < secretion_rates.length; i++ )
+        for( int i = 0; i < secretionRates.length; i++ )
         {
-            secretion_rates[i] = 0.0;
-            net_export_rates[i] = 0.0;
+            secretionRates[i] = 0.0;
+            netExportRates[i] = 0.0;
         }
     }
 
     void set_all_uptake_to_zero()
     {
-        for( int i = 0; i < uptake_rates.length; i++ )
+        for( int i = 0; i < uptakeRates.length; i++ )
         {
-            uptake_rates[i] = 0.0;
+            uptakeRates[i] = 0.0;
         }
     }
 
     public void scale_all_secretion_by_factor(double factor)
     {
-        for( int i = 0; i < secretion_rates.length; i++ )
+        for( int i = 0; i < secretionRates.length; i++ )
         {
-            secretion_rates[i] *= factor;
-            net_export_rates[i] *= factor;
+            secretionRates[i] *= factor;
+            netExportRates[i] *= factor;
         }
     }
 
     public void scale_all_uptake_by_factor(double factor)
     {
-        for( int i = 0; i < uptake_rates.length; i++ )
+        for( int i = 0; i < uptakeRates.length; i++ )
         {
-            uptake_rates[i] *= factor;
+            uptakeRates[i] *= factor;
         }
 
     }
@@ -189,7 +146,7 @@ public class Secretion implements Cloneable
     public void setSecretionRate(int index, double val)
     {
         //        int index = microenvironment.find_density_index( name );
-        secretion_rates[index] = val;
+        secretionRates[index] = val;
         //        return 0;
     }
 
@@ -220,10 +177,10 @@ public class Secretion implements Cloneable
         try
         {
             Secretion result = (Secretion)super.clone();
-            result.secretion_rates = this.secretion_rates.clone();
-            result.uptake_rates = this.secretion_rates.clone();
-            result.saturation_densities = this.saturation_densities.clone();
-            result.net_export_rates = this.net_export_rates.clone();
+            result.secretionRates = this.secretionRates.clone();
+            result.uptakeRates = this.secretionRates.clone();
+            result.saturationDensities = this.saturationDensities.clone();
+            result.netExportRates = this.netExportRates.clone();
             return result;
         }
         catch( CloneNotSupportedException e )

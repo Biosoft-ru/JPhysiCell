@@ -1,8 +1,17 @@
-package ru.biosoft.biofvm.cell;
+package ru.biosoft.biofvm.examples;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.DecimalFormat;
 
 import ru.biosoft.biofvm.BasicAgent;
 import ru.biosoft.biofvm.Microenvironment;
-import ru.biosoft.biofvm.VectorUtil;
+import ru.biosoft.biofvm.cell.Cell;
+import ru.biosoft.biofvm.cell.CellContainer;
+import ru.biosoft.biofvm.cell.CellDefinition;
+import ru.biosoft.biofvm.cell.PhysiCellConstants;
+import ru.biosoft.biofvm.cell.StandardModels;
 
 /*
 ###############################################################################
@@ -39,7 +48,7 @@ import ru.biosoft.biofvm.VectorUtil;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,117 +79,107 @@ import ru.biosoft.biofvm.VectorUtil;
 #                                                                             #
 ###############################################################################
 */
-public class Molecular implements Cloneable
+public class TestVolume
 {
-    Microenvironment pMicroenvironment;
+    private static DecimalFormat format = new DecimalFormat( "##.##" );
+    static double outputInterval = 60.0;
+    static double dt = 5;
+    static double o2Conc = 5.01;
 
+    static String APOPTOSIS = "Apoptosis";
+    static String NECROSIS = "Necrosis";
 
-    // we'll set this to replace BioFVM's version       
-    double[] internalized_total_substrates;// = new double[0];
+    private static String resultPath = "C:/Users/Damag/BIOFVM/Volume/";
 
-    // for each substrate, a fraction 0 <= f <= 1 of the 
-    // total internalized substrate is released back inot
-    // the environment at death 
-    double[] fraction_released_at_death;// = new double[0];
-
-    // for each substrate, a fraction 0 <= f <= 1 of the 
-    // total internalized substrate is transferred to the  
-    // predatory cell when ingested 
-    double[] fraction_transferred_when_ingested;// = new double[0];
-
-    void sync(Microenvironment m)
+    public static void main(String[] argv) throws Exception
     {
-        int number_of_densities = m.number_of_densities();
-        internalized_total_substrates = VectorUtil.resize( internalized_total_substrates, number_of_densities );
-        fraction_released_at_death = VectorUtil.resize( internalized_total_substrates, number_of_densities );
-        fraction_transferred_when_ingested = VectorUtil.resize( fraction_transferred_when_ingested, number_of_densities );
+        run( 2402, APOPTOSIS, resultPath + "/Apoptosis.txt" );
+        run( 2402, NECROSIS, resultPath + "/Necrosis.txt" );
+        run( 2402, "", resultPath + "/Default.txt" );
     }
 
-    void sync(BasicAgent pCell)
+    public static void run(double tMax, String type, String name) throws Exception
     {
-        //                delete pCell.internalized_substrates;
-        //                pCell.internalized_substrates = &internalized_total_substrates;
-        pCell.internalizedSubstrates = internalized_total_substrates;
+        Microenvironment m = new Microenvironment( "substrate scale", 2000, 20, "minutes", "microns" );
+        CellContainer.createCellContainer( m, 30 );
 
-        //                delete pCell.fraction_released_at_death;
-        //                pCell.fraction_released_at_death = &fraction_released_at_death; 
-        pCell.fraction_released_at_death = fraction_released_at_death;
+        m.setDensity( 0, "oxygen", "mmHg" );
+        for( int n = 0; n < m.number_of_voxels(); n++ )
+            m.getDensity( n )[0] = o2Conc;
 
-        //                delete pCell.fraction_transferred_when_ingested; 
-        //                pCell.fraction_transferred_when_ingested = &fraction_transferred_when_ingested; 
-        pCell.fraction_transferred_when_ingested = fraction_transferred_when_ingested;
-    }
+        CellDefinition.clearCellDefinitions();
+        CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
+        CellDefinition.registerCellDefinition( cd );
+        cd.functions.cycleModel = StandardModels.createAdvancedKi67();
+        cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based();
+        //cell_defaults.functions.volume_update_function = standard_volume_update_function;
 
-    // ease of access 
-    //            double& internalized_total_substrate( String name )
-    //            {
-    //                int index = microenvironment.find_density_index(name); 
-    //                return internalized_total_substrates[index]; 
-    //            }
+        // first find index for a few key variables. 
+        int apoptosisModelIndex = cd.phenotype.death.find_death_model_index( "Apoptosis" );
+        int necrosisModelIndex = cd.phenotype.death.find_death_model_index( "Necrosis" );
 
-    /*
-    void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
-    {
-        // if this phenotype is not associated with a cell, exit 
-        if( pCell == NULL )
-        { return; }
-    
-        // if there is no microenvironment, attempt to sync. 
-        if( pMicroenvironment == NULL )
+        int K1_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
+        int K2_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
+        int Q_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_negative );
+        int A_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.apoptotic );
+        int N_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.necrotic_swelling );
+
+        Cell cell = Cell.createCell( cd, m, new double[] {500, 500, 500} );
+        if( type.equals( APOPTOSIS ) )
         {
-            // first, try the cell's microenvironment
-            if( pCell->get_microenvironment() )
+            cell.phenotype.cycle.data.currentPhaseIndex = A_index;
+            cell.phenotype.death.trigger_death( apoptosisModelIndex );
+            cell.phenotype.cycle = cell.phenotype.death.current_model();
+        }
+        else if( type.equals( NECROSIS ) )
+        {
+            cell.phenotype.cycle.data.currentPhaseIndex = N_index;
+            cell.phenotype.death.trigger_death( necrosisModelIndex );
+            cell.phenotype.cycle = cell.phenotype.death.current_model();
+        }
+        else
+        {
+            cell.phenotype.cycle.data.currentPhaseIndex = K1_index;
+            cell.phenotype.death.rates.set( apoptosisModelIndex, 0.0 ); // disable apoptosis
+            cell.phenotype.cycle.data.setTransitionRate( Q_index, K1_index, 1e9 ); // set Q duration to a large value
+        }
+        cell.phenotype.cycle.currentPhase().entryFunction.execute( cell, cell.phenotype, dt );
+        for( BasicAgent agent : m.getAgents() )
+            agent.setUptakeConstants( dt );
+
+        //Simulation starts
+        try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( name ) ) ))
+        {
+            bw.append( "Total\tFluid\tNuclear\tCytoplasmatic\n" );
+            double t = 0.0;
+            double nextOutputTime = 0;
+            while( t < tMax )
             {
-                sync_to_microenvironment( pCell->get_microenvironment() ); 
+                if( Math.abs( t - nextOutputTime ) < 0.001 )
+                {
+                    String report = format.format( cell.get_total_volume() ) + "\t" + format.format( cell.phenotype.volume.fluid )
+                            + "\t" + format.format( cell.phenotype.volume.nuclear_solid ) + "\t"
+                            + format.format( cell.phenotype.volume.cytoplasmic_solid ) + "\n";
+                    bw.append( report );
+                    nextOutputTime += outputInterval;
+                }
+                if( m.getAgentsCount() > 1 )
+                {
+                    Cell toDelete = null;
+                    for( BasicAgent agent : m.getAgents() )
+                    {
+                        if (agent.ID == cell.ID)
+                            continue;
+                        else
+                            toDelete = (Cell)agent;
+                    }
+                    Cell.delete_cell( toDelete );
+                    bw.append( "New cell deleted \n" );
+                }
+                ( (CellContainer)m.agentContainer ).updateAllCells( m, t, dt, dt, dt );
+                t += dt;
             }
-            // otherwise, try the default microenvironment
-            else
-            {
-                sync_to_microenvironment( get_default_microenvironment() ); 
-            }
-    
-            // if we've still failed, return. 
-            if( pMicroenvironment == NULL ) 
-            {
-                return; 
-            }
         }
-    
-        // make sure the associated cell has the correct rate vectors 
-        if( pCell->internalized_substrates != &internalized_substrates )
-        {
-            // copy the data over 
-            internalized_substrates = *(pCell->internalized_substrates);
-            // remove the BioFVM copy 
-            delete pCell->internalized_substrates; 
-            // point BioFVM to this one  
-            pCell->internalized_substrates = &internalized_substrates; 
-        }
-    
-        // now, call the functions 
-    //  if( pCell->functions.internal_substrate_function )
-    //  { pCell->functions.internal_substrate_function( pCell,phenotype,dt);  }
-    //  if( pCell->functions.molecular_model_function )
-    //  { pCell->functions.molecular_model_function( pCell,phenotype,dt);  }
-    
-    
-        return; 
-    }
-    */
-    @Override
-    public Molecular clone()
-    {
-        try
-        {
-            Molecular result = (Molecular)super.clone();
-            result.internalized_total_substrates = this.internalized_total_substrates.clone();
-            result.fraction_released_at_death = this.fraction_released_at_death.clone();
-            result.fraction_transferred_when_ingested = this.fraction_transferred_when_ingested.clone();
-            return result;
-        }
-        catch( CloneNotSupportedException e )
-        {
-            throw ( new InternalError( e ) );
-        }
+        m.getAgents().clear();
     }
 }

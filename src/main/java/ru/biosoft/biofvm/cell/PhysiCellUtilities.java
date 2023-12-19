@@ -1,5 +1,7 @@
 package ru.biosoft.biofvm.cell;
 
+import ru.biosoft.biofvm.GeneralMesh;
+
 public class PhysiCellUtilities
 {
     public static double[] UniformOnUnitSphere()
@@ -16,12 +18,12 @@ public class PhysiCellUtilities
 
     public static double[] UniformOnUnitCircle()
     {
-       double[] output = {0,0,0}; 
-       double theta = UniformRandom(); //  BioFVM::uniform_random();
-       theta *= 2 * Math.PI;//two_pi; // Choose theta uniformly distributed on [0, 2*pi).
-       output[0] = Math.cos( theta );
-       output[1] = Math.sin( theta ); // (cos(t) , sin(t) , 0 )
-        return output; 
+        double[] output = {0, 0, 0};
+        double theta = UniformRandom(); //  BioFVM::uniform_random();
+        theta *= 2 * Math.PI;//two_pi; // Choose theta uniformly distributed on [0, 2*pi).
+        output[0] = Math.cos( theta );
+        output[1] = Math.sin( theta ); // (cos(t) , sin(t) , 0 )
+        return output;
     }
 
     public static double UniformRandom()
@@ -54,4 +56,14 @@ public class PhysiCellUtilities
         //        return out; 
         //    */  
     }
+
+    public static double[] getCenter(GeneralMesh mesh)
+    {
+        double[] center = new double[3];
+        center[0] = ( mesh.boundingBox[0] + mesh.boundingBox[3] ) / 2;
+        center[1] = ( mesh.boundingBox[1] + mesh.boundingBox[4] ) / 2;
+        center[2] = ( mesh.boundingBox[2] + mesh.boundingBox[5] ) / 2;
+        return center;
+    }
+
 }

@@ -13,9 +13,9 @@ public class SignalBehavior
     public static double[] signal_scales = new double[0];
     public static double get_single_signal( Cell pCell, int index )
     {
-        Microenvironment microenvironment = Microenvironment.get_default_microenvironment();
+        Microenvironment microenvironment = pCell.getMicroenvironment();//Microenvironment.get_default_microenvironment();
         int m = microenvironment.number_of_densities(); 
-        int n = Cell.cell_definition_indices_by_name.size(); 
+        int n = CellDefinition.getDefinitionsCount();
 
         double out = 0.0; 
         if( index < 0 )
@@ -72,7 +72,7 @@ public class SignalBehavior
 
         // physical contact with cells (of each type) 
         // individual contact signals are a bit costly 
-        int contact_ind = find_signal_index( "contact with " + Cell.cell_definitions_by_type.get(0).name ); 
+        int contact_ind = find_signal_index( "contact with " + pCell.type );
         if( contact_ind <= index && index < contact_ind + n+2 )
         {
             //            std::vector<int> counts( n , 0 );
@@ -87,8 +87,8 @@ public class SignalBehavior
                 { dead_cells++; } 
                 else
                 { live_cells++; } 
-                int nCT = Cell.cell_definition_indices_by_type.get( pC.type );
-                counts[nCT] += 1; 
+                //                int nCT = CellDefinition.getCellDefinition( pC.type );// Cell.cell_definition_indices_by_type.get( pC.type );
+                counts[pC.type] += 1;
             }
 
             if( index < contact_ind + n )
@@ -173,7 +173,7 @@ public class SignalBehavior
         int apoptotic_ind = find_signal_index( "apoptotic" ); 
         if( index == apoptotic_ind )
         {
-            if( pCell.phenotype.cycle.current_phase().code == PhysiCellConstants.apoptotic )
+            if( pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.apoptotic )
             { return 1; }
             else
             { return 0; }
@@ -182,9 +182,9 @@ public class SignalBehavior
         int necrotic_ind = find_signal_index( "necrotic" ); 
         if( index == necrotic_ind )
         {
-            if( pCell.phenotype.cycle.current_phase().code == PhysiCellConstants.necrotic_swelling
-                    || pCell.phenotype.cycle.current_phase().code == PhysiCellConstants.necrotic_lysed
-                    || pCell.phenotype.cycle.current_phase().code == PhysiCellConstants.necrotic )
+            if( pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_swelling
+                    || pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_lysed
+                    || pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic )
             { return 1; }
             else
             { return 0; }

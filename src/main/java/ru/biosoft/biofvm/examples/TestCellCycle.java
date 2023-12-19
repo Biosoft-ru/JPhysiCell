@@ -1,22 +1,16 @@
 package ru.biosoft.biofvm.examples;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
-
 import ru.biosoft.biofvm.BasicAgent;
-import ru.biosoft.biofvm.ConstantCoefficientsLOD3D;
 import ru.biosoft.biofvm.Microenvironment;
 import ru.biosoft.biofvm.VectorUtil;
 import ru.biosoft.biofvm.Visualizer;
+import ru.biosoft.biofvm.Visualizer.Section;
 import ru.biosoft.biofvm.cell.Cell;
 import ru.biosoft.biofvm.cell.CellContainer;
 import ru.biosoft.biofvm.cell.CellDefinition;
@@ -95,26 +89,28 @@ public class TestCellCycle
     private static double o2Сonc = 6.06;
     private static DecimalFormat format = new DecimalFormat( "##.##" );
     private static String resultPath = "C:/Users/Damag/BIOFVM/CellCycle";
-
+    private static String resultName = "CellCycle3";
+    private static int zSlice = 100;
     //visualizer settings
-    private static Visualizer visualizer = new Visualizer();
+    private static Visualizer visualizer = new Visualizer( resultPath, resultName, Section.Z, zSlice );
     static
     {
+        visualizer.setSaveImage( false );
         visualizer.setDrawDensity( false );
         visualizer.setColorPhase( "Ki67-", Color.gray );
         visualizer.setColorPhase( "Ki67+ (premitotic)", Color.blue );
-        visualizer.setColorPhase( "Ki67+ (postmitotic)", Color.cyan );
+        visualizer.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 180, 0 ) );
         visualizer.setColorPhase( "Apoptotic", Color.red );
     }
 
     //Cell types
     private static int num_ki67_q = 0;//100;//20;
-    private static int num_ki67_positive_pre = 1;//100;//20;
-    private static int num_ki67_positive_post = 0;//100;//20;
-    private static int num_apoptotic = 0;//100;//20;
+    private static int num_ki67_positive_pre = 0;//100;//100;//20;
+    private static int num_ki67_positive_post = 0;//100;//100;//20;
+    private static int num_apoptotic = 100;//100;//20;
 
     private static int size = 1000;
-    private static int zSlice = 100;
+    private static int cellSize = 20;
 
     //Time options
     private static double tMax = 60 * 24 * 6;
@@ -122,8 +118,6 @@ public class TestCellCycle
     private static double outputInterval = 60;
 
     private static boolean outputReport = true;
-    private static boolean outputImage = true;
-    private static boolean outputGIF = true;
 
     public static String format(double val)
     {
@@ -132,47 +126,29 @@ public class TestCellCycle
 
     public static void main(String ... argv) throws Exception
     {
-        double sideLength = size;// 2000;
-        double dx = 20;
-        double dy = 20;
-        double dz = 20;
+        Microenvironment m = new Microenvironment( "substrate scale", size, cellSize, "minutes", "microns" );
+        m.setDensity( 0, "oxygen", "mmHg" );
+        for( int n = 0; n < m.number_of_voxels(); n++ )
+            m.getDensity( n )[0] = o2Сonc;
 
-        Microenvironment microenvironment = new Microenvironment();
-        microenvironment.name = "substrate scale";
-        microenvironment.setDensity( 0, "oxygen", "mmHg" );
-        microenvironment.resizeSpace( 0, sideLength, 0, sideLength, 0, sideLength, dx, dy, dz );
-        microenvironment.spatialUnits = "microns";
-        microenvironment.timeUnits = "minutes";
-        microenvironment.mesh.units = "microns";
+        CellContainer.createCellContainer( m, 30 );
 
-        // Cell_Container 
-        double mechanicsVoxelSize = 30;
-        CellContainer.create_cell_container_for_microenvironment( microenvironment, mechanicsVoxelSize );
-        for( int n = 0; n < microenvironment.number_of_voxels(); n++ )
-            microenvironment.density_vector( n )[0] = o2Сonc;
-        microenvironment.setSolver( new ConstantCoefficientsLOD3D() );
+        CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
+        CellDefinition.registerCellDefinition( cd );
+        cd.functions.cycleModel = StandardModels.Ki67_advanced; // set default cell cycle model 
+        cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based(); // set default_cell_functions; 
+        cd.functions.updateVelocity = null;
+        Phenotype defaultPhenotype = cd.phenotype;
 
-        StandardModels.initialize_default_cell_definition();
-        CellDefinition cellDefaults = StandardModels.cellDefaults;
-        cellDefaults.type = 0;
-        cellDefaults.name = "tumor cell";
-        cellDefaults.functions.cycle_model = StandardModels.Ki67_advanced; // set default cell cycle model 
-        cellDefaults.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based(); // set default_cell_functions; 
-        cellDefaults.functions.updateVelocity = (pCell, phenotype, dt) -> { // disable cell's movement
-            return;
-        };
-        Phenotype defaultPhenotype = cellDefaults.phenotype;
-        defaultPhenotype.secretion.sync_to_microenvironment( microenvironment );
-        cellDefaults.phenotype.sync_to_functions( cellDefaults.functions );
         // first find index for a few key variables. 
         int apoptosisModelIndex = defaultPhenotype.death.find_death_model_index( "Apoptosis" );
         int necrosisModelIndex = defaultPhenotype.death.find_death_model_index( "Necrosis" );
-        int oxygenSubstrateIndex = microenvironment.find_density_index( "oxygen" );
+        int oxygenSubstrateIndex = m.findDensityIndex( "oxygen" );
 
-        int K1_index = cellDefaults.functions.cycle_model.find_phase_index( PhysiCellConstants.Ki67_positive_premitotic );
-        int K2_index = cellDefaults.functions.cycle_model.find_phase_index( PhysiCellConstants.Ki67_positive_postmitotic );
-        int Q_index = cellDefaults.functions.cycle_model.find_phase_index( PhysiCellConstants.Ki67_negative );
-        int A_index = cellDefaults.functions.cycle_model.find_phase_index( PhysiCellConstants.apoptotic );
+        int K1_index = cd.functions.cycleModel.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
+        int K2_index = cd.functions.cycleModel.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
+        int Q_index = cd.functions.cycleModel.findPhaseIndex( PhysiCellConstants.Ki67_negative );
+        int A_index = cd.functions.cycleModel.findPhaseIndex( PhysiCellConstants.apoptotic );
         //        int N_index = cell_defaults.functions.cycle_model.find_phase_index( PhysiCellConstants.necrotic_swelling );
 
         // cells apoptose after about 7 days 
@@ -182,13 +158,13 @@ public class TestCellCycle
         defaultPhenotype.death.rates.set( necrosisModelIndex, 0.0 );
 
         // make sure the cells uptake oxygen at the right rate 
-        defaultPhenotype.secretion.uptake_rates[oxygenSubstrateIndex] = 0;
+        defaultPhenotype.secretion.uptakeRates[oxygenSubstrateIndex] = 0;
 
         // cells leave the Q phase and enter the K1 phase after 5 hours 
         defaultPhenotype.cycle.data.setTransitionRate( Q_index, K1_index, 1.0 / ( 5.0 * 60.0 ) );
 
         // let's make necrotic cells survive 6 hours in minimal oxygen conditions  
-        cellDefaults.parameters.max_necrosis_rate = 1.0 / ( 6.0 * 60.0 );
+        cd.parameters.max_necrosis_rate = 1.0 / ( 6.0 * 60.0 );
 
         int total = num_ki67_positive_pre + num_ki67_positive_post + num_ki67_q + num_apoptotic;
         //        double T1 = 13 * 60;
@@ -200,10 +176,8 @@ public class TestCellCycle
         {
             double[] tempPosition = VectorUtil.random( 3, 0, size );
             tempPosition[2] = zSlice;//keep z at slice
-            Cell cell = Cell.createCell();
-            cell.registerMicroenvironment( microenvironment );
+            Cell cell = Cell.createCell( cd, m, tempPosition );
             cell.tag = "Source";
-            cell.assignPosition( tempPosition );
             if( i < num_ki67_positive_pre )
             {
                 phaseIndex = K1_index;
@@ -219,30 +193,22 @@ public class TestCellCycle
                 phaseIndex = A_index;
                 //                T = TA;
                 cell.phenotype.death.trigger_death( apoptosisModelIndex );
-                cell.phenotype.cycle.sync_to_cycle_model( cell.phenotype.death.current_model() );
+                cell.phenotype.cycle = cell.phenotype.death.current_model();
             }
             else
             {
                 phaseIndex = Q_index;
                 //                T = T/Q;
             }
-            cell.phenotype.cycle.data.current_phase_index = phaseIndex;
-            if( cell.phenotype.cycle.current_phase().entryFunction != null )
-                cell.phenotype.cycle.current_phase().entryFunction.execute( cell, cell.phenotype, dt );
+            cell.phenotype.cycle.data.currentPhaseIndex = phaseIndex;
+            if( cell.phenotype.cycle.currentPhase().entryFunction != null )
+                cell.phenotype.cycle.currentPhase().entryFunction.execute( cell, cell.phenotype, dt );
         }
 
-        for( BasicAgent agent : BasicAgent.allBasicAgents )
+        for( BasicAgent agent : m.getAgents() )
             agent.setUptakeConstants( dt );
 
-        ImageWriter writer = null;
-        ImageOutputStream ios = null;
-        if( outputImage && outputGIF )
-        {
-            writer = ImageIO.getImageWritersByFormatName( "GIF" ).next();
-            ios = ImageIO.createImageOutputStream( new File( resultPath + "/result.gif" ) );
-            writer.setOutput( ios );
-            writer.prepareWriteSequence( null );
-        }
+        visualizer.init();
 
         //Simulation starts
         double t = 0.0;
@@ -253,45 +219,32 @@ public class TestCellCycle
             if( Math.abs( t - tNextOutputTime ) < 0.0001 )
             {
                 if( outputReport )
-                    writTestReport( t );
+                    writTestReport( m, t );
 
-                if( outputImage )
-                {
-                    BufferedImage image = visualizer.draw( microenvironment, zSlice, (int)t, resultPath + "/figure_" + (int)t + ".png" );
-                    if( outputGIF )
-                        writer.writeToSequence( new IIOImage( image, null, null ), writer.getDefaultWriteParam() );
-                }
+                visualizer.saveResult( m, t );
                 tNextOutputTime += tOutputInterval;
-                System.out.println( t + ", cell count " + BasicAgent.allBasicAgents.size() );
+                System.out.println( t + ", cell count " + m.getAgentsCount() );
             }
-            ( (CellContainer)microenvironment.agent_container ).update_all_cells( t, dt, dt, dt );
+            ( (CellContainer)m.agentContainer ).updateAllCells( m, t, dt, dt, dt );
             t += dt;
         }
-
-        if( outputImage && outputGIF )
-        {
-            writer.endWriteSequence();
-            writer.reset();
-            writer.dispose();
-            ios.flush();
-            ios.close();
-        }
+        visualizer.finish();
     }
 
-    public static void writTestReport(double timepoint)
+    public static void writTestReport(Microenvironment m, double timepoint)
     {
         String filename = resultPath + "/cells_" + (int)timepoint + ".txt";
         File f = new File( filename );
         try (BufferedWriter bw = new BufferedWriter( new FileWriter( f ) ))
         {
             bw.write( "\tID\tx\ty\tz\tradius\tphenotype\telapsed_time\n" );
-            for( int i = 0; i < Cell.allBasicAgents.size(); i++ )
+            for( BasicAgent agent : m.getAgents() )
             {
-                Cell cell = (Cell)Cell.allBasicAgents.get( i );
-                String phenotypeCode = cell.phenotype.cycle.current_phase().name;
-                bw.write( i + "\t" + cell.ID + "\t" + format( cell.position[0] ) + "\t" + format( cell.position[1] ) + "\t"
+                Cell cell = (Cell)agent;
+                String phenotypeCode = cell.phenotype.cycle.currentPhase().name;
+                bw.write( cell.ID + "\t" + format( cell.position[0] ) + "\t" + format( cell.position[1] ) + "\t"
                         + format( cell.position[1] ) + "\t" + format( cell.position[2] ) + "\t" + format( cell.phenotype.geometry.radius )
-                        + "\t" + phenotypeCode + "\t" + cell.phenotype.cycle.data.elapsed_time_in_phase + "\n" );
+                        + "\t" + phenotypeCode + "\t" + cell.phenotype.cycle.data.elapsedTimePhase + "\n" );
             }
         }
         catch( Exception ex )
