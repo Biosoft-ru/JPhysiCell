@@ -36,6 +36,10 @@ public class Visualizer
     private String folder;
     private String name;
 
+    private int xShift = 0;
+    private int yShift = 0;
+    private int zShift = 0;
+
     public Visualizer()
     {
 
@@ -47,6 +51,17 @@ public class Visualizer
         this.name = name;
         this.sec = sec;
         this.slice = slice;
+        setDefaultScheme();
+    }
+
+    private void setDefaultScheme()
+    {
+        setColorPhase( "Ki67-", Color.lightGray );
+        setColorPhase( "Ki67+ (premitotic)", Color.green );
+        setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
+        setColorPhase( "Apoptotic", Color.red );
+        setColorPhase( "Necrotic (swelling)", Color.magenta );
+        setColorPhase( "Necrotic (lysed)", Color.pink );
     }
 
     public void init() throws IOException
@@ -102,10 +117,29 @@ public class Visualizer
 
     public BufferedImage draw(Microenvironment m, Section sec, double slice, double time, String fileName) throws Exception
     {
+        this.xShift = -(int) ( Math.floor( m.mesh.x_coordinates[0] - m.mesh.dx / 2.0 ) );
+        this.yShift = -(int) ( Math.floor( m.mesh.y_coordinates[0] - m.mesh.dy / 2.0 ) );
+        this.zShift = -(int) ( Math.floor( m.mesh.z_coordinates[0] - m.mesh.dz / 2.0 ) );
+
         int xCells = m.mesh.x_coordinates.length;
         int yCells = m.mesh.y_coordinates.length;
+        int zCells = m.mesh.y_coordinates.length;
         int width = (int) ( xCells * m.mesh.dx );
         int height = (int) ( yCells * m.mesh.dy );
+        switch( sec )
+        {
+            case X:
+                width = (int) ( yCells * m.mesh.dy );
+                height = (int) ( zCells * m.mesh.dz );
+                break;
+            case Y:
+                width = (int) ( xCells * m.mesh.dx );
+                height = (int) ( zCells * m.mesh.dz );
+                break;
+            default:
+                break;
+        }
+
         BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_RGB );
         Graphics g = img.getGraphics();
         g.setColor( Color.white );
@@ -121,6 +155,21 @@ public class Visualizer
         if( fileName != null )
             ImageIO.write( img, "PNG", new File( fileName ) );
         return img;
+    }
+
+    private void drawCoords(Microenvironment m, Section sec, Graphics g)
+    {
+        double[] c1 = null;
+        double[] c2 = null;
+
+        for( int i = 0; i < c1.length; i++ )
+        {
+
+        }
+        for( int j = 0; j < c2.length; j++ )
+        {
+
+        }
     }
 
     private void drawText(Microenvironment m, Section sec, double time, Graphics g)
@@ -147,29 +196,30 @@ public class Visualizer
             int x = (int)position[0];
             int y = (int)position[1];
             int z = (int)position[2];
-            int c1 = x; //first coordinate
-            int c2 = y; //second coordinate
-            int c3 = z; //section coordinate;
+            int c1 = x + xShift; //first coordinate
+            int c2 = y + yShift; //second coordinate
+            double d = Math.abs( z - slice ); //distance from slice;
             switch( sec )
             {
                 case X:
                 {
-                    c1 = y;
-                    c2 = z;
-                    c3 = x;
+                    c1 = y + yShift;
+                    c2 = z + zShift;
+                    d = Math.abs( x - slice );
+                    break;
                 }
                 case Y:
                 {
-                    c1 = x;
-                    c2 = z;
-                    c3 = y;
+                    c1 = x + xShift;
+                    c2 = z + yShift;
+                    d = Math.abs( y - slice );
+                    break;
                 }
                 default:
                     break;
             }
 
             double radius = agent.getRadius(); //we consider agents to be spheres
-            double d = Math.abs( c3 - slice );
             if( d > radius ) //it does not intersect slice;
                 continue;
             int r = (int)Math.sqrt( radius * radius - d * d );
@@ -186,6 +236,10 @@ public class Visualizer
                     g.setColor( color );
                     g.fillOval( c1 - r, c2 - r, 2 * r, 2 * r );
                 }
+                else
+                {
+                    System.out.println( "Unknown phase " + phase );
+                }
                 g.setColor( Color.black );
                 g.drawOval( c1 - r, c2 - r, 2 * r, 2 * r );
             }
@@ -200,7 +254,7 @@ public class Visualizer
         }
     }
 
-    private void drawDensity(Microenvironment m, double Slice, Graphics g)
+    private void drawDensity(Microenvironment m, double slice, Graphics g)
     {
         int xCells = m.mesh.x_coordinates.length;
         int yCells = m.mesh.y_coordinates.length;
@@ -215,7 +269,7 @@ public class Visualizer
         int size1 = sizeX;
         int size2 = sizeY;
         int size3 = sizeZ;
-
+        int shift = this.zShift;
         switch( sec )
         {
             case X:
@@ -224,6 +278,7 @@ public class Visualizer
                 size1 = sizeY;
                 size2 = sizeZ;
                 size3 = sizeX;
+                shift = xShift;
                 break;
             case Y:
                 n1 = xCells;
@@ -231,12 +286,13 @@ public class Visualizer
                 size1 = sizeX;
                 size2 = sizeZ;
                 size3 = sizeY;
+                shift = yShift;
                 break;
             default:
                 break;
         }
 
-        int n = (int) ( slice / size3 );
+        int n = (int) ( ( slice + shift ) / size3 );
 
         for( int i = 0; i < n1; i++ )
         {
@@ -255,7 +311,7 @@ public class Visualizer
                     default: //Z
                         index = i + n1 * j + n * n1 * n2;
                 }
-                red = (int) ( ( maxDensity - m.density[index][0] ) * 255 );
+                red = (int) ( ( 1 - ( m.density[index][0] / maxDensity ) ) * 255 );
                 g.setColor( new Color( 255, red, red ) );
                 g.fillRect( i * size1, j * size2, size1, size2 );
             }
@@ -321,5 +377,10 @@ public class Visualizer
     public void setColorPhase(String phase, Color color)
     {
         this.phaseColor.put( phase, color );
+    }
+
+    public void setMaxDensity(double density)
+    {
+        this.maxDensity = density;
     }
 }

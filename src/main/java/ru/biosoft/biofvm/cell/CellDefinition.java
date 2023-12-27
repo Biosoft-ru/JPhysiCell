@@ -130,19 +130,13 @@ public class CellDefinition
 
     public CellDefinition(Microenvironment m, String name)
     {
-        //  extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        //  int number_of_cell_defs = cell_definition_indices_by_name.size(); 
-
-        // set up the default parameters 
-        // the default Cell_Parameters constructor should take care of this
-
+        // set up the default parameters, the default Cell_Parameters constructor should take care of this
         this.type = -1; //not registered
         this.name = name;
         is_movable = true;
-        parameters.pReference_live_phenotype = phenotype; //TODO: check
+        //        parameters.pReference_live_phenotype = phenotype; //TODO: check
 
-        // set up the default custom data 
-        // the default Custom_Cell_Data constructor should take care of this
+        // set up the default custom data, the default Custom_Cell_Data constructor should take care of this
 
         // set up the default functions 
         functions.instantiate_cell = null;

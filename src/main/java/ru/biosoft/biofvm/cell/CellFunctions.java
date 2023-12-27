@@ -68,7 +68,7 @@ package ru.biosoft.biofvm.cell;
 */
 public class CellFunctions
 {
-    public CycleModel cycleModel;
+    //    public CycleModel cycleModel; TODO: temporarily commented
 
     instantiate_cell instantiate_cell;
     public volume_update_function updateVolume;
@@ -79,7 +79,7 @@ public class CellFunctions
     post_update_intracellular post_update_intracellular;
     public update_velocity updateVelocity;
     add_cell_basement_membrane_interactions add_cell_basement_membrane_interactions;
-    calculate_distance_to_membrane calculate_distance_to_membrane;
+    public calculate_distance_to_membrane calculate_distance_to_membrane;
     set_orientation set_orientation;
     contact_function contact_function;
 
@@ -144,7 +144,7 @@ public class CellFunctions
     @FunctionalInterface
     public static interface calculate_distance_to_membrane
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
+        public double execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
     @FunctionalInterface

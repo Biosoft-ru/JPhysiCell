@@ -78,12 +78,12 @@ public class PhysiCellConstants
     static int deterministic_necrosis = 0;
     static int stochastic_necrosis = 1;
 
-    static int mesh_min_x_index = 0;
-    static int mesh_min_y_index = 1;
-    static int mesh_min_z_index = 2;
-    static int mesh_max_x_index = 3;
-    static int mesh_max_y_index = 4;
-    static int mesh_max_z_index = 5;
+    public static int mesh_min_x_index = 0;
+    public static int mesh_min_y_index = 1;
+    public static int mesh_min_z_index = 2;
+    public static int mesh_max_x_index = 3;
+    public static int mesh_max_y_index = 4;
+    public static int mesh_max_z_index = 5;
     static int custom_cycle_model = 9999;
 
     static int mesh_lx_face_index = 0;

@@ -117,7 +117,9 @@ public class CycleModel implements Cloneable
         List<PhaseLink> links = phase_links.get( start_index );
         int n = links.size();
         PhaseArrest arrest = arrestFunction == null ? null : arrestFunction.getClass().newInstance();
-        links.add( new PhaseLink( start_index, end_index, arrest ) );
+        Phase start = phases.get( start_index );
+        Phase end = phases.get( end_index );
+        links.add( new PhaseLink( start, start_index, end, end_index, arrest ) );
         inverse_index_maps.get( start_index ).put( end_index, n );//link from start_index to end_index have index n        
         data.sync_to_cycle_model(); // lastly, make sure the transition rates are the right size;
         return n;
@@ -139,7 +141,7 @@ public class CycleModel implements Cloneable
                 return i;
             }
         }
-        return 0;//?
+        return -1;//?
     }
 
     int find_phase_index(String name)
@@ -151,7 +153,7 @@ public class CycleModel implements Cloneable
                 return i;
             }
         }
-        return 0;
+        return -1;
     }
 
     public String toString()
@@ -170,7 +172,7 @@ public class CycleModel implements Cloneable
             for( int k = 0; k < phase_links.get( i ).size(); k++ )
             {
                 int j = phase_links.get( i ).get( k ).endPhaseIndex;
-                sb.append( "\tPhase " + " (" + phases.get( j ).name + "( with rate " + data.transitionRates.get( i ).get( j ) + " "
+                sb.append( "\tPhase " + " (" + phases.get( j ).name + "( with rate " + data.getTransitionRate( i, j ) + " "
                         + data.timeUnits + "^-1; \n" );
             }
             sb.append( "\n" );
@@ -183,7 +185,7 @@ public class CycleModel implements Cloneable
     //    double& ::transition_rate( int start_index , int end_index )
     public double transition_rate(int start_index, int end_index)
     {
-        return data.transition_rate( start_index, end_index );
+        return data.getTransitionRate( start_index, end_index );
     }
 
     public void setTransitionRate(int start_index, int end_index, double rate)

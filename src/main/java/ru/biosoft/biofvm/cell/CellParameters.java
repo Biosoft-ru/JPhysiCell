@@ -84,8 +84,7 @@ public class CellParameters implements Cloneable
     double o2_necrosis_max; // value at which necrosis reaches its maximum rate 
     // o2_necrosis_max < o2_necrosis_threshold
 
-    Phenotype pReference_live_phenotype; // reference live phenotype (typically physioxic) 
-    Phenotype pReference_necrotic_phenotype; // reference live phenotype (typically physioxic) 
+    //    Phenotype pReference_live_phenotype; // reference live phenotype (typically physioxic) 
 
     // necrosis parameters (may evenually be moved into a reference necrotic phenotype 
     public double max_necrosis_rate; // deprecate
@@ -110,8 +109,6 @@ public class CellParameters implements Cloneable
 
         max_necrosis_rate = 1.0 / ( 6.0 * 60.0 ); // assume cells survive 6 hours in very low oxygen 
         //        necrosis_type = PhysiCell_constants::deterministic_necrosis;;//TODO: uncomment
-
-        return;
     }
 
     @Override
@@ -119,12 +116,14 @@ public class CellParameters implements Cloneable
     {
         try
         {
+            //            CellParameters result = (CellParameters)super.clone();
+            //            result.pReference_live_phenotype = pReference_live_phenotype != null ? pReference_live_phenotype.clone() : null;
             return (CellParameters)super.clone();
+
         }
         catch( CloneNotSupportedException e )
         {
-            e.printStackTrace();
-            return null;
+            throw new InternalError( e );
         }
     }
 }

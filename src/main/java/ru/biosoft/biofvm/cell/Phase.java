@@ -85,4 +85,10 @@ public class Phase
         removalAtExit = false;
         entryFunction = null;
     }
+
+    @Override
+    public String toString()
+    {
+        return name + "( " + code + " )";
+    }
 }

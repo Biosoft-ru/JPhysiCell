@@ -95,13 +95,13 @@ public class StandardModels
         CellDefinition result = new CellDefinition( m, name );
         create_standard_cycle_and_death_models(); // If the standard models have not yet been created, do so now. 
 
-        result.parameters.pReference_live_phenotype = result.phenotype;
+        //        result.parameters.pReference_live_phenotype = result.phenotype;
 
         // set up the default custom data 
         // the default Custom_Cell_Data constructor should take care of this
 
         // set up the default functions 
-        result.functions.cycleModel = Ki67_advanced;
+        //        result.functions.cycleModel = Ki67_advanced;
         result.functions.updateVolume = new standard_volume_update_function();
         //        result.functions.update_migration_bias = null;
         result.functions.updatePhenotype = new update_cell_and_death_parameters_O2_based();
@@ -119,7 +119,7 @@ public class StandardModels
         result.phenotype.death.add_death_model( 0.0, necrosis, necrosis_parameters );
 
         // set up the default phenotype (to be consistent with the default functions)
-        result.phenotype.cycle = result.functions.cycleModel;
+        result.phenotype.cycle = Ki67_advanced;//result.functions.cycleModel;
 
         // set molecular defaults 
 
@@ -184,7 +184,8 @@ public class StandardModels
 
         apoptosis_parameters.relative_rupture_volume = 2.0;
 
-        // set up the apoptosis model 
+        // set up the apoptosis model
+        apoptosis = new CycleModel();
         apoptosis.name = "Apoptosis";
         apoptosis.code = PhysiCellConstants.apoptosis_death_model;
 
@@ -223,6 +224,7 @@ public class StandardModels
         necrosis_parameters.relative_rupture_volume = 2.0;
 
         // set up the necrosis model 
+        necrosis = new CycleModel();
         necrosis.name = "Necrosis";
         necrosis.code = PhysiCellConstants.necrosis_death_model;
 
@@ -257,6 +259,7 @@ public class StandardModels
 
     public static CycleModel createAdvancedKi67() throws Exception
     {
+        Ki67_advanced = new CycleModel();
         Ki67_advanced.code = PhysiCellConstants.advanced_Ki67_cycle_model;
         Ki67_advanced.name = "Ki67 (advanced)";
         Ki67_advanced.data.timeUnits = "min";
@@ -285,6 +288,7 @@ public class StandardModels
 
     public static CycleModel createBasicKi67() throws Exception
     {
+        Ki67_basic = new CycleModel();
         Ki67_basic.code = PhysiCellConstants.basic_Ki67_cycle_model;
         Ki67_basic.name = "Ki67 (basic)";
         Ki67_basic.data.timeUnits = "min";
@@ -307,6 +311,7 @@ public class StandardModels
 
     static void create_live_model() throws Exception
     {
+        live = new CycleModel();
         live.code = PhysiCellConstants.live_cells_cycle_model;
         live.name = "Live";
         live.data.timeUnits = "min";
@@ -604,7 +609,7 @@ public class StandardModels
 
             int oxygen_substrate_index = pCell.getMicroenvironment().findDensityIndex( "oxygen" );
 
-            if( indices_initiated == false )
+            if( !indices_initiated )
             {
                 // Ki67 models
                 if( phenotype.cycle.code == PhysiCellConstants.advanced_Ki67_cycle_model
@@ -655,7 +660,7 @@ public class StandardModels
             }
 
             // don't continue if we never "figured out" the current cycle model. 
-            if( indices_initiated == false )
+            if( !indices_initiated )
                 return;
 
             // sample the microenvironment to get the pO2 value 
@@ -675,11 +680,9 @@ public class StandardModels
             }
 
             // now, update the appropriate cycle transition rate 
-
-            //        phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index ) = multiplier
-            //                * pCell.parameters.pReference_live_phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index );
-            phenotype.cycle.data.setTransitionRate( start_phase_index, end_phase_index, multiplier
-                    * pCell.parameters.pReference_live_phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index ) );
+            //            pCell.parameters.pReference_live_phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index )\
+            //            double base = pCell.parameters.pReference_live_phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index );
+            phenotype.cycle.data.modifyTransitionRate( start_phase_index, end_phase_index, multiplier );
 
             // Update necrosis rate
             multiplier = 0.0;

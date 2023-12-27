@@ -135,7 +135,6 @@ public class TestMechanics2
         visualizer3.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
         visualizer3.setColorPhase( "Apoptotic", Color.red );
         resultListeners.add( visualizer3 );
-
     }
 
     public static void main(String ... argv) throws Exception
@@ -146,7 +145,7 @@ public class TestMechanics2
 
         CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
         CellDefinition.registerCellDefinition( cd );
-        cd.functions.cycleModel = StandardModels.Ki67_advanced;
+        cd.phenotype.cycle = StandardModels.Ki67_advanced;
         cd.functions.updatePhenotype = null;
         cd.functions.updateVolume = null;
         int Qindex = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_negative );

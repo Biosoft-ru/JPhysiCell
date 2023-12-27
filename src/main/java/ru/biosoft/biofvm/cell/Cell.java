@@ -88,7 +88,7 @@ public class Cell extends BasicAgent
     public Phenotype phenotype;// = new Phenotype();
     public boolean isOutOfDomain;
     boolean isMovable;
-    double[] displacement; // this should be moved to state, or made private
+    public double[] displacement; // this should be moved to state, or made private
 
     public Cell(CellDefinition cd, Microenvironment m)
     {
@@ -99,8 +99,10 @@ public class Cell extends BasicAgent
         parameters = cd.parameters.clone();
         functions = cd.functions;
         phenotype = cd.phenotype.clone();
+//        parameters.pReference_live_phenotype = phenotype;
         phenotype.molecular.sync( this );
-        phenotype.cycle = functions.cycleModel.clone();
+//        parameters.pReference_live_phenotype = phenotype;
+        //        phenotype.cycle = functions.cycleMod/el.clone();
         this.definition = cd;
         // cell state should be fine by the default constructor 
         currentMechanicsVoxelIndex = -1;

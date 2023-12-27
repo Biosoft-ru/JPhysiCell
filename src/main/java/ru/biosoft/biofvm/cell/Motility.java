@@ -78,7 +78,7 @@ public class Motility implements Cloneable
     double migration_speed; // migration speed along chosen direction, 
     // in absence of all other adhesive / repulsive forces 
 
-    double[] migration_bias_direction; // a unit vector
+    double[] migration_bias_direction = new double[0];; // a unit vector
     // random motility is biased in this direction (e.g., chemotaxis)
     double migration_bias; // how biased is motility
     // if 0, completely random. if 1, deterministic along the bias vector 
@@ -86,13 +86,13 @@ public class Motility implements Cloneable
     boolean restrict_to_2D;
     // if true, set random motility to 2D only. 
 
-    double[] motility_vector;
+    double[] motility_vector = new double[0];;
 
     int chemotaxis_index;
     int chemotaxis_direction;
 
     // advanced chemotaxis 
-    double[] chemotactic_sensitivities;;
+    double[] chemotactic_sensitivities = new double[0];
 
     public Motility()
     {

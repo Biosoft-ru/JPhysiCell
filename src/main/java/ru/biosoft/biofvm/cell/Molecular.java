@@ -76,17 +76,17 @@ public class Molecular implements Cloneable
 
 
     // we'll set this to replace BioFVM's version       
-    double[] internalized_total_substrates;// = new double[0];
+    double[] internalized_total_substrates = new double[0];// = new double[0];
 
     // for each substrate, a fraction 0 <= f <= 1 of the 
     // total internalized substrate is released back inot
     // the environment at death 
-    double[] fraction_released_at_death;// = new double[0];
+    double[] fraction_released_at_death = new double[0];// = new double[0];
 
     // for each substrate, a fraction 0 <= f <= 1 of the 
     // total internalized substrate is transferred to the  
     // predatory cell when ingested 
-    double[] fraction_transferred_when_ingested;// = new double[0];
+    double[] fraction_transferred_when_ingested = new double[0];// = new double[0];
 
     void sync(Microenvironment m)
     {

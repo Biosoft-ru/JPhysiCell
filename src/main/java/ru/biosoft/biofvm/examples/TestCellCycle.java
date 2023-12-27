@@ -89,7 +89,7 @@ public class TestCellCycle
     private static double o2Сonc = 6.06;
     private static DecimalFormat format = new DecimalFormat( "##.##" );
     private static String resultPath = "C:/Users/Damag/BIOFVM/CellCycle";
-    private static String resultName = "CellCycle3";
+    private static String resultName = "CellCycle4";
     private static int zSlice = 100;
     //visualizer settings
     private static Visualizer visualizer = new Visualizer( resultPath, resultName, Section.Z, zSlice );
@@ -104,9 +104,9 @@ public class TestCellCycle
     }
 
     //Cell types
-    private static int num_ki67_q = 0;//100;//20;
-    private static int num_ki67_positive_pre = 0;//100;//100;//20;
-    private static int num_ki67_positive_post = 0;//100;//100;//20;
+    private static int num_ki67_q = 100;//100;//20;
+    private static int num_ki67_positive_pre = 100;//100;//100;//20;
+    private static int num_ki67_positive_post = 100;//100;//100;//20;
     private static int num_apoptotic = 100;//100;//20;
 
     private static int size = 1000;
@@ -135,7 +135,7 @@ public class TestCellCycle
 
         CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
         CellDefinition.registerCellDefinition( cd );
-        cd.functions.cycleModel = StandardModels.Ki67_advanced; // set default cell cycle model 
+        cd.phenotype.cycle = StandardModels.Ki67_advanced; // set default cell cycle model 
         cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based(); // set default_cell_functions; 
         cd.functions.updateVelocity = null;
         Phenotype defaultPhenotype = cd.phenotype;
@@ -145,10 +145,10 @@ public class TestCellCycle
         int necrosisModelIndex = defaultPhenotype.death.find_death_model_index( "Necrosis" );
         int oxygenSubstrateIndex = m.findDensityIndex( "oxygen" );
 
-        int K1_index = cd.functions.cycleModel.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
-        int K2_index = cd.functions.cycleModel.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
-        int Q_index = cd.functions.cycleModel.findPhaseIndex( PhysiCellConstants.Ki67_negative );
-        int A_index = cd.functions.cycleModel.findPhaseIndex( PhysiCellConstants.apoptotic );
+        int K1_index = cd.phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
+        int K2_index = cd.phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
+        int Q_index = cd.phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_negative );
+        //        int A_index = cd.phenotype.cycle.findPhaseIndex( PhysiCellConstants.apoptotic );
         //        int N_index = cell_defaults.functions.cycle_model.find_phase_index( PhysiCellConstants.necrotic_swelling );
 
         // cells apoptose after about 7 days 
@@ -171,9 +171,10 @@ public class TestCellCycle
         //        double T2 = 2.5 * 60;
         //        double TQ = 74.35 * 60;
         //        double TA = 8.6 * 60;
-        int phaseIndex;
+
         for( int i = 0; i < total; i++ )
         {
+            int phaseIndex = 0;
             double[] tempPosition = VectorUtil.random( 3, 0, size );
             tempPosition[2] = zSlice;//keep z at slice
             Cell cell = Cell.createCell( cd, m, tempPosition );
@@ -190,7 +191,7 @@ public class TestCellCycle
             }
             else if( i < num_ki67_positive_pre + num_ki67_positive_post + num_apoptotic )
             {
-                phaseIndex = A_index;
+                //                phaseIndex = A_index;
                 //                T = TA;
                 cell.phenotype.death.trigger_death( apoptosisModelIndex );
                 cell.phenotype.cycle = cell.phenotype.death.current_model();

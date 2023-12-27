@@ -57,7 +57,7 @@ public class Microenvironment
 {
     private Set<BasicAgent> agents = new HashSet<>();
 
-    public <T extends BasicAgent> Set<T> getAgents(T clazz)
+    public <T extends BasicAgent> Set<T> getAgents(Class<T> clazz)
     {
         return (Set<T>)agents;
     }
@@ -169,6 +169,15 @@ public class Microenvironment
     double[][] supply_rates;
     double[][] uptake_rates;
 
+    public Microenvironment(String name, String timeUnits, String spatialUnits)
+    {
+        this();
+        this.name = name;
+        this.spatialUnits = spatialUnits;
+        this.timeUnits = timeUnits;
+        mesh.units = spatialUnits;
+    }
+
     public Microenvironment(String name, double size, double nodeSize, String timeUnits, String spatialUnits)
     {
         this();
@@ -217,7 +226,7 @@ public class Microenvironment
 
         density_names = new String[] {"unnamed"};
         density_units = new String[] {"none"};
-        ;
+
         diffusion_coefficients = new double[number_of_densities()];
         decay_rates = new double[number_of_densities()];
         one_half = new double[] {0.5};
@@ -245,29 +254,81 @@ public class Microenvironment
         options.Dirichlet_ymax_values = new double[] {1.0};
         options.Dirichlet_zmin_values = new double[] {1.0};
         options.Dirichlet_zmax_values = new double[] {1.0};
-        //        default_microenvironment_options.Dirichlet_all.assign( 1, true );
-        //        default_microenvironment_options.Dirichlet_xmin.assign( 1, false );
-        //        default_microenvironment_options.Dirichlet_xmax.assign( 1, false );
-        //        default_microenvironment_options.Dirichlet_ymin.assign( 1, false );
-        //        default_microenvironment_options.Dirichlet_ymax.assign( 1, false );
-        //        default_microenvironment_options.Dirichlet_zmin.assign( 1, false );
-        //        default_microenvironment_options.Dirichlet_zmax.assign( 1, false );
-
-        //        default_microenvironment_options.Dirichlet_xmin_values.assign( 1, 1.0 );
-        //        default_microenvironment_options.Dirichlet_xmax_values.assign( 1, 1.0 );
-        //        default_microenvironment_options.Dirichlet_ymin_values.assign( 1, 1.0 );
-        //        default_microenvironment_options.Dirichlet_ymax_values.assign( 1, 1.0 );
-        //        default_microenvironment_options.Dirichlet_zmin_values.assign( 1, 1.0 );
-        //        default_microenvironment_options.Dirichlet_zmax_values.assign( 1, 1.0 );
-
-
     }
+
+    //    void addDensity(String name, String units, double diffusion_constant, double decay_rate)
+    //    {
+    //        // fix in PhysiCell preview November 2017 
+    //        // default_microenvironment_options.use_oxygen_as_first_field = false; 
+    //
+    //        VectorUtil.push_back( zero, 0 );
+    //        VectorUtil.push_back( one, 1 );
+    //
+    //        // update units
+    //        density_names.push_back( name );
+    //        density_units.push_back( units );
+    //
+    //        // update coefficients 
+    //        VectorUtil.push_back( diffusion_coefficients, diffusion_constant );
+    //        VectorUtil.push_back( decay_rates, decay_rate );
+    //
+    //        // update sources and such 
+    //        for( int i = 0; i < temporary_density_vectors1.size(); i++ )
+    //        {
+    //            temporary_density_vectors1[i].push_back( 0.0 );
+    //            temporary_density_vectors2[i].push_back( 0.0 );
+    //        }
+    //
+    //        // resize the gradient data structures 
+    //        for( int k = 0; k < mesh.voxels.length; k++ )
+    //        {
+    //            gradient_vectors[k].resize( number_of_densities() );
+    //            for( int i = 0; i < number_of_densities(); i++ )
+    //            {
+    //                ( gradient_vectors[k] )[i].resize( 3, 0.0 );
+    //            }
+    //        }
+    //        gradient_vector_computed.resize( mesh.voxels.size(), false );
+    //
+    //        VectorUtil.push_back( one_half, 0.5);
+    //        VectorUtil.push_back( one_third, 1.0 / 3.0 );
+    ////        one_half = one;
+    ////        one_half *= 0.5;
+    //
+    ////        one_third = one;
+    ////        one_third /= 3.0;
+    //
+    //        dirichlet_value_vectors.assign( mesh.voxels.size(), one );
+    //        dirichlet_activation_vector.push_back( false );
+    //        dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector );
+    //
+    //        // fix in PhysiCell preview November 2017 
+    //        default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); // = one; 
+    //        default_microenvironment_options.Dirichlet_activation_vector.push_back( false ); // assign( number_of_densities(), false ); 
+    //
+    //        default_microenvironment_options.initial_condition_vector.push_back( 1.0 );
+    //
+    //        default_microenvironment_options.Dirichlet_all.push_back( true );
+    //        //  default_microenvironment_options.Dirichlet_interior.push_back( true ); 
+    //        default_microenvironment_options.Dirichlet_xmin.push_back( false );
+    //        default_microenvironment_options.Dirichlet_xmax.push_back( false );
+    //        options.Dirichlet_ymin.push_back( false );
+    //        default_microenvironment_options.Dirichlet_ymax.push_back( false );
+    //        default_microenvironment_options.Dirichlet_zmin.push_back( false );
+    //        default_microenvironment_options.Dirichlet_zmax.push_back( false );
+    //
+    //        default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 );
+    //        default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 );
+    //        default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 );
+    //        default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 );
+    //        default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 );
+    //        default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 );
+    //    }
 
     public double[] get(int n)
     {
         return density[n];
     }
-
 
     public void simulate_cell_sources_and_sinks(Set<BasicAgent> agents, double dt)
     {
@@ -772,6 +833,17 @@ public class Microenvironment
     public double[] nearest_density_vector(int voxel_index)
     {
         return ( density )[voxel_index];
+    }
+
+    public void add_dirichlet_node(int voxel_index, double[] value)
+    {
+        mesh.voxels[voxel_index].isDirichlet = true;
+        /*
+        dirichlet_indices.push_back( voxel_index );
+        dirichlet_value_vectors.push_back( value ); 
+        */
+
+        dirichlet_value_vectors[voxel_index] = value; // .assign( mesh.voxels.size(), one ); 
     }
 
 }

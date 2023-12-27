@@ -68,18 +68,30 @@ package ru.biosoft.biofvm.cell;
 */
 public class PhaseLink
 {
+    Phase startPhase;
+    Phase endPhase;
     int startPhaseIndex;
     int endPhaseIndex;
     boolean fixedDuration;
     PhaseArrest arrestFunction; // return true if arrested, false if not 
     PhaseExit exitFunction; // function to be executed when completing the phase transition 
 
-    public PhaseLink(int startIndex, int endIndex, PhaseArrest arrestFunction)
+    public PhaseLink(Phase start, int startIndex, Phase end, int endIndex, PhaseArrest arrestFunction)
     {
+        this.startPhase = start;
+        this.endPhase = end;
         startPhaseIndex = startIndex;
         endPhaseIndex = endIndex;
         fixedDuration = false;
         this.arrestFunction = arrestFunction;
         exitFunction = null;
+    }
+
+    @Override
+    public String toString()
+    {
+        if( endPhase != null )
+            return startPhase.toString() + " -> " + endPhase.toString();
+        return startPhase.toString() + " -> ";
     }
 }

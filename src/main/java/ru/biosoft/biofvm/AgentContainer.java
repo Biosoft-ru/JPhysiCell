@@ -69,7 +69,7 @@ public class AgentContainer
     public void add_agent_to_voxel(BasicAgent agent, int voxel_index)
     {
     }
-    public void update_all_cells(double dt)
+    public void updateAllCells(double dt)
     {
     }
 }

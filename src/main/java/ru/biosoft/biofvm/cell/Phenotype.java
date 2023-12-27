@@ -88,10 +88,10 @@ public class Phenotype implements Cloneable
     // then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
     public Intracellular intracellular = new Intracellular();
 
-    public void sync(CellFunctions functions)
-    {
-        cycle = functions.cycleModel;
-    }
+    //    public void sync(CellFunctions functions)
+    //    {
+    //        cycle = functions.cycleModel;
+    //    }
 
     /**
      * Synchronize all parts with microenvironment (densities)  
@@ -104,7 +104,7 @@ public class Phenotype implements Cloneable
     }
 
     /**
-     * Synchronize all parts with Cell Definitions  
+     * Synchronize all parts with Cell Definition
      */
     public void sync()
     {

@@ -72,10 +72,10 @@ import ru.biosoft.biofvm.VectorUtil;
 */
 public class Secretion implements Cloneable
 {
-    double[] secretionRates;
-    public double[] uptakeRates;
-    double[] saturationDensities;
-    double[] netExportRates;
+    double[] secretionRates = new double[0];
+    public double[] uptakeRates = new double[0];
+    double[] saturationDensities = new double[0];
+    double[] netExportRates = new double[0];
 
     public void sync(Microenvironment m)
     {

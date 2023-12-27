@@ -93,9 +93,9 @@ public class TestVolume
 
     public static void main(String[] argv) throws Exception
     {
-        run( 2402, APOPTOSIS, resultPath + "/Apoptosis.txt" );
-        run( 2402, NECROSIS, resultPath + "/Necrosis.txt" );
-        run( 2402, "", resultPath + "/Default.txt" );
+        //        run( 2402, APOPTOSIS, resultPath + "/Apoptosis.txt" );
+        //        run( 2402, NECROSIS, resultPath + "/Necrosis.txt" );
+        run( 4000, "", resultPath + "/Default.txt" );
     }
 
     public static void run(double tMax, String type, String name) throws Exception
@@ -110,7 +110,7 @@ public class TestVolume
         CellDefinition.clearCellDefinitions();
         CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
         CellDefinition.registerCellDefinition( cd );
-        cd.functions.cycleModel = StandardModels.createAdvancedKi67();
+        cd.phenotype.cycle = StandardModels.createAdvancedKi67();
         cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based();
         //cell_defaults.functions.volume_update_function = standard_volume_update_function;
 
@@ -121,19 +121,19 @@ public class TestVolume
         int K1_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
         int K2_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
         int Q_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_negative );
-        int A_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.apoptotic );
-        int N_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.necrotic_swelling );
+        //        int A_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.apoptotic );
+        //        int N_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.necrotic_swelling );
 
         Cell cell = Cell.createCell( cd, m, new double[] {500, 500, 500} );
         if( type.equals( APOPTOSIS ) )
         {
-            cell.phenotype.cycle.data.currentPhaseIndex = A_index;
+            //            cell.phenotype.cycle.data.currentPhaseIndex = A_index;
             cell.phenotype.death.trigger_death( apoptosisModelIndex );
             cell.phenotype.cycle = cell.phenotype.death.current_model();
         }
         else if( type.equals( NECROSIS ) )
         {
-            cell.phenotype.cycle.data.currentPhaseIndex = N_index;
+            //            cell.phenotype.cycle.data.currentPhaseIndex = N_index;
             cell.phenotype.death.trigger_death( necrosisModelIndex );
             cell.phenotype.cycle = cell.phenotype.death.current_model();
         }
@@ -157,9 +157,11 @@ public class TestVolume
             {
                 if( Math.abs( t - nextOutputTime ) < 0.001 )
                 {
-                    String report = format.format( cell.get_total_volume() ) + "\t" + format.format( cell.phenotype.volume.fluid )
-                            + "\t" + format.format( cell.phenotype.volume.nuclear_solid ) + "\t"
+                    String report = cell.ID + "\t" + cell.phenotype.cycle.currentPhase().name + "\t"
+                            + format.format( cell.get_total_volume() ) + "\t" + format.format( cell.phenotype.volume.fluid ) + "\t"
+                            + format.format( cell.phenotype.volume.nuclear_solid ) + "\t"
                             + format.format( cell.phenotype.volume.cytoplasmic_solid ) + "\n";
+                    //                    String report = cell.ID + "\t" + m.get( cell.currentVoxelIndex )[0];
                     bw.append( report );
                     nextOutputTime += outputInterval;
                 }
@@ -168,7 +170,7 @@ public class TestVolume
                     Cell toDelete = null;
                     for( BasicAgent agent : m.getAgents() )
                     {
-                        if (agent.ID == cell.ID)
+                        if( agent.ID == cell.ID )
                             continue;
                         else
                             toDelete = (Cell)agent;

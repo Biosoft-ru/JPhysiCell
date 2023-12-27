@@ -103,7 +103,7 @@ public class TestMechanics1
         CellContainer.createCellContainer( m, 30 );
         CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
         CellDefinition.registerCellDefinition( cd );
-        cd.functions.cycleModel = StandardModels.Ki67_advanced;
+        cd.phenotype.cycle = StandardModels.Ki67_advanced;
         cd.functions.updatePhenotype = null;
         cd.functions.updateVolume = null;
 
