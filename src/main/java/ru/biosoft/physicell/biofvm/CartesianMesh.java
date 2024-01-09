@@ -51,13 +51,13 @@ import java.util.Arrays;
 */
 public class CartesianMesh extends GeneralMesh
 {
-    double[] x_coordinates;
-    double[] y_coordinates;
-    double[] z_coordinates;
+    public double[] x_coordinates;
+    public double[] y_coordinates;
+    public double[] z_coordinates;
     public int[][] moore_connected_voxel_indices = new int[0][]; // Keeps the list of voxels in the Moore nighborhood
-    double dx;
-    double dy;
-    double dz;
+    public double dx;
+    public double dy;
+    public double dz;
 
     double dV;
     double dS;

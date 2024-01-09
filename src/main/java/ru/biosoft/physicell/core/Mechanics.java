@@ -126,7 +126,7 @@ public class Mechanics implements Cloneable
     {
         int number_of_cell_defs = CellDefinition.getDefinitionsCount();
         if( cell_adhesion_affinities.length != number_of_cell_defs )
-            VectorUtil.resize( cell_adhesion_affinities, number_of_cell_defs, 1.0 );
+            cell_adhesion_affinities = VectorUtil.resize( cell_adhesion_affinities, number_of_cell_defs, 1.0 );
     }
 
     double cell_adhesion_affinity(String type_name)

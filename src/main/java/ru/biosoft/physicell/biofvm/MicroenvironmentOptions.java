@@ -146,16 +146,16 @@ public class MicroenvironmentOptions
 
         track_internalized_substrates_in_each_agent = false;
 
-        VectorUtil.push_back( Dirichlet_all, true );
-        VectorUtil.push_back( Dirichlet_xmin, false );
-        VectorUtil.push_back( Dirichlet_xmax, false );
-        VectorUtil.push_back( Dirichlet_ymin, false );
-        VectorUtil.push_back( Dirichlet_ymax, false );
-        VectorUtil.push_back( Dirichlet_zmin, false );
-        VectorUtil.push_back( Dirichlet_zmax, false );
+        Dirichlet_all = VectorUtil.push_back( Dirichlet_all, true );
+        Dirichlet_xmin = VectorUtil.push_back( Dirichlet_xmin, false );
+        Dirichlet_xmax = VectorUtil.push_back( Dirichlet_xmax, false );
+        Dirichlet_ymin = VectorUtil.push_back( Dirichlet_ymin, false );
+        Dirichlet_ymax = VectorUtil.push_back( Dirichlet_ymax, false );
+        Dirichlet_zmin = VectorUtil.push_back( Dirichlet_zmin, false );
+        Dirichlet_zmax = VectorUtil.push_back( Dirichlet_zmax, false );
 
-        VectorUtil.push_back( Dirichlet_activation_vector, calculate_gradients );
-        VectorUtil.push_back( Dirichlet_activation_vector, calculate_gradients );
+        Dirichlet_activation_vector = VectorUtil.push_back( Dirichlet_activation_vector, calculate_gradients );
+        Dirichlet_activation_vector = VectorUtil.push_back( Dirichlet_activation_vector, calculate_gradients );
         //        Dirichlet_all.push_back( true ); 
         //    //  Dirichlet_interior.push_back( true ); 
         //        Dirichlet_xmin.push_back( false ); 

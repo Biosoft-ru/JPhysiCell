@@ -101,7 +101,7 @@ public class Microenvironment
     boolean bulk_source_sink_solver_setup_done;
 
     /*! stores pointer to current density solutions. Access via operator() functions. */
-    double[][] density;
+    public double[][] density;
     double[][][] gradient_vectors;
     boolean[] gradient_vector_computed;
 
@@ -211,18 +211,7 @@ public class Microenvironment
         density = temporary_density_vectors1;
 
         gradient_vectors = new double[mesh.voxels.length][1][3];
-        //        gradient_vectors.resize( mesh.voxels.size() ); 
-        //        for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
-        //        {
-        //            gradient_vectors[k].resize( 1 ); 
-        //            (gradient_vectors[k])[0].resize( 3, 0.0 );
-        //        }
-        //        gradient_vector_computed.resize( mesh.voxels.size() , false ); 
         gradient_vector_computed = new boolean[mesh.voxels.length];
-
-        //        bulk_supply_rate_function = zero_function;
-        //        bulk_supply_target_densities_function = zero_function;
-        //        bulk_uptake_rate_function = zero_function;
 
         density_names = new String[] {"unnamed"};
         density_units = new String[] {"none"};
@@ -232,9 +221,6 @@ public class Microenvironment
         one_half = new double[] {0.5};
         one_third = new double[] {1.0 / 3.0};
 
-        //        dirichlet_activation_vector.assign( 1, false );
-        //        dirichlet_value_vectors.assign( mesh.voxels.size(), one );
-        //        dirichlet_activation_vectors.assign( 1, dirichlet_activation_vector );
         dirichlet_value_vectors = VectorUtil.assign( mesh.voxels.length, one );
         dirichlet_activation_vector = new boolean[] {false};
         dirichlet_activation_vectors = VectorUtil.assign( 1, dirichlet_activation_vector );
@@ -256,74 +242,72 @@ public class Microenvironment
         options.Dirichlet_zmax_values = new double[] {1.0};
     }
 
-    //    void addDensity(String name, String units, double diffusion_constant, double decay_rate)
-    //    {
-    //        // fix in PhysiCell preview November 2017 
-    //        // default_microenvironment_options.use_oxygen_as_first_field = false; 
-    //
-    //        VectorUtil.push_back( zero, 0 );
-    //        VectorUtil.push_back( one, 1 );
-    //
-    //        // update units
-    //        density_names.push_back( name );
-    //        density_units.push_back( units );
-    //
-    //        // update coefficients 
-    //        VectorUtil.push_back( diffusion_coefficients, diffusion_constant );
-    //        VectorUtil.push_back( decay_rates, decay_rate );
-    //
-    //        // update sources and such 
-    //        for( int i = 0; i < temporary_density_vectors1.size(); i++ )
-    //        {
-    //            temporary_density_vectors1[i].push_back( 0.0 );
-    //            temporary_density_vectors2[i].push_back( 0.0 );
-    //        }
-    //
-    //        // resize the gradient data structures 
-    //        for( int k = 0; k < mesh.voxels.length; k++ )
-    //        {
-    //            gradient_vectors[k].resize( number_of_densities() );
-    //            for( int i = 0; i < number_of_densities(); i++ )
-    //            {
-    //                ( gradient_vectors[k] )[i].resize( 3, 0.0 );
-    //            }
-    //        }
-    //        gradient_vector_computed.resize( mesh.voxels.size(), false );
-    //
-    //        VectorUtil.push_back( one_half, 0.5);
-    //        VectorUtil.push_back( one_third, 1.0 / 3.0 );
-    ////        one_half = one;
-    ////        one_half *= 0.5;
-    //
-    ////        one_third = one;
-    ////        one_third /= 3.0;
-    //
-    //        dirichlet_value_vectors.assign( mesh.voxels.size(), one );
-    //        dirichlet_activation_vector.push_back( false );
-    //        dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector );
-    //
-    //        // fix in PhysiCell preview November 2017 
-    //        default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); // = one; 
-    //        default_microenvironment_options.Dirichlet_activation_vector.push_back( false ); // assign( number_of_densities(), false ); 
-    //
-    //        default_microenvironment_options.initial_condition_vector.push_back( 1.0 );
-    //
-    //        default_microenvironment_options.Dirichlet_all.push_back( true );
-    //        //  default_microenvironment_options.Dirichlet_interior.push_back( true ); 
-    //        default_microenvironment_options.Dirichlet_xmin.push_back( false );
-    //        default_microenvironment_options.Dirichlet_xmax.push_back( false );
-    //        options.Dirichlet_ymin.push_back( false );
-    //        default_microenvironment_options.Dirichlet_ymax.push_back( false );
-    //        default_microenvironment_options.Dirichlet_zmin.push_back( false );
-    //        default_microenvironment_options.Dirichlet_zmax.push_back( false );
-    //
-    //        default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 );
-    //        default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 );
-    //        default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 );
-    //        default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 );
-    //        default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 );
-    //        default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 );
-    //    }
+    public void addDensity(String name, String units, double diffusion_constant, double decay_rate)
+    {
+        // fix in PhysiCell preview November 2017 
+        // default_microenvironment_options.use_oxygen_as_first_field = false; 
+
+        zero = VectorUtil.push_back( zero, 0 );
+        one = VectorUtil.push_back( one, 1 );
+        one_half = VectorUtil.push_back( one_half, 0.5 );
+        one_third = VectorUtil.push_back( one_third, 1.0 / 3.0 );
+
+        // update units
+        density_names = VectorUtil.push_back( density_names, name );
+        density_units = VectorUtil.push_back( density_units, units );
+
+        // update coefficients 
+        diffusion_coefficients = VectorUtil.push_back( diffusion_coefficients, diffusion_constant );
+        decay_rates = VectorUtil.push_back( decay_rates, decay_rate );
+
+        // update sources and such 
+        for( int i = 0; i < temporary_density_vectors1.length; i++ )
+        {
+            temporary_density_vectors1[i] = VectorUtil.push_back( temporary_density_vectors1[i], 0.0 );
+            temporary_density_vectors2[i] = VectorUtil.push_back( temporary_density_vectors2[i], 0.0 );
+        }
+
+        // resize the gradient data structures 
+        for( int k = 0; k < mesh.voxels.length; k++ )
+        {
+            gradient_vectors[k] = VectorUtil.resize( gradient_vectors[k], number_of_densities() );
+            for( int i = 0; i < number_of_densities(); i++ )
+            {
+                gradient_vectors[k][i] = VectorUtil.resize( gradient_vectors[k][i], 3 );
+            }
+        }
+        gradient_vector_computed = VectorUtil.resize( gradient_vector_computed, mesh.voxels.length );
+
+        dirichlet_value_vectors = VectorUtil.assign( mesh.voxels.length, one );
+        //        dirichlet_value_vectors.assign( mesh.voxels.size(), one );
+        dirichlet_activation_vector = VectorUtil.push_back( dirichlet_activation_vector, false );
+        //        dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector );
+        dirichlet_activation_vectors = VectorUtil.assign( mesh.voxels.length, dirichlet_activation_vector );
+
+        // fix in PhysiCell preview November 2017 
+        options.Dirichlet_condition_vector = VectorUtil.push_back( options.Dirichlet_condition_vector, 1.0 ); // = one; 
+        options.Dirichlet_activation_vector = VectorUtil.push_back( options.Dirichlet_activation_vector, false ); // assign( number_of_densities(), false ); 
+
+        options.initial_condition_vector = VectorUtil.push_back( options.initial_condition_vector, 1.0 );
+
+        options.Dirichlet_all = VectorUtil.push_back( options.Dirichlet_all, true );
+        //  default_microenvironment_options.Dirichlet_interior.push_back( true ); 
+        options.Dirichlet_xmin = VectorUtil.push_back( options.Dirichlet_xmin, false );
+        options.Dirichlet_xmax = VectorUtil.push_back( options.Dirichlet_xmax, false );
+        options.Dirichlet_ymin = VectorUtil.push_back( options.Dirichlet_ymin, false );
+
+
+        options.Dirichlet_ymax = VectorUtil.push_back( options.Dirichlet_ymax, false );
+        options.Dirichlet_zmin = VectorUtil.push_back( options.Dirichlet_zmin, false );
+        options.Dirichlet_zmax = VectorUtil.push_back( options.Dirichlet_zmax, false );
+
+        options.Dirichlet_xmin_values = VectorUtil.push_back( options.Dirichlet_xmin_values, 1.0 );
+        options.Dirichlet_xmax_values = VectorUtil.push_back( options.Dirichlet_xmax_values, 1.0 );
+        options.Dirichlet_ymin_values = VectorUtil.push_back( options.Dirichlet_ymin_values, 1.0 );
+        options.Dirichlet_ymax_values = VectorUtil.push_back( options.Dirichlet_ymax_values, 1.0 );
+        options.Dirichlet_zmin_values = VectorUtil.push_back( options.Dirichlet_zmin_values, 1.0 );
+        options.Dirichlet_zmax_values = VectorUtil.push_back( options.Dirichlet_zmax_values, 1.0 );
+    }
 
     public double[] get(int n)
     {
@@ -539,6 +523,7 @@ public class Microenvironment
             options.use_oxygen_as_first_field = false;//TODO: check
         }
 
+        //        VectorUtil.resize( dirichlet_activation_vector, index )
         density_names[index] = name;
         density_units[index] = units;
     }
@@ -564,24 +549,9 @@ public class Microenvironment
         resizeSpace( x_start, x_end, y_start, y_end, z_start, z_end, dx_new, dx_new, dx_new );
     }
 
-	public void resizeSpace(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end,
-			double x_nodes,
+    public void resizeSpace(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end, double x_nodes,
             double y_nodes, double z_nodes)
     {
-        //        temporary_density_vectors1.assign( mesh.voxels.size() , zero ); 
-        //        temporary_density_vectors2.assign( mesh.voxels.size() , zero ); 
-        //        gradient_vectors.resize( mesh.voxels.size() ); 
-        //        for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
-        //        {
-        //            gradient_vectors[k].resize( number_of_densities() ); 
-        //            for( unsigned int i=0 ; i < number_of_densities() ; i++ )
-        //            {
-        //                (gradient_vectors[k])[i].resize( 3, 0.0 );
-        //            }
-        //        }
-        //        gradient_vector_computed.resize( mesh.voxels.size() , false );  
-        //        dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-        //        dirichlet_activation_vectors.assign( mesh.voxels.length , dirichlet_activation_vector );  
         mesh.resize( x_start, x_end, y_start, y_end, z_start, z_end, x_nodes, y_nodes, z_nodes );
         temporary_density_vectors1 = new double[mesh.voxels.length][zero.length];
         density = temporary_density_vectors1;
@@ -594,24 +564,6 @@ public class Microenvironment
 
     void resize_space(int x_nodes, int y_nodes, int z_nodes)
     {
-        //        temporary_density_vectors1.assign( mesh.voxels.length , zero ); 
-        //        temporary_density_vectors2.assign( mesh.voxels.length , zero ); 
-        //        gradient_vectors.resize( mesh.voxels.length ); 
-
-        //        for( int k=0 ; k < mesh.voxels.length ; k++ )
-        //        {
-        //            gradient_vectors[k] = new double[number_of_densities()][];//.resize(  ); 
-        //            for( int i=0 ; i < number_of_densities() ; i++ )
-        //            {
-        //                gradient_vectors[k][i] = new double[3];
-        ////                (gradient_vectors[k])[i].resize( 3, 0.0 );
-        //            }
-        //        }
-
-        //        gradient_vector_computed = new double
-        //        gradient_vector_computed.resize( mesh.voxels.length , false );  
-        //        dirichlet_value_vectors.assign( mesh.voxels.length, one ); 
-        //        dirichlet_activation_vectors.assign( mesh.voxels.length , dirichlet_activation_vector );
         mesh.resize( x_nodes, y_nodes, z_nodes );
         temporary_density_vectors1 = new double[mesh.voxels.length][];
         density = temporary_density_vectors1;
@@ -670,157 +622,159 @@ public class Microenvironment
         return -1;
     }
 
-    public void compute_all_gradient_vectors(  )
+    public void compute_all_gradient_vectors()
     {
-         double two_dx = mesh.dx; 
-         double two_dy = mesh.dy; 
-         double two_dz = mesh.dz; 
-         boolean gradient_constants_defined = false; 
+        double two_dx = mesh.dx;
+        double two_dy = mesh.dy;
+        double two_dz = mesh.dz;
+        boolean gradient_constants_defined = false;
         if( gradient_constants_defined == false )
         {
-            two_dx *= 2.0; 
-            two_dy *= 2.0; 
+            two_dx *= 2.0;
+            two_dy *= 2.0;
             two_dz *= 2.0;
-            gradient_constants_defined = true; 
+            gradient_constants_defined = true;
         }
-        
-//        #pragma omp parallel for 
-        for(  int k=0; k < mesh.z_coordinates.length ; k++ )
+
+        //        #pragma omp parallel for 
+        for( int k = 0; k < mesh.z_coordinates.length; k++ )
         {
-            for(  int j=0; j < mesh.y_coordinates.length ; j++ )
+            for( int j = 0; j < mesh.y_coordinates.length; j++ )
             {
                 // endcaps 
-                for(  int q=0; q < number_of_densities() ; q++ )
+                for( int q = 0; q < number_of_densities(); q++ )
                 {
-                    int i = 0; 
-                    int n = voxel_index(i,j,k);
+                    int i = 0;
+                    int n = voxel_index( i, j, k );
                     // x-derivative of qth substrate at voxel n
                     gradient_vectors[n][q][0] = density[n + thomas_i_jump][q];
                     gradient_vectors[n][q][0] -= density[n][q];
-                    gradient_vectors[n][q][0] /= mesh.dx; 
-                    
-                    gradient_vector_computed[n] = true; 
+                    gradient_vectors[n][q][0] /= mesh.dx;
+
+                    gradient_vector_computed[n] = true;
                 }
-                for(  int q=0; q < number_of_densities() ; q++ )
+                for( int q = 0; q < number_of_densities(); q++ )
                 {
-                    int i = mesh.x_coordinates.length-1; 
-                    int n = voxel_index(i,j,k);
+                    int i = mesh.x_coordinates.length - 1;
+                    int n = voxel_index( i, j, k );
                     // x-derivative of qth substrate at voxel n
                     gradient_vectors[n][q][0] = ( density )[n][q];
                     gradient_vectors[n][q][0] -= ( density )[n - thomas_i_jump][q];
-                    gradient_vectors[n][q][0] /= mesh.dx; 
-                    
-                    gradient_vector_computed[n] = true; 
+                    gradient_vectors[n][q][0] /= mesh.dx;
+
+                    gradient_vector_computed[n] = true;
                 }
-                
-                for(  int i=1; i < mesh.x_coordinates.length-1 ; i++ )
+
+                for( int i = 1; i < mesh.x_coordinates.length - 1; i++ )
                 {
-                    for(  int q=0; q < number_of_densities() ; q++ )
+                    for( int q = 0; q < number_of_densities(); q++ )
                     {
-                        int n = voxel_index(i,j,k);
+                        int n = voxel_index( i, j, k );
                         // x-derivative of qth substrate at voxel n
                         gradient_vectors[n][q][0] = ( density )[n + thomas_i_jump][q];
                         gradient_vectors[n][q][0] -= ( density )[n - thomas_i_jump][q];
-                        gradient_vectors[n][q][0] /= two_dx; 
-                        
-                        gradient_vector_computed[n] = true; 
+                        gradient_vectors[n][q][0] /= two_dx;
+
+                        gradient_vector_computed[n] = true;
                     }
                 }
-                
+
             }
         }
-        
-//        #pragma omp parallel for 
-        for(  int k=0; k < mesh.z_coordinates.length ; k++ )
+
+        //        #pragma omp parallel for 
+        for( int k = 0; k < mesh.z_coordinates.length; k++ )
         {
-            for(  int i=0; i < mesh.x_coordinates.length ; i++ )
+            for( int i = 0; i < mesh.x_coordinates.length; i++ )
             {
                 // endcaps 
-                for(  int q=0; q < number_of_densities() ; q++ )
+                for( int q = 0; q < number_of_densities(); q++ )
                 {
-                    int j = 0; 
-                    int n = voxel_index(i,j,k);
+                    int j = 0;
+                    int n = voxel_index( i, j, k );
                     // x-derivative of qth substrate at voxel n
                     gradient_vectors[n][q][1] = ( density )[n + thomas_j_jump][q];
                     gradient_vectors[n][q][1] -= ( density )[n][q];
-                    gradient_vectors[n][q][1] /= mesh.dy; 
-                    
-                    gradient_vector_computed[n] = true; 
+                    gradient_vectors[n][q][1] /= mesh.dy;
+
+                    gradient_vector_computed[n] = true;
                 }
-                for(  int q=0; q < number_of_densities() ; q++ )
+                for( int q = 0; q < number_of_densities(); q++ )
                 {
-                    int j = mesh.y_coordinates.length-1; 
-                    int n = voxel_index(i,j,k);
+                    int j = mesh.y_coordinates.length - 1;
+                    int n = voxel_index( i, j, k );
                     // x-derivative of qth substrate at voxel n
                     gradient_vectors[n][q][1] = ( density )[n][q];
                     gradient_vectors[n][q][1] -= ( density )[n - thomas_j_jump][q];
-                    gradient_vectors[n][q][1] /= mesh.dy; 
-                    
-                    gradient_vector_computed[n] = true; 
-                }       
-                
-                for(  int j=1; j < mesh.y_coordinates.length-1 ; j++ )
+                    gradient_vectors[n][q][1] /= mesh.dy;
+
+                    gradient_vector_computed[n] = true;
+                }
+
+                for( int j = 1; j < mesh.y_coordinates.length - 1; j++ )
                 {
-                    for(  int q=0; q < number_of_densities() ; q++ )
+                    for( int q = 0; q < number_of_densities(); q++ )
                     {
-                        int n = voxel_index(i,j,k);
+                        int n = voxel_index( i, j, k );
                         // y-derivative of qth substrate at voxel n
                         gradient_vectors[n][q][1] = ( density )[n + thomas_j_jump][q];
                         gradient_vectors[n][q][1] -= ( density )[n - thomas_j_jump][q];
-                        gradient_vectors[n][q][1] /= two_dy; 
-                        gradient_vector_computed[n] = true; 
+                        gradient_vectors[n][q][1] /= two_dy;
+                        gradient_vector_computed[n] = true;
                     }
                 }
-                
+
             }
         }
-        
+
         // don't bother computing z component if there is no z-directoin 
         if( mesh.z_coordinates.length == 1 )
-        { return; }
-
-//        #pragma omp parallel for 
-        for(  int j=0; j < mesh.y_coordinates.length ; j++ )
         {
-            for(  int i=0; i < mesh.x_coordinates.length ; i++ )
+            return;
+        }
+
+        //        #pragma omp parallel for 
+        for( int j = 0; j < mesh.y_coordinates.length; j++ )
+        {
+            for( int i = 0; i < mesh.x_coordinates.length; i++ )
             {
                 // endcaps 
-                for(  int q=0; q < number_of_densities() ; q++ )
+                for( int q = 0; q < number_of_densities(); q++ )
                 {
-                    int k = 0; 
-                    int n = voxel_index(i,j,k);
+                    int k = 0;
+                    int n = voxel_index( i, j, k );
                     // x-derivative of qth substrate at voxel n
                     gradient_vectors[n][q][2] = ( density )[n + thomas_k_jump][q];
                     gradient_vectors[n][q][2] -= ( density )[n][q];
-                    gradient_vectors[n][q][2] /= mesh.dz; 
-                    
-                    gradient_vector_computed[n] = true; 
+                    gradient_vectors[n][q][2] /= mesh.dz;
+
+                    gradient_vector_computed[n] = true;
                 }
-                for(  int q=0; q < number_of_densities() ; q++ )
+                for( int q = 0; q < number_of_densities(); q++ )
                 {
-                    int k = mesh.z_coordinates.length-1; 
-                    int n = voxel_index(i,j,k);
+                    int k = mesh.z_coordinates.length - 1;
+                    int n = voxel_index( i, j, k );
                     // x-derivative of qth substrate at voxel n
                     gradient_vectors[n][q][2] = ( density )[n][q];
                     gradient_vectors[n][q][2] -= ( density )[n - thomas_k_jump][q];
-                    gradient_vectors[n][q][2] /= mesh.dz; 
-                    
-                    gradient_vector_computed[n] = true; 
-                }           
-                
-                for(  int k=1; k < mesh.z_coordinates.length-1 ; k++ )
+                    gradient_vectors[n][q][2] /= mesh.dz;
+
+                    gradient_vector_computed[n] = true;
+                }
+
+                for( int k = 1; k < mesh.z_coordinates.length - 1; k++ )
                 {
-                    for(  int q=0; q < number_of_densities() ; q++ )
+                    for( int q = 0; q < number_of_densities(); q++ )
                     {
-                        int n = voxel_index(i,j,k);
+                        int n = voxel_index( i, j, k );
                         // y-derivative of qth substrate at voxel n
                         gradient_vectors[n][q][2] = ( density )[n + thomas_k_jump][q];
                         gradient_vectors[n][q][2] -= ( density )[n - thomas_k_jump][q];
-                        gradient_vectors[n][q][2] /= two_dz; 
-                        gradient_vector_computed[n] = true; 
+                        gradient_vectors[n][q][2] /= two_dz;
+                        gradient_vector_computed[n] = true;
                     }
                 }
-                
+
             }
         }
     }

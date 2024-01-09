@@ -197,7 +197,7 @@ public class GeneralMesh
         }
 
         // add it to the vector of voxel faces 
-        VectorUtil.push_back( voxel_faces, VF1 );
+        voxel_faces = VectorUtil.push_back( voxel_faces, VF1 );
         //        voxel_faces.push_back( VF1 ); 
     }
 
@@ -206,8 +206,8 @@ public class GeneralMesh
         // check to see if the voxels are connected -- implement later!
 
         // add j to the list of connected voxels for voxel i 
-        VectorUtil.push_back( connected_voxel_indices[i], j );
-        VectorUtil.push_back( connected_voxel_indices[j], i );
+        connected_voxel_indices[i] = VectorUtil.push_back( connected_voxel_indices[i], j );
+        connected_voxel_indices[j] = VectorUtil.push_back( connected_voxel_indices[j], i );
         //        connected_voxel_indices[i].push_back( j ); 
         //        connected_voxel_indices[j].push_back( i ); 
 
