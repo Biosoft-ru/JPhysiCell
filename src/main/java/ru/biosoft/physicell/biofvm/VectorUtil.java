@@ -51,17 +51,9 @@ import java.util.Arrays;
 */
 public class VectorUtil
 {
-
-    /* faster operator overloading. multiplication and division are element-wise (Hadamard) */
-
-
-    //std::vector<double> operator-( const std::vector<double>& v1 , const std::vector<double>& v2 )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] -= v2[i]; }
-    // return v; 
-    //}
+    /**
+    * Creates new array with values v1[i] - v2[i]
+    */
     public static double[] newDiff(double[] v1, double[] v2)
     {
         double[] v = new double[v1.length];
@@ -70,13 +62,9 @@ public class VectorUtil
         return v;
     }
 
-    //std::vector<double> operator+( const std::vector<double>& v1 , const std::vector<double>& v2 )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] += v2[i]; }
-    // return v; 
-    //}
+    /**
+     * Creates new array with values v1[i] + v2[i]
+     */
     public static double[] newSum(double[] v1, double[] v2)
     {
         double[] v = new double[v1.length];
@@ -85,13 +73,9 @@ public class VectorUtil
         return v;
     }
 
-    //std::vector<double> operator*( const std::vector<double>& v1 , const std::vector<double>& v2 )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] *= v2[i]; }
-    // return v; 
-    //}
+    /**
+     * Creates new array with values v1[i] * v2[i]
+     */
     public static double[] newProd(double[] v1, double[] v2)
     {
         double[] v = new double[v1.length];
@@ -100,6 +84,9 @@ public class VectorUtil
         return v;
     }
 
+    /**
+     * Creates new array with values v1[i] * d
+     */
     public static double[] newProd(double[] v1, double d)
     {
         double[] v = new double[v1.length];
@@ -108,13 +95,9 @@ public class VectorUtil
         return v;
     }
 
-    //std::vector<double> operator/( const std::vector<double>& v1 , const std::vector<double>& v2 )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] /= v2[i]; }
-    // return v; 
-    //}
+    /**
+     * Creates new array with values v1[i] / v2[i]
+     */
     public static double[] newDiv(double[] v1, double[] v2)
     {
         double[] v = new double[v1.length];
@@ -123,13 +106,9 @@ public class VectorUtil
         return v;
     }
 
-    //std::vector<double> operator*( double d , const std::vector<double>& v1 )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] *= d; }
-    // return v; 
-    //}
+    /**
+     * Returns new array with values v1[i] * d
+     */
     public static double[] newProd(double d, double[] v1)
     {
         double[] v = new double[v1.length];
@@ -137,14 +116,10 @@ public class VectorUtil
             v[i] = v1[i] * d;
         return v;
     }
-    //
-    //std::vector<double> operator+( double d , const std::vector<double>& v1 )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] += d; }
-    // return v; 
-    //}
+
+    /**
+     * Returns new array which contains each element of v1 increased by value d
+     */
     public static double[] newSum(double d, double[] v1)
     {
         double[] v = new double[v1.length];
@@ -153,13 +128,9 @@ public class VectorUtil
         return v;
     }
 
-    //std::vector<double> operator+( const std::vector<double>& v1 , double d )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] += d; }
-    // return v; 
-    //}
+    /**
+    * Returns new array which contains each element of v1 increased by value d
+    */
     public static double[] newSum(double[] v1, double d)
     {
         double[] v = new double[v1.length];
@@ -168,27 +139,18 @@ public class VectorUtil
         return v;
     }
 
-    //std::vector<double> operator-( double d , const std::vector<double>& v1 )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] = d - v1[i]; }
-    // return v; 
-    //}
-    public static void diff(double d, double[] v1)
+    /**
+    * Modifies array v1: new ith value is d - v1[i]
+    */
+    public static void diff(double d, double[] v)
     {
-        double[] v = new double[v1.length];
-        for( int i = 0; i < v1.length; i++ )
-            v[i] = d - v1[i];
+        for( int i = 0; i < v.length; i++ )
+            v[i] = d - v[i];
     }
 
-    //std::vector<double> operator-( const std::vector<double>& v1 , double d  )
-    //{
-    // std::vector<double> v = v1;
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v[i] -= d; }
-    // return v; 
-    //}
+    /**
+     * Creates new array with values v1[i] - d
+     */
     public static double[] newDiff(double[] v1, double d)
     {
         double[] v = new double[v1.length];
@@ -197,95 +159,63 @@ public class VectorUtil
         return v;
     }
 
-    //void operator+=( std::vector<double>& v1, const std::vector<double>& v2 )
-    //{
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v1[i] += v2[i]; }
-    // return; 
-    //}
+    /**
+    * Modifies array v1: new ith value is v1[i]+v2[i]
+    */
     public static void sum(double[] v1, double[] v2)
     {
         for( int i = 0; i < v1.length; i++ )
             v1[i] += v2[i];
     }
 
-    //void operator-=( std::vector<double>& v1, const std::vector<double>& v2 )
-    //{
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v1[i] -= v2[i]; }
-    // return; 
-    //}
+    /**
+     * Modifies v1 array with values v1[i] - v2[i]
+     */
     public static void diff(double[] v1, double[] v2)
     {
         for( int i = 0; i < v1.length; i++ )
             v1[i] -= v2[i];
     }
 
-    //void operator/=( std::vector<double>& v1, const std::vector<double>& v2 )
-    //{
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v1[i] /= v2[i]; }
-    // return;  
-    //} 
+    /**
+    * Modifies v1 array with values v1[i] / v2[i]
+    */
     public static void div(double[] v1, double[] v2)
     {
         for( int i = 0; i < v1.length; i++ )
             v1[i] /= v2[i];
     }
 
-    //void operator*=( std::vector<double>& v1, const double& a )
-    //{
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v1[i] *= a; }
-    // return; 
-    //}
+    /**
+     * Modifies v1 array with values v1[i] * a
+     */
     public static void prod(double[] v1, double a)
     {
         for( int i = 0; i < v1.length; i++ )
             v1[i] *= a;
     }
 
-    //void operator*=( std::vector<double>& v1, const std::vector<double>& v2 )
-    //{
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v1[i] *= v2[i]; }
-    // return;  
-    //}
+    /**
+     * Modifies v1 array with values v1[i] * v2[i]
+     */
     public static void prod(double[] v1, double[] v2)
     {
         for( int i = 0; i < v1.length; i++ )
             v1[i] *= v2[i];
     }
 
-    //void operator/=( std::vector<double>& v1, const double& a )
-    //{
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // { v1[i] /= a; }
-    // return;  
-    //}
+    /**
+     * Modifies v1 array with values v1[i] / a
+     */
     public static void div(double[] v1, double a)
     {
         for( int i = 0; i < v1.length; i++ )
             v1[i] /= a;
     }
 
-    //
-    ///* other commonly needed operations on vectors */ 
-    //
-    //std::ostream& operator<<(std::ostream& os, const std::vector<double>& v )
-    //{
-    // /*
-    // if( v.size() == 3 )
-    // {
-    //  os << "x=\"" << v[0] << "\" y=\"" << v[1] << "\" z=\"" << v[2] << "\"" ; 
-    //  return os; 
-    // }
-    // */
-    //
-    // for( unsigned int i=0; i < v.size(); i++ )
-    // { os << v[i] << " " ; }
-    // return os; 
-    //}
+    /**
+     * Returns String representing given array: "v[0] v[1] ... v[n]"
+     */
     public static String print(double[] v)
     {
         StringBuilder sb = new StringBuilder();
@@ -297,13 +227,9 @@ public class VectorUtil
         return sb.toString();
     }
 
-    //
-    //std::ostream& operator<<(std::ostream& os, const std::vector<int>& v )
-    //{
-    // for( unsigned int i=0; i < v.size(); i++ )
-    // { os << v[i] << " " ; }
-    // return os; 
-    //}
+    /**
+     * Returns String representing given array: "v[0] v[1] ... v[n]"
+     */
     public static String print(int[] v)
     {
         StringBuilder sb = new StringBuilder();
@@ -315,13 +241,9 @@ public class VectorUtil
         return sb.toString();
     }
 
-    //
-    //std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v )
-    //{
-    // for( unsigned int i=0; i < v.size(); i++ )
-    // { os << v[i] << " " ; }
-    // return os; 
-    //}
+    /**
+     * Returns String representing given array: "v[0] v[1] ... v[n]"
+     */
     public static String print(String[] v)
     {
         StringBuilder sb = new StringBuilder();
@@ -333,39 +255,10 @@ public class VectorUtil
         return sb.toString();
     }
 
-
-    //// this one returns a new vector that has been normalized
-    //std::vector<double> normalize( std::vector<double>& v )
-    //{
-    // std::vector<double> output = v ;
-    //
-    // double norm = 0.0; 
-    // norm = 0.0; 
-    //
-    // for( unsigned int i=0; i < v.size(); i++ )
-    // { norm += ( v[i]*v[i] ); }
-    // norm = sqrt( norm ); 
-    //
-    // for( unsigned int i=0; i < v.size(); i++ )
-    // { output[i] /= norm ; }
-    //
-    // // If the norm is small, normalizing doens't make sense. 
-    // // Just set the entire vector to zero. 
-    // static bool I_warned_you = false; 
-    // if( norm <= 1e-16 )
-    // { 
-    //  if( I_warned_you == false )
-    //  {
-    //   std::cout << "Warning and FYI: Very small vector are normalized to 0 vector" << std::endl << std::endl; 
-    //   I_warned_you = true; 
-    //  }
-    //
-    //  for( unsigned int i=0; i < v.size(); i++ )
-    //  { output[i] = 0.0; }
-    // }
-    //
-    // return output; 
-    //}
+    /**
+     * Returns new normalized vector i.e. divided by vector norm: [ v[0]/norm v[1]/norm ... v[n]/norm)<br>
+     * Where norm = sqrt( v[0]^2 + v[1]^2 + ... + v[n]^2 ) 
+     */
     public static double[] newNormalize(double[] v)
     {
         double norm = 0.0;
@@ -398,35 +291,10 @@ public class VectorUtil
         return output;
     }
 
-    //// this one normalizes v
-    //void normalize( std::vector<double>* v )
-    //{
-    // double norm = 1e-32; 
-    //
-    // for( unsigned int i=0; i < v->size(); i++ )
-    // { norm += ( (*v)[i] * (*v)[i] ); }
-    // norm = sqrt( norm ); 
-    //
-    // for( unsigned int i=0; i < v->size(); i++ )
-    // { (*v)[i] /=  norm ; }
-    //
-    // // If the norm is small, normalizing doens't make sense. 
-    // // Just set the entire vector to zero. 
-    // static bool I_warned_you = false; 
-    // if( norm <= 1e-16 )
-    // { 
-    //  if( I_warned_you == false )
-    //  {
-    //   std::cout << "Warning and FYI: Very small vectors are normalized to 0 vector" << std::endl << std::endl; 
-    //   I_warned_you = true; 
-    //  }
-    //
-    //  for( unsigned int i=0; i < v->size(); i++ )
-    //  { (*v)[i] = 0.0; }
-    // }
-    //
-    // return; 
-    //}
+    /**
+     * Normalizes given vector i.e. divide each element by vector norm: [ v[0]/norm v[1]/norm ... v[n]/norm)<br>
+     * Where norm = sqrt( v[0]^2 + v[1]^2 + ... + v[n]^2 ) 
+     */
     public static void normalize(double[] v)
     {
         double norm = 1e-32;
@@ -451,13 +319,10 @@ public class VectorUtil
         }
     }
 
-    //double norm_squared( const std::vector<double>& v )
-    //{
-    // double out = 0.0; 
-    // for( unsigned int i=0 ; i < v.size() ; i++ )
-    // { out += ( v[i] * v[i] ); }
-    // return out; 
-    //}
+    /**
+     * Returns squared norm of the vector,<br>
+     * Where norm = v[0]^2 + v[1]^2 + ... + v[n]^2 
+     */
     public static double norm_squared(double[] v)
     {
         double out = 0;
@@ -466,31 +331,27 @@ public class VectorUtil
         return out;
     }
 
-    //double norm( const std::vector<double>& v )
-    //{
-    // return sqrt( norm_squared( v ) ); 
-    //}
+    /**
+     * Returns norm of the vector,<br>
+     * Where norm = sqrt( v[0]^2 + v[1]^2 + ... + v[n]^2 ) 
+     */
     public static double norm(double[] v)
     {
         return Math.sqrt( norm_squared( v ) );
     }
 
+    /**
+     * Returns distance between two vector,<br>
+     */
     public static double dist(double[] p1, double[] p2)
     {
         return VectorUtil.norm( VectorUtil.newDiff( p1, p2 ) );
     }
 
-    //
-    //double maxabs( const std::vector<double>& v )
-    //{
-    // double out = 0.0; 
-    // for( unsigned int i=0; i < v.size() ; i++ )
-    // {
-    //  if( fabs( v[i] ) > out )
-    //  { out = v[i]; }
-    // }
-    // return out; 
-    //}
+    /**
+     * Returns greatest in modulus value of the vector:<br>
+     * result = v[k]: |v[k]| >= v[i] for all i
+     */
     public double maxabs(double[] v)
     {
         double out = 0.0;
@@ -504,16 +365,11 @@ public class VectorUtil
         return out;
     }
 
-    //double max_abs_difference( const std::vector<double>& v1 , const std::vector<double>& v2 )
-    //{
-    // double out = 0.0; 
-    // for( unsigned int i=0; i < v1.size() ; i++ )
-    // {
-    //  if( fabs( v1[i] -v2[i] ) > out )
-    //  { out = fabs( v1[i] - v2[i] ); }
-    // }
-    // return out; 
-    //}
+
+    /**
+     * Returns greatest in modulus value of the diffrences between two arrays components:<br>
+     * result = v1[k]-v2[k]: |result| >= v1[i] - v2[i] for all i
+     */
     public static double max_abs_difference(double[] v1, double[] v2)
     {
         double out = 0.0;
@@ -527,15 +383,10 @@ public class VectorUtil
         return out;
     }
 
-    //std::vector<double> exponentiate( const std::vector<double>& exponent )
-    //{
-    // std::vector<double> out( exponent.size() , 0.0 );
-    // 
-    // for( unsigned int i=0 ; i < out.size() ; i++ )
-    // { out[i] = exp( exponent[i] ); }
-    //
-    // return out; 
-    //}
+    /**
+     * Returns new array which is exponentiated given array
+     * result[i] = EXP( exponent[i] )
+     */
     public static double[] exponentiate(double[] exponent)
     {
         double[] out = new double[exponent.length];
@@ -547,25 +398,20 @@ public class VectorUtil
         return out;
     }
 
-    //void randomize( std::vector<double>* v )
-    //{
-    // static double d1 = 2.0 / (double) RAND_MAX; 
-    //
-    // for( unsigned int i=0; i < v->size(); i++ )
-    // { (*v)[i] =  -1 + d1 * rand(); }
-    // 
-    // return; 
-    //}
+    /**
+     * Modifies given array: sets all its values to random uniformly distributed numbers between -1 and 1
+     */
     public static void randomize(double[] v)
     {
-        //        Random r = new Random();
         for( int i = 0; i < v.length; i++ )
         {
-            //            v[i] = -1 + r.nextInt() * 2 / Integer.MAX_VALUE; //Possibly replace by Math.random()
             v[i] = -1 + 2 * Math.random();
         }
     }
 
+    /**
+     * Creates and returns random vector of length size, each value is a random number uniformly distributed between min and max
+     */
     public static double[] random(int size, double min, double max)
     {
         double[] result = new double[size];
@@ -574,15 +420,9 @@ public class VectorUtil
         return result;
     }
 
-    ///* axpy and related BLAS-type operations */ 
-    //
-    //void axpy( std::vector<double>* y, const double& a , const std::vector<double>& x )
-    //{
-    // for( unsigned int i=0; i < (*y).size() ; i++ )
-    // {
-    //  (*y)[i] += a * x[i] ; 
-    // }
-    // return ; 
+    /**
+     * Modifies y array so that y[i] = y[i] + a*x[i]  
+     */
     public static void axpy(double[] y, double a, double[] x)
     {
         for( int i = 0; i < y.length; i++ )
@@ -591,14 +431,9 @@ public class VectorUtil
         }
     }
 
-    //void axpy( std::vector<double>* y, const std::vector<double>& a , const std::vector<double>& x )
-    //{
-    // for( unsigned int i=0; i < (*y).size() ; i++ )
-    // {
-    //  (*y)[i] += a[i] * x[i] ; 
-    // }
-    // return; 
-    //}
+    /**
+     * Modifies y array so that y[i] = y[i] + a[i]*x[i]  
+     */
     public static void axpy(double[] y, double[] a, double[] x)
     {
         for( int i = 0; i < y.length; i++ )
@@ -607,14 +442,9 @@ public class VectorUtil
         }
     }
 
-    //void naxpy( std::vector<double>* y, const double& a , const std::vector<double>& x )
-    //{
-    // for( unsigned int i=0; i < (*y).size() ; i++ )
-    // {
-    //  (*y)[i] -= a * x[i] ; 
-    // }
-    // return ; 
-    //}
+    /**
+     * Modifies y array so that y[i] = y[i] - a*x[i]  
+     */
     public static void naxpy(double[] y, double a, double[] x)
     {
         for( int i = 0; i < y.length; i++ )
@@ -623,14 +453,9 @@ public class VectorUtil
         }
     }
 
-    //void naxpy( std::vector<double>* y, const std::vector<double>& a , const std::vector<double>& x )
-    //{
-    // for( unsigned int i=0; i < (*y).size() ; i++ )
-    // {
-    //  (*y)[i] -= a[i] * x[i] ; 
-    // }
-    // return; 
-    //}
+    /**
+     * Modifies y array so that y[i] = y[i] - a[i]*x[i]  
+     */
     public static void naxpy(double[] y, double[] a, double[] x)
     {
         for( int i = 0; i < y.length; i++ )
@@ -803,6 +628,9 @@ public class VectorUtil
     //}
     //
 
+    /**
+     * Returns dot product of two arrays: a[0]*b[0]+...+a[n]*b[n]
+     */
     double dot_product(double[] a, double[] b)
     {
         double out = 0.0;
@@ -822,6 +650,12 @@ public class VectorUtil
         return out;
     }
 
+    /**
+     * Returns new array of given size on the base of given array. 
+     * If new size is smaller than v.length then new array is simply part of given array
+     * Else new array contains v entirely at the start
+     * If initial array is null - return array of length 1
+     */
     public static boolean[] resize(boolean[] v, int size)
     {
         if( v == null )
@@ -829,6 +663,12 @@ public class VectorUtil
         return Arrays.copyOf( v, size );
     }
 
+    /**
+     * Returns new array of given size on the base of given array.<br>
+     * If new size is smaller than v.length then new array is simply part of given array<br>
+     * Else new array contains v entirely at the start<br>
+     * If initial array is null - return array of length 1
+     */
     public static double[] resize(double[] v, int size)
     {
         if( v == null )
@@ -836,6 +676,12 @@ public class VectorUtil
         return Arrays.copyOf( v, size );
     }
 
+    /**
+     * Returns new array of given size on the base of given array.<br>
+     * If new size is smaller than v.length then new array is simply part of given array<br>
+     * Else new array contains v entirely at the start, all other values are equal to val<br>
+     * If initial array is null - return array of length 1 with result[0] = val
+     */
     public static double[] resize(double[] v, int size, double val)
     {
         if( v == null || v.length == 0 )
@@ -843,49 +689,54 @@ public class VectorUtil
         if( size <= v.length )
             return Arrays.copyOf( v, size );
         double[] result = new double[size];
-        System.arraycopy( v, size, result, 0, size );
+        System.arraycopy( v, 0, result, 0, v.length );
         for( int i = v.length; i < size; i++ )
             result[i] = val;
         return result;
 
     }
 
+    /**
+     * Returns new array of given size on the base of given array.<br>
+     * If new size is smaller than v.length then new array is simply part of given array<br>
+     * Else new array contains v entirely at the start, all other elements are arrays of the same size as v[0]
+     */
     public static int[][] resize(int[][] v, int size)
     {
         if( v == null || v.length == 0 )
             return new int[size][];
         if( size <= v.length )
             return Arrays.copyOf( v, size );
-        else
-        {
-            int[][] result = Arrays.copyOf( v, size );
-            int innerSize = v[0] == null ? 0 : v[0].length;
-            for( int i = v.length; i < result.length; i++ )
-            {
-                result[i] = new int[innerSize];
-            }
-
-            return result;
-        }
+        int[][] result = Arrays.copyOf( v, size );
+        int innerSize = v[0] == null ? 0 : v[0].length;
+        for( int i = v.length; i < result.length; i++ )
+            result[i] = new int[innerSize];
+        return result;
     }
 
+    /**
+     * Returns new array of given size on the base of given array.<br>
+     * If new size is smaller than v.length then new array is simply part of given array<br>
+     * Else new array contains v entirely at the start, all other elements are arrays of the same size as v[0]
+     */
     public static double[][] resize(double[][] v, int size)
     {
+        if( v == null || v.length == 0 )
+            return new double[size][];
         if( size <= v.length )
             return Arrays.copyOf( v, size );
-        else
-        {
-            double[][] result = Arrays.copyOf( v, size );
-            int innerSize = v[0].length;
-            for( int i = v.length; i < result.length; i++ )
-            {
-                result[i] = new double[innerSize];
-            }
-
-            return result;
-        }
+        double[][] result = Arrays.copyOf( v, size );
+        int innerSize = v[0].length;
+        for( int i = v.length; i < result.length; i++ )
+            result[i] = new double[innerSize];
+        return result;
     }
 
+    /**
+     * Returns new array which length is arr.length +1. Such that:<br>
+     * for i < arr.length result[i] = arr[i]<br>
+     * result[arr.length] = val
+     */
     public static <T> T[] push_back(T[] arr, T val)
     {
         T[] result = Arrays.copyOf( arr, arr.length + 1 );
@@ -893,37 +744,55 @@ public class VectorUtil
         return result;
     }
 
-
+    /**
+     * Returns new array which length is arr.length +1. Such that:<br>
+     * for i < arr.length result[i] = arr[i]<br>
+     * result[arr.length] = val<br>
+     * If initial array is null or empty returns array with one value: val
+     */
     public static boolean[] push_back(boolean[] arr, boolean val)
     {
         if( arr == null || arr.length == 0 )
             return new boolean[] {val};
-        boolean[] result = new boolean[arr.length + 1];
-        System.arraycopy( arr, 0, result, 0, arr.length );
+        boolean[] result = Arrays.copyOf( arr, arr.length + 1 );
         result[result.length - 1] = val;
         return result;
     }
 
+    /**
+     * Returns new array which length is arr.length +1. Such that:<br>
+     * for i < arr.length result[i] = arr[i]<br>
+     * result[arr.length] = val<br>
+     * If initial array is null or empty returns array with one value: val
+     */
     public static double[] push_back(double[] arr, double val)
     {
         if( arr == null || arr.length == 0 )
             return new double[] {val};
-        double[] result = new double[arr.length + 1];
-        System.arraycopy( arr, 0, result, 0, arr.length );
+        double[] result = Arrays.copyOf( arr, arr.length + 1 );
         result[result.length - 1] = val;
         return result;
     }
 
+    /**
+     * Returns new array which length is arr.length +1. Such that:<br>
+     * for i < arr.length result[i] = arr[i]<br>
+     * result[arr.length] = val<br>
+     * If initial array is null or empty returns array with one value: val
+     */
     public static int[] push_back(int[] arr, int val)
     {
         if( arr == null || arr.length == 0 )
             return new int[] {val};
-        int[] result = new int[arr.length + 1];
-        System.arraycopy( arr, 0, result, 0, arr.length );
+        int[] result = Arrays.copyOf( arr, arr.length + 1 );
         result[result.length - 1] = val;
         return result;
     }
 
+    /**
+     * Returns new array of size length with all values equal to template:<br>
+     * result[i] = template
+     */
     public static double[][] assign(int length, double[] template)
     {
         double[][] result = new double[length][];
@@ -932,6 +801,10 @@ public class VectorUtil
         return result;
     }
 
+    /**
+     * Returns new array of size length with all values equal to template:<br>
+     * result[i] = template
+     */
     public static boolean[][] assign(int length, boolean[] template)
     {
         boolean[][] result = new boolean[length][];
@@ -940,11 +813,30 @@ public class VectorUtil
         return result;
     }
 
+    /**
+     * Returns new array of size length with all values equal to template:<br>
+     * result[i] = template
+     */
     public static double[] assign(int length, double template)
     {
         double[] result = new double[length];
         for( int i = 0; i < length; i++ )
             result[i] = template;
         return result;
+    }
+
+    /**
+     * Returns true if two arrays are of the same size and all corresponding elements are equal: arr1[i] = arr2[i]
+     */
+    public static boolean equals(double[] arr1, double[] arr2)
+    {
+        if( arr1 == null || arr2 == null || arr1.length != arr2.length )
+            return false;
+        for( int i = 0; i < arr1.length; i++ )
+        {
+            if( arr1[i] != arr2[i] )
+                return false;
+        }
+        return true;
     }
 }
