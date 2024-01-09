@@ -1,4 +1,4 @@
-package ru.biosoft.physicell.biofvm;
+package ru.biosoft.physicell.ui;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -15,6 +15,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import ru.biosoft.physicell.biofvm.BasicAgent;
+import ru.biosoft.physicell.biofvm.Microenvironment;
 
 public class SimpleVisualizer
 {

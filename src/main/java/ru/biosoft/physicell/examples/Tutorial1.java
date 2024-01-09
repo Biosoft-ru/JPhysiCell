@@ -3,9 +3,9 @@ package ru.biosoft.physicell.examples;
 import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
-import ru.biosoft.physicell.biofvm.Visualizer;
-import ru.biosoft.physicell.biofvm.Visualizer.Section;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
+import ru.biosoft.physicell.ui.Visualizer;
+import ru.biosoft.physicell.ui.Visualizer.Section;
 
 /*
 #############################################################################

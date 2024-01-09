@@ -12,13 +12,13 @@ import java.util.Set;
 import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
-import ru.biosoft.physicell.biofvm.Visualizer;
-import ru.biosoft.physicell.biofvm.Visualizer.Section;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.StandardModels;
+import ru.biosoft.physicell.ui.Visualizer;
+import ru.biosoft.physicell.ui.Visualizer.Section;
 
 public class TestMechanics2
 {

@@ -1,4 +1,4 @@
-package ru.biosoft.physicell.biofvm;
+package ru.biosoft.physicell.ui;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,6 +14,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
+import ru.biosoft.physicell.biofvm.BasicAgent;
+import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 
 public class Visualizer
