@@ -1,5 +1,7 @@
 package ru.biosoft.physicell.core;
 
+import java.util.Set;
+
 import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
@@ -73,18 +75,19 @@ import ru.biosoft.physicell.core.CellFunctions.instantiate_cell;
 */
 public class Cell extends BasicAgent
 {
+    public static double[] cell_division_orientation;
     CellContainer container;
     int currentMechanicsVoxelIndex;
     int updated_current_mechanics_voxel_index; // keeps the updated voxel index for later adjusting of current voxel index
 
-    String type_name;
+    public String type_name;
 
     CellDefinition definition;
     CustomCellData custom_data;// = new CustomCellData();
     CellParameters parameters;// = new CellParameters();
     public CellFunctions functions;// = new CellFunctions();
 
-    CellState state = new CellState();
+    public CellState state = new CellState();
     public Phenotype phenotype;// = new Phenotype();
     public boolean isOutOfDomain;
     boolean isMovable;
@@ -95,14 +98,11 @@ public class Cell extends BasicAgent
         super( m );
         type = cd.type;
         type_name = cd.name;
-        custom_data = cd.custom_data;
+        custom_data = cd.custom_data.clone();
         parameters = cd.parameters.clone();
         functions = cd.functions;
         phenotype = cd.phenotype.clone();
-//        parameters.pReference_live_phenotype = phenotype;
         phenotype.molecular.sync( this );
-//        parameters.pReference_live_phenotype = phenotype;
-        //        phenotype.cycle = functions.cycleMod/el.clone();
         this.definition = cd;
         // cell state should be fine by the default constructor 
         currentMechanicsVoxelIndex = -1;
@@ -165,34 +165,9 @@ public class Cell extends BasicAgent
         }
     }
 
-    //    void start_death(int death_model_index)
-    //    {
-    //    // set the death data struture to the indicated death model 
-    //    phenotype.death.trigger_death( death_model_index ); 
-    //    // change the cycle model to the current death model 
-    //    phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() ); 
-    //        
-    //    // turn off secretion, and reduce uptake by a factor of 10 
-    //    phenotype.secretion.set_all_secretion_to_zero();
-    //    phenotype.secretion.scale_all_uptake_by_factor( 0.10 );
-    //        
-    //    // turn off motility.
-    //    phenotype.motility.is_motile = false; 
-    //    phenotype.motility.motility_vector.assign( 3, 0.0 ); 
-    //    functions.update_migration_bias = NULL;
-    //        
-    //    // make sure to run the death entry function 
-    //    if( phenotype.cycle.current_phase().entry_function )
-    //    {
-    //        phenotype.cycle.current_phase().entry_function( this, phenotype, 0.0 ); 
-    //    }
-    //    
-    //    return; 
-    //    }
-    //    
     void assign_orientation()
     {
-        state.orientation = new double[3];//.orientation.resize(3,0.0);
+        state.orientation = new double[3];
         //TODO: check if function should be used at all
         //        if( functions.set_orientation != null )
         //        {
@@ -237,7 +212,8 @@ public class Cell extends BasicAgent
         delete_cell( this );
     }
 
-    void update_position(double dt)
+    @Override
+    public void update_position(double dt)
     {
         // BioFVM Basic_Agent::update_position(dt) returns without doing anything. 
         // So we remove this to avoid any future surprises. 
@@ -349,11 +325,11 @@ public class Cell extends BasicAgent
                 custom_data.variables.get( nn ).value *= 0.5;
             }
         }
-        for( int nn = 0; nn < custom_data.vector_variables.size(); nn++ )
+        for( int nn = 0; nn < custom_data.vectorVariables.size(); nn++ )
         {
-            if( custom_data.vector_variables.get( nn ).conserved_quantity )
+            if( custom_data.vectorVariables.get( nn ).conserved_quantity )
             {
-                VectorUtil.prod( custom_data.vector_variables.get( nn ).value, 0.5 );
+                VectorUtil.prod( custom_data.vectorVariables.get( nn ).value, 0.5 );
             }
         }
 
@@ -440,38 +416,27 @@ public class Cell extends BasicAgent
         // #endif
         // changes for new phenotyp March 2022
         state.damage = 0.0;
-        state.total_attack_time = 0;
+        state.totalAttackTime = 0;
         child.state.damage = 0.0;
-        child.state.total_attack_time = 0.0;
+        child.state.totalAttackTime = 0.0;
         return child;
     }
 
-    void remove_all_attached_cells()
+    public void remove_all_attached_cells()
     {
-        // remove self from any attached cell's list. 
-        //            for( int i = 0; i < state.attached_cells.length ; i++ )
-        //            {
-        //                state.attached_cells[i]->detach_cell( this ); 
-        //            }
-
-        for( Cell cell : state.attached_cells )
+        for( Cell cell : state.attachedCells )
             cell.detach_cell( this );
-        state.attached_cells.clear(); // clear my list 
+        state.attachedCells.clear();
     }
 
-    void remove_all_spring_attachments()
+    public void remove_all_spring_attachments()
     {
-        // remove self from any attached cell's list. 
-        //            for( int i = 0; i < state.spring_attachments.size(); i++ )
-        //            {
-        //                state.spring_attachments[i].detach_cell_as_spring( this );
-        //            }
-        for( Cell cell : state.spring_attachments )
+        for( Cell cell : state.springAttachments )
             cell.detach_cell_as_spring( this );
-        state.spring_attachments.clear(); // clear my list 
+        state.springAttachments.clear();
     }
 
-    void attach_cells(Cell pCell_1, Cell pCell_2)
+    public static void attach_cells(Cell pCell_1, Cell pCell_2)
     {
         pCell_1.attach_cell( pCell_2 );
         pCell_2.attach_cell( pCell_1 );
@@ -497,81 +462,23 @@ public class Cell extends BasicAgent
 
     void attach_cell(Cell pAddMe)
     {
-        //        #pragma omp critical
-        //            bool already_attached = false; 
-        //            for( int i=0 ; i < state.attached_cells.size() ; i++ )
-        //            {
-        //                if( state.attached_cells[i] == pAddMe )
-        //                { already_attached = true; }
-        //            }
-        //            if( already_attached == false )
-        //            { state.attached_cells.push_back( pAddMe ); }
-        state.attached_cells.add( pAddMe );
-        // pAddMe->attach_cell( this ); 
+        state.attachedCells.add( pAddMe );
     }
 
     void attach_cell_as_spring(Cell pAddMe)
     {
-        //        #pragma omp critical
-            //            bool already_attached = false;
-            //            for( int i = 0; i < state.spring_attachments.size(); i++ )
-            //            {
-            //                if( state.spring_attachments[i] == pAddMe )
-            //                {
-            //                    already_attached = true;
-            //                }
-            //            }
-            //            if( already_attached == false )
-            //            {
-            //                state.spring_attachments.push_back( pAddMe );
-            //            }
-            state.spring_attachments.add( pAddMe );
-        // pAddMe->attach_cell( this );  
+        state.springAttachments.add( pAddMe );
     }
 
     void detach_cell(Cell pRemoveMe)
     {
-        //        #pragma omp critical
-            //            bool found = false;
-            //            int i = 0;
-            //            while( !found && i < state.attached_cells.size() )
-            //            {
-            //                // if pRemoveMe is in the cell's list, remove it
-            //                if( state.attached_cells[i] == pRemoveMe )
-            //                {
-            //                    int n = state.attached_cells.size();
-            //                    // copy last entry to current position 
-            //                    state.attached_cells[i] = state.attached_cells[n - 1];
-            //                    // shrink by one 
-            //                    state.attached_cells.pop_back();
-            //                    found = true;
-            //                }
-            //                i++;
-            //            }
-            state.attached_cells.remove( pRemoveMe );
+            state.attachedCells.remove( pRemoveMe );
     }
 
     void detach_cell_as_spring(Cell pRemoveMe)
     {
-        //        #pragma omp critical
-        //        {
-        //            boolean found = false;
-        //            int i = 0;
-        //            while( !found && i < state.spring_attachments.size() )
-        //            {
-        //                // if pRemoveMe is in the cell's list, remove it
-        //                if( state.spring_attachments[i] == pRemoveMe )
-        //                {
-        //                    int n = state.spring_attachments.size();
-        //                    // copy last entry to current position 
-        //                    state.spring_attachments[i] = state.spring_attachments[n - 1];
-        //                    // shrink by one 
-        //                    state.spring_attachments.pop_back();
-        //                    found = true;
-        //                }
-        //                i++;
-        //            }
-        state.spring_attachments.remove( pRemoveMe );
+
+        state.springAttachments.remove( pRemoveMe );
     }
 
     public void copy_data(Cell copy_me)
@@ -692,8 +599,8 @@ public class Cell extends BasicAgent
         phenotype.cycle = phenotype.death.current_model();
 
         // turn off secretion, and reduce uptake by a factor of 10 
-        phenotype.secretion.set_all_secretion_to_zero();
-        phenotype.secretion.scale_all_uptake_by_factor( 0.10 );
+        phenotype.secretion.setSecretionToZero();
+        phenotype.secretion.scaleUptake( 0.10 );
 
         // turn off motility.
         phenotype.motility.is_motile = false;
@@ -750,7 +657,7 @@ public class Cell extends BasicAgent
             temp_r = 1 - distance / R;
             temp_r *= temp_r; // (1-d/R)^2 
             // add the relative pressure contribution 
-            state.simple_pressure += ( temp_r / simple_pressure_scale ); // New July 2017 
+            state.simplePressure += ( temp_r / simple_pressure_scale ); // New July 2017 
         }
 
         Mechanics m1 = phenotype.mechanics;
@@ -775,8 +682,8 @@ public class Cell extends BasicAgent
 
             // August 2017 - back to the original if both have same coefficient 
             // May 2022 - back to original if both affinities are 1
-            int ii = type;//CellDefinition.getCellDefinition( type ).;
-            int jj = other.type;//find_cell_definition_index( other.type );
+            int ii = CellDefinition.getCellDefinitionIndex( type );//CellDefinition.getCellDefinition( type ).;
+            int jj = CellDefinition.getCellDefinitionIndex( other.type );//find_cell_definition_index( other.type );
 
             double adhesion_ii = m1.cell_cell_adhesion_strength * m1.cell_adhesion_affinities[jj];
             double adhesion_jj = m2.cell_cell_adhesion_strength * m2.cell_adhesion_affinities[ii];
@@ -793,9 +700,6 @@ public class Cell extends BasicAgent
         temp_r /= distance;
         VectorUtil.axpy( velocity, temp_r, displacement );
     }
-
-
-
 
     public void update_motility_vector(double dt_)
     {
@@ -957,8 +861,8 @@ public class Cell extends BasicAgent
             // mark it as dead 
             pCell_to_eat.phenotype.death.dead = true;
             // set secretion and uptake to zero 
-            pCell_to_eat.phenotype.secretion.set_all_secretion_to_zero();
-            pCell_to_eat.phenotype.secretion.set_all_uptake_to_zero();
+            pCell_to_eat.phenotype.secretion.setSecretionToZero();
+            pCell_to_eat.phenotype.secretion.setUptakeToZero();
 
             // deactivate all custom function 
             pCell_to_eat.functions.custom_cell_rule = null;
@@ -1045,38 +949,26 @@ public class Cell extends BasicAgent
 
     void attack_cell(Cell pCell_to_attack, double dt)
     {
-        // don't attack self 
         if( pCell_to_attack == this )
-        {
-            return;
-        }
+            return; // don't attack self 
 
-        // don't attack a dead or tiny cell 
         if( pCell_to_attack.phenotype.death.dead == true || pCell_to_attack.phenotype.volume.total < 1e-15 )
-        {
-            return;
-        }
+            return; // don't attack a dead or tiny cell 
 
         // make this thread safe 
         //        #pragma omp critical
         {
             // std::cout << this.type_name << " attacks " << pCell_to_attack.type_name << std::endl;
-            // 
-            pCell_to_attack.state.damage += phenotype.cell_interactions.damage_rate * dt;
-            pCell_to_attack.state.total_attack_time += dt;
+            pCell_to_attack.state.damage += phenotype.cell_interactions.damageRate * dt;
+            pCell_to_attack.state.totalAttackTime += dt;
         }
-        return;
     }
-
-
 
     void fuse_cell(Cell pCell_to_fuse)
     {
-        // don't ingest a cell that's already fused or fuse self 
+
         if( pCell_to_fuse.phenotype.volume.total < 1e-15 || this == pCell_to_fuse )
-        {
-            return;
-        }
+            return; // don't ingest a cell that's already fused or fuse self 
 
         // make this thread safe 
         //        #pragma omp critical
@@ -1117,7 +1009,7 @@ public class Cell extends BasicAgent
 
             // set number of nuclei 
 
-            state.number_of_nuclei += pCell_to_fuse.state.number_of_nuclei;
+            state.numberNuclei += pCell_to_fuse.state.numberNuclei;
 
             // absorb all the volume(s)
 
@@ -1181,8 +1073,8 @@ public class Cell extends BasicAgent
             // mark it as dead 
             pCell_to_fuse.phenotype.death.dead = true;
             // set secretion and uptake to zero 
-            pCell_to_fuse.phenotype.secretion.set_all_secretion_to_zero();
-            pCell_to_fuse.phenotype.secretion.set_all_uptake_to_zero();
+            pCell_to_fuse.phenotype.secretion.setSecretionToZero();
+            pCell_to_fuse.phenotype.secretion.setUptakeToZero();
 
             // deactivate all custom function 
             pCell_to_fuse.functions.custom_cell_rule = null;
@@ -1221,7 +1113,7 @@ public class Cell extends BasicAgent
         setTotalVolume( phenotype.volume.total );
     }
 
-    public void advance_bundled_phenotype_functions(double dt_)
+    public void advance_bundled_phenotype_functions(double dt_) throws Exception
     {
         // New March 2022
         // perform transformations 
@@ -1275,7 +1167,7 @@ public class Cell extends BasicAgent
         phenotype.geometry.update( this, phenotype, dt_ );
 
         // check for new death events 
-        if( phenotype.death.check_for_death( dt_ ) )
+        if( phenotype.death.checkForDeath( dt_ ) )
         {
             // if so, change the cycle model to the current death model 
             phenotype.cycle = phenotype.death.current_model();
@@ -1287,8 +1179,8 @@ public class Cell extends BasicAgent
             functions.update_migration_bias = null;
 
             // turn off secretion, and reduce uptake by a factor of 10 
-            phenotype.secretion.set_all_secretion_to_zero();
-            phenotype.secretion.scale_all_uptake_by_factor( 0.10 );
+            phenotype.secretion.setSecretionToZero();
+            phenotype.secretion.scaleUptake( 0.10 );
 
             // make sure to run the death entry function 
             if( phenotype.cycle.currentPhase().entryFunction != null )
@@ -1320,27 +1212,35 @@ public class Cell extends BasicAgent
     //TODO: move somewhere else
     static boolean cell_definitions_by_name_constructed = false;
 
-    //    public static void build_cell_definitions_maps()
-    //    {
-    //        cell_definitions_by_name.clear();
-    //        cell_definitions_by_type.clear();
-    //        cell_definition_indices_by_name.clear();
-    //        cell_definition_indices_by_type.clear();
-    //        for( int n = 0; n < cell_definitions_by_index.size(); n++ )
-    //        {
-    //            CellDefinition pCD = cell_definitions_by_index.get( n );
-    //            cell_definitions_by_name.put( pCD.name, pCD );
-    //            cell_definitions_by_type.put( pCD.type, pCD );
-    //            cell_definition_indices_by_name.put( pCD.name, n );// = n;
-    //            cell_definition_indices_by_type.put( pCD.type, n );
-    //        }
-    //        cell_definitions_by_name_constructed = true;
-    //    }
-
     @Deprecated
     public double get_total_volume()
     {
         return phenotype.volume.total;
     }
 
+    public CellContainer getContainer()
+    {
+        if( container == null )
+        {
+            container = (CellContainer)getMicroenvironment().agentContainer;
+        }
+
+        return container;
+    }
+
+    public Set<Cell> cells_in_my_container()
+    {
+        return getContainer().agent_grid.get( get_current_mechanics_voxel_index() );
+    }
+
+    public double[] nearest_gradient(int substrate_index)
+    {
+        return getMicroenvironment().gradient_vector( currentVoxelIndex )[substrate_index];
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Cell: " + type_name + " ( " + type + " ) ";
+    }
 }

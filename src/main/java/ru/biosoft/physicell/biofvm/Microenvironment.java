@@ -83,6 +83,10 @@ public class Microenvironment
     }
 
     public MicroenvironmentOptions options;
+    public MicroenvironmentOptions getOptions()
+    {
+        return options;
+    }
     private DiffusionDecaySolver solver;
 
     public void setSolver(DiffusionDecaySolver solver)
@@ -291,12 +295,9 @@ public class Microenvironment
         options.initial_condition_vector = VectorUtil.push_back( options.initial_condition_vector, 1.0 );
 
         options.Dirichlet_all = VectorUtil.push_back( options.Dirichlet_all, true );
-        //  default_microenvironment_options.Dirichlet_interior.push_back( true ); 
         options.Dirichlet_xmin = VectorUtil.push_back( options.Dirichlet_xmin, false );
         options.Dirichlet_xmax = VectorUtil.push_back( options.Dirichlet_xmax, false );
         options.Dirichlet_ymin = VectorUtil.push_back( options.Dirichlet_ymin, false );
-
-
         options.Dirichlet_ymax = VectorUtil.push_back( options.Dirichlet_ymax, false );
         options.Dirichlet_zmin = VectorUtil.push_back( options.Dirichlet_zmin, false );
         options.Dirichlet_zmax = VectorUtil.push_back( options.Dirichlet_zmax, false );
@@ -305,7 +306,7 @@ public class Microenvironment
         options.Dirichlet_xmax_values = VectorUtil.push_back( options.Dirichlet_xmax_values, 1.0 );
         options.Dirichlet_ymin_values = VectorUtil.push_back( options.Dirichlet_ymin_values, 1.0 );
         options.Dirichlet_ymax_values = VectorUtil.push_back( options.Dirichlet_ymax_values, 1.0 );
-        options.Dirichlet_zmin_values = VectorUtil.push_back( options.Dirichlet_zmin_values, 1.0 );
+        options.Dirichlet_zmin_values = VectorUtil.push_back( options.Dirichlet_zmin_values, 1.0 );       
         options.Dirichlet_zmax_values = VectorUtil.push_back( options.Dirichlet_zmax_values, 1.0 );
     }
 
@@ -515,17 +516,23 @@ public class Microenvironment
         return mesh.nearest_voxel_index( position );
     }
 
-    public void setDensity(int index, String name, String units)
+    /**
+     * Changes index density characteristics: name, units, diffusion and decay rate
+     * Microenvironment always contains one density after creation. If you need more densities use addDensity method
+     */
+    public void setDensity(int index, String name, String units, double diffussion, double decay)
     {
         // fix in PhysiCell preview November 2017 
-        if( index == 0 )
-        {
-            options.use_oxygen_as_first_field = false;//TODO: check
-        }
+        //        if( index == 0 )
+        //        {
+        //            options.use_oxygen_as_first_field = false;//TODO: check
+        //        }
 
         //        VectorUtil.resize( dirichlet_activation_vector, index )
         density_names[index] = name;
         density_units[index] = units;
+        diffusion_coefficients[index] = diffussion;
+        decay_rates[index] = decay;
     }
 
     public int number_of_densities()
@@ -614,7 +621,7 @@ public class Microenvironment
     {
         for( int i = 0; i < density_names.length; i++ )
         {
-            if( density_names[i] == name )
+            if( density_names[i].equals( name ) )
             {
                 return i;
             }
@@ -798,6 +805,87 @@ public class Microenvironment
         */
 
         dirichlet_value_vectors[voxel_index] = value; // .assign( mesh.voxels.size(), one ); 
+    }
+
+    public double[][] gradient_vector(int n)
+    {
+        // if the gradient has not yet been computed, then do it!
+        if( gradient_vector_computed[n] == false )
+        {
+            compute_gradient_vector( n );
+        }
+        
+        
+        return gradient_vectors[n];
+    }
+
+    void compute_gradient_vector( int n )
+    {
+        double two_dx = mesh.dx; 
+        double two_dy = mesh.dy; 
+        double two_dz = mesh.dz; 
+        boolean gradient_constants_defined = false; 
+        int[] indices = new int[3];//(3,0);
+        
+        if( gradient_constants_defined == false )
+        {
+            two_dx *= 2.0; 
+            two_dy *= 2.0; 
+            two_dz *= 2.0;
+            gradient_constants_defined = true; 
+        }   
+        
+        indices = cartesian_indices( n );
+        
+        // d/dx 
+        if( indices[0] > 0 && indices[0] < mesh.x_coordinates.length-1 )
+        {
+            for( int q=0; q < number_of_densities() ; q++ )
+            {
+                gradient_vectors[n][q][0] = ( density )[n + thomas_i_jump][q];
+                gradient_vectors[n][q][0] -= ( density )[n - thomas_i_jump][q];
+                gradient_vectors[n][q][0] /= two_dx; 
+                gradient_vector_computed[n] = true; 
+            }
+        }
+        
+        // don't bother computing y and z component if there is no y-direction. (1D)
+        if( mesh.y_coordinates.length == 1 )
+        return; 
+        
+        // d/dy 
+        if( indices[1] > 0 && indices[1] < mesh.y_coordinates.length-1 )
+        {
+            for( int q = 0; q < number_of_densities(); q++ )
+            {
+                gradient_vectors[n][q][1] = ( density )[n + thomas_j_jump][q];
+                gradient_vectors[n][q][1] -= ( density )[n - thomas_j_jump][q];
+                gradient_vectors[n][q][1] /= two_dy; 
+                gradient_vector_computed[n] = true; 
+            }
+        }
+        
+        // don't bother computing z component if there is no z-direction (2D) 
+        if( mesh.z_coordinates.length == 1 )
+         return;
+        
+        // d/dz 
+        if( indices[2] > 0 && indices[2] < mesh.z_coordinates.length-1 )
+        {
+            for( int q=0; q < number_of_densities() ; q++ )
+            {
+                gradient_vectors[n][q][2] = ( density )[n + thomas_k_jump][q];
+                gradient_vectors[n][q][2] -= ( density )[n - thomas_k_jump][q];
+                gradient_vectors[n][q][2] /= two_dz; 
+                gradient_vector_computed[n] = true; 
+            }
+        }
+        
+    }
+
+    int[] cartesian_indices(int n)
+    {
+        return mesh.cartesian_indices( n );
     }
 
 }

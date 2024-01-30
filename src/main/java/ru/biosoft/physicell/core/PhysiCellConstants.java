@@ -1,5 +1,8 @@
 package ru.biosoft.physicell.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -95,20 +98,20 @@ public class PhysiCellConstants
 
     // currently recognized cell cycle models
 
-    static int advanced_Ki67_cycle_model = 0;
-    static int basic_Ki67_cycle_model = 1;
-    static int flow_cytometry_cycle_model = 2;
-    static int live_apoptotic_cycle_model = 3;
-    static int total_cells_cycle_model = 4;
-    static int live_cells_cycle_model = 5;
-    static int flow_cytometry_separated_cycle_model = 6;
-    static int cycling_quiescent_model = 7;
+    public static int advanced_Ki67_cycle_model = 0;
+    public static int basic_Ki67_cycle_model = 1;
+    public static int flow_cytometry_cycle_model = 2;
+    public static int live_apoptotic_cycle_model = 3;
+    public static int total_cells_cycle_model = 4;
+    public static int live_cells_cycle_model = 5;
+    public static int flow_cytometry_separated_cycle_model = 6;
+    public static int cycling_quiescent_model = 7;
 
     // currently recognized death models
 
-    static int apoptosis_death_model = 100;
-    static int necrosis_death_model = 101;
-    static int autophagy_death_model = 102;
+    public static int apoptosis_death_model = 100;
+    public static int necrosis_death_model = 101;
+    public static int autophagy_death_model = 102;
 
 
 
@@ -146,4 +149,39 @@ public class PhysiCellConstants
     static int necrotic_lysed = 102;
     static int necrotic = 103;
     static int debris = 104;
+
+    private static Map<String, Integer> cycle_model_codes = new HashMap<>();
+    {
+        //        {
+            cycle_model_codes.put( "Ki67 (advanced)", advanced_Ki67_cycle_model );
+            cycle_model_codes.put( "Ki67 (basic)", basic_Ki67_cycle_model );
+            cycle_model_codes.put( "Flow cytometry model (basic)", flow_cytometry_cycle_model );
+            // { ,PhysiCell_constants::live_apoptotic_cycle_model}, // not implemented 
+            // { ,PhysiCell_constants::total_cells_cycle_model}, // not implemented 
+            cycle_model_codes.put( "Live", live_cells_cycle_model );
+            cycle_model_codes.put( "Flow cytometry model (separated)", flow_cytometry_separated_cycle_model );
+            cycle_model_codes.put( "Cycling-Quiescent model", cycling_quiescent_model );
+
+            // currently recognized death models 
+            cycle_model_codes.put( "Apoptosis", apoptosis_death_model );
+            cycle_model_codes.put( "Necrosis", necrosis_death_model );
+            // { ,PhysiCell_constants::autophagy_death_model}, // not implemented 
+
+            cycle_model_codes.put( "ki67 (advanced)", advanced_Ki67_cycle_model );
+            cycle_model_codes.put( "ki67 (basic)", basic_Ki67_cycle_model );
+            cycle_model_codes.put( "flow cytometry model (basic)", flow_cytometry_cycle_model );
+            cycle_model_codes.put( "live", live_cells_cycle_model );
+            cycle_model_codes.put( "flow cytometry model (separated)", flow_cytometry_separated_cycle_model );
+            cycle_model_codes.put( "cycling-quiescent model", cycling_quiescent_model );
+            cycle_model_codes.put( "apoptosis", apoptosis_death_model );
+            cycle_model_codes.put( "necrosis", necrosis_death_model );
+            //        }
+    }
+
+    public static int find_cycle_model_code(String model_name)
+    {
+        if( cycle_model_codes.containsKey( model_name ) )
+            return cycle_model_codes.get( model_name );
+        return -1;
+    }
 }

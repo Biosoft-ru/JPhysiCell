@@ -127,13 +127,13 @@ public class TestCellCycle
     public static void main(String ... argv) throws Exception
     {
         Microenvironment m = new Microenvironment( "substrate scale", size, cellSize, "minutes", "microns" );
-        m.setDensity( 0, "oxygen", "mmHg" );
+        m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
         for( int n = 0; n < m.number_of_voxels(); n++ )
             m.getDensity( n )[0] = o2Сonc;
 
         CellContainer.createCellContainer( m, 30 );
 
-        CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
+        CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         CellDefinition.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.Ki67_advanced; // set default cell cycle model 
         cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based(); // set default_cell_functions; 

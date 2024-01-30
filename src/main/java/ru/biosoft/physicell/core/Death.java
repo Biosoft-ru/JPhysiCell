@@ -72,43 +72,39 @@ import java.util.List;
 public class Death implements Cloneable
 {
     public List<Double> rates;
-    List<CycleModel> models;
-    List<DeathParameters> parameters;
+    public List<CycleModel> models;
+    public List<DeathParameters> parameters;
 
     boolean dead;
-    int current_death_model_index;
+    int currentDeathModelIndex;
 
     public Death()
     {
-        rates = new ArrayList<>();// double[0];//.resize( 0 ); 
-        models = new ArrayList<>();//= new CycleModel[0];//.resize( 0 ); 
-        parameters = new ArrayList<>();//= new DeathParameters[0];//.resize( 0 ); 
+        rates = new ArrayList<>();
+        models = new ArrayList<>();
+        parameters = new ArrayList<>();
 
         dead = false;
-        current_death_model_index = 0;
+        currentDeathModelIndex = 0;
     }
 
-    int add_death_model(double rate, CycleModel pModel)
+    int addDeathModel(double rate, CycleModel pModel)
     {
         rates.add( rate );
         models.add( pModel );
         parameters.add( new DeathParameters() );
-        //    parameters.resize( rates.size() ); //TODO:
         return rates.size() - 1;
     }
 
-    int add_death_model(double rate, CycleModel pModel, DeathParameters deathParameters)
+    public int addDeathModel(double rate, CycleModel pModel, DeathParameters deathParameters)
     {
-        //    rates.push_back( rate );
-        //    models.push_back( pModel ); 
-        //    parameters.push_back( death_parameters ); 
         rates.add( rate );
         models.add( pModel );
         parameters.add( deathParameters );
         return rates.size() - 1;
     }
 
-    int find_death_model_index(int code)
+    public int findDeathModelIndex(int code)
     {
         for( int i = 0; i < models.size(); i++ )
         {
@@ -132,16 +128,13 @@ public class Death implements Cloneable
         return 0;
     }
 
-    boolean check_for_death(double dt)
+    boolean checkForDeath(double dt)
     {
         // If the cell is already dead, exit. 
-        if( dead == true )
-        {
+        if( dead )
             return false;
-        }
 
-        // If the cell is alive, evaluate all the 
-        // death rates for each registered death type. 
+        // If the cell is alive, evaluate all the death rates for each registered death type. 
         int i = 0;
         while( !dead && i < rates.size() )
         {
@@ -150,22 +143,19 @@ public class Death implements Cloneable
             {
                 // update the Death data structure 
                 dead = true;
-                current_death_model_index = i;
-
+                currentDeathModelIndex = i;
                 // and set the cycle model to this death model 
-
                 return dead;
             }
             i++;
         }
-
         return dead;
     }
 
     public void trigger_death(int death_model_index)
     {
         dead = true;
-        current_death_model_index = death_model_index;
+        currentDeathModelIndex = death_model_index;
 
         /*  
             // if so, change the cycle model to the current death model 
@@ -191,27 +181,13 @@ public class Death implements Cloneable
 
     public DeathParameters current_parameters()
     {
-        return parameters.get( current_death_model_index );
+        return parameters.get( currentDeathModelIndex );
     }
 
     public CycleModel current_model()
     {
-        return models.get( current_death_model_index );
+        return models.get( currentDeathModelIndex );
     }
-
-    //double ref
-    //    double apoptosis_rate()
-    //    {
-    //        int nApoptosis = find_death_model_index( PhysiCellConstants.apoptosis_death_model );
-    //        return rates[nApoptosis];
-    //    }
-    //
-    //    //double ref
-    //    double necrosis_rate()
-    //    {
-    //        int nNecrosis = find_death_model_index( PhysiCellConstants.necrosis_death_model );
-    //        return rates[nNecrosis];
-    //    }
 
     @Override
     public Death clone()

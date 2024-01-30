@@ -684,11 +684,15 @@ public class VectorUtil
      */
     public static double[] resize(double[] v, int size, double val)
     {
+        double[] result = new double[size];
         if( v == null || v.length == 0 )
-            return new double[size];
+        {
+            for( int i = 0; i < size; i++ )
+                result[i] = val;
+            return result;
+        }
         if( size <= v.length )
             return Arrays.copyOf( v, size );
-        double[] result = new double[size];
         System.arraycopy( v, 0, result, 0, v.length );
         for( int i = v.length; i < size; i++ )
             result[i] = val;
@@ -838,5 +842,35 @@ public class VectorUtil
                 return false;
         }
         return true;
+    }
+
+    /**
+     * turn a delimited character array (e.g., csv) into a vector of doubles
+     */
+    public static double[] csv_to_vector(String buffer)
+    {
+        String[] splited = buffer.split( " " );
+        double[] result = new double[splited.length];
+        for( int i = 0; i < splited.length; i++ )
+            result[i] = Double.parseDouble( splited[i] );
+        return result;
+        //        List<Double> result = new ArrayList<>();
+        //        int length = buffer.length();
+        //        for( int i = 0; i < length; i++ )
+        //        {
+        //            char c = buffer.charAt( i );
+        //            // churn through delimiters, whitespace, etc. to reach the next numeric term
+        //            if( !Character.isDigit( c ) && c != '.' && c != '-' && c != 'e' && c != 'E' )
+        //            {
+        //                continue;
+        //            }
+        //            String pEnd;
+        //            if( i < length ) // add this extra check in case of a final character, e.g., ']'
+        //            {
+        //                result.add( Double.parseDouble( c ) ); //vect.push_back( strtod( buffer+i , &pEnd ) ); 
+        //                i = pEnd - buffer; 
+        //            }
+        //        }  
+        //        return result.stream().mapToDouble(d -> d).toArray();
     }
 }

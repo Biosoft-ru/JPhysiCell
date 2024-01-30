@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -72,151 +73,84 @@ import java.util.Map;
 */
 public class CustomCellData
 {
-    //    std::unordered_map<std::string,int> name_to_index_map; 
-    Map<String, Integer> name_to_index_map = new HashMap<>();
-
-    /// /  std::unordered_map<std::string,int> vector_name_to_index_map; 
-
-    //    friend std::ostream&operator<<(std::ostream&os,const Custom_Cell_Data&ccd); // done 
-    //    public:std::vector<Variable> variables;
-    //    std::vector<Vector_Variable> vector_variables;
-
-    //    Variable[] variables;
-    //    VectorVariable[] vector_variables;
-    List<Variable> variables = new ArrayList<>();
-    List<VectorVariable> vector_variables = new ArrayList<VectorVariable>();
+    private Map<String, Integer> nameToIndex = new HashMap<>();
+    public List<Variable> variables = new ArrayList<>();
+    public List<VectorVariable> vectorVariables = new ArrayList<VectorVariable>();
 
     public CustomCellData()
     {
-    //  std::cout << __FUNCTION__ << "(default)" << std::endl; 
-    //        variables = new Variable[0];//.resize(0); 
-    //        vector_variables = new VectorVariable[0];//.resize(0); 
-        
-        name_to_index_map.clear(); 
-    //  vector_name_to_index_map.clear();
+        nameToIndex.clear();
     }
 
     public CustomCellData(CustomCellData ccd)
     {
-    //  std::cout << __FUNCTION__ << "(copy)" << std::endl; 
-        variables = ccd.variables; 
-        vector_variables = ccd.vector_variables; 
-        name_to_index_map= ccd.name_to_index_map; 
+        variables = ccd.variables;
+        vectorVariables = ccd.vectorVariables;
+        nameToIndex = ccd.nameToIndex;
     }
 
     int add_variable(Variable v)
     {
-        int n = variables.size(); 
-        variables.add( v );//.push_back( v ); 
-        name_to_index_map.put( v.name, n );//[ v.name ] = n; 
-        return n; 
+        int n = variables.size();
+        variables.add( v );
+        nameToIndex.put( v.name, n );
+        return n;
     }
 
-    int add_variable(String name, String units, double value)
+    public int add_variable(String name, String units, double value)
     {
-        int n = variables.size(); 
+        int n = variables.size();
         Variable variable = new Variable();
         variable.name = name;
         variable.units = units;
         variable.value = value;
         variables.add( variable );
-        name_to_index_map.put( name, n );
-        //        variables.resize( n+1 ); 
-        //        variables[n].name = name; 
-        //        variables[n].units = units; 
-        //        variables[n].value = value; 
-        //        name_to_index_map[ name ] = n; 
-        return n; 
-    }
-
-    int add_variable(String name , double value )
-    {
-        //        int 
-        return add_variable( name, "dimensionless", value );
-        //        variables.resize( n+1 ); 
-        //        variables[n].name = name; 
-        //        variables[n].units = "dimensionless"; 
-        //        variables[n].value = value; 
-        //        name_to_index_map[ name ] = n; 
-        //        return n; 
-    }
-
-    int add_vector_variable( VectorVariable v )
-    {
-        int n = vector_variables.size();
-        vector_variables.add( v );
-        name_to_index_map.put( v.name, n );
+        nameToIndex.put( name, n );
         return n;
-        //        int n = vector_variables.size(); 
-        //        vector_variables.push_back( v ); 
-    //  vector_name_to_index_map[ v.name ] = n; 
-    //        return n; 
     }
 
-    int add_vector_variable( String name , String units , double[] value )
+    int add_variable(String name, double value)
+    {
+        return add_variable( name, "dimensionless", value );
+    }
+
+    int add_vector_variable(VectorVariable v)
+    {
+        int n = vectorVariables.size();
+        vectorVariables.add( v );
+        nameToIndex.put( v.name, n );
+        return n;
+    }
+
+    public int add_vector_variable(String name, String units, double[] value)
     {
         VectorVariable v = new VectorVariable();
         v.name = name;
         v.units = units;
         v.value = value.clone();
         return add_vector_variable( v );
-        //        int n = vector_variables.size(); 
-        //        vector_variables.resize( n+1 ); 
-        //        vector_variables[n].name = name; 
-        //        vector_variables[n].units = units; 
-        //        vector_variables[n].value = value; 
-    //  vector_name_to_index_map[ name ] = n; 
-        //        return n; 
     }
 
-    int add_vector_variable( String name , double[] value )
+    int add_vector_variable(String name, double[] value)
     {
         return add_vector_variable( name, "dimensionless", value );
-        //        int n = vector_variables.size(); 
-        //        vector_variables.resize( n+1 ); 
-        //        vector_variables[n].name = name; 
-        //        vector_variables[n].units = "dimensionless"; 
-        //        vector_variables[n].value = value; 
-        //    //  vector_name_to_index_map[ name ] = n; 
-        //        return n; 
     }
 
-    int find_variable_index( String name )
+    public int find_variable_index(String name)
     {
-        if( name_to_index_map.containsKey( name ) )
-            return name_to_index_map.get( name );
+        if( nameToIndex.containsKey( name ) )
+            return nameToIndex.get( name );
         return -1;
-        // this should return -1 if not found, not zero 
-        //        auto out = name_to_index_map.find( name ); 
-        //        if( out != name_to_index_map.end() )
-        //        { return out->second; }
-        //        return -1; 
     }
 
-    /*
-    int Custom_Cell_Data::find_vector_variable_index( std::string name )
+    public int find_vector_variable_index(String name)
     {
-        return vector_name_to_index_map[ name ]; 
-    }
-    */
-
-    int find_vector_variable_index( String name )
-    {
-        for( int i = 0; i < vector_variables.size(); i++ )
+        for( int i = 0; i < vectorVariables.size(); i++ )
         {
-            if( vector_variables.get( i ).name.equals( name ) )
+            if( vectorVariables.get( i ).name.equals( name ) )
                 return i;
         }
         return -1;
-        //        int n = 0; 
-        //        while( n < vector_variables.size() )
-        //        {
-        //            if( std::strcmp( vector_variables[n].name.c_str() , name.c_str() ) == 0 )
-        //            { return n; } 
-        //            n++; 
-        //        }
-        //        
-        //        return -1; 
     }
 
     public double get(int i)
@@ -227,35 +161,33 @@ public class CustomCellData
     {
         variables.get( i ).value = val;
     }
-    
+
     public void set(String name, double val)
     {
-        int index = name_to_index_map.get( name );
+        int index = nameToIndex.get( name );
         variables.get( index ).value = val;
     }
-    
+
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( "Custom data (scalar): "); 
+        sb.append( "Custom data (scalar): " );
         for( int i = 0; i < variables.size(); i++ )
         {
             sb.append( i + ": " + variables.get( i ) );
         }
-
-        sb.append( "Custom data (vector): "); 
-        for( int i = 0; i < vector_variables.size(); i++ )
+        sb.append( "Custom data (vector): " );
+        for( int i = 0; i < vectorVariables.size(); i++ )
         {
-            sb.append( i + ": " + vector_variables.get( i ) );
+            sb.append( i + ": " + vectorVariables.get( i ) );
         }
-        
         return sb.toString();
     }
 
-    public static class Variable
+    public static class Variable implements Cloneable
     {
         String name;
-        double value;
+        public double value;
         String units;
         boolean conserved_quantity;
 
@@ -271,14 +203,27 @@ public class CustomCellData
         @Override
         public String toString()
         {
-            return name + ": " + value + " " + units; 
+            return name + ": " + value + " " + units;
+        }
+
+        @Override
+        public Variable clone()
+        {
+            try
+            {
+                return (Variable)super.clone();
+            }
+            catch( CloneNotSupportedException ex )
+            {
+                return null;
+            }
         }
     }
 
-    public class VectorVariable
+    public class VectorVariable implements Cloneable
     {
         String name;
-        double[] value;
+        public double[] value;
         String units;
         boolean conserved_quantity;
 
@@ -294,24 +239,47 @@ public class CustomCellData
         public String toString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.append( name + ": ");
+            sb.append( name + ": " );
             if( value.length == 0 )
-            { sb.append( "[empty]");
-            return sb.toString();
+            {
+                sb.append( "[empty]" );
+                return sb.toString();
             }
-            
-            /*
-            if( v.value.size() == 1 )
-            { os << v.value[0] << " (" << v.units << ")"; return os;  }
-        */
-            for( int i=0; i < value.length-1 ; i++ )
-            { 
-                sb.append( value[i]+"," );
-//                os << v.value[i] << ","; 
+            for( int i = 0; i < value.length - 1; i++ )
+            {
+                sb.append( value[i] + "," );
+                //                os << v.value[i] << ","; 
             }
             sb.append( value[value.length - 1] + " (" + units + " )" );
-//            os << v.value[v.value.size()-1] << " (" << v.units << ")"; 
-            return sb.toString(); 
+            return sb.toString();
         }
+
+        @Override
+        public VectorVariable clone()
+        {
+            try
+            {
+                VectorVariable result = (VectorVariable)super.clone();
+                result.value = value.clone();
+                return result;
+            }
+            catch( CloneNotSupportedException ex )
+            {
+                return null;
+            }
+        }
+    }
+
+    public CustomCellData clone()
+    {
+        CustomCellData result = new CustomCellData();
+        result.nameToIndex = new HashMap<String, Integer>( nameToIndex );
+        result.variables = new ArrayList<>();
+        for( Variable var : variables )
+            result.variables.add( var.clone() );
+        result.vectorVariables = new ArrayList<>();
+        for( VectorVariable var : vectorVariables )
+            result.vectorVariables.add( var.clone() );
+        return result;
     }
 }

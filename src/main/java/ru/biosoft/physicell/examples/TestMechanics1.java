@@ -99,9 +99,9 @@ public class TestMechanics1
     public static void main(String ... args) throws Exception
     {
         Microenvironment m = new Microenvironment( "substrate scale", size, 20, "minutes", "microns" );
-        m.setDensity( 0, "oxygen", "mmHg" );
+        m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
         CellContainer.createCellContainer( m, 30 );
-        CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
+        CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         CellDefinition.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         cd.functions.updatePhenotype = null;

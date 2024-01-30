@@ -68,22 +68,17 @@ package ru.biosoft.physicell.core;
 */
 public class DeathParameters implements Cloneable
 {
-    String time_units;
-    
-    double unlysed_fluid_change_rate;
-    double lysed_fluid_change_rate; 
-    
-    double cytoplasmic_biomass_change_rate;
-    double nuclear_biomass_change_rate; 
-    
-    double calcification_rate; 
-    
-    double relative_rupture_volume; 
+    public String time_units;
+    public double unlysed_fluid_change_rate;
+    public double lysed_fluid_change_rate;
+    public double cytoplasmic_biomass_change_rate;
+    public double nuclear_biomass_change_rate;
+    public double calcification_rate;
+    public double relative_rupture_volume;
     
     public DeathParameters()
     {
         time_units = "min";
-
         // reference values: MCF-7 (1/min)
         unlysed_fluid_change_rate = 3.0 / 60.0; // apoptosis 
         lysed_fluid_change_rate = 0.05 / 60.0; // lysed necrotic cell 

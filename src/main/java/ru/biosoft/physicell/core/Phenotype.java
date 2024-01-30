@@ -108,9 +108,17 @@ public class Phenotype implements Cloneable
      */
     public void sync()
     {
-        cell_interactions.sync_to_cell_definitions();
-        cell_transformations.sync_to_cell_definitions();
-        mechanics.sync_to_cell_definitions();
+        this.initialize( CellDefinition.getDefinitionsCount() );
+        //        cell_interactions.sync_to_cell_definitions();
+        //        cell_transformations.sync_to_cell_definitions();
+        //        mechanics.sync_to_cell_definitions();
+    }
+
+    public void initialize(int cellDefinitionSize)
+    {
+        cell_interactions.initialize( cellDefinitionSize );
+        cell_transformations.initialize( cellDefinitionSize );
+        mechanics.initialize( cellDefinitionSize );
     }
 
     public Phenotype()

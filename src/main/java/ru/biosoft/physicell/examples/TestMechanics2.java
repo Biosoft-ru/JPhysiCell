@@ -99,7 +99,7 @@ public class TestMechanics2
     static int zSlice = 500;
     static double dt = 1;
     static double outputInterval = 10.0; // 1.0;
-    static double tMax = 2000;
+    static double tMax = 20000;
 
     static double sampleСellRadius = 10;
     static double volume = 2.4943e+03;
@@ -141,9 +141,9 @@ public class TestMechanics2
     {
         Microenvironment m = new Microenvironment( "substrate scale", size, 20, "minutes", "microns" );
         CellContainer.createCellContainer( m, 30 );
-        m.setDensity( 0, "oxygen", "mmHg" );
+        m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
 
-        CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
+        CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         CellDefinition.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         cd.functions.updatePhenotype = null;

@@ -72,7 +72,7 @@ public class PhaseLink
     Phase endPhase;
     int startPhaseIndex;
     int endPhaseIndex;
-    boolean fixedDuration;
+    public boolean fixedDuration;
     PhaseArrest arrestFunction; // return true if arrested, false if not 
     PhaseExit exitFunction; // function to be executed when completing the phase transition 
 
@@ -85,6 +85,11 @@ public class PhaseLink
         fixedDuration = false;
         this.arrestFunction = arrestFunction;
         exitFunction = null;
+    }
+
+    public void setFixedDuration(boolean fixed)
+    {
+        this.fixedDuration = fixed;
     }
 
     @Override

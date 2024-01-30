@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 
@@ -77,18 +78,19 @@ public class CellDefinition
 {
     //Static, move to registry of some kind
     private static List<CellDefinition> cellDefinitions = new ArrayList<>();
-    private static Map<String, CellDefinition> cellDefinitionsMap = new HashMap<>();
+    private static Map<Integer, Integer> typeToIndex = new HashMap<>();
+    private static Map<String, CellDefinition> cellDefinitionNames = new HashMap<>();
+    private static Map<Integer, CellDefinition> cellDefinitionTypes = new HashMap<>();
 
     public int type;
     public String name;
 
-    boolean is_movable;
+    boolean isMovable;
 
     public CellParameters parameters = new CellParameters();
     public CustomCellData custom_data = new CustomCellData();
     public CellFunctions functions = new CellFunctions();
     public Phenotype phenotype = new Phenotype();
-
 
     public static int getDefinitionsCount()
     {
@@ -97,27 +99,50 @@ public class CellDefinition
 
     public static void registerCellDefinition(CellDefinition cd)
     {
-        cd.type = cellDefinitions.size();
+        cellDefinitionNames.put( cd.name, cd );
+        cellDefinitionTypes.put( cd.type, cd );
+        typeToIndex.put( cd.type, cellDefinitions.size() );
         cellDefinitions.add( cd );
-        cellDefinitionsMap.put( cd.name, cd );
         sync();
     }
 
     public static void clearCellDefinitions()
     {
         cellDefinitions.clear();
-        cellDefinitionsMap.clear();
+        cellDefinitionNames.clear();
+        cellDefinitionTypes.clear();
+        typeToIndex.clear();
         sync();
+    }
+
+    public static Iterable<CellDefinition> getCellDefinitions()
+    {
+        return cellDefinitions;
+    }
+
+    public static CellDefinition getCellDefinitionByIndex(int index)
+    {
+        return cellDefinitions.get( index );
+    }
+
+    public static int getCellDefinitionIndex(int type)
+    {
+        return typeToIndex.get( type );
     }
 
     public static CellDefinition getCellDefinition(int type)
     {
-        return cellDefinitions.get( type );
+        return cellDefinitionTypes.get( type );
+    }
+
+    public static Set<String> getCellDefinitionNames()
+    {
+        return cellDefinitionNames.keySet();
     }
 
     public static CellDefinition getCellDefinition(String name)
     {
-        return cellDefinitionsMap.get( name );
+        return cellDefinitionNames.get( name );
     }
 
     private static void sync()
@@ -128,16 +153,11 @@ public class CellDefinition
         }
     }
 
-    public CellDefinition(Microenvironment m, String name)
+    public CellDefinition()
     {
-        // set up the default parameters, the default Cell_Parameters constructor should take care of this
-        this.type = -1; //not registered
-        this.name = name;
-        is_movable = true;
+        isMovable = true;
         //        parameters.pReference_live_phenotype = phenotype; //TODO: check
-
         // set up the default custom data, the default Custom_Cell_Data constructor should take care of this
-
         // set up the default functions 
         functions.instantiate_cell = null;
         functions.updateVolume = null; // standard_volume_update_function;
@@ -149,65 +169,40 @@ public class CellDefinition
         functions.updateVelocity = null; // standard_update_cell_velocity;
         functions.add_cell_basement_membrane_interactions = null;
         functions.calculate_distance_to_membrane = null;
-        //
-        //        // bug fix July 31 2023
-        //                functions.plot_agent_SVG = standard_agent_SVG;
-        //                functions.plot_agent_legend = standard_agent_legend;
-        //        // bug fix July 31 2023
-        //        
         functions.set_orientation = null;
-
-        phenotype.sync( m );
-        // new March 2022 : make sure Cell_Interactions and Cell_Transformations are appropriately sized. Same on motiltiy. 
-        //        phenotype.sync();
     }
 
-    //    public CellDefinition( CellDefinition cd )
-    //    {
-    //        // set the microenvironment pointer 
-    //        pMicroenvironment = cd.pMicroenvironment;
-    //
-    //        // set up the default parameters 
-    //            // the default Cell_Parameters constructor should take care of this
-    //            
-    //        type = cd.type; 
-    //        name = cd.name; 
-    //         
-    //        parameters = cd.parameters;
-    //        custom_data = cd.custom_data; 
-    //        functions = cd.functions; 
-    //        phenotype = cd.phenotype; 
-    //        
-    //        // this is the whole reason we need ot make a copy constructor 
-    //        parameters.pReference_live_phenotype = &phenotype; 
-    //        
-    //        cell_definitions_by_index.push_back( this ); 
-    //        
-    //        return; 
-    //    }
-    //
-    //    CellDefinition::operator=(const Cell_Definition&cd)
-    //    {
-    //        // set the microenvironment pointer 
-    //        pMicroenvironment = cd.pMicroenvironment;
-    //
-    //        // set up the default parameters 
-    //            // the default Cell_Parameters constructor should take care of this
-    //            
-    //        type = cd.type; 
-    //        name = cd.name; 
-    //         
-    //        parameters = cd.parameters;
-    //        custom_data = cd.custom_data; 
-    //        functions = cd.functions; 
-    //        phenotype = cd.phenotype; 
-    //        
-    //        // this is the whole reason we need ot make a copy constructor 
-    //        parameters.pReference_live_phenotype = &phenotype; 
-    //        
-    //        // commented out on March 10, 2020 
-    //        // cell_definitions_by_index.push_back( this ); 
-    //        
-    //        return *this; 
-    //    }
+    public CellDefinition(Microenvironment m, int type, String name)
+    {
+        this();
+        this.type = type;
+        this.name = name;
+        phenotype.sync( m );
+    }
+
+    public static int findCellDefinitionIndex(String name)
+    {
+        CellDefinition cd = cellDefinitionNames.get( name );
+        if( cd != null )
+            return cd.type;
+        return -1;
+    }
+
+    public CellDefinition clone(String name, int type, Microenvironment m)
+    {
+        CellDefinition result = new CellDefinition( m, type, name );
+        result.isMovable = this.isMovable;
+        result.parameters = parameters.clone();
+        result.custom_data = custom_data.clone();
+        result.phenotype = phenotype.clone();
+        result.functions = functions.clone();
+        result.phenotype.sync( m );
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return name + " ( " + type + " ) ";
+    }
 }

@@ -79,10 +79,10 @@ public class CycleModel implements Cloneable
     * transition_rates[i][k] (the transition rate from phase i to phase j
     */
     List<Map<Integer, Integer>> inverse_index_maps;
-    String name;
-    int code;
+    public String name;
+    public int code;
     List<Phase> phases;
-    List<List<PhaseLink>> phase_links;
+    public List<List<PhaseLink>> phase_links;
     int default_phase_index;
     public CycleData data; // this will be copied to individual cell agents 
 

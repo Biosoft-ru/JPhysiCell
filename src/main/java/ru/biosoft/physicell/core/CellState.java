@@ -71,31 +71,31 @@ import java.util.Set;
 */
 public class CellState
 {
-    Set<Cell> attached_cells;
-    Set<Cell> spring_attachments;
+    public Set<Cell> attachedCells;
+    Set<Cell> springAttachments;
     Set<Cell> neighbors;
     double[] orientation;
-    double simple_pressure;
-    int number_of_nuclei;
+    double simplePressure;
+    int numberNuclei;
     double damage;
-    double total_attack_time;
-    boolean contact_with_basement_membrane; // not implemented yet 
+    double totalAttackTime;
+    boolean contactWithBasementMembrane; // not implemented yet 
 
     public CellState()
     {
         neighbors = new HashSet<Cell>();//.resize(0); 
-        spring_attachments = new HashSet<>();//new Cell[0];//.resize(0); 
+        springAttachments = new HashSet<>();//new Cell[0];//.resize(0); 
         orientation = new double[3];//.resize( 3 , 0.0 ); 
-        simple_pressure = 0.0;
-        attached_cells = new HashSet<>();
-        number_of_nuclei = 1;
+        simplePressure = 0.0;
+        attachedCells = new HashSet<>();
+        numberNuclei = 1;
         damage = 0.0;
-        total_attack_time = 0.0;
-        contact_with_basement_membrane = false;
+        totalAttackTime = 0.0;
+        contactWithBasementMembrane = false;
     }
 
-    int number_of_attached_cells()
+    public int numberAttachedCells()
     {
-        return attached_cells.size();
+        return attachedCells.size();
     }
 }

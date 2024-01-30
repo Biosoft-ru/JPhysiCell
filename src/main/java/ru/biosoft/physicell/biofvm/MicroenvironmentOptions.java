@@ -54,49 +54,49 @@ public class MicroenvironmentOptions
 
     String time_units;
     String spatial_units;
-    double dx;
-    double dy;
-    double dz;
+    public double dx;
+    public double dy;
+    public double dz;
 
-    boolean outer_Dirichlet_conditions;
-    double[] Dirichlet_condition_vector;
-    boolean[] Dirichlet_activation_vector;
+    public boolean outer_Dirichlet_conditions;
+    public double[] Dirichlet_condition_vector;
+    public boolean[] Dirichlet_activation_vector;
 
     /* new in PhysiCell 1.7.0 to enable setting Dirichlet conditions 
        on a boundary-by-boundary basis */
-    boolean[] Dirichlet_all = new boolean[0];
+    public boolean[] Dirichlet_all = new boolean[0];
 
     //  boolean[] Dirichlet_interior; 
-    boolean[] Dirichlet_xmin = new boolean[0];
-    boolean[] Dirichlet_xmax = new boolean[0];
-    boolean[] Dirichlet_ymin = new boolean[0];
-    boolean[] Dirichlet_ymax = new boolean[0];
-    boolean[] Dirichlet_zmin = new boolean[0];
-    boolean[] Dirichlet_zmax = new boolean[0];
+    public boolean[] Dirichlet_xmin = new boolean[0];
+    public boolean[] Dirichlet_xmax = new boolean[0];
+    public boolean[] Dirichlet_ymin = new boolean[0];
+    public boolean[] Dirichlet_ymax = new boolean[0];
+    public boolean[] Dirichlet_zmin = new boolean[0];
+    public boolean[] Dirichlet_zmax = new boolean[0];
 
-    double[] Dirichlet_xmin_values = new double[0];
-    double[] Dirichlet_xmax_values = new double[0];
-    double[] Dirichlet_ymin_values = new double[0];
-    double[] Dirichlet_ymax_values = new double[0];
-    double[] Dirichlet_zmin_values = new double[0];
-    double[] Dirichlet_zmax_values = new double[0];
+    public double[] Dirichlet_xmin_values = new double[0];
+    public double[] Dirichlet_xmax_values = new double[0];
+    public double[] Dirichlet_ymin_values = new double[0];
+    public double[] Dirichlet_ymax_values = new double[0];
+    public double[] Dirichlet_zmin_values = new double[0];
+    public double[] Dirichlet_zmax_values = new double[0];
 
-    double[] initial_condition_vector = new double[0];
+    public double[] initial_condition_vector = new double[0];
 
     public boolean simulate_2D;
-    double[] X_range;
-    double[] Y_range;
-    double[] Z_range;
+    public double[] X_range;
+    public double[] Y_range;
+    public double[] Z_range;
 
     public boolean calculate_gradients;
 
-    boolean use_oxygen_as_first_field;
+    //    boolean use_oxygen_as_first_field;
 
     public boolean track_internalized_substrates_in_each_agent;
 
     MicroenvironmentOptions(Microenvironment microenvironment)
     {
-        use_oxygen_as_first_field = true;
+        //        use_oxygen_as_first_field = true;
 
         //        if( Microenvironment.get_default_microenvironment() != null )
         //        {

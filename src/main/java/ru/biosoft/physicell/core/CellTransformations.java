@@ -71,7 +71,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 public class CellTransformations implements Cloneable
 {
     // rates of transforming into different cell types 
-    double[] transformation_rates;
+    public double[] transformation_rates;
 
     public CellTransformations()
     {
@@ -80,13 +80,12 @@ public class CellTransformations implements Cloneable
 
     void sync_to_cell_definitions()
     {
-        int number_of_cell_defs = CellDefinition.getDefinitionsCount();
+        initialize( CellDefinition.getDefinitionsCount() );
+    }
 
-        if( transformation_rates.length != number_of_cell_defs )
-        {
-            //            transformation_rates.resize( number_of_cell_defs, 0.0 );
-            transformation_rates = VectorUtil.resize( transformation_rates, number_of_cell_defs );
-        }
+    public void initialize(int cellDefinitionSize)
+    {
+        transformation_rates = VectorUtil.resize( transformation_rates, cellDefinitionSize );
     }
 
     // ease of access 

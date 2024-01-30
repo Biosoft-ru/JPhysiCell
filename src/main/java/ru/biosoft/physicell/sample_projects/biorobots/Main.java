@@ -1,7 +1,9 @@
-package ru.biosoft.physicell.core;
+package ru.biosoft.physicell.sample_projects.biorobots;
 
-import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.biofvm.VectorUtil;
+import java.io.File;
+
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.xml.ModelReader;
 
 /*
 ###############################################################################
@@ -38,7 +40,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -69,56 +71,26 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 #                                                                             #
 ###############################################################################
 */
-public class Motility implements Cloneable
+public class Main
 {
-    public boolean is_motile;
-    public double persistence_time; // mean time to keep going in one direction before resampling for a new direction. 
-    public double migration_speed; // migration speed along chosen direction, in absence of all other adhesive / repulsive forces 
-    double[] migration_bias_direction = new double[0];; // a unit vector random motility is biased in this direction (e.g., chemotaxis)
-    public double migration_bias; // how biased is motility if 0, completely random. if 1, deterministic along the bias vector 
-    public boolean restrict_to_2D; // if true, set random motility to 2D only. 
-    double[] motility_vector = new double[0];;
-    public int chemotaxis_index;
-    public int chemotaxis_direction;
-    public double[] chemotactic_sensitivities = new double[0]; // advanced chemotaxis
+    private static String path = "src/main/java/ru/biosoft/physicell/sample_projects/biorobots/config/PhysiCell_settings.xml";
+    private static String resultPath = "src/main/java/ru/biosoft/physicell/sample_projects/biorobots/result";
 
-    public Motility()
+    public static void main(String ... strings) throws Exception
     {
-        is_motile = false;
-        persistence_time = 1.0;
-        migration_speed = 1.0;
-        migration_bias_direction = new double[3];
-        migration_bias = 0.0;
-        restrict_to_2D = false;
-        motility_vector = new double[3];
-        chemotaxis_index = 0;
-        chemotaxis_direction = 1;
-    }
+        File settings = new File( path );
+        Model model = new ModelReader().read( settings );
+        double mechanics_voxel_size = 30;
+        model.createContainer( mechanics_voxel_size );
+        model.setResultFolder( resultPath );
 
-    void sync(Microenvironment m)
-    {
-        chemotactic_sensitivities = VectorUtil.resize( chemotactic_sensitivities, m.number_of_densities(), 0 );
-    }
+        //        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 0.4 );
+        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
 
-    public void setChemotacticSensitivity(int index, double value)
-    {
-        chemotactic_sensitivities[index] = value;
-    }
+        /* Users typically start modifying here. START USERMODS */
+        CustomBiorobots.init( model );
+        /* Users typically stop modifying here. END USERMODS */
 
-    @Override
-    public Motility clone()
-    {
-        try
-        {
-            Motility result = (Motility)super.clone();
-            result.chemotactic_sensitivities = this.chemotactic_sensitivities.clone();
-            result.motility_vector = this.motility_vector.clone();
-            result.migration_bias_direction = this.migration_bias_direction.clone();
-            return result;
-        }
-        catch( CloneNotSupportedException e )
-        {
-            throw ( new InternalError( e ) );
-        }
+        model.simulate();
     }
 }

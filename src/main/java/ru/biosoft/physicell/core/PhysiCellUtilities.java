@@ -4,6 +4,11 @@ import ru.biosoft.physicell.biofvm.GeneralMesh;
 
 public class PhysiCellUtilities
 {
+    private static double seed = 0;
+    public static void setSeed(double val)
+    {
+        seed = val;
+    }
     public static double[] UniformOnUnitSphere()
     {
         double[] output = {0, 0, 0};
@@ -26,6 +31,10 @@ public class PhysiCellUtilities
         return output;
     }
 
+    public static double UniformRandom(double min, double max)
+    {
+        return min + ( max - min ) * Math.random();
+    }
     public static double UniformRandom()
     {
         return Math.random();

@@ -70,98 +70,65 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 */
 public class CellInteractions implements Cloneable
 {
-    double dead_phagocytosis_rate; // phagocytosis parameters (e.g., macrophages)
-    double[] live_phagocytosis_rates; // attack parameters (e.g., T cells)
-    double[] attack_rates; // do I attack cell type j? 
-    double[] immunogenicities; // how immnogenic am I to cell type j?  
-    double damage_rate;
-    double[] fusion_rates; // cell fusion parameters 
+    public double deadPhagocytosisRate; // phagocytosis parameters (e.g., macrophages)
+    public double[] livePhagocytosisRates; // attack parameters (e.g., T cells)
+    public double[] attackRates; // do I attack cell type j? 
+    public double[] immunogenicities; // how immnogenic am I to cell type j?  
+    public double damageRate;
+    public double[] fusionRates; // cell fusion parameters 
 
     public CellInteractions()
     {
-        dead_phagocytosis_rate = 0.0;
-        live_phagocytosis_rates = new double[] {0.0};
-        damage_rate = 1.0;
-        attack_rates = new double[] {0.0};
+        deadPhagocytosisRate = 0.0;
+        livePhagocytosisRates = new double[] {0.0};
+        damageRate = 1.0;
+        attackRates = new double[] {0.0};
         immunogenicities = new double[] {1};
-        fusion_rates = new double[] {0.0};
+        fusionRates = new double[] {0.0};
     }
 
-    void sync_to_cell_definitions()
+    public void initialize(int cellDefinitionSize)
     {
-        int cellDefCount = CellDefinition.getDefinitionsCount();
-
-        if( live_phagocytosis_rates.length != cellDefCount )
-        {
-            live_phagocytosis_rates = VectorUtil.resize( live_phagocytosis_rates, cellDefCount );
-            attack_rates = VectorUtil.resize( attack_rates, cellDefCount );
-            fusion_rates = VectorUtil.resize( fusion_rates, cellDefCount );
-            immunogenicities = VectorUtil.resize( immunogenicities, cellDefCount, 1 );
-        }
+        livePhagocytosisRates = VectorUtil.resize( livePhagocytosisRates, cellDefinitionSize );
+        attackRates = VectorUtil.resize( attackRates, cellDefinitionSize );
+        fusionRates = VectorUtil.resize( fusionRates, cellDefinitionSize );
+        immunogenicities = VectorUtil.resize( immunogenicities, cellDefinitionSize, 1 );
     }
 
-    public double live_phagocytosis_rate(String name)
+    public double getLivePhagocytosisRate(String name)
     {
         int n = CellDefinition.getCellDefinition( name ).type;
-        return live_phagocytosis_rates[n];
-    }
-    public double attack_rate(String name)
-    {
-        int n = CellDefinition.getCellDefinition( name ).type;
-        return attack_rates[n];
+        return livePhagocytosisRates[n];
     }
 
-    public double fusion_rate(String name)
+    public double getAttackRate(String name)
     {
         int n = CellDefinition.getCellDefinition( name ).type;
-        return fusion_rates[n];
+        return attackRates[n];
     }
 
-    public double immunogenicity(String name)
+    public double getFusionRate(String name)
+    {
+        int n = CellDefinition.getCellDefinition( name ).type;
+        return fusionRates[n];
+    }
+
+    public double getImmunogenicity(String name)
     {
         int n = CellDefinition.getCellDefinition( name ).type;
         return immunogenicities[n];
     }
 
-    // ease of access 
-    //    double&Cell_Interactions::live_phagocytosis_rate( std::string type_name )
-    //    {
-    //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-    //        int n = cell_definition_indices_by_name[type_name]; 
-    //        // std::cout << type_name << " " << n << std::endl; 
-    //        return live_phagocytosis_rates[n]; 
-    //    }
-    //
-    //    double& Cell_Interactions::attack_rate( std::string type_name ) 
-    //    {
-    //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-    //        int n = cell_definition_indices_by_name[type_name]; 
-    //        return attack_rates[n]; 
-    //    }
-    //
-    //    double& Cell_Interactions::fusion_rate( std::string type_name )
-    //    {
-    //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-    //        int n = cell_definition_indices_by_name[type_name]; 
-    //        return fusion_rates[n]; 
-    //    }
-    //
-    //    double& Cell_Interactions::immunogenicity( std::string type_name )
-    //    {
-    //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-    //        int n = cell_definition_indices_by_name[type_name]; 
-    //        return immunogenicities[n]; 
-    //    }
     @Override
     public CellInteractions clone()
     {
         try
         {
             CellInteractions result = (CellInteractions)super.clone();
-            result.live_phagocytosis_rates = this.live_phagocytosis_rates.clone();
-            result.attack_rates = this.attack_rates.clone();
+            result.livePhagocytosisRates = this.livePhagocytosisRates.clone();
+            result.attackRates = this.attackRates.clone();
             result.immunogenicities = this.immunogenicities.clone();
-            result.fusion_rates = this.fusion_rates.clone();
+            result.fusionRates = this.fusionRates.clone();
             return result;
         }
         catch( CloneNotSupportedException e )

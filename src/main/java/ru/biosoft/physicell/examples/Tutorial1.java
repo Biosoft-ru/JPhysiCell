@@ -65,13 +65,15 @@ public class Tutorial1
     static
     {
         visualizer.setSaveImage( false );
+        visualizer.setSaveGIF( true );
     }
 
     public static void main(String ... args) throws Exception
     {
         double timeStart = System.currentTimeMillis();
         Microenvironment m = new Microenvironment( "substrate scale", size, cellSize, "minutes", "microns" );
-        m.setDensity( 0, "substrate1", "dimensionless" );
+        //        m.setDensity( 0, "substrate1", "dimensionless" );
+        m.setDensity( 0, "substrate1", "dimensionless", diffusionCoefficients, decayRate );
 
         //set initial density - more in the middle, gradually decrease
         double[] center = PhysiCellUtilities.getCenter( m.mesh );
@@ -85,8 +87,8 @@ public class Tutorial1
         }
 
         // register substrates properties 
-        m.diffusion_coefficients[0] = diffusionCoefficients; // microns^2 / min 
-        m.decay_rates[0] = decayRate;
+        //        m.diffusion_coefficients[0] = diffusionCoefficients; // microns^2 / min 
+        //        m.decay_rates[0] = decayRate;
         m.options.track_internalized_substrates_in_each_agent = false;
 
         //populate model

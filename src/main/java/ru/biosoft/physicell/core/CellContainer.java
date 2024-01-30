@@ -130,7 +130,13 @@ public class CellContainer extends AgentContainer
 
     }
 
+    public void updateAllCells(Microenvironment m, double t, double dt) throws Exception
+    {
+        updateAllCells( m, t, dt, dt, dt );
+    }
+
     public void updateAllCells(Microenvironment m, double t, double phenotype_dt_, double mechanics_dt_, double diffusion_dt_)
+            throws Exception
     {
         // secretions and uptakes. Syncing with BioFVM is automated. 
         //            #pragma omp parallel for 
@@ -258,7 +264,7 @@ public class CellContainer extends AgentContainer
             }
             // new March 2023: 
             // dynamic spring attachments, followed by built-in springs
-            if( true ) //TODO: use settings PhysiCellSettings.disable_automated_spring_adhesions == false )
+            if( !PhysiCellSettings.disable_automated_spring_adhesions )
             {
                 //                    #pragma omp parallel for 
                 for( BasicAgent agent : agents )
@@ -272,7 +278,7 @@ public class CellContainer extends AgentContainer
                     Cell cell = (Cell)agent;
                     if( cell.isMovable )
                     {
-                        for( Cell pC1 : cell.state.spring_attachments )
+                        for( Cell pC1 : cell.state.springAttachments )
                         {
                             StandardModels.standard_elastic_contact_function( cell, cell.phenotype, pC1, pC1.phenotype,
                                     time_since_last_mechanics );
@@ -316,7 +322,12 @@ public class CellContainer extends AgentContainer
             //                #pragma omp parallel for 
             for( BasicAgent agent : agents )
             {
+
                 Cell cell = (Cell)agent;
+                if( cell.definition.name.contains( "work" ) )
+                {
+                    double a = 4;
+                }
                 if( cell.isOutOfDomain == false && cell.isMovable )
                 {
                     cell.update_position( time_since_last_mechanics );

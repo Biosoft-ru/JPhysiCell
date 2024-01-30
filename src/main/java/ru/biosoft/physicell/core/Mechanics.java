@@ -70,24 +70,21 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 */
 public class Mechanics implements Cloneable
 {
-    double cell_cell_adhesion_strength;
-    double cell_BM_adhesion_strength;
+    public double cell_cell_adhesion_strength;
+    public double cell_BM_adhesion_strength;
+    public double cell_cell_repulsion_strength;
+    public double cell_BM_repulsion_strength;
+    public double[] cell_adhesion_affinities;
 
-    double cell_cell_repulsion_strength;
-    double cell_BM_repulsion_strength;
-
-    double[] cell_adhesion_affinities;
-
-    // this is a multiple of the cell (equivalent) radius
-    double relative_maximum_adhesion_distance;
+    public double relative_maximum_adhesion_distance; // this is a multiple of the cell (equivalent) radius
     // double maximum_adhesion_distance; // needed? 
 
     /* for spring attachments */
     int maximum_number_of_attachments;
-    double attachment_elastic_constant;
+    public double attachment_elastic_constant;
 
-    double attachment_rate;
-    double detachment_rate;
+    public double attachment_rate;
+    public double detachment_rate;
 
     /* to be deprecated */
     double relative_maximum_attachment_distance;
@@ -124,9 +121,12 @@ public class Mechanics implements Cloneable
 
     public void sync_to_cell_definitions()
     {
-        int number_of_cell_defs = CellDefinition.getDefinitionsCount();
-        if( cell_adhesion_affinities.length != number_of_cell_defs )
-            cell_adhesion_affinities = VectorUtil.resize( cell_adhesion_affinities, number_of_cell_defs, 1.0 );
+        initialize( CellDefinition.getDefinitionsCount() );
+    }
+
+    public void initialize(int cellDinitionSize)
+    {
+        cell_adhesion_affinities = VectorUtil.resize( cell_adhesion_affinities, cellDinitionSize, 1.0 );
     }
 
     double cell_adhesion_affinity(String type_name)
@@ -208,7 +208,7 @@ public class Mechanics implements Cloneable
     // set the cell-cell equilibrium spacing, accomplished by changing the 
     // cell-cell adhesion strength, while leaving the cell-cell repulsion 
     // strength and the maximum adhesion distance unchanged 
-    void set_relative_equilibrium_distance(double new_value)
+    public void set_relative_equilibrium_distance(double new_value)
     {
         if( new_value > 2.0 )
         {
@@ -221,7 +221,6 @@ public class Mechanics implements Cloneable
         }
 
         // adjust the adhesive coefficient to achieve the new (relative) equilibrium distance
-
         double temp1 = new_value;
         temp1 /= 2.0;
 
@@ -241,13 +240,11 @@ public class Mechanics implements Cloneable
         return;
     }
 
-    void set_absolute_equilibrium_distance(Phenotype phenotype, double new_value)
+    public void set_absolute_equilibrium_distance(Phenotype phenotype, double new_value)
     {
         set_relative_equilibrium_distance( new_value / phenotype.geometry.radius );
     }
 
-    // void Mechanics::set_absolute_maximum_adhesion_distance( double new_value );
-    // void 
     @Override
     public Mechanics clone()
     {

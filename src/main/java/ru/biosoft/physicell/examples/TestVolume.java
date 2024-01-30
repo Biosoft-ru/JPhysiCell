@@ -94,7 +94,7 @@ public class TestVolume
     public static void main(String[] argv) throws Exception
     {
 		run(2402, APOPTOSIS, resultPath + "/Apoptosis.txt");
-		run(2402, NECROSIS, resultPath + "/Necrosis.txt");
+        run( 2402, NECROSIS, resultPath + "/Necrosis.txt" );
         run( 4000, "", resultPath + "/Default.txt" );
     }
 
@@ -103,12 +103,12 @@ public class TestVolume
         Microenvironment m = new Microenvironment( "substrate scale", 2000, 20, "minutes", "microns" );
         CellContainer.createCellContainer( m, 30 );
 
-        m.setDensity( 0, "oxygen", "mmHg" );
+        m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
         for( int n = 0; n < m.number_of_voxels(); n++ )
             m.getDensity( n )[0] = o2Conc;
 
         CellDefinition.clearCellDefinitions();
-        CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
+        CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         CellDefinition.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.createAdvancedKi67();
         cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based();

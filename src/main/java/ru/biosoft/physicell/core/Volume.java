@@ -77,7 +77,7 @@ public class Volume implements Cloneable
     public double nuclear_fluid;
     public double nuclear_solid;
 
-    double cytoplasmic;
+    public double cytoplasmic;
     public double cytoplasmic_fluid;
     public double cytoplasmic_solid;
 
@@ -90,11 +90,11 @@ public class Volume implements Cloneable
     //
     // parameters that can be set by users 
     //
-    double cytoplasmic_biomass_change_rate;
-    double nuclear_biomass_change_rate;
-    double fluid_change_rate;
+    public double cytoplasmic_biomass_change_rate;
+    public double nuclear_biomass_change_rate;
+    public double fluid_change_rate;
 
-    double calcification_rate;
+    public double calcification_rate;
 
     double target_solid_cytoplasmic;
     double target_solid_nuclear;
@@ -184,5 +184,28 @@ public class Volume implements Cloneable
         {
             throw new InternalError( e );
         }
+    }
+
+    public void adjust()
+    {
+        fluid = fluid_fraction * total;
+        solid = total - fluid;
+
+        nuclear_fluid = fluid_fraction * nuclear;
+        nuclear_solid = nuclear - nuclear_fluid;
+
+        cytoplasmic = total - nuclear;
+        cytoplasmic_fluid = fluid_fraction * cytoplasmic;
+        cytoplasmic_solid = cytoplasmic - cytoplasmic_fluid;
+
+
+        target_solid_cytoplasmic = cytoplasmic_solid;
+        target_solid_nuclear = nuclear_solid;
+        target_fluid_fraction = fluid_fraction;
+
+        cytoplasmic_to_nuclear_ratio = cytoplasmic / ( 1e-16 + nuclear );
+        target_cytoplasmic_to_nuclear_ratio = cytoplasmic_to_nuclear_ratio;
+
+        rupture_volume = relative_rupture_volume * total; // in volumee units 
     }
 }

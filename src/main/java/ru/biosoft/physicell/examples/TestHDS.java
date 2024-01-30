@@ -164,7 +164,7 @@ public class TestHDS
 
         // create a microenvironment
         Microenvironment microenvironment = new Microenvironment( "substrate scale", "minutes", "microns" );
-        microenvironment.setDensity( 0, "oxygen", "mmHg" );
+        microenvironment.setDensity( 0, "oxygen", "mmHg", 1.0e5, 0.1 );
         microenvironment.resizeSpace( bounding_box[0], bounding_box[3], bounding_box[1], bounding_box[4], bounding_box[2], bounding_box[5],
                 dx, dy, dz );
 
@@ -176,10 +176,10 @@ public class TestHDS
             microenvironment.getDensity( n )[0] = o2_conc;
 
         // register substrates properties 
-        microenvironment.diffusion_coefficients[0] = 1.0e5; // microns^2 / min 
-        microenvironment.decay_rates[0] = 0.1;
+        //        microenvironment.diffusion_coefficients[0] = 1.0e5; // microns^2 / min 
+        //        microenvironment.decay_rates[0] = 0.1;
 
-        CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", microenvironment );
+        CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, microenvironment );
 
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         // set default_cell_functions; 

@@ -77,9 +77,7 @@ public class Geometry implements Cloneable
 
     public Geometry()
     {
-        // reference values for MCF-7, based on 
-        // volume = 2494 cubic microns
-        // nuclear volume = 540 cubic microns 
+        // reference values for MCF-7, based on volume = 2494 cubic microns nuclear volume = 540 cubic microns 
         radius = 8.412710547954228;
         nuclear_radius = 5.051670902881889;
         surface_area = 889.3685284131693;
@@ -88,8 +86,8 @@ public class Geometry implements Cloneable
 
     void update_radius(Cell pCell, Phenotype phenotype, double dt)
     {
-        radius = phenotype.volume.total; 
-        radius /= four_thirds_pi; 
+        radius = phenotype.volume.total;
+        radius /= four_thirds_pi;
         radius = Math.pow( radius, 0.333333333333333333333333333333333333333 );
     }
 
@@ -104,10 +102,10 @@ public class Geometry implements Cloneable
     {
 
         surface_area = Math.pow( phenotype.volume.total, 0.666666666666667 );
-        surface_area /= the_constant; 
+        surface_area /= the_constant;
     }
 
-    void update(Cell pCell, Phenotype phenotype, double dt)
+    public void update(Cell pCell, Phenotype phenotype, double dt)
     {
         update_radius( pCell, phenotype, dt );
         update_nuclear_radius( pCell, phenotype, dt );
@@ -130,4 +128,5 @@ public class Geometry implements Cloneable
             throw new InternalError( e );
         }
     }
+
 }

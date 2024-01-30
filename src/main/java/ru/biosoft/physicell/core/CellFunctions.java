@@ -70,18 +70,18 @@ public class CellFunctions
 {
     //    public CycleModel cycleModel; TODO: temporarily commented
 
-    instantiate_cell instantiate_cell;
+    public instantiate_cell instantiate_cell;
     public volume_update_function updateVolume;
-    update_migration_bias update_migration_bias;
-    custom_cell_rule custom_cell_rule;
+    public update_migration_bias update_migration_bias;
+    public custom_cell_rule custom_cell_rule;
     public update_phenotype updatePhenotype;
-    pre_update_intracellular pre_update_intracellular;
-    post_update_intracellular post_update_intracellular;
+    public pre_update_intracellular pre_update_intracellular;
+    public post_update_intracellular post_update_intracellular;
     public update_velocity updateVelocity;
-    add_cell_basement_membrane_interactions add_cell_basement_membrane_interactions;
+    public add_cell_basement_membrane_interactions add_cell_basement_membrane_interactions;
     public calculate_distance_to_membrane calculate_distance_to_membrane;
-    set_orientation set_orientation;
-    contact_function contact_function;
+    public set_orientation set_orientation;
+    public contact_function contact_function;
 
     /* prototyping / beta in 1.5.0 */
     /*  
@@ -92,6 +92,34 @@ public class CellFunctions
 
     //           void (*plot_agent_SVG)(std::ofstream& os, Cell* pCell, double z_slice, std::vector<std::string> (*cell_coloring_function)(Cell*), double X_lower, double Y_lower);
     //           void (*plot_agent_legend)(std::ofstream& os, Cell_Definition* cell_def, double& cursor_x, double& cursor_y, std::vector<std::string> (*cell_coloring_function)(Cell*), double temp_cell_radius);
+
+    public CellFunctions clone()
+    {
+
+        CellFunctions result = new CellFunctions();
+        try
+        {
+            result.instantiate_cell = instantiate_cell == null ? null : instantiate_cell.getClass().newInstance();
+            result.updateVolume = updateVolume == null ? null : updateVolume.getClass().newInstance();
+            result.update_migration_bias = update_migration_bias == null ? null : update_migration_bias.getClass().newInstance();
+            result.updatePhenotype = updatePhenotype == null ? null : updatePhenotype.getClass().newInstance();
+            result.pre_update_intracellular = pre_update_intracellular == null ? null : pre_update_intracellular.getClass().newInstance();
+            result.post_update_intracellular = post_update_intracellular == null ? null
+                    : post_update_intracellular.getClass().newInstance();
+            result.updateVelocity = updateVelocity == null ? null : updateVelocity.getClass().newInstance();
+            result.add_cell_basement_membrane_interactions = add_cell_basement_membrane_interactions == null ? null
+                    : add_cell_basement_membrane_interactions.getClass().newInstance();
+            result.calculate_distance_to_membrane = calculate_distance_to_membrane == null ? null
+                    : calculate_distance_to_membrane.getClass().newInstance();
+            result.set_orientation = set_orientation == null ? null : set_orientation.getClass().newInstance();
+            result.contact_function = contact_function == null ? null : contact_function.getClass().newInstance();
+        }
+        catch( Exception ex )
+        {
+            ex.printStackTrace();
+        }
+        return result;
+    }
 
     @FunctionalInterface
     public static interface volume_update_function
@@ -108,7 +136,7 @@ public class CellFunctions
     @FunctionalInterface
     public static interface update_phenotype
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
+        public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
     }
 
     @FunctionalInterface

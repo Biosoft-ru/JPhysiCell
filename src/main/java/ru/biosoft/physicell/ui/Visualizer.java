@@ -6,8 +6,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -20,6 +18,8 @@ import ru.biosoft.physicell.core.Cell;
 
 public class Visualizer
 {
+    private AgentVisualizer agentVisualizer = new AgentVisualizer();
+
     private boolean drawTitle = true;
     private boolean drawAgents = true;
     private boolean drawGrid = false;
@@ -27,9 +27,7 @@ public class Visualizer
     private boolean saveImage = true;
     private boolean saveGIF = true;
 
-    private double maxDensity = 1;//6.06;
-
-    private Map<String, Color> phaseColor = new HashMap<>();
+    private double maxDensity = 1E-13;//6.06;
 
     private ImageWriter writer = null;
     private ImageOutputStream ios = null;
@@ -41,11 +39,19 @@ public class Visualizer
     private int xShift = 0;
     private int yShift = 0;
     private int zShift = 0;
+    private int substrateIndex = 0;
 
     public Visualizer()
     {
 
     }
+
+    public Visualizer setStubstrateIndex(int i)
+    {
+        this.substrateIndex = i;
+        return this;
+    }
+
 
     public Visualizer(String folder, String name, Section sec, double slice)
     {
@@ -227,23 +233,24 @@ public class Visualizer
             int r = (int)Math.sqrt( radius * radius - d * d );
             if( agent instanceof Cell )
             {
-                Cell cell = (Cell)agent;
-                String phase = cell.phenotype.cycle.currentPhase().name;
-                Color color = phaseColor.get( phase );
-                if( cell.isOutOfDomain )
-                    continue;
-
-                if( color != null )
-                {
-                    g.setColor( color );
-                    g.fillOval( c1 - r, c2 - r, 2 * r, 2 * r );
-                }
-                else
-                {
-                    System.out.println( "Unknown phase " + phase );
-                }
-                g.setColor( Color.black );
-                g.drawOval( c1 - r, c2 - r, 2 * r, 2 * r );
+                //                Cell cell = (Cell)agent;
+                agentVisualizer.drawAgent( (Cell)agent, c1, c2, r, g );
+                //                String phase = cell.phenotype.cycle.currentPhase().name;
+                //                Color color = phaseColor.get( phase );
+                //                if( cell.isOutOfDomain )
+                //                    continue;
+                //
+                //                if( color != null )
+                //                {
+                //                    g.setColor( color );
+                //                    g.fillOval( c1 - r, c2 - r, 2 * r, 2 * r );
+                //                }
+                //                else
+                //                {
+                //                    System.out.println( "Unknown phase " + phase );
+                //                }
+                //                g.setColor( Color.black );
+                //                g.drawOval( c1 - r, c2 - r, 2 * r, 2 * r );
             }
             else
             {
@@ -296,6 +303,7 @@ public class Visualizer
 
         int n = (int) ( ( slice + shift ) / size3 );
 
+        double actualMaxDensity = 0;
         for( int i = 0; i < n1; i++ )
         {
             for( int j = 0; j < n2; j++ )
@@ -313,10 +321,22 @@ public class Visualizer
                     default: //Z
                         index = i + n1 * j + n * n1 * n2;
                 }
-                red = (int) ( ( 1 - ( m.density[index][0] / maxDensity ) ) * 255 );
+                double density = m.density[index][substrateIndex];
+                if( density > actualMaxDensity )
+                    actualMaxDensity = density;
+
+                double ratio = ( density / maxDensity );
+                ratio = Math.min( 1, ratio );
+                red = (int) ( ( 1 - ratio ) * 255 );
+
                 g.setColor( new Color( 255, red, red ) );
                 g.fillRect( i * size1, j * size2, size1, size2 );
             }
+        }
+        if( actualMaxDensity > 0 )
+        {
+            //            System.out.println( "Max density: " + actualMaxDensity );
+            maxDensity = actualMaxDensity;
         }
     }
 
@@ -376,9 +396,14 @@ public class Visualizer
         this.saveGIF = saveGIF;
     }
 
+    public void setColorType(Integer cellType, Color color)
+    {
+        agentVisualizer.addTypeColor( cellType, color );
+    }
+
     public void setColorPhase(String phase, Color color)
     {
-        this.phaseColor.put( phase, color );
+        agentVisualizer.addPhaseColor( phase, color );
     }
 
     public void setMaxDensity(double density)

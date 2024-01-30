@@ -18,7 +18,7 @@ public class PhysiCellSettings
     boolean enable_full_saves = true;
     boolean enable_legacy_saves = false;
 
-    boolean disable_automated_spring_adhesions = false;
+    public static boolean disable_automated_spring_adhesions = false;
 
     double SVG_save_interval = 60;
     boolean enable_SVG_saves = true;

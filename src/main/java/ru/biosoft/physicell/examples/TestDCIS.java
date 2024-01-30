@@ -134,10 +134,9 @@ public class TestDCIS
         bounding_box[PhysiCellConstants.mesh_max_y_index] = 200;
         bounding_box[PhysiCellConstants.mesh_min_z_index] = -200;
         bounding_box[PhysiCellConstants.mesh_max_z_index] = 200;
-        // create a microenvironment
+
         Microenvironment m = new Microenvironment( "substrate scale", "minutes", "microns" );
-        // add a microenvironment for simulating substrates 	
-        m.setDensity( 0, "oxygen", "mmHg" );
+        m.setDensity( 0, "oxygen", "mmHg", 1.0e5, 0.1 );
         // microenvironment.add_density( "glucose" , "dimensionless" );
 
         m.resizeSpace( bounding_box[0], bounding_box[3], bounding_box[1], bounding_box[4], bounding_box[2], bounding_box[5], dx, dy, dz );
@@ -149,11 +148,7 @@ public class TestDCIS
         for( int n = 0; n < m.number_of_voxels(); n++ )
             m.getDensity( n )[0] = o2_conc;
 
-        // register substrates properties 
-        m.diffusion_coefficients[0] = 1.0e5; // microns^2 / min 
-        m.decay_rates[0] = 0.1;
-
-        CellDefinition cd = StandardModels.createDefaultCellDefinition( "tumor cell", m );
+        CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         // set default cell cycle model 
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         // set default_cell_functions; 

@@ -138,7 +138,7 @@ public class BasicAgent
         return radius;
     }
 
-    void update_position(double dt)
+    public void update_position(double dt)
     {
         //make sure to update current_voxel_index if you are implementing this function
     };
@@ -213,8 +213,10 @@ public class BasicAgent
         return pNew;
     }
 
+    public boolean init = false;
     public void setUptakeConstants(double dt)
     {
+        init = true;
         /* // new for tracking internal densities
         if( use_internal_densities_as_targets == true )
         {
@@ -284,7 +286,6 @@ public class BasicAgent
             VectorUtil.diff( internalizedSubstrates, densityChange ); //apply source sink change
             VectorUtil.diff( internalizedSubstrates, sourceSinkExport1 ); //apply export change
         }
-        return;
     }
 
     public CellContainer get_container()
@@ -321,7 +322,8 @@ public class BasicAgent
 
     public void setTotalVolume(double volume)
     {
-
+        this.volume = volume;
+        this.volumeChanged = true;
     }
 
     public int get_current_mechanics_voxel_index()
