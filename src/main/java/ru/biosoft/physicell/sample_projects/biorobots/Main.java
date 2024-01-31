@@ -78,8 +78,12 @@ public class Main
 
     public static void main(String ... strings) throws Exception
     {
+		if (!new File(resultPath).exists())
+			new File(resultPath).mkdirs();
+
         File settings = new File( path );
         Model model = new ModelReader().read( settings );
+
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
