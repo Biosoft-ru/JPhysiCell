@@ -3,8 +3,10 @@ package ru.biosoft.physicell.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.ui.Visualizer;
@@ -22,6 +24,8 @@ public class Model
     private double full_save_interval;
     private String resultFolder;
     private boolean enableFullSaves;
+    private boolean hasEvents = false;
+    private List<Event> events = new ArrayList<>();
 
     public Iterable<Visualizer> getVisualizers()
     {
@@ -31,6 +35,11 @@ public class Model
     public void setResultFolder(String folder)
     {
         this.resultFolder = folder;
+    }
+
+    public void addEvent(Event event)
+    {
+        this.events.add( event );
     }
 
     public Visualizer addVisualizer(int zSlice, String name)
@@ -78,12 +87,30 @@ public class Model
         for( Visualizer listener : visualizers )
             listener.init();
 
+        boolean hasEvents = !events.isEmpty();
+        boolean eventsFired = false;
         try
         {
             while( curTime < tMax + 0.1 * diffusion_dt )
             {
+                if( hasEvents )
+                {
+                    eventsFired = false;
+                    Set<Event> executedEvens = new HashSet<>();
+                    for( Event event : events )
+                    {
+                        if( curTime > event.executionTime - 0.01 * diffusion_dt )
+                        {
+                            event.execute( this );
+                            executedEvens.add( event );
+                        }
+                    }
+                    events.removeAll( executedEvens ); //events are one-time things
+                    hasEvents = !events.isEmpty();
+                }
+
                 // save data if it's time. 
-                if( Math.abs( curTime - next_full_save_time ) < 0.01 * diffusion_dt )
+                if( Math.abs( curTime - next_full_save_time ) < 0.01 * diffusion_dt || eventsFired )
                 {
                     //                    display_simulation_status( std::cout ); 
                     if( enable_legacy_saves )
@@ -215,5 +242,22 @@ public class Model
     public boolean isEnableFullSaves()
     {
         return enableFullSaves;
+    }
+
+    public static abstract class Event
+    {
+        public double executionTime;
+        public boolean executed = false;
+        public abstract void execute(Model model) throws Exception;
+
+        public Event(double executionTime)
+        {
+            this.executionTime = executionTime;
+        }
+    }
+    
+    public void saveResult()
+    {
+
     }
 }

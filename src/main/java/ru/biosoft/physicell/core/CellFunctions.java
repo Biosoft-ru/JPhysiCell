@@ -113,6 +113,7 @@ public class CellFunctions
                     : calculate_distance_to_membrane.getClass().newInstance();
             result.set_orientation = set_orientation == null ? null : set_orientation.getClass().newInstance();
             result.contact_function = contact_function == null ? null : contact_function.getClass().newInstance();
+            result.custom_cell_rule = custom_cell_rule == null ? null : custom_cell_rule.getClass().newInstance();
         }
         catch( Exception ex )
         {
@@ -148,7 +149,7 @@ public class CellFunctions
     @FunctionalInterface
     public static interface custom_cell_rule
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
+		public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
     }
 
     @FunctionalInterface
@@ -184,7 +185,7 @@ public class CellFunctions
     @FunctionalInterface
     public static interface contact_function
     {
-        public void execute(Cell pCell, Phenotype phenotype, Cell cell2, Phenotype phenotype2);
+		public void execute(Cell pCell, Phenotype phenotype, Cell cell2, Phenotype phenotype2, double dt);
     }
 
     @FunctionalInterface

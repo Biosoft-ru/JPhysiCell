@@ -26,11 +26,16 @@ public class AgentVisualizer
     {
         g.setColor( findColor( cell ) );
         g.fillOval( x - r, y - r, 2 * r, 2 * r );
-        g.setColor( Color.black );
+        g.setColor( findBorderColor( cell ) );
         g.drawOval( x - r, y - r, 2 * r, 2 * r );
     }
 
-    private Color findColor(Cell cell)
+    public Color findBorderColor(Cell cell)
+    {
+        return Color.black;
+    }
+
+    public Color findColor(Cell cell)
     {
         Color c = Color.white;
         int type = cell.type;

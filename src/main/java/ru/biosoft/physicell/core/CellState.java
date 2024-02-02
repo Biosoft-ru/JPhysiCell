@@ -77,7 +77,7 @@ public class CellState
     double[] orientation;
     double simplePressure;
     int numberNuclei;
-    double damage;
+	public double damage;
     double totalAttackTime;
     boolean contactWithBasementMembrane; // not implemented yet 
 

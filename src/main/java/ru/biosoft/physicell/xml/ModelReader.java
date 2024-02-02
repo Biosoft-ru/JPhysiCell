@@ -265,11 +265,6 @@ public class ModelReader extends Constants
         }
     }
 
-    //<options>
-    //    <legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
-    //<virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
-    //<disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
-    //</options>  
     public void readMicroenvironmentSetup(Element physicell, Microenvironment m)
     {
         Element microenvironmentSetupElement = findElement( physicell, "microenvironment_setup" );
@@ -404,6 +399,9 @@ public class ModelReader extends Constants
         options.Dirichlet_zmin_values = Dirichlet_zmin_values;
         options.Dirichlet_zmax_values = Dirichlet_zmax_values;
 
+        for( int i = 0; i < m.number_of_voxels(); i++ )
+            m.density[i] = options.initial_condition_vector.clone();
+
         // if any of the substrates have outer Dirichlet conditions enables, then set the outer_Dirichlet_conditions = true;       
         if( activated_Dirichlet_boundary_detected )
             options.outer_Dirichlet_conditions = true;
@@ -415,6 +413,8 @@ public class ModelReader extends Constants
         Element trackSubstrate = findElement( microenvironmentSetupElement, "track_internalized_substrates_in_each_agent" );
         if( trackSubstrate != null )
             options.track_internalized_substrates_in_each_agent = getBoolVal( trackSubstrate );
+
+        Microenvironment.initialize_microenvironment( m );
     }
 
     //    void initialize_cell_definitions_from_pugixml(Element el)

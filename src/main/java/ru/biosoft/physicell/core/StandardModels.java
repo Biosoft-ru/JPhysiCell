@@ -1,5 +1,7 @@
 package ru.biosoft.physicell.core;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
@@ -793,9 +795,10 @@ public class StandardModels
             return;
         }
 
-        for( Cell cell : pCell.state.attachedCells )
+        List<Cell> attached = new ArrayList<>( pCell.state.attachedCells );
+        for( Cell cell : attached )
         {
-            pCell.functions.contact_function.execute( pCell, phenotype, cell, cell.phenotype );
+            pCell.functions.contact_function.execute( pCell, phenotype, cell, cell.phenotype, dt );
         }
 
         //        for( int n = 0; n < pCell.state.attached_cells.size(); n++ )
@@ -967,7 +970,7 @@ public class StandardModels
     public static class standard_elastic_contact_function implements contact_function
     {
         @Override
-        public void execute(Cell pC1, Phenotype p1, Cell pC2, Phenotype p2)
+        public void execute(Cell pC1, Phenotype p1, Cell pC2, Phenotype p2, double dt)
         {
             if( pC1.position.length != 3 || pC2.position.length != 3 )
             {

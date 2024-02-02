@@ -90,7 +90,7 @@ public class MicroenvironmentOptions
 
     public boolean calculate_gradients;
 
-    //    boolean use_oxygen_as_first_field;
+    boolean use_oxygen_as_first_field = true;
 
     public boolean track_internalized_substrates_in_each_agent;
 

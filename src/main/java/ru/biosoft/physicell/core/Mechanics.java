@@ -87,9 +87,9 @@ public class Mechanics implements Cloneable
     public double detachment_rate;
 
     /* to be deprecated */
-    double relative_maximum_attachment_distance;
-    double relative_detachment_distance;
-    double maximum_attachment_rate;
+	public double relative_maximum_attachment_distance;
+	public double relative_detachment_distance;
+	public double maximum_attachment_rate;
 
     public Mechanics()
     {

@@ -1,9 +1,7 @@
 package ru.biosoft.physicell.core;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
@@ -244,7 +242,7 @@ public class SignalBehavior
         int_to_signal.put( index, name );//] = name; 
     }
 
-    private static void registerBehaviour(String name, int index)
+    private static void registerBehavior(String name, int index)
     {
         behavior_to_int.put( name, index );// ] = m+i;
         int_to_behavior.put( index, name );//] = name; 
@@ -340,15 +338,17 @@ public class SignalBehavior
         signal_to_int.put( "global time", map_index );
 
         int nc = 0;
-        Set<String> customVars = new HashSet<>();
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
-        {
-            for( Variable var : cd.custom_data.variables )
-                customVars.add( var.name );
-        }
+        //        Set<String> customVars = new HashSet<>();
+        //        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        //        {
+        //            for( Variable var : cd.custom_data.variables )
+        //                customVars.add( var.name );
+        //        }
+        CellDefinition def = CellDefinition.getCellDefinition( 0 );
         // custom signals
-        for( String varName : customVars )
+        for( Variable var : def.custom_data.variables )
         {
+            String varName = var.name;
             map_index++;
             register( "custom:" + varName, map_index );
             signal_to_int.put( "custom: " + varName, map_index );
@@ -391,26 +391,26 @@ public class SignalBehavior
             name = microenvironment.density_names[i];
 
             // secretion rate 
-            registerBehaviour( name + " " + "secretion", map_index );
+            registerBehavior( name + " " + "secretion", map_index );
 
             // secretion target 
             map_index = m + i;
-            registerBehaviour( name + " " + "secretion target", map_index );
+            registerBehavior( name + " " + "secretion target", map_index );
 
             // synonym 
             behavior_to_int.put( name + " " + "secretion saturation density", map_index );
 
             // uptake rate 
             map_index = 2 * m + i;
-            registerBehaviour( name + " " + "uptake", map_index );
+            registerBehavior( name + " " + "uptake", map_index );
 
             // net export rate 
             map_index = 3 * m + i;
-            registerBehaviour( name + " " + "export", map_index );
+            registerBehavior( name + " " + "export", map_index );
         }
 
         map_index = 4 * m;
-        registerBehaviour( "cycle entry", map_index );
+        registerBehavior( "cycle entry", map_index );
 
         // synonym 
         behavior_to_int.put( "exit from cycle phase 0", map_index );
@@ -419,69 +419,69 @@ public class SignalBehavior
         for( int i = 1; i < 6; i++ )
         {
             map_index++;
-            registerBehaviour( "exit from cycle phase " + i, map_index );
+            registerBehavior( "exit from cycle phase " + i, map_index );
         }
 
         map_index++;
-        registerBehaviour( "apoptosis", map_index );
+        registerBehavior( "apoptosis", map_index );
 
         map_index++;
-        registerBehaviour( "necrosis", map_index );
+        registerBehavior( "necrosis", map_index );
 
         map_index++;
-        registerBehaviour( "migration speed", map_index );
+        registerBehavior( "migration speed", map_index );
 
         map_index++;
-        registerBehaviour( "migration bias", map_index );
+        registerBehavior( "migration bias", map_index );
 
         map_index++;
-        registerBehaviour( "migration persistence time", map_index );
+        registerBehavior( "migration persistence time", map_index );
 
         // chemotactic sensitivities 
         for( int i = 0; i < m; i++ )
         {
             map_index++;
-            registerBehaviour( "chemotactic response to " + microenvironment.density_names[i], map_index );
+            registerBehavior( "chemotactic response to " + microenvironment.density_names[i], map_index );
             behavior_to_int.put( "chemotactic sensitivity to " + microenvironment.density_names[i], map_index );
         }
 
         // cell-cell adhesion 
         map_index++;
-        registerBehaviour( "cell-cell adhesion", map_index );
+        registerBehavior( "cell-cell adhesion", map_index );
 
         map_index++;
-        registerBehaviour( "cell-cell adhesion elastic constant", map_index );
+        registerBehavior( "cell-cell adhesion elastic constant", map_index );
 
         // cell adhesion affinities 
         // cell-type specific adhesion 
         for( CellDefinition cd : CellDefinition.getCellDefinitions() )
         {
             map_index++;
-            registerBehaviour( "adhesive affinity to " + cd.name, map_index );
+            registerBehavior( "adhesive affinity to " + cd.name, map_index );
             behavior_to_int.put( "adhesive affinity to cell type " + cd.type, map_index );
         }
 
         // max adhesion distance 
         map_index++;
-        registerBehaviour( "relative maximum adhesion distance", map_index );
+        registerBehavior( "relative maximum adhesion distance", map_index );
 
         // cell-cell repulsion 
         map_index++;
-        registerBehaviour( "cell-cell repulsion", map_index );
+        registerBehavior( "cell-cell repulsion", map_index );
 
         // cell-BM adhesion 
         map_index++;
-        registerBehaviour( "cell-BM adhesion", map_index );
+        registerBehavior( "cell-BM adhesion", map_index );
         behavior_to_int.put( "cell-membrane adhesion", map_index );
 
         // cell-BM repulsion 
         map_index++;
-        registerBehaviour( "cell-BM repulsion", map_index );
+        registerBehavior( "cell-BM repulsion", map_index );
         behavior_to_int.put( "cell-membrane repulsion", map_index );
 
         // phagocytosis of dead cell
         map_index++;
-        registerBehaviour( "phagocytose dead cell", map_index );
+        registerBehavior( "phagocytose dead cell", map_index );
         behavior_to_int.put( "phagocytosis of dead cell", map_index );
         behavior_to_int.put( "phagocytosis of dead cells", map_index );
 
@@ -489,7 +489,7 @@ public class SignalBehavior
         for( CellDefinition cd : CellDefinition.getCellDefinitions() )
         {
             map_index++;
-            registerBehaviour( "phagocytose " + cd.name, map_index );
+            registerBehavior( "phagocytose " + cd.name, map_index );
             behavior_to_int.put( "phagocytose cell type " + cd.type, map_index );
             behavior_to_int.put( "phagocytosis of " + cd.type, map_index );
         }
@@ -498,7 +498,7 @@ public class SignalBehavior
         for( CellDefinition cd : CellDefinition.getCellDefinitions() )
         {
             map_index++;
-            registerBehaviour( "attack " + cd.name, map_index );
+            registerBehavior( "attack " + cd.name, map_index );
             behavior_to_int.put( "attack cell type " + cd.type, map_index );
         }
 
@@ -506,7 +506,7 @@ public class SignalBehavior
         for( CellDefinition cd : CellDefinition.getCellDefinitions() )
         {
             map_index++;
-            registerBehaviour( "fuse to " + cd.name, map_index );
+            registerBehavior( "fuse to " + cd.name, map_index );
             behavior_to_int.put( "fuse to cell type " + cd.type, map_index );
         }
 
@@ -514,23 +514,24 @@ public class SignalBehavior
         for( CellDefinition cd : CellDefinition.getCellDefinitions() )
         {
             map_index++;
-            registerBehaviour( "transform to " + cd.name, map_index );
+            registerBehavior( "transform to " + cd.name, map_index );
             behavior_to_int.put( "transform to cell type " + cd.type, map_index );
         }
 
         // custom behaviors
         nc = 0;
-        for( String varName : customVars )
+        for( Variable var : def.custom_data.variables )
         {
+            String varName = var.name;
             map_index++;
-            registerBehaviour( "custom:" + varName, map_index );
+            registerBehavior( "custom:" + varName, map_index );
             behavior_to_int.put( "custom: " + varName, map_index );
             behavior_to_int.put( "custom " + nc, map_index );
             nc++;
         }
 
         map_index++;
-        registerBehaviour( "is_movable", map_index );
+        registerBehavior( "is_movable", map_index );
         behavior_to_int.put( "movable", map_index );
         behavior_to_int.put( "is movable", map_index );
 
@@ -538,21 +539,21 @@ public class SignalBehavior
         for( CellDefinition cd : CellDefinition.getCellDefinitions() )
         {
             map_index++;
-            registerBehaviour( "immunogenicity to " + cd.name, map_index );
+            registerBehavior( "immunogenicity to " + cd.name, map_index );
             behavior_to_int.put( "immunogenicity to cell type " + cd.type, map_index );
         }
 
         map_index++;
-        registerBehaviour( "cell attachment rate", map_index );
+        registerBehavior( "cell attachment rate", map_index );
 
         map_index++;
-        registerBehaviour( "cell detachment rate", map_index );
+        registerBehavior( "cell detachment rate", map_index );
 
         map_index++;
-        registerBehaviour( "maximum number of cell attachments", map_index );
+        registerBehavior( "maximum number of cell attachments", map_index );
 
         map_index++;
-        registerBehaviour( "damage rate", map_index );
+        registerBehavior( "damage rate", map_index );
 
         /* add new behaviors above this line */
 

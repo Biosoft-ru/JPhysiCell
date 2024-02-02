@@ -157,6 +157,12 @@ public class CustomCellData
     {
         return variables.get( i ).value;
     }
+
+    public double get(String name)
+    {
+        return variables.get( nameToIndex.get( name ) ).value;
+    }
+
     public void set(int i, double val)
     {
         variables.get( i ).value = val;

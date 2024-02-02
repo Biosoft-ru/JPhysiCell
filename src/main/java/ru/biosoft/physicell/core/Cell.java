@@ -100,7 +100,7 @@ public class Cell extends BasicAgent
         type_name = cd.name;
         custom_data = cd.custom_data.clone();
         parameters = cd.parameters.clone();
-        functions = cd.functions;
+        functions = cd.functions.clone();
         phenotype = cd.phenotype.clone();
         phenotype.molecular.sync( this );
         this.definition = cd;
@@ -448,7 +448,7 @@ public class Cell extends BasicAgent
         pCell_2.attach_cell_as_spring( pCell_1 );
     }
 
-    void detach_cells(Cell pCell_1, Cell pCell_2)
+	public static void detach_cells(Cell pCell_1, Cell pCell_2)
     {
         pCell_1.detach_cell( pCell_2 );
         pCell_2.detach_cell( pCell_1 );
@@ -500,7 +500,7 @@ public class Cell extends BasicAgent
 
     void copy_function_pointers(Cell copy_me)
     {
-        functions = copy_me.functions;
+        functions = copy_me.functions.clone();
     }
 
     void update_voxel_in_container()
@@ -1102,10 +1102,10 @@ public class Cell extends BasicAgent
         // use the cell defaults; 
         type = cd.type;
         type_name = cd.name;
-        custom_data = cd.custom_data;
-        parameters = cd.parameters;
-        functions = cd.functions;
-        phenotype = cd.phenotype;
+        custom_data = cd.custom_data.clone();
+        parameters = cd.parameters.clone();
+        functions = cd.functions.clone();
+        phenotype = cd.phenotype.clone();
         // is_movable = true;
         // is_out_of_domain = false;
         // displacement.resize(3,0.0); // state? 
@@ -1150,6 +1150,10 @@ public class Cell extends BasicAgent
         if( functions.updatePhenotype != null )
         {
             functions.updatePhenotype.execute( this, phenotype, dt_ );
+        }
+        else
+        {
+            double a = 3;
         }
 
         // update volume 
@@ -1241,6 +1245,6 @@ public class Cell extends BasicAgent
     @Override
     public String toString()
     {
-        return "Cell: " + type_name + " ( " + type + " ) ";
+        return "Cell " + ID + ", type: " + type_name + " (" + type + ") in phase " + phenotype.cycle.name;
     }
 }

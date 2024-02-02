@@ -62,6 +62,11 @@ public class Visualizer
         setDefaultScheme();
     }
 
+    public void setAgentVisualizer(AgentVisualizer agentVisualizer)
+    {
+        this.agentVisualizer = agentVisualizer;
+    }
+
     private void setDefaultScheme()
     {
         setColorPhase( "Ki67-", Color.lightGray );

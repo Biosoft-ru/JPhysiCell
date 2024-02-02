@@ -1,4 +1,9 @@
-package ru.biosoft.physicell.core;
+package ru.biosoft.physicell.sample_projects.cancer_biorobots;
+
+import java.io.File;
+
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.xml.ModelReader;
 
 /*
 ###############################################################################
@@ -35,7 +40,7 @@ package ru.biosoft.physicell.core;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -66,64 +71,33 @@ package ru.biosoft.physicell.core;
 #                                                                             #
 ###############################################################################
 */
-public class CellParameters implements Cloneable
+public class Main
 {
-    // oxygen values (in mmHg) for critical phenotype changes
-    double o2_hypoxic_threshold; // value at which hypoxic signaling starts
-    double o2_hypoxic_response; // value at which omics changes are observed 
-    double o2_hypoxic_saturation; // value at which hypoxic signalign saturates 
-    // o2_hypoxic_saturation < o2_hypoxic_threshold
+	private static String path = "src/main/java/ru/biosoft/physicell/sample_projects/cancer_biorobots/config/PhysiCell_settings.xml";
+	private static String resultPath = "src/main/java/ru/biosoft/physicell/sample_projects/cancer_biorobots/result";
 
-	public double o2_proliferation_saturation; // value at which extra o2 does not increase proliferation
-    double o2_proliferation_threshold; // value at which o2 is sufficient for proliferation
-
-	public double o2_reference; // physioxic reference value, in the linked reference Phenotype
-    // o2_proliferation_threshold < o2_reference < o2_proliferation_saturation; 
-
-    double o2_necrosis_threshold; // value at which cells start experiencing necrotic death 
-    double o2_necrosis_max; // value at which necrosis reaches its maximum rate 
-    // o2_necrosis_max < o2_necrosis_threshold
-
-    //    Phenotype pReference_live_phenotype; // reference live phenotype (typically physioxic) 
-
-    // necrosis parameters (may evenually be moved into a reference necrotic phenotype 
-    public double max_necrosis_rate; // deprecate
-    int necrosis_type; // deprecate 
-
-    public CellParameters()
+    public static void main(String ... strings) throws Exception
     {
-        o2_hypoxic_threshold = 15.0; // HIF-1alpha at half-max around 1.5-2%, and tumors often are below 2%
-        o2_hypoxic_response = 8.0; // genomic / proteomic changes observed at 7-8 mmHg 
-        o2_hypoxic_saturation = 4.0; // maximum HIF-1alpha at 0.5% o2 (McKeown)
+		if (!new File(resultPath).exists())
+			new File(resultPath).mkdirs();
 
-        o2_necrosis_threshold = 5.0;
-        o2_necrosis_max = 2.5;
+        File settings = new File( path );
+        Model model = new ModelReader().read( settings );
 
-        o2_proliferation_threshold = 5.0; // assume no proliferation at same level as starting necrosis 
-        o2_proliferation_saturation = 160.0; // 5% = 38, 21% = 160 mmHg 
-        o2_reference = 160.0; // assume all was measured in normoxic 21% o2 
+        double mechanics_voxel_size = 30;
+        model.createContainer( mechanics_voxel_size );
+        model.setResultFolder( resultPath );
 
-        //        pReference_live_phenotype = NULL; // reference live (usually physioxic) phenotype //TODO: uncomment 
+        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 38 );
+        //        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        //        model.addVisualizer( 0, "figure1" ).setStubstrateIndex( 2 ).setMaxDensity( 0.01 );
+        //        model.addVisualizer( 0, "figure2" ).setStubstrateIndex( 2 ).setMaxDensity( 0.1 );
+        //        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
 
-        // necrosis parameters 
+        /* Users typically start modifying here. START USERMODS */
+		CancerBiorobots.init(model);
+        /* Users typically stop modifying here. END USERMODS */
 
-        max_necrosis_rate = 1.0 / ( 6.0 * 60.0 ); // assume cells survive 6 hours in very low oxygen 
-        //        necrosis_type = PhysiCell_constants::deterministic_necrosis;;//TODO: uncomment
-    }
-
-    @Override
-    public CellParameters clone()
-    {
-        try
-        {
-            //            CellParameters result = (CellParameters)super.clone();
-            //            result.pReference_live_phenotype = pReference_live_phenotype != null ? pReference_live_phenotype.clone() : null;
-            return (CellParameters)super.clone();
-
-        }
-        catch( CloneNotSupportedException e )
-        {
-            throw new InternalError( e );
-        }
+        model.simulate();
     }
 }
