@@ -137,7 +137,7 @@ public class CycleData
         }
     }
 
-    double getTransitionRate(int start_phase_index, int end_phase_index)
+    public double getTransitionRate(int start_phase_index, int end_phase_index)
     {
         int index = cycleModel.inverse_index_maps.get( start_phase_index ).get( end_phase_index );
         return transitionRates.get( start_phase_index ).get( index );
@@ -182,7 +182,7 @@ public class CycleData
         for( int i = 0; i < transitionRates.size(); i++ )
         {
             result.transitionRates.add( new ArrayList<Double>( transitionRates.get( i ) ) );
-            result.basicRates.add( new ArrayList<Double>( transitionRates.get( i ) ) );
+            result.basicRates.add( new ArrayList<Double>( basicRates.get( i ) ) );
         }
         return result;
     }

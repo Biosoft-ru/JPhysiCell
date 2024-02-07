@@ -1,8 +1,9 @@
-package ru.biosoft.physicell.core;
+package ru.biosoft.physicell.sample_projects.cancer_immune;
 
-import ru.biosoft.physicell.biofvm.BasicAgent;
-import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.biofvm.VectorUtil;
+import java.io.File;
+
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.xml.ModelReader;
 
 /*
 ###############################################################################
@@ -39,7 +40,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,95 +71,35 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 #                                                                             #
 ###############################################################################
 */
-public class Secretion implements Cloneable
+public class Main
 {
-    public double[] secretionRates = new double[0];
-    public double[] uptakeRates = new double[0];
-    public double[] saturationDensities = new double[0];
-    public double[] netExportRates = new double[0];
+    private static String path = "src/main/java/ru/biosoft/physicell/sample_projects/cancer_immune/config/PhysiCell_settings.xml";
+    private static String resultPath = "src/main/java/ru/biosoft/physicell/sample_projects/cancer_immune/result";
 
-    public void sync(Microenvironment m)
+    public static void main(String ... strings) throws Exception
     {
-        int size = m.number_of_densities();
-        secretionRates = VectorUtil.resize( secretionRates, size );
-        uptakeRates = VectorUtil.resize( uptakeRates, size );
-        saturationDensities = VectorUtil.resize( saturationDensities, size );
-        netExportRates = VectorUtil.resize( netExportRates, size );
-    }
+		if (!new File(resultPath).exists())
+			new File(resultPath).mkdirs();
 
-    public void advance(BasicAgent cell, Phenotype phenotype, double dt)
-    {
-        if( cell == null ) // if this phenotype is not associated with a cell, exit 
-            return;
+        File settings = new File( path );
 
-        // make sure the associated cell has the correct rate vectors 
-        if( cell.secretionRates != secretionRates )
-        {
-            cell.secretionRates = secretionRates;//TODO: remove cell.secretionRate
-            cell.uptakeRates = uptakeRates;
-            cell.saturationDensities = saturationDensities;
-            cell.netExportRates = netExportRates;
-            cell.setTotalVolume( phenotype.volume.total );
-            cell.setUptakeConstants( dt );
-        }
-        cell.simulateSecretionUptake( cell.getMicroenvironment(), dt );
-    }
+        Model model = new ModelReader().read( settings );
 
-    public void setSecretionToZero()
-    {
-        for( int i = 0; i < secretionRates.length; i++ )
-        {
-            secretionRates[i] = 0.0;
-            netExportRates[i] = 0.0;
-        }
-    }
+        double mechanics_voxel_size = 30;
+        model.createContainer( mechanics_voxel_size );
+        model.setResultFolder( resultPath );
 
-    public void setUptakeToZero()
-    {
-        for( int i = 0; i < uptakeRates.length; i++ )
-        {
-            uptakeRates[i] = 0.0;
-        }
-    }
+        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        ;// ..setDrawDensity( false );
+        //        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        //        model.addVisualizer( 0, "figure1" ).setStubstrateIndex( 2 ).setMaxDensity( 0.01 );
+        //        model.addVisualizer( 0, "figure2" ).setStubstrateIndex( 2 ).setMaxDensity( 0.1 );
+        //        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
 
-    public void scaleSecretion(double factor)
-    {
-        for( int i = 0; i < secretionRates.length; i++ )
-        {
-            secretionRates[i] *= factor;
-            netExportRates[i] *= factor;
-        }
-    }
+        /* Users typically start modifying here. START USERMODS */
+        CancerImmune.init( model );
+        /* Users typically stop modifying here. END USERMODS */
 
-    public void scaleUptake(double factor)
-    {
-        for( int i = 0; i < uptakeRates.length; i++ )
-        {
-            uptakeRates[i] *= factor;
-        }
-
-    }
-
-    public void setSecretionRate(int index, double val)
-    {
-        secretionRates[index] = val;
-    }
-
-    @Override
-    public Secretion clone()
-    {
-        try
-        {
-            Secretion result = (Secretion)super.clone();
-            result.secretionRates = this.secretionRates.clone();
-            result.uptakeRates = this.uptakeRates.clone();
-            result.saturationDensities = this.saturationDensities.clone();
-            result.netExportRates = this.netExportRates.clone();
-            return result;
-        }
-        catch( CloneNotSupportedException e )
-        {
-            throw ( new InternalError( e ) );
-        }
+        model.simulate();
     }
 }

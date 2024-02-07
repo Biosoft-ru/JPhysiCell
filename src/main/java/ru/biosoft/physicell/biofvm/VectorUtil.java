@@ -2,6 +2,8 @@ package ru.biosoft.physicell.biofvm;
 
 import java.util.Arrays;
 
+import ru.biosoft.physicell.core.PhysiCellUtilities;
+
 /*
 #############################################################################
 # If you use BioFVM in your project, please cite BioFVM and the version     #
@@ -405,7 +407,7 @@ public class VectorUtil
     {
         for( int i = 0; i < v.length; i++ )
         {
-            v[i] = -1 + 2 * Math.random();
+            v[i] = -1 + 2 * PhysiCellUtilities.UniformRandom();
         }
     }
 
@@ -416,7 +418,7 @@ public class VectorUtil
     {
         double[] result = new double[size];
         for( int i = 0; i < size; i++ )
-            result[i] = min + ( max - min ) * Math.random();
+            result[i] = min + ( max - min ) * PhysiCellUtilities.UniformRandom();
         return result;
     }
 

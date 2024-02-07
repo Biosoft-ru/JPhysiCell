@@ -341,38 +341,41 @@ public class ModelReader extends Constants
             Dirichlet_zmax_values[i] = dirichletValue;
 
             Element dirichletOptionsElement = findElement( variableElement, "Dirichlet_options" );
-            for( Element el : findAllElements( dirichletOptionsElement, "boundary_value" ) )
+            if( dirichletOptionsElement != null )
             {
-                boolean enabled = getBoolAttr( el, "enabled" );
-                double value = getDoubleVal( el );
-                if( !enabled )
-                    Dirichlet_all[i] = false;
-                switch( getAttr( el, "ID" ) )
+                for( Element el : findAllElements( dirichletOptionsElement, "boundary_value" ) )
                 {
-                    case "xmin":
-                        Dirichlet_xmin[i] = enabled;
-                        Dirichlet_xmin_values[i] = value;
-                        break;
-                    case "xmax":
-                        Dirichlet_xmax[i] = enabled;
-                        Dirichlet_xmax_values[i] = value;
-                        break;
-                    case "ymin":
-                        Dirichlet_ymin[i] = enabled;
-                        Dirichlet_ymin_values[i] = value;
-                        break;
-                    case "ymax":
-                        Dirichlet_ymax[i] = enabled;
-                        Dirichlet_ymax_values[i] = value;
-                        break;
-                    case "zmin":
-                        Dirichlet_zmin[i] = enabled;
-                        Dirichlet_zmin_values[i] = value;
-                        break;
-                    case "zmax":
-                        Dirichlet_zmax[i] = enabled;
-                        Dirichlet_zmax_values[i] = value;
-                        break;
+                    boolean enabled = getBoolAttr( el, "enabled" );
+                    double value = getDoubleVal( el );
+                    if( !enabled )
+                        Dirichlet_all[i] = false;
+                    switch( getAttr( el, "ID" ) )
+                    {
+                        case "xmin":
+                            Dirichlet_xmin[i] = enabled;
+                            Dirichlet_xmin_values[i] = value;
+                            break;
+                        case "xmax":
+                            Dirichlet_xmax[i] = enabled;
+                            Dirichlet_xmax_values[i] = value;
+                            break;
+                        case "ymin":
+                            Dirichlet_ymin[i] = enabled;
+                            Dirichlet_ymin_values[i] = value;
+                            break;
+                        case "ymax":
+                            Dirichlet_ymax[i] = enabled;
+                            Dirichlet_ymax_values[i] = value;
+                            break;
+                        case "zmin":
+                            Dirichlet_zmin[i] = enabled;
+                            Dirichlet_zmin_values[i] = value;
+                            break;
+                        case "zmax":
+                            Dirichlet_zmax[i] = enabled;
+                            Dirichlet_zmax_values[i] = value;
+                            break;
+                    }
                 }
             }
         }
@@ -479,21 +482,22 @@ public class ModelReader extends Constants
 
             CellDefinition parent = null;
             String parentType = getAttr( cdElement, "parent_type" );
-            if( !parentType.isEmpty() )
-                parent = CellDefinition.getCellDefinition( parentType );
+            //                        if( ! )
+            //                            parent = CellDefinition.getCellDefinition( parentType );
             //            boolean use_default_as_parent_without_specifying = false;
-            if( parent == null && !defaultDefinition )
+            if( parentType.isEmpty() && !defaultDefinition )
             {
                 parent = StandardModels.createFromDefault( "default", -1, m );
+                cd = parent.clone( name, id, m );
                 //                use_default_as_parent_without_specifying = true;
             }
-
-            // if we found something to inherit from, then do it! 
-            if( parent != null )
-            {
-                System.out.println( "\tCopying from type " + parent.name + " ... " );
-                cd = parent.clone( name, id, m );
-            }
+            //
+            //            // if we found something to inherit from, then do it! 
+            //            if( parent != null )
+            //            {
+            //                System.out.println( "\tCopying from type " + parent.name + " ... " );
+            //                cd = parent.clone( name, id, m );
+            //            }
             CellDefinition.registerCellDefinition( cd );
         }
     }
@@ -537,12 +541,34 @@ public class ModelReader extends Constants
     //            }
     public void readPhenotypes(Element physicell, Microenvironment m) throws Exception
     {
+
+
         Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
         for( Element cdElement : findAllElements( cellDefinitionsElement, "cell_definition" ) )
         {
             String name = getAttr( cdElement, "name" );
             CellDefinition cd = CellDefinition.getCellDefinition( name );
             Phenotype p = cd.phenotype;
+
+            CellDefinition parent = null;
+            String parentType = getAttr( cdElement, "parent_type" );
+            if( !parentType.isEmpty() )
+                parent = CellDefinition.getCellDefinition( parentType );
+            //            boolean use_default_as_parent_without_specifying = false;
+            //            if( parent == null && !defaultDefinition )
+            //            {
+            //                parent = StandardModels.createFromDefault( "default", -1, m );
+            //                //                use_default_as_parent_without_specifying = true;
+            //            }
+
+            // if we found something to inherit from, then do it! 
+            if( parent != null )
+            {
+                System.out.println( "\tCopying from type " + parent.name + " ... " );
+                cd = parent.clone( name, cd.type, m );
+                CellDefinition.registerCellDefinition( cd );
+            }
+
             p.sync( m );
             Element phenotypeElement = findElement( cdElement, "phenotype" );
             for( Element el : getAllElements( phenotypeElement ) )
@@ -1371,10 +1397,11 @@ public class ModelReader extends Constants
         //                </cell_transformations>
     }
 
-    private void readCustomData(Element el, CellDefinition cd)
+    private void readCustomData(Element el, CellDefinition cd) throws Exception
     {
         for( Element child : getAllElements( el ) )
         {
+            CellDefinition defaults = StandardModels.getDefaultCellDefinition();
             // name of teh custom data 
             String name = child.getTagName();
 
@@ -1405,6 +1432,7 @@ public class ModelReader extends Constants
                 else
                 {
                     cd.custom_data.add_variable( name, units, values[0] );
+                    defaults.custom_data.add_variable( name, units, values[0] );
                 }
 
                 n = cd.custom_data.find_variable_index( name );
@@ -1445,14 +1473,17 @@ public class ModelReader extends Constants
     public void readInitialConditions(Element el, Model m) throws Exception
     {
         Element parametersElement = findElement( el, "initial_conditions" );
-        Element positionsElement = findElement( parametersElement, "cell_positions" );
-        boolean enabled = getBoolAttr( positionsElement, "enabled" );
-        if( !enabled )
-            return;
-        String folder = getVal( findElement( positionsElement, "folder" ) );
-        String fileName = getVal( findElement( positionsElement, "fileName" ) );
-        String input_filename = folder + "/" + fileName;
-        CellCSVReader.load_cells_csv( input_filename, m.getMicroenvironment() );
+        if( parametersElement != null )
+        {
+            Element positionsElement = findElement( parametersElement, "cell_positions" );
+            boolean enabled = getBoolAttr( positionsElement, "enabled" );
+            if( !enabled )
+                return;
+            String folder = getVal( findElement( positionsElement, "folder" ) );
+            String fileName = getVal( findElement( positionsElement, "fileName" ) );
+            String input_filename = folder + "/" + fileName;
+            CellCSVReader.load_cells_csv( input_filename, m.getMicroenvironment() );
+        }
     }
 
     private Element findElement(Element parent, String tag)

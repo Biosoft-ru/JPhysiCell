@@ -1,8 +1,6 @@
 package ru.biosoft.physicell.core;
 
-import ru.biosoft.physicell.biofvm.BasicAgent;
-import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.biofvm.VectorUtil;
+import java.util.List;
 
 /*
 ###############################################################################
@@ -39,7 +37,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,95 +68,158 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 #                                                                             #
 ###############################################################################
 */
-public class Secretion implements Cloneable
+
+public class BasicSignaling
 {
-    public double[] secretionRates = new double[0];
-    public double[] uptakeRates = new double[0];
-    public double[] saturationDensities = new double[0];
-    public double[] netExportRates = new double[0];
+    //    #include "./PhysiCell_basic_signaling.h"
+    //
+    //    using namespace BioFVM; 
+    //
+    //    namespace PhysiCell{
 
-    public void sync(Microenvironment m)
+    double Hill_response_function(double s, double half_max, double hill_power)
     {
-        int size = m.number_of_densities();
-        secretionRates = VectorUtil.resize( secretionRates, size );
-        uptakeRates = VectorUtil.resize( uptakeRates, size );
-        saturationDensities = VectorUtil.resize( saturationDensities, size );
-        netExportRates = VectorUtil.resize( netExportRates, size );
-    }
+        // newer. only one expensive a^b operation. 45% less computationl expense. 
 
-    public void advance(BasicAgent cell, Phenotype phenotype, double dt)
-    {
-        if( cell == null ) // if this phenotype is not associated with a cell, exit 
-            return;
-
-        // make sure the associated cell has the correct rate vectors 
-        if( cell.secretionRates != secretionRates )
+        // give an early exit possibility to cut cost on "empty" rules
+        if( s < 1e-16 ) // maybe also try a dynamic threshold: 0.0001 * half_max 
         {
-            cell.secretionRates = secretionRates;//TODO: remove cell.secretionRate
-            cell.uptakeRates = uptakeRates;
-            cell.saturationDensities = saturationDensities;
-            cell.netExportRates = netExportRates;
-            cell.setTotalVolume( phenotype.volume.total );
-            cell.setUptakeConstants( dt );
-        }
-        cell.simulateSecretionUptake( cell.getMicroenvironment(), dt );
-    }
-
-    public void setSecretionToZero()
-    {
-        for( int i = 0; i < secretionRates.length; i++ )
-        {
-            secretionRates[i] = 0.0;
-            netExportRates[i] = 0.0;
-        }
-    }
-
-    public void setUptakeToZero()
-    {
-        for( int i = 0; i < uptakeRates.length; i++ )
-        {
-            uptakeRates[i] = 0.0;
-        }
-    }
-
-    public void scaleSecretion(double factor)
-    {
-        for( int i = 0; i < secretionRates.length; i++ )
-        {
-            secretionRates[i] *= factor;
-            netExportRates[i] *= factor;
-        }
-    }
-
-    public void scaleUptake(double factor)
-    {
-        for( int i = 0; i < uptakeRates.length; i++ )
-        {
-            uptakeRates[i] *= factor;
+            return 0.0;
         }
 
+        // operations to reduce a^b operations and minimize hidden memory allocation / deallocation / copy operations. 
+        // Hill = (s/half_max)^hill_power / ( 1 + (s/half_max)^hill_power  )
+        double temp = s; // s 
+        temp /= half_max; // s/half_max 
+        double temp1 = Math.pow( temp, hill_power ); // (s/half_max)^h 
+        temp = temp1; // (s/half_max)^h 
+        temp += 1; // (1+(s/half_max)^h ); 
+        temp1 /= temp; // (s/half_max)^h / ( 1 + s/half_max)^h) 
+        return temp1;
     }
 
-    public void setSecretionRate(int index, double val)
+
+    double linear_response_function(double s, double s_min, double s_max)
     {
-        secretionRates[index] = val;
+        if( s <= s_min )
+        {
+            return 0.0;
+        }
+        if( s >= s_max )
+        {
+            return 1.0;
+        }
+        s -= s_min; // overwrite s with s - s_min 
+        s_max -= s_min; // overwrite s_max with s_max - s_min 
+        s /= s_max; // now we have (s-s_min)/(s_max-s_min
+        return s;
     }
 
-    @Override
-    public Secretion clone()
+    double decreasing_linear_response_function(double s, double s_min, double s_max)
     {
-        try
+        if( s <= s_min )
         {
-            Secretion result = (Secretion)super.clone();
-            result.secretionRates = this.secretionRates.clone();
-            result.uptakeRates = this.uptakeRates.clone();
-            result.saturationDensities = this.saturationDensities.clone();
-            result.netExportRates = this.netExportRates.clone();
-            return result;
+            return 1.0;
         }
-        catch( CloneNotSupportedException e )
+        if( s >= s_max )
         {
-            throw ( new InternalError( e ) );
+            return 0.0;
         }
+        // (smax-s)/(smax-smin); 
+        // = -(s-smax)/(smax-smin)
+        s -= s_max; // replace s by s-s_max 
+        s_max -= s_min; // replace s_max = s_max - s_min 
+        s /= s_max; // this is (s-s_max)/(s_max-s_min)
+        s *= -1; // this is (s_max-s)/(s_max-s_min)
+        return s;
     }
-}
+
+    double interpolate_behavior(double base_value, double max_changed_value, double response)
+    {
+        double output = max_changed_value; // bM
+        output -= base_value; // (bM-b0); 
+        output *= response; // R*(bM-b0); 
+        output += base_value; // b0 + (bM-b0)*R; 
+        return output;
+    }
+
+    public static double multivariate_Hill_response_function(List<Double> signals, List<Double> half_maxes, List<Double> hill_powers)
+    {
+        double temp1 = 0.0;
+        double temp2 = 0.0;
+        double temp3 = 0.0;
+        // create the generalized (s^h), stored in temp1; 
+        for( int j = 0; j < signals.size(); j++ )
+        {
+            temp2 = signals.get( j ); // s
+            temp2 /= half_maxes.get( j ); // s/s_half 
+            temp3 = Math.pow( temp2, hill_powers.get( j ) ); // (s/s_half)^h 
+            temp1 += temp3;
+        }
+        temp2 = temp1; // numerator (S^h)
+        temp1 += 1.0; // denominator (1+S^h)
+        temp2 /= temp1; // numerator/denominator = S^h / (1+S^h)
+        return temp2;
+    }
+
+    double multivariate_linear_response_function(double[] signals, double[] min_thresholds, double[] max_thresholds)
+    {
+        double output = 0.0;
+
+        for( int j = 0; j < signals.length; j++ )
+        {
+            output += linear_response_function( signals[j], min_thresholds[j], max_thresholds[j] );
+        }
+
+        if( output > 1.0 )
+        {
+            return 1.0;
+        }
+
+        return output;
+    }
+
+    double[] linear_response_to_Hill_parameters(double s0, double s1)
+    {
+        double tol = 0.1;
+        double param1 = ( 1 - tol ) / tol;
+        double param2 = Math.log( param1 );
+
+        // half max, then hill power 
+        double hm = 0.5 * ( s0 + s1 );
+
+        // hp so that H(s1) ~ (1-tol)
+        double hp = Math.round( param2 / Math.log( s1 / hm ) );
+
+        return new double[] {hm, hp};
+        //    std::vector<double>output=
+        //    { hm , hp };
+        //
+        //    return output;
+    }
+
+    double[] Hill_response_to_linear_parameters(double half_max, double Hill_power)
+    {
+        double tol = 0.1;
+        double param1 = ( 1 - tol ) / tol;
+        double param2 = Math.pow( param1, 1.0 / Hill_power );
+
+        // s1 such that H(s1) ~ (1-tol)
+        double s1 = half_max * param2;
+
+        // s0 for symmetry
+        double s0 = 2 * half_max - s1;
+        if( s0 < 0 )
+        {
+            s0 = 0.0;
+        }
+        return new double[] {s0, s1};
+        //    std::vector<double>output=
+        //    {s0,s1};
+        //
+        //    return output;
+    }
+
+
+
+};

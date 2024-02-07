@@ -80,6 +80,7 @@ public class Model
         double curTime = 0;
         double next_full_save_time = 0;
         boolean enable_legacy_saves = false;
+
         //        boolean enable_full_saves = false;
         File reportFile;
         int full_output_index = 0;
@@ -148,9 +149,6 @@ public class Model
                 m.simulate_diffusion_decay( diffusion_dt );
 
                 // run PhysiCell 
-                //                double diffusion_dt = 0.01;
-                //                double mechanics_dt = 0.1;
-                //                double phenotype_dt = 6.0;
                 ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
 
                 /*
@@ -207,6 +205,11 @@ public class Model
     public double getParameterDouble(String name)
     {
         return Double.parseDouble( parameters.get( name ) );
+    }
+
+    public boolean getParameterBoolean(String name)
+    {
+        return Boolean.parseBoolean( parameters.get( name ) );
     }
 
     public void setTMax(double tMax)

@@ -165,6 +165,7 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
         if( !m.diffusion_solver_setup_done )
             setup( m, dt );
 
+
         // x-diffusion 
         m.apply_dirichlet_conditions();
         for( int k = 0; k < zLength; k++ ) //        #pragma omp parallel for 

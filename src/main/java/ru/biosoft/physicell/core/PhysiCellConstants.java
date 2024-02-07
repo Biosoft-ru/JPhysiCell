@@ -131,7 +131,7 @@ public class PhysiCellConstants
     static int G2M_phase = 11;
     static int G2_phase = 12;
     static int M_phase = 13;
-    static int live = 14;
+    public static int live = 14;
 
 
     static int G1pm_phase = 15;
@@ -146,8 +146,8 @@ public class PhysiCellConstants
 
     public static int apoptotic = 100;
     public static int necrotic_swelling = 101;
-    static int necrotic_lysed = 102;
-    static int necrotic = 103;
+    public static int necrotic_lysed = 102;
+    public static int necrotic = 103;
     static int debris = 104;
 
     private static Map<String, Integer> cycle_model_codes = new HashMap<>();

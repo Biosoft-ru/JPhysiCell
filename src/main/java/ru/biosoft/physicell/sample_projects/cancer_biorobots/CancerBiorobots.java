@@ -203,26 +203,19 @@ public class CancerBiorobots
             while( x < x_outer )
             {
                 pCell = Cell.createCell( pCD_cancer, microenvironment, new double[] {x, y, 0.0} ); // tumor cell
-                //                pCell = create_cell(); // tumor cell//TODO
-                //                pCell.assign_position( x, y, 0.0 );
 
                 if( Math.abs( y ) > 0.01 )
                 {
-                    pCell = Cell.createCell( pCD_cancer, microenvironment, new double[] {x, -y, 0.0} ); // tumor cell
-                    //				pCell.assign_position( x , -y , 0.0 );				
+                    pCell = Cell.createCell( pCD_cancer, microenvironment, new double[] {x, -y, 0.0} ); // tumor cell			
                 }
 
                 if( Math.abs( x ) > 0.01 )
                 {
                     Cell.createCell( pCD_cancer, microenvironment, new double[] { -x, y, 0.0} );
-                    //				pCell = create_cell(pCD_cancer); // tumor cell 
-                    //				pCell.assign_position( -x , y , 0.0 );
 
                     if( Math.abs( y ) > 0.01 )
                     {
                         Cell.createCell( pCD_cancer, microenvironment, new double[] { -x, -y, 0.0} );
-                        //					pCell = create_cell(pCD_cancer); // tumor cell 
-                        //					pCell.assign_position( -x , -y , 0.0 );
                     }
                 }
                 x += cell_spacing;
@@ -293,99 +286,20 @@ public class CancerBiorobots
                     }
                     //  
                       // live tumor -- shade by level of damage 
-                      
-                      
                       // if live: color by damage 
                       if( SignalBehavior.get_single_signal( cell, "dead") < 0.5 )
                       {
                           int damage_int = (int) Math.round( damage * 255.0 / max_damage ); 
                           return new Color( damage_int, 255 - damage_int, damage_int );
-                          //                          char szTempString [128];
-                          //                          sprintf( szTempString , "rgb(%u,%u,%u)" , damage_int , 255-damage_int , damage_int );
-                          //                          output[0].assign( szTempString );
-                          //                          output[1].assign( szTempString );
-                          //                          sprintf( szTempString , "rgb(%u,%u,%u)" , damage_int/4 , (255-damage_int)/4 , damage_int/4 );
-                          //                          output[2].assign( szTempString );
                       }
-                    //  return output; 
             return c;
         }
     }
-
-    //std::vector<std::string>
-    //
-    //cancer_biorobots_coloring_function( Cell pCell )
-    //{
-    //	std::vector< std::string > output( 4, "black" ); 
-    //	
-    //	double damage = get_single_signal( pCell, "damage");
-    //
-    //	static double max_damage = 1.0 * get_single_signal(pCell, "custom:damage_rate")
-    //			/ (1e-16 + get_single_signal(pCell, "custom:repair_rate"));
-    //
-    //	CellDefinition pCD_cargo = find_CellDefinition("cargo cell");
-    //	CellDefinition pCD_cancer = find_CellDefinition("cancer cell");
-    //	CellDefinition pCD_worker = find_CellDefinition("worker cell");
-    //	
-    //	// cargo cell 
-    //	if(pCell.type==pCD_cargo.type)
-    //	{
-    //		output[0] = "blue";
-    //		output[1] = "blue";
-    //		output[2] = "blue"; 
-    //		output[3] = "none"; // no nuclear outline color 
-    //		return output;
-    //	}
-    //	
-    //	// worker cell 
-    //	if(pCell.type==pCD_worker.type)
-    //	{
-    //		output[0] = "red";
-    //		output[1] = "red";
-    //		output[2] = "red"; 
-    //		output[3] = "none"; // no nuclear outline color 
-    //		return output;
-    //	}
-    //	
-    //	// apoptotic tumor - cyan 
-    //	if( get_single_signal( pCell, "apoptotic" ) > 0.5 )  // Apoptotic - cyan
-    //	{
-    //		output[0] = "cyan";
-    //		output[2] = "darkcyan"; 
-    //		return output; 
-    //	}	
-    //	
-    //	// Necrotic tumor - Brown
-    //	if( get_single_signal( pCell, "necrotic") > 0.5 )
-    //	{
-    //		output[0] = "rgb(250,138,38)";
-    //		output[2] = "rgb(139,69,19)";
-    //		return output; 
-    //	}		
-    //	
-    //	// live tumor -- shade by level of damage 
-    //	
-    //	
-    //	// if live: color by damage 
-    //	if( get_single_signal( pCell, "dead") < 0.5 )
-    //	{
-    //		int damage_int = (int) round( damage * 255.0 / max_damage ); 
-    //		
-    //		char szTempString [128];
-    //		sprintf( szTempString , "rgb(%u,%u,%u)" , damage_int , 255-damage_int , damage_int );
-    //		output[0].assign( szTempString );
-    //		output[1].assign( szTempString );
-    //		sprintf( szTempString , "rgb(%u,%u,%u)" , damage_int/4 , (255-damage_int)/4 , damage_int/4 );
-    //		output[2].assign( szTempString );
-    //	}
-    //	return output; 
-    //}
 
     public static void introduce_biorobots(Model model) throws Exception
     {
         Microenvironment m = model.getMicroenvironment();
         // idea: we'll "inject" them in a little column
-
         double worker_fraction = model.getParameterDouble( "worker_fraction" ); // 0.10; /* param */
         int number_of_injected_cells = model.getParameterInt( "number_of_injected_cells" ); // 500; /* param */
 
@@ -422,9 +336,7 @@ public class CancerBiorobots
         {
             if( SignalBehavior.get_single_signal( pCell, "dead" ) > 0.5 )
             {
-                // the cell death functions don't automatically turn off custom functions,
-                // since those are part of mechanics.
-
+                // the cell death functions don't automatically turn off custom functions, since those are part of mechanics.
                 // Let's just fully disable now.
                 pCell.functions.custom_cell_rule = null;
                 return;
@@ -444,9 +356,7 @@ public class CancerBiorobots
         public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
         {
             // if dettached and receptor on, secrete signal
-
             // if dettached and receptor off, secrete chemo
-
             double receptor = SignalBehavior.get_single_signal( pCell, "custom:receptor" );
 
             if( pCell.state.numberAttachedCells() == 0 )
@@ -465,11 +375,8 @@ public class CancerBiorobots
             }
 
             // if you reach this point of the code, the cell is attached
-
             // if attached and oxygen high, secrete nothing, receptor off
-
             // if attached and oxygen low, dettach, start secreting chemo, receptor off
-
             double o2 = SignalBehavior.get_single_signal( pCell, "oxygen" );
             double o2_drop = SignalBehavior.get_single_signal( pCell, "custom:cargo_release_o2_threshold" );
 
@@ -484,7 +391,6 @@ public class CancerBiorobots
                 SignalBehavior.setSingleBehavior( pCell, "chemoattractant secretion", 0 );
                 SignalBehavior.setSingleBehavior( pCell, "therapeutic secretion", 10 );
                 SignalBehavior.setSingleBehavior( pCell, "custom:receptor", 0 );
-
                 pCell.remove_all_attached_cells();
             }
         }
@@ -495,18 +401,14 @@ public class CancerBiorobots
         public void execute(Cell pActingOn, Phenotype pao, Cell pAttachedTo, Phenotype pat, double dt)
         {
             double[] displacement = VectorUtil.newDiff( pAttachedTo.position, pActingOn.position );
-
             double max_elastic_displacement = pao.geometry.radius * pao.mechanics.relative_detachment_distance;
             double max_displacement_squared = max_elastic_displacement * max_elastic_displacement;
-
             // detach cells if too far apart
-
             if( VectorUtil.norm_squared( displacement ) > max_displacement_squared )
             {
                 Cell.detach_cells( pActingOn, pAttachedTo );
                 return;
             }
-
             VectorUtil.axpy( ( pActingOn.velocity ), pao.mechanics.attachment_elastic_constant, displacement );
         }
     }
@@ -556,7 +458,6 @@ public class CancerBiorobots
             damage /= temp; // (d_prev + dt*chemo*damage_rate)/(1 + dt*repair_rate)
 
             // then, see if the cell undergoes death from the therapy
-
             temp = dt;
             temp *= damage;
             temp *= drug_death_rate;
@@ -613,32 +514,15 @@ public class CancerBiorobots
                         break;
                     }
                 }
-                //                int i = 0;
-                //                while( i < nearby.size() && attached == false )
-                //                {
-                //                    // if it is expressing the receptor, dock with it
-                //                    if( get_single_signal( nearby[i], "custom:receptor" ) > 0.5 && attached == false )
-                //                    {
-                //                        attach_cells( pCell, nearby[i] );
-                //                        // nearby[i].custom_data["receptor"] = 0.0; // put into cargo cell rule instead?
-                //                        // nearby[i].phenotype.secretion.set_all_secretion_to_zero(); // put into cargo
-                //                        // rule instead?
-                //                        attached = true;
-                //                    }
-                //                    i++;
-                //                }
             }
 
             // from prior motility function
-
             double o2 = SignalBehavior.get_single_signal( pCell, "oxygen" );
             double chemoattractant = SignalBehavior.get_single_signal( pCell, "chemoattractant" );
-
             double detection_threshold = SignalBehavior.get_single_signal( pCell, "custom:motility_shutdown_detection_threshold" );
 
             // if attached, biased motility towards director chemoattractant
             // otherwise, biased motility towards cargo chemoattractant
-
             double attached_worker_migration_bias = SignalBehavior.get_single_signal( pCell, "custom:attached_worker_migration_bias" );
             double unattached_worker_migration_bias = SignalBehavior.get_single_signal( pCell, "custom:unattached_worker_migration_bias" );
 
@@ -664,11 +548,9 @@ public class CancerBiorobots
 
     public static class TherapyEvent extends Event
     {
-
         public TherapyEvent(double executionTime)
         {
             super( executionTime );
-            // TODO Auto-generated constructor stub
         }
 
         @Override
@@ -676,11 +558,7 @@ public class CancerBiorobots
         {
             System.out.println( "Therapy started!" );
             model.setSaveInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 
-            //                    PhysiCell_settings.SVG_save_interval = parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
-            //            model.next_full_save_time = curTime;
-            //                    PhysiCell_globals.next_SVG_save_time = PhysiCell_globals.current_time; 
             introduce_biorobots( model );
         }
-
     }
 }

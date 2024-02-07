@@ -83,7 +83,7 @@ public class Cell extends BasicAgent
     public String type_name;
 
     CellDefinition definition;
-    CustomCellData custom_data;// = new CustomCellData();
+    public CustomCellData custom_data;// = new CustomCellData();
     CellParameters parameters;// = new CellParameters();
     public CellFunctions functions;// = new CellFunctions();
 
@@ -176,8 +176,8 @@ public class Cell extends BasicAgent
         //        else
         //        {
         //assign a random unit vector
-        double theta = Math.random() * 6.28318530717959; //rand*2*pi
-        double z = 2 * Math.random() - 1;
+        double theta = PhysiCellUtilities.UniformRandom() * 6.28318530717959; //rand*2*pi
+        double z = 2 * PhysiCellUtilities.UniformRandom() - 1;
         double temp = Math.sqrt( 1 - z * z );
         state.orientation[0] = temp * Math.cos( theta );
         state.orientation[1] = temp * Math.sin( theta );
@@ -307,6 +307,7 @@ public class Cell extends BasicAgent
 
     public Cell divide()
     {
+        //        System.out.println( toString() + " divided" );
         //commented in original code
         // phenotype.flagged_for_division = false; 
         // phenotype.flagged_for_removal = false; 
@@ -487,7 +488,7 @@ public class Cell extends BasicAgent
         type = copy_me.type;
         type_name = copy_me.type_name;
 
-        custom_data = copy_me.custom_data;
+        custom_data = copy_me.custom_data.clone();
         parameters = copy_me.parameters.clone();
 
         velocity = copy_me.velocity.clone();
@@ -591,7 +592,7 @@ public class Cell extends BasicAgent
         return true;
     }
 
-    void start_death(int death_model_index)
+    public void start_death(int death_model_index)
     {
         // set the death data struture to the indicated death model 
         phenotype.death.trigger_death( death_model_index );
@@ -831,7 +832,7 @@ public class Cell extends BasicAgent
         return true;
     }
 
-    double[] nearest_density_vector()
+    public double[] nearest_density_vector()
     {
         return getMicroenvironment().nearest_density_vector( this.currentVoxelIndex );//current_voxel_index );
     }

@@ -1,13 +1,17 @@
 package ru.biosoft.physicell.core;
 
+import java.util.Random;
+
 import ru.biosoft.physicell.biofvm.GeneralMesh;
 
 public class PhysiCellUtilities
 {
     private static double seed = 0;
-    public static void setSeed(double val)
+    private static Random r = new Random();
+    public static void setSeed(long val)
     {
         seed = val;
+        r.setSeed( val );
     }
     public static double[] UniformOnUnitSphere()
     {
@@ -33,11 +37,21 @@ public class PhysiCellUtilities
 
     public static double UniformRandom(double min, double max)
     {
-        return min + ( max - min ) * Math.random();
+        return min + ( max - min ) * r.nextDouble();
+    }
+
+    public static double NormalRandom()
+    {
+        return r.nextGaussian();
+    }
+
+    public static double NormalRandom(double m, double var)
+    {
+        return m + var * r.nextGaussian();
     }
     public static double UniformRandom()
     {
-        return Math.random();
+        return r.nextDouble();
         //        thread_local std::uniform_real_distribution<double> distribution(0.0,1.0);
         //        if( local_pnrg_setup_done == false )
         //        {

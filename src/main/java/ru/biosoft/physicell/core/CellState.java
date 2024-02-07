@@ -75,7 +75,7 @@ public class CellState
     Set<Cell> springAttachments;
     Set<Cell> neighbors;
     double[] orientation;
-    double simplePressure;
+    public double simplePressure;
     int numberNuclei;
 	public double damage;
     double totalAttackTime;

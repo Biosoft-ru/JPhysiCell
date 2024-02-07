@@ -1,9 +1,6 @@
 package ru.biosoft.physicell.core;
 
-import ru.biosoft.physicell.biofvm.BasicAgent;
-import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.biofvm.VectorUtil;
-
+import java.util.List;
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -39,7 +36,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,95 +67,108 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 #                                                                             #
 ###############################################################################
 */
-public class Secretion implements Cloneable
+
+public class IntegratedSignal
 {
-    public double[] secretionRates = new double[0];
-    public double[] uptakeRates = new double[0];
-    public double[] saturationDensities = new double[0];
-    public double[] netExportRates = new double[0];
+    double base_activity;
+    double max_activity;
 
-    public void sync(Microenvironment m)
+    List<Double> promoters;
+    List<Double> promoter_weights;
+    double promoters_Hill;
+    double promoters_half_max;
+
+    List<Double> inhibitors;
+    List<Double> inhibitor_weights;
+    double inhibitors_Hill;
+    double inhibitors_half_max;
+
+    public IntegratedSignal()
     {
-        int size = m.number_of_densities();
-        secretionRates = VectorUtil.resize( secretionRates, size );
-        uptakeRates = VectorUtil.resize( uptakeRates, size );
-        saturationDensities = VectorUtil.resize( saturationDensities, size );
-        netExportRates = VectorUtil.resize( netExportRates, size );
+        base_activity = 0.0;
+        max_activity = 1.0;
+
+        promoters.clear();
+        promoter_weights.clear();
+
+        promoters_half_max = 0.1;
+        promoters_Hill = 4;
+
+        inhibitors.clear();
+        inhibitor_weights.clear();
+
+        inhibitors_half_max = 0.1;
+        inhibitors_Hill = 4;
     }
 
-    public void advance(BasicAgent cell, Phenotype phenotype, double dt)
+    void reset()
     {
-        if( cell == null ) // if this phenotype is not associated with a cell, exit 
+        promoters.clear();
+        promoter_weights.clear();
+
+        inhibitors.clear();
+        inhibitor_weights.clear();
+    }
+
+    double compute_signal()
+    {
+        double pr = 0.0;
+        double w = 0.0;
+        for( int k = 0; k < promoters.size(); k++ )
+        {
+            pr += promoters.get( k );
+            w += promoter_weights.get( k );
+        }
+        w += 1e-16;
+        pr /= w;
+
+        double inhib = 0.0;
+        w = 0.0;
+        for( int k = 0; k < inhibitors.size(); k++ )
+        {
+            inhib += inhibitors.get( k );
+            w += inhibitor_weights.get( k );
+        }
+        w += 1e-16;
+        inhib /= w;
+
+        double Pn = Math.pow( pr, promoters_Hill );
+        double Phalf = Math.pow( promoters_half_max, promoters_Hill );
+
+        double In = Math.pow( inhib, inhibitors_Hill );
+        double Ihalf = Math.pow( inhibitors_half_max, inhibitors_Hill );
+
+        double P = Pn / ( Pn + Phalf );
+        double I = 1.0 / ( In + Ihalf );
+
+        double output = max_activity;
+        output -= base_activity; //(max-base)
+        output *= P; // (max-base)*P 
+        output += base_activity; // base + (max-base)*P 
+        output *= I; // (base + (max-base)*P)*I; 
+
+        return output;
+    };
+
+    void add_signal(char signal_type, double signal, double weight)
+    {
+        if( signal_type == 'P' || signal_type == 'p' )
+        {
+            promoters.add( signal );
+            promoter_weights.add( weight );
             return;
-
-        // make sure the associated cell has the correct rate vectors 
-        if( cell.secretionRates != secretionRates )
-        {
-            cell.secretionRates = secretionRates;//TODO: remove cell.secretionRate
-            cell.uptakeRates = uptakeRates;
-            cell.saturationDensities = saturationDensities;
-            cell.netExportRates = netExportRates;
-            cell.setTotalVolume( phenotype.volume.total );
-            cell.setUptakeConstants( dt );
         }
-        cell.simulateSecretionUptake( cell.getMicroenvironment(), dt );
+        if( signal_type == 'I' || signal_type == 'i' )
+        {
+            inhibitors.add( signal );
+            inhibitor_weights.add( weight );
+            return;
+        }
     }
 
-    public void setSecretionToZero()
+    void add_signal(char signal_type, double signal)
     {
-        for( int i = 0; i < secretionRates.length; i++ )
-        {
-            secretionRates[i] = 0.0;
-            netExportRates[i] = 0.0;
-        }
+        add_signal( signal_type, signal, 1.0 );
     }
 
-    public void setUptakeToZero()
-    {
-        for( int i = 0; i < uptakeRates.length; i++ )
-        {
-            uptakeRates[i] = 0.0;
-        }
-    }
-
-    public void scaleSecretion(double factor)
-    {
-        for( int i = 0; i < secretionRates.length; i++ )
-        {
-            secretionRates[i] *= factor;
-            netExportRates[i] *= factor;
-        }
-    }
-
-    public void scaleUptake(double factor)
-    {
-        for( int i = 0; i < uptakeRates.length; i++ )
-        {
-            uptakeRates[i] *= factor;
-        }
-
-    }
-
-    public void setSecretionRate(int index, double val)
-    {
-        secretionRates[index] = val;
-    }
-
-    @Override
-    public Secretion clone()
-    {
-        try
-        {
-            Secretion result = (Secretion)super.clone();
-            result.secretionRates = this.secretionRates.clone();
-            result.uptakeRates = this.uptakeRates.clone();
-            result.saturationDensities = this.saturationDensities.clone();
-            result.netExportRates = this.netExportRates.clone();
-            return result;
-        }
-        catch( CloneNotSupportedException e )
-        {
-            throw ( new InternalError( e ) );
-        }
-    }
 }

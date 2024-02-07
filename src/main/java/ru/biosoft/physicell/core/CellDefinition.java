@@ -87,6 +87,7 @@ public class CellDefinition
 
     boolean isMovable;
 
+    private Microenvironment m;
     public CellParameters parameters = new CellParameters();
     public CustomCellData custom_data = new CustomCellData();
     public CellFunctions functions = new CellFunctions();
@@ -175,6 +176,7 @@ public class CellDefinition
     public CellDefinition(Microenvironment m, int type, String name)
     {
         this();
+        this.m = m;
         this.type = type;
         this.name = name;
         phenotype.sync( m );
@@ -204,5 +206,10 @@ public class CellDefinition
     public String toString()
     {
         return name + " ( " + type + " ) ";
+    }
+
+    public Microenvironment getMicroenvironment()
+    {
+        return m;
     }
 }

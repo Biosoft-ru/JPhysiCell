@@ -95,7 +95,7 @@ public class Main
         //        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
 
         /* Users typically start modifying here. START USERMODS */
-		CancerBiorobots.init(model);
+        CancerBiorobots.init( model );
         /* Users typically stop modifying here. END USERMODS */
 
         model.simulate();

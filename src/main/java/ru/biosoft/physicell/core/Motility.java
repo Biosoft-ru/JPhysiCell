@@ -74,7 +74,7 @@ public class Motility implements Cloneable
     public boolean is_motile;
     public double persistence_time; // mean time to keep going in one direction before resampling for a new direction. 
     public double migration_speed; // migration speed along chosen direction, in absence of all other adhesive / repulsive forces 
-    double[] migration_bias_direction = new double[0];; // a unit vector random motility is biased in this direction (e.g., chemotaxis)
+    public double[] migration_bias_direction = new double[0];; // a unit vector random motility is biased in this direction (e.g., chemotaxis)
     public double migration_bias; // how biased is motility if 0, completely random. if 1, deterministic along the bias vector 
     public boolean restrict_to_2D; // if true, set random motility to 2D only. 
     double[] motility_vector = new double[0];;

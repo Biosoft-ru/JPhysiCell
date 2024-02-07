@@ -75,7 +75,7 @@ public class Death implements Cloneable
     public List<CycleModel> models;
     public List<DeathParameters> parameters;
 
-    boolean dead;
+    public boolean dead;
     int currentDeathModelIndex;
 
     public Death()
@@ -139,7 +139,7 @@ public class Death implements Cloneable
         while( !dead && i < rates.size() )
         {
             double rate = rates.get( i );
-            if( rate != 0 && Math.random() < rate * dt )
+            if( rate != 0 && PhysiCellUtilities.UniformRandom() < rate * dt )
             {
                 // update the Death data structure 
                 dead = true;
