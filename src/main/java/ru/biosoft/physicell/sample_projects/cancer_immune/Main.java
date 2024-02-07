@@ -1,6 +1,7 @@
 package ru.biosoft.physicell.sample_projects.cancer_immune;
 
 import java.io.File;
+import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
@@ -73,15 +74,20 @@ import ru.biosoft.physicell.xml.ModelReader;
 */
 public class Main
 {
-    private static String path = "src/main/java/ru/biosoft/physicell/sample_projects/cancer_immune/config/PhysiCell_settings.xml";
-    private static String resultPath = "src/main/java/ru/biosoft/physicell/sample_projects/cancer_immune/result";
+    private static String settingsPath = "config/PhysiCell_settings.xml";
+    private static String resultPath = "/result";
 
     public static void main(String ... strings) throws Exception
     {
+        if( strings != null && strings.length > 0 )
+            resultPath = strings[0];
+        else
+            resultPath = Main.class.getResource( "" ).getFile() + resultPath;
+
 		if (!new File(resultPath).exists())
 			new File(resultPath).mkdirs();
 
-        File settings = new File( path );
+        InputStream settings = Main.class.getResourceAsStream( settingsPath );
 
         Model model = new ModelReader().read( settings );
 

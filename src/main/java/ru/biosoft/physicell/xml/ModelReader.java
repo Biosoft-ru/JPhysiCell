@@ -2,6 +2,7 @@ package ru.biosoft.physicell.xml;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,11 +37,25 @@ import ru.biosoft.physicell.core.Volume;
 public class ModelReader extends Constants
 {
 
+
+    public Model read(InputStream is) throws Exception
+    {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse( is );
+        return read( doc );
+    }
+
     public Model read(File f) throws Exception
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse( f );
+        return read( doc );
+    }
+
+    public Model read(Document doc) throws Exception
+    {
         NodeList nodes = doc.getChildNodes();
 
         Element physicell = findElement( nodes, PHYSICELL_ELEMENT );
