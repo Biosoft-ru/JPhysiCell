@@ -1,4 +1,4 @@
-package ru.biosoft.physicell.sample_projects.celltypes3.custom_modules;
+package ru.biosoft.physicell.sample_projects.celltypes3;
 
 import java.awt.Color;
 
