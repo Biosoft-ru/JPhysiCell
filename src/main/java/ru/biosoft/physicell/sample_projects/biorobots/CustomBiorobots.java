@@ -39,7 +39,7 @@ public class CustomBiorobots
 
     static void createCellTypes(Model m) throws Exception
     {
-        PhysiCellUtilities.setSeed( m.getParameterDouble( "random_seed" ) );
+        PhysiCellUtilities.setSeed( m.getParameterInt( "random_seed" ) );
         SignalBehavior.setup_signal_behavior_dictionaries( m.getMicroenvironment() );
         double elastic_coefficient = m.getParameterDouble( "elastic_coefficient" );
         double threshold = m.getParameterDouble( "drop_threshold" ); // 0.4; 
