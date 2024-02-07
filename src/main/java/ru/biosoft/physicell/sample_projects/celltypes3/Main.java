@@ -3,7 +3,6 @@ package ru.biosoft.physicell.sample_projects.celltypes3;
 import java.io.File;
 
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.sample_projects.celltypes3.custom_modules.Celltype3;
 import ru.biosoft.physicell.xml.ModelReader;
 
 /*
