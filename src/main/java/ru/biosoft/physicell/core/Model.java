@@ -142,9 +142,10 @@ public class Model
 
                         if( logFile != null )
                         {
-                            try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( logFile ) ) ))
+                            try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( logFile ), true ) ))
                             {
                                 bw.append( info );
+                                bw.append( "\n" );
                             }
                         }
                         System.out.println( info );
