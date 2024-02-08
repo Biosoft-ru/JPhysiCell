@@ -1,6 +1,8 @@
 package ru.biosoft.physicell.core;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +17,8 @@ import ru.biosoft.physicell.ui.Visualizer.Section;
 public class Model
 {
     private List<Visualizer> visualizers = new ArrayList<Visualizer>();
+    private String logFile;
+
     private Microenvironment m;
     private Map<String, String> parameters = new HashMap<>();
     private double tMax;
@@ -40,6 +44,11 @@ public class Model
     public void addEvent(Event event)
     {
         this.events.add( event );
+    }
+
+    public void setLogFile(String path)
+    {
+        this.logFile = path;
     }
 
     public Visualizer addVisualizer(int zSlice, String name)
@@ -88,6 +97,7 @@ public class Model
         for( Visualizer listener : visualizers )
             listener.init();
 
+        double startTime = System.currentTimeMillis();
         boolean hasEvents = !events.isEmpty();
         boolean eventsFired = false;
         try
@@ -123,9 +133,21 @@ public class Model
                     {
                         for( Visualizer listener : visualizers )
                             listener.saveResult( m, curTime );
-                        System.out.println(
-                                PhysiCellUtilities.getCurrentTime() + " Time: " + (int)Math.round( curTime ) + " Cells: "
-                                        + m.getAgentsCount() );
+                        
+                        
+                        String info = PhysiCellUtilities.getCurrentTime() + "\tElapsed\t" + ( System.currentTimeMillis() - startTime ) / 1000
+                                + "\tTime:\t"
+                                + (int)Math.round( curTime ) + "\tCells\t"
+                                + m.getAgentsCount();
+
+                        if( logFile != null )
+                        {
+                            try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( logFile ) ) ))
+                            {
+                                bw.append( info );
+                            }
+                        }
+                        System.out.println( info );
                         //                                    sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 
                         //                                    save_PhysiCell_to_MultiCellDS_v2( filename , m , curTime ); 
