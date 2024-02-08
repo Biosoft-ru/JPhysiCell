@@ -581,6 +581,7 @@ public class ModelReader extends Constants
             {
                 System.out.println( "\tCopying from type " + parent.name + " ... " );
                 cd = parent.clone( name, cd.type, m );
+                p = cd.phenotype;
                 CellDefinition.registerCellDefinition( cd );
             }
 
@@ -797,37 +798,39 @@ public class ModelReader extends Constants
             }
 
             Element parametersElement = findElement( modelElement, "parameters" );
-            for( Element paramEl : getAllElements( parametersElement ) )
+            if( parametersElement != null )
             {
-                switch( paramEl.getTagName() )
+                for( Element paramEl : getAllElements( parametersElement ) )
                 {
-                    case "unlysed_fluid_change_rate":
-                        parameters.unlysed_fluid_change_rate = getDoubleVal( paramEl );
-                        //                        String unlysed_fluid_change_rate_units = getAttr( paramEl, "units" ); //TODO
-                        break;
-                    case "lysed_fluid_change_rate":
-                        parameters.lysed_fluid_change_rate = getDoubleVal( paramEl );
-                        //                        String lysed_fluid_change_rate_units = getAttr( paramEl, "units" );
-                        break;
-                    case "cytoplasmic_biomass_change_rate":
-                        parameters.cytoplasmic_biomass_change_rate = getDoubleVal( paramEl );
-                        //                        String cytoplasmic_biomass_change_rate_units = getAttr( paramEl, "units" );
-                        break;
-                    case "nuclear_biomass_change_rate":
-                        parameters.nuclear_biomass_change_rate = getDoubleVal( paramEl );
-                        //                        String nuclear_biomass_change_rate_units = getAttr( paramEl, "units" );
-                        break;
-                    case "calcification_rate":
-                        parameters.calcification_rate = getDoubleVal( paramEl );
-                        //                        String calcification_rate_units = getAttr( paramEl, "units" );
-                        break;
-                    case "relative_rupture_volume":
-                        parameters.relative_rupture_volume = getDoubleVal( paramEl );
-                        //                        String relative_rupture_volume_units = getAttr( paramEl, "units" );
-                        break;
+                    switch( paramEl.getTagName() )
+                    {
+                        case "unlysed_fluid_change_rate":
+                            parameters.unlysed_fluid_change_rate = getDoubleVal( paramEl );
+                            //                        String unlysed_fluid_change_rate_units = getAttr( paramEl, "units" ); //TODO
+                            break;
+                        case "lysed_fluid_change_rate":
+                            parameters.lysed_fluid_change_rate = getDoubleVal( paramEl );
+                            //                        String lysed_fluid_change_rate_units = getAttr( paramEl, "units" );
+                            break;
+                        case "cytoplasmic_biomass_change_rate":
+                            parameters.cytoplasmic_biomass_change_rate = getDoubleVal( paramEl );
+                            //                        String cytoplasmic_biomass_change_rate_units = getAttr( paramEl, "units" );
+                            break;
+                        case "nuclear_biomass_change_rate":
+                            parameters.nuclear_biomass_change_rate = getDoubleVal( paramEl );
+                            //                        String nuclear_biomass_change_rate_units = getAttr( paramEl, "units" );
+                            break;
+                        case "calcification_rate":
+                            parameters.calcification_rate = getDoubleVal( paramEl );
+                            //                        String calcification_rate_units = getAttr( paramEl, "units" );
+                            break;
+                        case "relative_rupture_volume":
+                            parameters.relative_rupture_volume = getDoubleVal( paramEl );
+                            //                        String relative_rupture_volume_units = getAttr( paramEl, "units" );
+                            break;
+                    }
                 }
             }
-
             if( code == PhysiCellConstants.apoptosis_death_model )
             {
                 if( !alreadyExists )
@@ -1074,8 +1077,14 @@ public class ModelReader extends Constants
                     break;
                 case "options":
                 {
-                    motility.is_motile = getBoolVal( findElement( child, "enabled" ) );
-                    motility.restrict_to_2D = getBoolVal( findElement( child, "use_2D" ) );
+                    Element enabledElement = findElement( child, "enabled" );
+                    if( enabledElement != null )
+                        motility.is_motile = getBoolVal( enabledElement );
+
+                    Element use2dElement = findElement( child, "use_2D" );
+                    if( use2dElement != null )
+                        motility.restrict_to_2D = getBoolVal( use2dElement );
+
                     if( m.options.simulate_2D && !motility.restrict_to_2D )
                     {
                         System.out.println( "Note: Overriding to set cell motility for " + cd.name
@@ -1480,7 +1489,8 @@ public class ModelReader extends Constants
         {
             for( Element element : getAllElements( parametersElement ) )
             {
-                model.addParameter( element.getTagName(), getVal( element ) );
+                if( element.hasChildNodes() )
+                    model.addParameter( element.getTagName(), getVal( element ) );
             }
         }
     }
@@ -1601,6 +1611,10 @@ public class ModelReader extends Constants
                 return Color.blue;
             case "limegreen":
                 return new Color( 50, 205, 50 );
+            case "magenta":
+                return Color.magenta;
+            case "cyan":
+                return Color.cyan;
             default:
                 return Color.white;
         }

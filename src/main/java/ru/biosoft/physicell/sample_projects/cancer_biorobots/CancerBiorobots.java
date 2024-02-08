@@ -351,7 +351,7 @@ public class CancerBiorobots
         }
     }
 
-    public static class cargo_cell_phenotype_rule implements update_phenotype
+    public static class cargo_cell_phenotype_rule extends update_phenotype
     {
         public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
         {
@@ -413,7 +413,7 @@ public class CancerBiorobots
         }
     }
 
-    public static class tumor_cell_phenotype_with_therapy implements update_phenotype
+    public static class tumor_cell_phenotype_with_therapy extends update_phenotype
     {
         public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
         {

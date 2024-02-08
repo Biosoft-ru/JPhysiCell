@@ -123,6 +123,9 @@ public class Model
                     {
                         for( Visualizer listener : visualizers )
                             listener.saveResult( m, curTime );
+                        System.out.println(
+                                PhysiCellUtilities.getCurrentTime() + " Time: " + (int)Math.round( curTime ) + " Cells: "
+                                        + m.getAgentsCount() );
                         //                                    sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 
                         //                                    save_PhysiCell_to_MultiCellDS_v2( filename , m , curTime ); 

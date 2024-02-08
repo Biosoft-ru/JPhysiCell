@@ -145,7 +145,7 @@ public class CustomBiorobots
         System.out.println( "Done!" );
     }
 
-    public static class DirectorCellRule implements update_phenotype
+    public static class DirectorCellRule extends update_phenotype
     {
         @Override
         public void execute(Cell pCell, Phenotype phenotype, double dt)
@@ -154,7 +154,7 @@ public class CustomBiorobots
         }
     }
 
-    public static class CargoCellRule implements update_phenotype
+    public static class CargoCellRule extends update_phenotype
     {
         private double elasticCoefficient;
 
@@ -170,7 +170,7 @@ public class CustomBiorobots
         }
     }
 
-    public static class WorkerCellRule implements update_phenotype
+    public static class WorkerCellRule extends update_phenotype
     {
         private double attachedMigrationBias;
         private double unattachedMigrationBias;

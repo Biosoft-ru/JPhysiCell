@@ -886,7 +886,7 @@ public class SignalBehavior
         return findParameterIndex( response_name );
     }
 
-    static double get_single_behavior(Cell pCell, String name) throws Exception
+    public static double get_single_behavior(Cell pCell, String name) throws Exception
     {
         return getSingleBehavior( pCell, findBehaviorIndex( name ) );
     }

@@ -207,19 +207,19 @@ public class CancerImmune
         //        return; 
     }
 
-    void setup_microenvironment(Model model)
-    {
-        Microenvironment m = model.getMicroenvironment();
-        if( m.options.simulate_2D == true )
-        {
-            //            std::cout << "Warning: overriding 2D setting to return to 3D" << std::endl; 
-            m.options.simulate_2D = false;
-        }
-        Microenvironment.initialize_microenvironment( m );
-        //        initialize_microenvironment();
-
-        //        return; 
-    }
+    //    void setup_microenvironment(Model model)
+    //    {
+    //        Microenvironment m = model.getMicroenvironment();
+    //        if( m.options.simulate_2D == true )
+    //        {
+    //            //            std::cout << "Warning: overriding 2D setting to return to 3D" << std::endl; 
+    //            m.options.simulate_2D = false;
+    //        }
+    //        Microenvironment.initialize_microenvironment( m );
+    //        //        initialize_microenvironment();
+    //
+    //        //        return; 
+    //    }
 
     public static void introduce_immune_cells(Model model)
     {
@@ -401,7 +401,7 @@ public class CancerImmune
     }
 
     // custom cell phenotype function to scale immunostimulatory factor with hypoxia 
-    public static class tumor_cell_phenotype_with_and_immune_stimulation implements update_phenotype
+    public static class tumor_cell_phenotype_with_and_immune_stimulation extends update_phenotype
     {
         @Override
         public void execute(Cell pCell, Phenotype phenotype, double dt)

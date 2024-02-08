@@ -1,5 +1,7 @@
 package ru.biosoft.physicell.core;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Random;
 
 import ru.biosoft.physicell.biofvm.GeneralMesh;
@@ -49,6 +51,23 @@ public class PhysiCellUtilities
     {
         return m + var * r.nextGaussian();
     }
+
+    public static double restrict(double val, double min, double max)
+    {
+        if( val < min )
+            return min;
+        if( val > max )
+            return max;
+        return val;
+    }
+
+    public static String getCurrentTime()
+    {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat( "[ HH:mm:ss ] " );
+        return sdf.format( cal.getTime() );
+    }
+
     public static double UniformRandom()
     {
         return r.nextDouble();

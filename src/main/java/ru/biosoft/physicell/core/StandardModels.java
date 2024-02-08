@@ -621,7 +621,7 @@ public class StandardModels
         //        }
     }
 
-    public static class update_cell_and_death_parameters_O2_based implements update_phenotype
+    public static class update_cell_and_death_parameters_O2_based extends update_phenotype
     {
         @Override
         public void execute(Cell pCell, Phenotype phenotype, double dt)

@@ -1,10 +1,3 @@
-package ru.biosoft.physicell.sample_projects.celltypes3;
-
-import java.io.File;
-
-import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.xml.ModelReader;
-
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -40,7 +33,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -71,83 +64,33 @@ import ru.biosoft.physicell.xml.ModelReader;
 #                                                                             #
 ###############################################################################
 */
-public class Main
-{
 
-    private static String path = "src/main/java/ru/biosoft/physicell/sample_projects/celltypes3/config/PhysiCell_settings.xml";
-    private static String resultPath = "src/main/java/ru/biosoft/physicell/sample_projects/celltypes3/result";
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-    public static void main(String ... strings) throws Exception
-    {
-        if( !new File( resultPath ).exists() )
-            new File( resultPath ).mkdirs();
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-        File settings = new File( path );
+// setup functions to help us along 
 
-        Model model = new ModelReader().read( settings );
+void create_cell_types( void );
+void setup_tissue( void ); 
 
-        double mechanics_voxel_size = 30;
-        model.createContainer( mechanics_voxel_size );
-        model.setResultFolder( resultPath );
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
 
-        model.addVisualizer( 0, "figure0" ).setDrawDensity( false );//.setStubstrateIndex( 1 ).setMaxDensity( 1 );
-        ;// ..setDrawDensity( false );
-         //        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
-         //        model.addVisualizer( 0, "figure1" ).setStubstrateIndex( 2 ).setMaxDensity( 0.01 );
-         //        model.addVisualizer( 0, "figure2" ).setStubstrateIndex( 2 ).setMaxDensity( 0.1 );
-         //        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
+// custom pathology coloring function 
 
-        /* Users typically start modifying here. START USERMODS */
-        Celltype3.init( model );
-        /* Users typically stop modifying here. END USERMODS */
+std::vector<std::string> my_coloring_function( Cell* );
 
-        model.simulate();
-    }
+// custom functions can go here 
 
-/*	
-	// testing here 
-	
-	std::cout << " testing ... " << std::endl; 
-	
-	up_down_signal model; 
-	model.display(); 
-	
-	model.add_effect( 0.2 , 'p' );  
-	model.display(); 
-	
-	model.add_effect( 0.2 , 'p' );  
-	model.display(); 
-	
-	model.add_effect( 0.2 , 'n' );  
-	model.display(); 
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
-	model.add_effect( 0.2 , 'p' );  
-	model.display(); 
-	
-	model.add_effect( 1 , 'p' );  
-	model.display(); 
-	
-	model.add_effect( 0.1 , 'i' );  
-	model.display(); 
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
-	model.add_effect( 0.9 , 'i' );  
-	model.display(); 
+std::vector<std::string> heterogeneity_coloring_function( Cell* );
 
-	model.add_effect( 0.9 , 'i' );  
-	model.display(); 
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-	model.reset(); 
-	model.display(); 
-	
-	model.add_effect( 1 , 'i' );  
-	model.display(); 
-
-	model.add_effect( 1 , 'p' );  
-	model.display(); 
-
-	model.add_effect( 10 , 'p' );  
-	model.display(); 
-
-	exit(-1); 
-*/
-}

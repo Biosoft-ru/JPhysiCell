@@ -92,7 +92,7 @@ public class Celltype3
         setup_tissue( model );
         for( Visualizer visualizer : model.getVisualizers() )
         {
-            visualizer.setAgentVisualizer( new FluorescenceAgentVisualizer() );
+            visualizer.setAgentVisualizer( new RegularAgentVisualizer( model ) );
         }
     }
 
@@ -515,7 +515,7 @@ public class Celltype3
         }
     }
 
-    public static class A_phenotype implements update_phenotype
+    public static class A_phenotype extends update_phenotype
     {
         private Model model;
         public A_phenotype(Model model)
@@ -646,9 +646,15 @@ public class Celltype3
 
             phenotype.secretion.secretionRates[nA] = sig.compute_effect();
         }
+
+        @Override
+        public A_phenotype clone()
+        {
+            return new A_phenotype( model );
+        }
     }
 
-    public static class B_phenotype implements update_phenotype
+    public static class B_phenotype extends update_phenotype
     {
         private Model model;
         public B_phenotype(Model model)
@@ -781,9 +787,15 @@ public class Celltype3
             phenotype.secretion.secretionRates[nB] = sig.compute_effect();
 
         }
+
+        @Override
+        public B_phenotype clone()
+        {
+            return new B_phenotype( model );
+        }
     }
 
-    public static class C_phenotype implements update_phenotype
+    public static class C_phenotype extends update_phenotype
     {
         private Model model;
         public C_phenotype(Model model)
@@ -791,6 +803,7 @@ public class Celltype3
             this.model = model;
         }
 
+        @Override
         public void execute(Cell pCell, Phenotype phenotype, double dt)
         {
             Microenvironment microenvironment = pCell.getMicroenvironment();
@@ -913,6 +926,12 @@ public class Celltype3
             sig.add_effect( R, model.getParameter( "C_signal_R" ) );
 
             phenotype.secretion.secretionRates[nC] = sig.compute_effect();
+        }
+
+        @Override
+        public C_phenotype clone()
+        {
+            return new C_phenotype( model );
         }
     }
 }

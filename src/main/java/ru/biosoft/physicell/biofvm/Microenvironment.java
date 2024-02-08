@@ -903,12 +903,12 @@ public class Microenvironment
         }
         
         // set the default substrate to oxygen (with typical units of mmHg)
-        if( microenvironment.options.use_oxygen_as_first_field == true )
-        {
-            microenvironment.setDensity(0, "oxygen" , "mmHg", 1E5, 0.1 );
-//            result.diffusion_coefficients[0] = 1e5; 
-//            result.decay_rates[0] = 0.1; 
-        }
+        //        if( microenvironment.options.use_oxygen_as_first_field == true )
+        //        {
+        //            microenvironment.setDensity(0, "oxygen" , "mmHg", 1E5, 0.1 );
+        ////            result.diffusion_coefficients[0] = 1e5; 
+        ////            result.decay_rates[0] = 0.1; 
+        //        }
         
         // resize the microenvironment  
         if( default_microenvironment_options.simulate_2D == true )

@@ -102,7 +102,7 @@ public class CellFunctions
             result.instantiate_cell = instantiate_cell == null ? null : instantiate_cell.getClass().newInstance();
             result.updateVolume = updateVolume == null ? null : updateVolume.getClass().newInstance();
             result.update_migration_bias = update_migration_bias == null ? null : update_migration_bias.getClass().newInstance();
-            result.updatePhenotype = updatePhenotype == null ? null : updatePhenotype.getClass().newInstance();
+            result.updatePhenotype = updatePhenotype == null ? null : updatePhenotype.clone();
             result.pre_update_intracellular = pre_update_intracellular == null ? null : pre_update_intracellular.getClass().newInstance();
             result.post_update_intracellular = post_update_intracellular == null ? null
                     : post_update_intracellular.getClass().newInstance();
@@ -134,10 +134,21 @@ public class CellFunctions
         public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
-    @FunctionalInterface
-    public static interface update_phenotype
+    public static abstract class update_phenotype implements Cloneable
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
+        public abstract void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
+
+        public update_phenotype clone()
+        {
+            try
+            {
+            return (update_phenotype)super.clone();
+            }
+            catch( Exception ex )
+            {
+                return null;
+            }
+        }
     }
 
     @FunctionalInterface
