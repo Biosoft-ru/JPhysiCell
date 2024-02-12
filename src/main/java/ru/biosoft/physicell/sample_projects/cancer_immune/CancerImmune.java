@@ -82,7 +82,7 @@ import ru.biosoft.physicell.ui.Visualizer;
 
 public class CancerImmune
 {
-    public static boolean use2D = true;
+    public static boolean use2D = false;
 
     public static void init(Model model) throws Exception
     {

@@ -78,12 +78,12 @@
 		<x_max>750</x_max>
 		<y_min>-750</y_min>
 		<y_max>750</y_max>
-		<z_min>-10</z_min><!--750-->
-		<z_max>10</z_max>
+		<z_min>-750</z_min>
+		<z_max>750</z_max>
 		<dx>20</dx>
 		<dy>20</dy>
 		<dz>20</dz>
-		<use_2D>true</use_2D>
+		<use_2D>false</use_2D>
 	</domain>
 	
 	<!-- [-750,750]^3 --> 
@@ -134,14 +134,6 @@
 			</physical_parameter_set>
 			<initial_condition units="mmHg">38</initial_condition>
 			<Dirichlet_boundary_condition units="mmHg" enabled="true">38</Dirichlet_boundary_condition>
-			        <Dirichlet_options>
-          <boundary_value ID="xmin" enabled="True">38</boundary_value>
-          <boundary_value ID="xmax" enabled="True">38</boundary_value>
-          <boundary_value ID="ymin" enabled="True">38</boundary_value>
-          <boundary_value ID="ymax" enabled="True">38</boundary_value>
-          <boundary_value ID="zmin" enabled="False">38</boundary_value>
-          <boundary_value ID="zmax" enabled="False">38</boundary_value>
-        </Dirichlet_options>
 		</variable>
 		
 		<variable name="immunostimulatory factor" units="dimensionless" ID="1">
@@ -275,7 +267,7 @@
 				<secretion>
 					<substrate name="oxygen">
 						<secretion_rate units="1/min">0</secretion_rate>
-						<secretion_target units="substrate density">1</secretion_target>
+						<secretion_target units="substrate density">38</secretion_target>
 						<uptake_rate units="1/min">10</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 
@@ -302,7 +294,6 @@
 				<max_attachment_distance units="micron">18.0</max_attachment_distance>
 				<min_attachment_distance units="micron">14.0</min_attachment_distance>
 			</custom_data>
-			
 		</cell_definition>
 
 		<cell_definition name="immune cell" ID="1" parent_type="cancer cell">
@@ -340,7 +331,7 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 
 		<!-- main --> 
-		<immune_activation_time type="double" units="min">10080</immune_activation_time> <!--20160 -->
+		<immune_activation_time type="double" units="min">20160</immune_activation_time> <!--20160 -->
 			<!-- activate in 7 days --> 
 		<save_interval_after_therapy_start type="double" units="min">15.0</save_interval_after_therapy_start>
 		<SVG_interval_after_therapy_start type="double" units="min">3.0</SVG_interval_after_therapy_start>
