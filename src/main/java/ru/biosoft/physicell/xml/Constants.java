@@ -13,7 +13,7 @@ public class Constants
     public static final String DX = "dx";
     public static final String DY = "dy";
     public static final String DZ = "dz";
-    public static final String USE_2D = "used_2d";
+    public static final String USE_2D = "use_2D";
     public static final String OVERALL = "overall";
     public static final String MAX_TIME = "max_time";
     public static final String UNITS = "units";
