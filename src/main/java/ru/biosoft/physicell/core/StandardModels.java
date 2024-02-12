@@ -197,15 +197,11 @@ public class StandardModels
     {
         // set default parameters for apoptosis
         apoptosis_parameters.time_units = "min";
-
         apoptosis_parameters.cytoplasmic_biomass_change_rate = 1.0 / 60.0;
         apoptosis_parameters.nuclear_biomass_change_rate = 0.35 / 60.0;
-
         apoptosis_parameters.unlysed_fluid_change_rate = 3.0 / 60.0;
         apoptosis_parameters.lysed_fluid_change_rate = 0.0;
-
-        apoptosis_parameters.calcification_rate = 0.0;
-
+        apoptosis_parameters.calcification_rate = 0;
         apoptosis_parameters.relative_rupture_volume = 2.0;
 
         // set up the apoptosis model
@@ -217,17 +213,15 @@ public class StandardModels
         // triggers the appropriate entry function, and note that 
         // it should trigger cell removal at its end 
         apoptosis.add_phase( PhysiCellConstants.apoptotic, "Apoptotic" );
-        apoptosis.phases.get( 0 ).entryFunction = new PhaseEntry.standard_apoptosis_entry_function();//standard_apoptosis_entry_function;
+        apoptosis.phases.get( 0 ).entryFunction = new PhaseEntry.standard_apoptosis_entry_function();
         apoptosis.phases.get( 0 ).removalAtExit = true;
 
         // add an empty junk debris phase for this model 
         apoptosis.add_phase( PhysiCellConstants.debris, "Debris" );
 
-        // Add a link between these phases. Set the cell to be removed 
-        // upon this transition. (So the "debris" phase should never be entered). 
+        // Add a link between these phases. Set the cell to be removed upon this transition. (So the "debris" phase should never be entered). 
         apoptosis.add_phase_link( 0, 1, null );
-        //        apoptosis.transition_rate( 0, 1 ) = 1.0 / ( 8.6 * 60.0 );
-        apoptosis.setTransitionRate( 0, 1, 1.0 / ( 8.6 * 60.0 ) );
+        apoptosis.setBasicTransitionRate( 0, 1, 1.0 / ( 8.6 * 60.0 ) );
         // Use the deterministic model, where this phase has fixed duration
         apoptosis.phase_link( 0, 1 ).fixedDuration = true;
     }
@@ -236,15 +230,11 @@ public class StandardModels
     {
         // set default parameters for necrosis
         necrosis_parameters.time_units = "min";
-
         necrosis_parameters.cytoplasmic_biomass_change_rate = 0.0032 / 60.0;
         necrosis_parameters.nuclear_biomass_change_rate = 0.013 / 60.0;
-
         necrosis_parameters.unlysed_fluid_change_rate = 0.67 / 60.0;
         necrosis_parameters.lysed_fluid_change_rate = 0.050 / 60.0;
-
         necrosis_parameters.calcification_rate = 0.0042 / 60.0;
-
         necrosis_parameters.relative_rupture_volume = 2.0;
 
         // set up the necrosis model 
@@ -262,14 +252,11 @@ public class StandardModels
         // add an empty junk debris phase for this model 
         necrosis.add_phase( PhysiCellConstants.debris, "Debris" );
 
-
         necrosis.add_phase_link( 0, 1, new PhaseArrest.standard_necrosis_arrest_function() );
         necrosis.add_phase_link( 1, 2, null );
 
-        necrosis.setTransitionRate( 0, 1, 9E9 );
-        necrosis.setTransitionRate( 1, 2, 1.0 / ( 60.0 * 24.0 * 60.0 ) );
-        //        necrosis.transition_rate( 0, 1 ) = 9e9; // set high so it's always evaluating against the "arrest" 
-        //        necrosis.transition_rate( 1, 2 ) = 1.0 / ( 60.0 * 24.0 * 60.0 ); // 60 days max  
+        necrosis.setBasicTransitionRate( 0, 1, 9E9 ); // set high so it's always evaluating against the "arrest"
+        necrosis.setBasicTransitionRate( 1, 2, 1.0 / ( 60.0 * 24.0 * 60.0 ) ); // 60 days max  
 
         // Deterministically remove the necrotic cell if it has been 60 days
         necrosis.phase_link( 1, 2 ).fixedDuration = true;
@@ -301,9 +288,9 @@ public class StandardModels
         Ki67_advanced.phase_link( 1, 2 ).fixedDuration = true;
         Ki67_advanced.phase_link( 2, 0 ).fixedDuration = true;
 
-        Ki67_advanced.setTransitionRate( 0, 1, 1.0 / ( 3.62 * 60.0 ) );// MCF10A cells ~3.62 hours in Ki67- in this fitted model
-        Ki67_advanced.setTransitionRate( 1, 2, 1.0 / ( 13.0 * 60.0 ) );
-        Ki67_advanced.setTransitionRate( 2, 0, 1.0 / ( 2.5 * 60.0 ) );
+        Ki67_advanced.setBasicTransitionRate( 0, 1, 1.0 / ( 3.62 * 60.0 ) );// MCF10A cells ~3.62 hours in Ki67- in this fitted model
+        Ki67_advanced.setBasicTransitionRate( 1, 2, 1.0 / ( 13.0 * 60.0 ) );
+        Ki67_advanced.setBasicTransitionRate( 2, 0, 1.0 / ( 2.5 * 60.0 ) );
 
         Ki67_advanced.phases.get( 0 ).entryFunction = null; // standard_Ki67_negative_phase_entry_function;
         Ki67_advanced.phases.get( 1 ).entryFunction = new PhaseEntry.standard_Ki67_positive_phase_entry_function();
@@ -324,8 +311,8 @@ public class StandardModels
         Ki67_basic.add_phase_link( 0, 1, null ); // - to +
         Ki67_basic.add_phase_link( 1, 0, null ); // + to - 
 
-        Ki67_basic.setTransitionRate( 0, 1, 1.0 / ( 4.59 * 60.0 ) ); // MCF10A cells are ~4.59 hours in Ki67- state
-        Ki67_basic.setTransitionRate( 1, 0, 1.0 / ( 15.5 * 60.0 ) );// length of Ki67+ states in advanced model 
+        Ki67_basic.setBasicTransitionRate( 0, 1, 1.0 / ( 4.59 * 60.0 ) ); // MCF10A cells are ~4.59 hours in Ki67- state
+        Ki67_basic.setBasicTransitionRate( 1, 0, 1.0 / ( 15.5 * 60.0 ) );// length of Ki67+ states in advanced model 
         Ki67_basic.phase_link( 1, 0 ).fixedDuration = true;
 
         Ki67_basic.phases.get( 0 ).entryFunction = null; // standard_Ki67_negative_phase_entry_function;
@@ -342,7 +329,7 @@ public class StandardModels
         live.add_phase( PhysiCellConstants.live, "Live" );
         live.phases.get( 0 ).divisionAtExit = true;
         live.add_phase_link( 0, 0, null );
-        live.setTransitionRate( 0, 0, 0.0432 / 60.0 ); // MCF10A have ~0.04 1/hr net birth rate
+        live.setBasicTransitionRate( 0, 0, 0.0432 / 60.0 ); // MCF10A have ~0.04 1/hr net birth rate
         live.phases.get( 0 ).entryFunction = new PhaseEntry.StandardLivePhaseEntry();
     }
 
@@ -364,21 +351,16 @@ public class StandardModels
         flow_cytometry_cycle_model.add_phase_link( 1, 2, null ); // S to G2/M
         flow_cytometry_cycle_model.add_phase_link( 2, 0, null ); // G2/M to G0/G1 
 
-        // need reference values! 
-        // https://www.ncbi.nlm.nih.gov/books/NBK9876/
-        //        flow_cytometry_cycle_model.transition_rate( 0, 1 ) = 0.00324; // 5.15 hours in G0/G1 by fitting 
-        //        flow_cytometry_cycle_model.transition_rate( 1, 2 ) = 0.00208; // 8 hours in S
-        //        flow_cytometry_cycle_model.transition_rate( 2, 0 ) = 0.00333; // 5 hours in G2/M 
-        flow_cytometry_cycle_model.setTransitionRate( 0, 1, 0.00324 );// 5.15 hours in G0/G1 by fitting 
-        flow_cytometry_cycle_model.setTransitionRate( 1, 2, 0.00208 );// 8 hours in S
-        flow_cytometry_cycle_model.setTransitionRate( 2, 0, 0.00333 );// 5 hours in G2/M 
+        // need reference values! https://www.ncbi.nlm.nih.gov/books/NBK9876/
+        flow_cytometry_cycle_model.setBasicTransitionRate( 0, 1, 0.00324 );// 5.15 hours in G0/G1 by fitting 
+        flow_cytometry_cycle_model.setBasicTransitionRate( 1, 2, 0.00208 );// 8 hours in S
+        flow_cytometry_cycle_model.setBasicTransitionRate( 2, 0, 0.00333 );// 5 hours in G2/M 
 
         flow_cytometry_cycle_model.phases.get( 0 ).entryFunction = null; //  ;
         flow_cytometry_cycle_model.phases.get( 1 ).entryFunction = new PhaseEntry.SPhaseEntry();// S_phase_entry_function; // Double nuclear volume ;
         flow_cytometry_cycle_model.phases.get( 2 ).entryFunction = null;
 
-        // // expanded flow cytometry model 
-
+        // expanded flow cytometry model 
         flow_cytometry_separated_cycle_model.code = PhysiCellConstants.flow_cytometry_separated_cycle_model;
         flow_cytometry_separated_cycle_model.name = "Flow cytometry model (separated)";
 
@@ -397,14 +379,10 @@ public class StandardModels
         flow_cytometry_separated_cycle_model.add_phase_link( 3, 0, null ); // M to G0/G1 
 
         // need reference values! 
-        //        flow_cytometry_separated_cycle_model.transition_rate( 0, 1 ) = 0.00335; // 4.98 hours in G0/G1
-        //        flow_cytometry_separated_cycle_model.transition_rate( 1, 2 ) = 0.00208; // 8 hours in S  
-        //        flow_cytometry_separated_cycle_model.transition_rate( 2, 3 ) = 0.00417; // 4 hours in G2 
-        //        flow_cytometry_separated_cycle_model.transition_rate( 3, 0 ) = 0.0167; // 1 hour in M 
-        flow_cytometry_separated_cycle_model.setTransitionRate( 0, 1, 0.00335 );// 4.98 hours in G0/G1
-        flow_cytometry_separated_cycle_model.setTransitionRate( 1, 2, 0.00208 );// 8 hours in S 
-        flow_cytometry_separated_cycle_model.setTransitionRate( 2, 3, 0.00417 );// 4 hours in G2
-        flow_cytometry_separated_cycle_model.setTransitionRate( 3, 0, 0.0167 );// 1 hour in M 
+        flow_cytometry_separated_cycle_model.setBasicTransitionRate( 0, 1, 0.00335 );// 4.98 hours in G0/G1
+        flow_cytometry_separated_cycle_model.setBasicTransitionRate( 1, 2, 0.00208 );// 8 hours in S 
+        flow_cytometry_separated_cycle_model.setBasicTransitionRate( 2, 3, 0.00417 );// 4 hours in G2
+        flow_cytometry_separated_cycle_model.setBasicTransitionRate( 3, 0, 0.0167 );// 1 hour in M 
 
         flow_cytometry_separated_cycle_model.phases.get( 0 ).entryFunction = null; //  ;
         flow_cytometry_separated_cycle_model.phases.get( 1 ).entryFunction = new PhaseEntry.SPhaseEntry(); // Double nuclear volume ;
@@ -415,26 +393,17 @@ public class StandardModels
     static void create_cycling_quiescent_model() throws Exception
     {
         // Ki67_basic: 
-
         cycling_quiescent.code = PhysiCellConstants.cycling_quiescent_model;
         cycling_quiescent.name = "Cycling-Quiescent model";
-
         cycling_quiescent.data.timeUnits = "min";
-
         cycling_quiescent.add_phase( PhysiCellConstants.quiescent, "Quiescent" );
         cycling_quiescent.add_phase( PhysiCellConstants.cycling, "Cycling" );
-
         cycling_quiescent.phases.get( 1 ).divisionAtExit = true;
-
         cycling_quiescent.add_phase_link( 0, 1, null ); // Q to C
         cycling_quiescent.add_phase_link( 1, 0, null ); // C to Q 
-
-        //        cycling_quiescent.transition_rate( 0, 1 ) = 1.0 / ( 4.59 * 60.0 ); // MCF10A cells are ~4.59 hours in Ki67- state
-        //        cycling_quiescent.transition_rate( 1, 0 ) = 1.0 / ( 15.5 * 60.0 ); // length of Ki67+ states in advanced model 
-        cycling_quiescent.setTransitionRate( 0, 1, 1.0 / ( 4.59 * 60.0 ) ); // MCF10A cells are ~4.59 hours in Ki67- state
-        cycling_quiescent.setTransitionRate( 1, 0, 1.0 / ( 15.5 * 60.0 ) );// length of Ki67+ states in advanced model 
+        cycling_quiescent.setBasicTransitionRate( 0, 1, 1.0 / ( 4.59 * 60.0 ) ); // MCF10A cells are ~4.59 hours in Ki67- state
+        cycling_quiescent.setBasicTransitionRate( 1, 0, 1.0 / ( 15.5 * 60.0 ) );// length of Ki67+ states in advanced model 
         cycling_quiescent.phase_link( 1, 0 ).fixedDuration = true;
-
         cycling_quiescent.phases.get( 0 ).entryFunction = null;
         cycling_quiescent.phases.get( 1 ).entryFunction = new PhaseEntry.StandardCyclingEntry();//standard_cycling_entry_function;
     }
@@ -624,7 +593,7 @@ public class StandardModels
     public static class update_cell_and_death_parameters_O2_based extends update_phenotype
     {
         @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt)
+        public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
         {
             // supported cycle models:
             // advanced_Ki67_cycle_model= 0;
@@ -715,6 +684,7 @@ public class StandardModels
             // now, update the appropriate cycle transition rate 
             //            pCell.parameters.pReference_live_phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index )\
             //            double base = pCell.parameters.pReference_live_phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index );
+            //            System.out.println( pCell.toString() + " " + multiplier );
             phenotype.cycle.data.modifyTransitionRate( start_phase_index, end_phase_index, multiplier );
 
             // Update necrosis rate
@@ -730,14 +700,10 @@ public class StandardModels
             }
 
             // now, update the necrosis rate 
-
-            //        pCell.phenotype.death.rates[necrosis_index] = multiplier * pCell.parameters.max_necrosis_rate;
             pCell.phenotype.death.rates.set( necrosis_index, multiplier * pCell.parameters.max_necrosis_rate );
             // check for deterministic necrosis 
-
             if( pCell.parameters.necrosis_type == PhysiCellConstants.deterministic_necrosis && multiplier > 1e-16 )
             {
-                //            pCell.phenotype.death.rates[necrosis_index] = 9e99;
                 pCell.phenotype.death.rates.set( necrosis_index, 9e99 );
             }
         }

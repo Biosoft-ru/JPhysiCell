@@ -1144,17 +1144,10 @@ public class Cell extends BasicAgent
         //
         //        }
 
-        //  if( functions.update_phenotype )
-        //  { functions.update_phenotype( this , phenotype , dt_ ); }
-
         // call the custom code to update the phenotype 
         if( functions.updatePhenotype != null )
         {
             functions.updatePhenotype.execute( this, phenotype, dt_ );
-        }
-        else
-        {
-            double a = 3;
         }
 
         // update volume 
@@ -1164,7 +1157,6 @@ public class Cell extends BasicAgent
 
             // The following line is needed in every volume 
             // regulation method (it sets BioFVM total_volume)
-
             setTotalVolume( phenotype.volume.total );
         }
 

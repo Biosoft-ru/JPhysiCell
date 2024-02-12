@@ -128,7 +128,7 @@ public class CycleModel implements Cloneable
     public int add_phase_link(int start_index, int end_index, double rate, PhaseArrest arrestFunction) throws Exception
     {
         int n = add_phase_link( start_index, end_index, arrestFunction );
-        data.setTransitionRate( start_index, end_index, rate );
+        data.setBasicTransitionRate( start_index, end_index, rate );
         return n;
     }
 
@@ -181,11 +181,18 @@ public class CycleModel implements Cloneable
         return sb.toString();
     }
 
-
-    //    double& ::transition_rate( int start_index , int end_index )
     public double transition_rate(int start_index, int end_index)
     {
         return data.getTransitionRate( start_index, end_index );
+    }
+
+    /**
+     * Sets basic transition rate 
+     */
+    public void setBasicTransitionRate(int start_index, int end_index, double rate)
+    {
+        data.setBasicTransitionRate( start_index, end_index, rate );
+        data.setTransitionRate( start_index, end_index, rate );
     }
 
     public void setTransitionRate(int start_index, int end_index, double rate)

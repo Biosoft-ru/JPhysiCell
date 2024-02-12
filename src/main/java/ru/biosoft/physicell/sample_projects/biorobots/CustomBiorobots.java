@@ -1,14 +1,11 @@
 package ru.biosoft.physicell.sample_projects.biorobots;
 
 import java.awt.Color;
-import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.CellFunctions.update_phenotype;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
 import ru.biosoft.physicell.core.SignalBehavior;
 import ru.biosoft.physicell.core.StandardModels;
@@ -32,6 +29,7 @@ public class CustomBiorobots
 
     public static void init(Model m) throws Exception
     {
+        PhysiCellUtilities.setSeed( m.getParameterInt( "random_seed" ) );
         createCellTypes( m );
         setupTissue( m );
         setColors( m );
@@ -39,23 +37,16 @@ public class CustomBiorobots
 
     static void createCellTypes(Model m) throws Exception
     {
-        PhysiCellUtilities.setSeed( m.getParameterInt( "random_seed" ) );
         SignalBehavior.setup_signal_behavior_dictionaries( m.getMicroenvironment() );
-        double elastic_coefficient = m.getParameterDouble( "elastic_coefficient" );
-        double threshold = m.getParameterDouble( "drop_threshold" ); // 0.4; 
-        double attached_worker_migration_bias = m.getParameterDouble( "attached_worker_migration_bias" );
-        double unattached_worker_migration_bias = m.getParameterDouble( "unattached_worker_migration_bias" );
-
         CellDefinition pCD = CellDefinition.getCellDefinition( "director cell" );
         pCD.functions.updatePhenotype = new DirectorCellRule();
 
         pCD = CellDefinition.getCellDefinition( "cargo cell" );
-        pCD.functions.updatePhenotype = new CargoCellRule( elastic_coefficient );
+        pCD.functions.updatePhenotype = new CargoCellRule( m );
         pCD.functions.contact_function = new StandardModels.standard_elastic_contact_function();
 
         pCD = CellDefinition.getCellDefinition( "worker cell" );
-        pCD.functions.updatePhenotype = new WorkerCellRule( threshold, attached_worker_migration_bias, unattached_worker_migration_bias,
-                elastic_coefficient );
+        pCD.functions.updatePhenotype = new WorkerCellRule( m );
         pCD.functions.contact_function = new StandardModels.standard_elastic_contact_function();
     }
 
@@ -143,100 +134,6 @@ public class CustomBiorobots
             Cell.createCell( pWorkerDef, m, position );
         }
         System.out.println( "Done!" );
-    }
-
-    public static class DirectorCellRule extends update_phenotype
-    {
-        @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt)
-        {
-            return;
-        }
-    }
-
-    public static class CargoCellRule extends update_phenotype
-    {
-        private double elasticCoefficient;
-
-        public CargoCellRule(double elasticCoefficient)
-        {
-            this.elasticCoefficient = elasticCoefficient;
-        }
-
-        @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
-        {
-            SignalBehavior.setSingleBehavior( pCell, "cell-cell adhesion elastic constant", elasticCoefficient );
-        }
-    }
-
-    public static class WorkerCellRule extends update_phenotype
-    {
-        private double attachedMigrationBias;
-        private double unattachedMigrationBias;
-        private double elasticCoefficient;
-        private double threshold;
-
-        public WorkerCellRule(double dropThreshold, double attachedMigrationBias, double unattachedMigrationBias,
-                double elasticCoefficient)
-        {
-            this.threshold = dropThreshold;
-            this.attachedMigrationBias = attachedMigrationBias;
-            this.unattachedMigrationBias = unattachedMigrationBias;
-            this.elasticCoefficient = elasticCoefficient;
-        }
-
-        @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
-        {
-            double director_signal = SignalBehavior.get_single_signal( pCell, "director signal" );
-            double cargo_signal = SignalBehavior.get_single_signal( pCell, "cargo signal" );
-
-            SignalBehavior.setSingleBehavior( pCell, "cell-cell adhesion elastic constant", elasticCoefficient );
-
-            // have I arrived? If so, release my cargo set chemotaxis weights to seek cargo set migration bias 
-            if( director_signal > threshold )
-            {
-                // set receptor = 0 for cells we're detaching from and set their cycle rate to zero 
-                for( Cell pTemp : pCell.state.attachedCells )
-                {
-                    SignalBehavior.setSingleBehavior( pTemp, "custom:receptor", 0.0 );
-                    SignalBehavior.setSingleBehavior( pTemp, "cycle entry", 0.0 );
-                }
-                pCell.remove_all_attached_cells();
-
-                SignalBehavior.setSingleBehavior( pCell, "chemotactic response to director signal", 0.0 );
-                SignalBehavior.setSingleBehavior( pCell, "chemotactic response to cargo signal", 1.0 );
-                SignalBehavior.setSingleBehavior( pCell, "migration bias", unattachedMigrationBias );
-            }
-
-            // am I searching for cargo? if so, see if I've found it
-            if( pCell.state.numberAttachedCells() == 0 )
-            {
-                Set<Cell> nearby = pCell.cells_in_my_container();
-                for( Cell cell : nearby )//int i=0; i < nearby.size(); i++ )
-                {
-                    // if it is expressing the receptor, dock with it set chemotaxis weights set migration bias 
-                    if( cell == pCell )
-                        continue;
-                    double receptor = SignalBehavior.get_single_signal( cell, "custom:receptor" );
-
-                    if( receptor > 0.5 )
-                    {
-                        Cell.attach_cells( pCell, cell );
-                        SignalBehavior.setSingleBehavior( cell, "custom:receptor", 0.0 );
-                        SignalBehavior.setSingleBehavior( cell, "director signal secretion", 0.0 );
-                        SignalBehavior.setSingleBehavior( cell, "cargo signal secretion", 0.0 );
-
-                        SignalBehavior.setSingleBehavior( pCell, "chemotactic response to director signal", 1.0 );
-                        SignalBehavior.setSingleBehavior( pCell, "chemotactic response to cargo signal", 0.0 );
-                        SignalBehavior.setSingleBehavior( pCell, "migration bias", attachedMigrationBias );
-
-                    }
-                }
-
-            }
-        }
     }
 
     /** 

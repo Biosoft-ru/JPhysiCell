@@ -81,30 +81,23 @@ public class Main
     {
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
-        //        else
-        //            resultPath = Main.class.getResource( "" ).getFile() + resultPath;
 
-		if (!new File(resultPath).exists())
-			new File(resultPath).mkdirs();
+        if( !new File( resultPath ).exists() )
+            new File( resultPath ).mkdirs();
 
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
 
         Model model = new ModelReader().read( settings );
+
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
-        model.setLogFile( resultPath + "/log.txt" );
-        model.addVisualizer( 0, "figure1" ).setDrawDensity( false );//.setStubstrateIndex( 1 ).setMaxDensity( 1 );
-        ;// ..setDrawDensity( false );
-        //        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
-        //        model.addVisualizer( 0, "figure1" ).setStubstrateIndex( 2 ).setMaxDensity( 0.01 );
-        //        model.addVisualizer( 0, "figure2" ).setStubstrateIndex( 2 ).setMaxDensity( 0.1 );
-        //        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
+        model.setLogFile( resultPath + "/log_no_apop.txt" );
+        model.addVisualizer( 0, "figure1_no_apop" ).setDrawDensity( false );//.setStubstrateIndex( 1 ).setMaxDensity( 1 );
 
         /* Users typically start modifying here. START USERMODS */
         Heterogeneity.init( model );
         /* Users typically stop modifying here. END USERMODS */
-
         model.simulate();
     }
 }

@@ -1,6 +1,7 @@
 package ru.biosoft.physicell.sample_projects.celltypes3;
 
 import java.io.File;
+import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
@@ -74,28 +75,25 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
 
-    private static String path = "src/main/java/ru/biosoft/physicell/sample_projects/celltypes3/config/PhysiCell_settings.xml";
-    private static String resultPath = "src/main/java/ru/biosoft/physicell/sample_projects/celltypes3/result";
+    private static String settingsPath = "config/PhysiCell_settings.xml";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/celltype3/result2";
 
     public static void main(String ... strings) throws Exception
     {
+        if( strings != null && strings.length > 0 )
+            resultPath = strings[0];
+
         if( !new File( resultPath ).exists() )
             new File( resultPath ).mkdirs();
 
-        File settings = new File( path );
+        InputStream settings = Main.class.getResourceAsStream( settingsPath );
 
         Model model = new ModelReader().read( settings );
-
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
 
-        model.addVisualizer( 0, "figure0" ).setDrawDensity( false );//.setStubstrateIndex( 1 ).setMaxDensity( 1 );
-        ;// ..setDrawDensity( false );
-         //        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
-         //        model.addVisualizer( 0, "figure1" ).setStubstrateIndex( 2 ).setMaxDensity( 0.01 );
-         //        model.addVisualizer( 0, "figure2" ).setStubstrateIndex( 2 ).setMaxDensity( 0.1 );
-         //        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
+        model.addVisualizer( 0, "figure0" ).setDrawDensity( false );
 
         /* Users typically start modifying here. START USERMODS */
         Celltype3.init( model );
@@ -103,51 +101,4 @@ public class Main
 
         model.simulate();
     }
-
-/*	
-	// testing here 
-	
-	std::cout << " testing ... " << std::endl; 
-	
-	up_down_signal model; 
-	model.display(); 
-	
-	model.add_effect( 0.2 , 'p' );  
-	model.display(); 
-	
-	model.add_effect( 0.2 , 'p' );  
-	model.display(); 
-	
-	model.add_effect( 0.2 , 'n' );  
-	model.display(); 
-
-	model.add_effect( 0.2 , 'p' );  
-	model.display(); 
-	
-	model.add_effect( 1 , 'p' );  
-	model.display(); 
-	
-	model.add_effect( 0.1 , 'i' );  
-	model.display(); 
-
-	model.add_effect( 0.9 , 'i' );  
-	model.display(); 
-
-	model.add_effect( 0.9 , 'i' );  
-	model.display(); 
-
-	model.reset(); 
-	model.display(); 
-	
-	model.add_effect( 1 , 'i' );  
-	model.display(); 
-
-	model.add_effect( 1 , 'p' );  
-	model.display(); 
-
-	model.add_effect( 10 , 'p' );  
-	model.display(); 
-
-	exit(-1); 
-*/
 }

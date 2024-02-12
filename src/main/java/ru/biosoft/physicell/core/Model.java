@@ -133,12 +133,11 @@ public class Model
                     {
                         for( Visualizer listener : visualizers )
                             listener.saveResult( m, curTime );
-                        
-                        
-                        String info = PhysiCellUtilities.getCurrentTime() + "\tElapsed\t" + ( System.currentTimeMillis() - startTime ) / 1000
-                                + "\tTime:\t"
-                                + (int)Math.round( curTime ) + "\tCells\t"
-                                + m.getAgentsCount();
+
+                        double[] trans = getAverageTransition( this );
+                        String info = PhysiCellUtilities.getCurrentTime() + "\tElapsed\t"
+                                + ( System.currentTimeMillis() - startTime ) / 1000 + "\tTime:\t" + (int)Math.round( curTime ) + "\tCells\t"
+                                + m.getAgentsCount() + "\t" + trans[0] + "\t" + trans[1];
 
                         if( logFile != null )
                         {
@@ -172,15 +171,19 @@ public class Model
                 //                }
                 //
                 // update the microenvironment
+                //                m.write_to_matlab( resultFolder + "/step_" + -1 + ".txt" );
                 m.simulate_diffusion_decay( diffusion_dt );
-
+                //                m.write_to_matlab( resultFolder + "/step_" + curTime + ".txt" );
                 // run PhysiCell 
+                //                m.write_to_matlab( resultFolder + "/step_" + 0 + ".txt" );
                 ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
-
+                //                m.write_to_matlab( resultFolder + "/step_" + 1 + ".txt" );
+                //                m.write_to_matlab( "C:/Users/Damag/BIOFVM/projects/cancer_immune/AFTERALL2_" + 1 + ".txt" );
                 /*
                   Custom add-ons could potentially go here. 
                 */
                 curTime += diffusion_dt;
+
             }
 
             for( Visualizer listener : visualizers )
@@ -210,7 +213,23 @@ public class Model
         {
             ex.printStackTrace();
         }
+    }
 
+    public double[] getAverageTransition(Model model)
+    {
+        double sum = 0;
+        int number = 0;
+        for( Cell cell : model.getMicroenvironment().getAgents( Cell.class ) )
+        {
+            if( cell.phenotype.cycle.code != 5 )
+                continue;
+            number++;
+            //            double prot = SignalBehavior.get_single_signal( cell, "custom:oncoprotein" );
+            double rate = cell.phenotype.cycle.transition_rate( 0, 0 );
+            sum += rate;
+        }
+        sum /= number;
+        return new double[] {sum, number};
     }
 
     public void addParameter(String name, String val)
@@ -284,7 +303,7 @@ public class Model
             this.executionTime = executionTime;
         }
     }
-    
+
     public void saveResult()
     {
 

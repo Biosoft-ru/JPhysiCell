@@ -140,16 +140,14 @@ public class CellContainer extends AgentContainer
     {
         // secretions and uptakes. Syncing with BioFVM is automated. 
         //            #pragma omp parallel for 
-        Set<BasicAgent> agents = m.getAgents();
-        for( BasicAgent agent : agents )
+        Set<Cell> cells = m.getAgents( Cell.class );
+        for( Cell cell : cells )
         {
-            Cell cell = (Cell)agent;
             if( !cell.isOutOfDomain )
             {
                 cell.phenotype.secretion.advance( cell, cell.phenotype, diffusion_dt_ );
             }
         }
-
         //if it is the time for running cell cycle, do it!
         double time_since_last_cycle = t - last_cell_cycle_time;
         double phenotype_dt_tolerance = 0.001 * phenotype_dt_;
@@ -157,9 +155,8 @@ public class CellContainer extends AgentContainer
 
         // intracellular update. called for every diffusion_dt, but actually depends on the intracellular_dt of each cell (as it can be noisy)
         //            #pragma omp parallel for 
-        for( BasicAgent agent : agents )
+        for( Cell cell : cells )
         {
-            Cell cell = (Cell)agent;
             if( !cell.isOutOfDomain && initialzed )
             {
                 if( cell.phenotype.intracellular != null && cell.phenotype.intracellular.need_update() )
@@ -189,10 +186,9 @@ public class CellContainer extends AgentContainer
             // new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
             // checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
             //                #pragma omp parallel for 
-            for( BasicAgent agent : agents )
+            for( Cell cell : cells )
             {
-                Cell cell = (Cell)agent;
-                if( cell.isOutOfDomain == false )
+                if( !cell.isOutOfDomain )
                 {
                     cell.advance_bundled_phenotype_functions( time_since_last_cycle );
                 }
@@ -234,9 +230,8 @@ public class CellContainer extends AgentContainer
             // end of new in Feb 2018 
             // perform interactions -- new in June 2020 
             //                #pragma omp parallel for 
-            for( BasicAgent agent : agents )
+            for( Cell cell : cells )
             {
-                Cell cell = (Cell)agent;
                 if( cell.functions.contact_function != null && !cell.isOutOfDomain )
                 {
                     StandardModels.evaluate_interactions( cell, cell.phenotype, time_since_last_mechanics );
@@ -244,9 +239,8 @@ public class CellContainer extends AgentContainer
             }
             // perform custom computations 
             //                #pragma omp parallel for 
-            for( BasicAgent agent : agents )
+            for( Cell cell : cells )
             {
-                Cell cell = (Cell)agent;
                 if( cell.functions.custom_cell_rule != null && !cell.isOutOfDomain )
                 {
                     cell.functions.custom_cell_rule.execute( cell, cell.phenotype, time_since_last_mechanics );
@@ -254,9 +248,8 @@ public class CellContainer extends AgentContainer
             }
             // update velocities 
             //                #pragma omp parallel for 
-            for( BasicAgent agent : agents )
+            for( Cell cell : cells )
             {
-                Cell cell = (Cell)agent;
                 if( cell.functions.updateVelocity != null && !cell.isOutOfDomain && cell.isMovable )
                 {
                     cell.functions.updateVelocity.execute( cell, cell.phenotype, time_since_last_mechanics );
@@ -267,15 +260,13 @@ public class CellContainer extends AgentContainer
             if( !PhysiCellSettings.disable_automated_spring_adhesions )
             {
                 //                    #pragma omp parallel for 
-                for( BasicAgent agent : agents )
+                for( Cell cell : cells )
                 {
-                    Cell cell = (Cell)agent;
                     StandardModels.dynamic_spring_attachments( cell, cell.phenotype, time_since_last_mechanics );
                 }
                 //                    #pragma omp parallel for 
-                for( BasicAgent agent : agents )
+                for( Cell cell : cells )
                 {
-                    Cell cell = (Cell)agent;
                     if( cell.isMovable )
                     {
                         for( Cell pC1 : cell.state.springAttachments )
@@ -296,9 +287,8 @@ public class CellContainer extends AgentContainer
             // new March 2022: 
             // run standard interactions (phagocytosis, attack, fusion) here 
             //                #pragma omp parallel for 
-            for( BasicAgent agent : agents )
+            for( Cell cell : cells )
             {
-                Cell cell = (Cell)agent;
                 StandardModels.standard_cell_cell_interactions( cell, cell.phenotype, time_since_last_mechanics );
             }
             // super-critical to performance! clear the "dummy" cells from phagocytosis / fusion
@@ -320,14 +310,8 @@ public class CellContainer extends AgentContainer
             }
             // update positions         
             //                #pragma omp parallel for 
-            for( BasicAgent agent : agents )
+            for( Cell cell : cells )
             {
-
-                Cell cell = (Cell)agent;
-                if( cell.definition.name.contains( "work" ) )
-                {
-                    double a = 4;
-                }
                 if( cell.isOutOfDomain == false && cell.isMovable )
                 {
                     cell.update_position( time_since_last_mechanics );
@@ -337,19 +321,16 @@ public class CellContainer extends AgentContainer
             // When somebody reviews this code, let's add proper braces for clarity!!! 
 
             // Update cell indices in the container
-            for( BasicAgent agent : agents )
+            for( Cell cell : cells )
             {
-                Cell cell = (Cell)agent;
                 if( !cell.isOutOfDomain && cell.isMovable )
                     cell.update_voxel_in_container();
             }
             last_mechanics_time = t;
         }
-
         initialzed = true;
-        return;
     }
-    //
+
     @Override
     public void register_agent(BasicAgent agent)
     {

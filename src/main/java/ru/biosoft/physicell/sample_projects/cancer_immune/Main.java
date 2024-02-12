@@ -75,14 +75,12 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "/result";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_immune/result2";
 
     public static void main(String ... strings) throws Exception
     {
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
-        else
-            resultPath = Main.class.getResource( "" ).getFile() + resultPath;
 
 		if (!new File(resultPath).exists())
 			new File(resultPath).mkdirs();
@@ -96,11 +94,6 @@ public class Main
         model.setResultFolder( resultPath );
         model.setLogFile( resultPath + "/log.txt" );
         model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
-        ;// ..setDrawDensity( false );
-        //        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
-        //        model.addVisualizer( 0, "figure1" ).setStubstrateIndex( 2 ).setMaxDensity( 0.01 );
-        //        model.addVisualizer( 0, "figure2" ).setStubstrateIndex( 2 ).setMaxDensity( 0.1 );
-        //        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
 
         /* Users typically start modifying here. START USERMODS */
         CancerImmune.init( model );

@@ -1,6 +1,7 @@
 package ru.biosoft.physicell.sample_projects.biorobots;
 
 import java.io.File;
+import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
@@ -73,22 +74,25 @@ import ru.biosoft.physicell.xml.ModelReader;
 */
 public class Main
 {
-    private static String path = "src/main/java/ru/biosoft/physicell/sample_projects/biorobots/config/PhysiCell_settings.xml";
-    private static String resultPath = "src/main/java/ru/biosoft/physicell/sample_projects/biorobots/result";
+    private static String settingsPath = "config/PhysiCell_settings.xml";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/biorobots/result";
 
     public static void main(String ... strings) throws Exception
     {
-		if (!new File(resultPath).exists())
-			new File(resultPath).mkdirs();
+        if( strings != null && strings.length > 0 )
+            resultPath = strings[0];
 
-        File settings = new File( path );
+        if( !new File( resultPath ).exists() )
+            new File( resultPath ).mkdirs();
+
+        InputStream settings = Main.class.getResourceAsStream( settingsPath );
+
         Model model = new ModelReader().read( settings );
 
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
 
-        //        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 0.4 );
         model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
 
         /* Users typically start modifying here. START USERMODS */

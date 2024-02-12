@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-750</x_min>
-		<x_max>750</x_max>
-		<y_min>-750</y_min>
-		<y_max>750</y_max>
+		<x_min>-1000</x_min>
+		<x_max>1000</x_max>
+		<y_min>-1000</y_min>
+		<y_max>1000</y_max>
 		<z_min>-10</z_min><!--750-->
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -134,6 +134,14 @@
 			</physical_parameter_set>
 			<initial_condition units="mmHg">38</initial_condition>
 			<Dirichlet_boundary_condition units="mmHg" enabled="true">38</Dirichlet_boundary_condition>
+			        <Dirichlet_options>
+          <boundary_value ID="xmin" enabled="True">38</boundary_value>
+          <boundary_value ID="xmax" enabled="True">38</boundary_value>
+          <boundary_value ID="ymin" enabled="True">38</boundary_value>
+          <boundary_value ID="ymax" enabled="True">38</boundary_value>
+          <boundary_value ID="zmin" enabled="False">38</boundary_value>
+          <boundary_value ID="zmax" enabled="False">38</boundary_value>
+        </Dirichlet_options>
 		</variable>
 		
 		<variable name="immunostimulatory factor" units="dimensionless" ID="1">
@@ -267,8 +275,8 @@
 				<secretion>
 					<substrate name="oxygen">
 						<secretion_rate units="1/min">0</secretion_rate>
-						<secretion_target units="substrate density">38</secretion_target>
-						<uptake_rate units="1/min">0</uptake_rate><!-- 10-->
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">10</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 
 

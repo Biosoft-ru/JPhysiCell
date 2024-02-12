@@ -695,7 +695,7 @@ public class ModelReader extends Constants
                     int endIndex = getIntAttr( rate, "end_index" );
                     boolean fixedDuration = getBoolAttr( rate, "fixed_duration" );
                     double rateValue = getDoubleVal( rate );
-                    p.cycle.setTransitionRate( startIndex, endIndex, rateValue );
+                    p.cycle.setBasicTransitionRate( startIndex, endIndex, rateValue );
                     p.cycle.phase_link( startIndex, endIndex ).fixedDuration = fixedDuration;
                 }
                 catch( Exception ex )
@@ -722,21 +722,6 @@ public class ModelReader extends Constants
                 p.cycle.phase_links.get( start ).get( 0 ).fixedDuration = fixed;
             }
         }
-
-        //    
-        // now, if we inherited from another cell, AND 
-        // if that parent type has the same cylce model, 
-        //  then overwrite with their transition rates 
-        //    
-        //    if( pParent != null )
-        //    {
-        //        if( cd.phenotype.cycle.code == pParent.phenotype.cycle.code )
-        //        {
-        //            System.out.println( "copying data ..." );
-        //            System.out.println( pParent.name + " to " + cd.name );
-        //            cd.phenotype.cycle.data = pParent.phenotype.cycle.data;
-        //        }
-        //    }
     }
 
     private void readDeath(Element el, Phenotype p) throws Exception
@@ -792,7 +777,7 @@ public class ModelReader extends Constants
                     int end = getIntAttr( transitionElement, "end_index" );
                     boolean fixed = getBoolAttr( transitionElement, "fixed_duration" );
                     double value = getDoubleVal( transitionElement );
-                    p.death.models.get( death_index ).setTransitionRate( start, end, value );
+                    p.death.models.get( death_index ).setBasicTransitionRate( start, end, value );
                     p.death.models.get( death_index ).phase_link( start, end ).fixedDuration = fixed;
                 }
             }

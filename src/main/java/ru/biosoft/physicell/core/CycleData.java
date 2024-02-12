@@ -143,11 +143,16 @@ public class CycleData
         return transitionRates.get( start_phase_index ).get( index );
     }
 
+    public void setBasicTransitionRate(int start_phase_index, int end_phase_index, double rate)
+    {
+        int index = cycleModel.inverse_index_maps.get( start_phase_index ).get( end_phase_index );
+        basicRates.get( start_phase_index ).set( index, rate );
+    }
+
     public void setTransitionRate(int start_phase_index, int end_phase_index, double rate)
     {
         int index = cycleModel.inverse_index_maps.get( start_phase_index ).get( end_phase_index );
         transitionRates.get( start_phase_index ).set( index, rate );
-        basicRates.get( start_phase_index ).set( index, rate );
     }
 
     public void modifyTransitionRate(int start_phase_index, int end_phase_index, double multiplier)

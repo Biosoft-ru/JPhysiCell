@@ -357,7 +357,6 @@ public class Microenvironment
                         getDensity( i )[j] = dirichlet_value_vectors[i][j];
                     }
                 }
-
             }
         }
         return;
@@ -803,8 +802,9 @@ public class Microenvironment
         dirichlet_indices.push_back( voxel_index );
         dirichlet_value_vectors.push_back( value ); 
         */
-
-        dirichlet_value_vectors[voxel_index] = value; // .assign( mesh.voxels.size(), one ); 
+        if( value[0] == 1 )
+            System.out.println( "s" );
+        dirichlet_value_vectors[voxel_index] = value.clone(); // .assign( mesh.voxels.size(), one ); 
     }
 
     public double[][] gradient_vector(int n)
