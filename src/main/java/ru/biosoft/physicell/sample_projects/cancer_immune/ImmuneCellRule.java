@@ -10,7 +10,7 @@ public class ImmuneCellRule implements custom_cell_rule
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        int attach_lifetime_i = pCell.custom_data.find_variable_index( "attachment_lifetime" );
+        int attach_lifetime_i = pCell.custom_data.findVariableIndex( "attachment_lifetime" );
 
         if( phenotype.death.dead == true )
         {
@@ -44,8 +44,8 @@ public class ImmuneCellRule implements custom_cell_rule
             // if I dettach, resume motile behavior 
             if( detach_me )
             {
-                Cell.detach_cells( pCell, attached );
-                phenotype.motility.is_motile = true;
+                Cell.detachCells( pCell, attached );
+                phenotype.motility.isMotile = true;
             }
             return;
         }
@@ -55,28 +55,28 @@ public class ImmuneCellRule implements custom_cell_rule
         if( immune_cell_check_neighbors_for_attachment( pCell, dt ) != null )
         {
             // set motility off 
-            phenotype.motility.is_motile = false;
+            phenotype.motility.isMotile = false;
             return;
         }
-        phenotype.motility.is_motile = true;
+        phenotype.motility.isMotile = true;
     }
 
     static boolean immune_cell_trigger_apoptosis(Cell pAttacker, Cell pTarget)
     {
-        int apoptosis_model_index = pTarget.phenotype.death.find_death_model_index( "apoptosis" );
+        int apoptosis_model_index = pTarget.phenotype.death.findDeathModelIndex( "apoptosis" );
         if( pTarget.phenotype.death.dead == true )
         {
             return false; // if the Target cell is already dead, don't bother!
         }
-        pTarget.start_death( apoptosis_model_index );
+        pTarget.startDeath( apoptosis_model_index );
         return true;
     }
 
     static boolean immune_cell_attempt_apoptosis(Cell pAttacker, Cell pTarget, double dt)
     {
-        int oncoprotein_i = pTarget.custom_data.find_variable_index( "oncoprotein" );
-        int apoptosis_model_index = pTarget.phenotype.death.find_death_model_index( "apoptosis" );
-        int kill_rate_index = pAttacker.custom_data.find_variable_index( "kill_rate" );
+        int oncoprotein_i = pTarget.custom_data.findVariableIndex( "oncoprotein" );
+        int apoptosis_model_index = pTarget.phenotype.death.findDeathModelIndex( "apoptosis" );
+        int kill_rate_index = pAttacker.custom_data.findVariableIndex( "kill_rate" );
 
         double oncoprotein_saturation = pAttacker.custom_data.get( "oncoprotein_saturation" ); // 2.0; 
         double oncoprotein_threshold = pAttacker.custom_data.get( "oncoprotein_threshold" ); // 0.5; // 0.1; 
@@ -120,8 +120,8 @@ public class ImmuneCellRule implements custom_cell_rule
 
     static boolean immune_cell_attempt_attachment(Cell pAttacker, Cell pTarget, double dt)
     {
-        int oncoprotein_i = pTarget.custom_data.find_variable_index( "oncoprotein" );
-        int attach_rate_i = pAttacker.custom_data.find_variable_index( "attachment_rate" );
+        int oncoprotein_i = pTarget.custom_data.findVariableIndex( "oncoprotein" );
+        int attach_rate_i = pAttacker.custom_data.findVariableIndex( "attachment_rate" );
 
         double oncoprotein_saturation = pAttacker.custom_data.get( "oncoprotein_saturation" );
         double oncoprotein_threshold = pAttacker.custom_data.get( "oncoprotein_threshold" );
@@ -159,7 +159,7 @@ public class ImmuneCellRule implements custom_cell_rule
             if( PhysiCellUtilities.UniformRandom() < pAttacker.custom_data.get( attach_rate_i ) * scale * dt * distance_scale )
             {
                 //              std::cout << "\t attach!" << " " << pTarget.custom_data[oncoprotein_i] << std::endl; 
-                Cell.attach_cells( pAttacker, pTarget );
+                Cell.attachcCells( pAttacker, pTarget );
             }
             return true;
         }

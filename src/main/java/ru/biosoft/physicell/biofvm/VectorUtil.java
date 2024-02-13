@@ -218,14 +218,18 @@ public class VectorUtil
     /**
      * Returns String representing given array: "v[0] v[1] ... v[n]"
      */
-    public static String print(double[] v)
+    public static String print(double[] v, int accuracy)
     {
         StringBuilder sb = new StringBuilder();
+        double factor = Math.pow( 10, accuracy );
+        sb.append( "[ " );
         for( int i = 0; i < v.length; i++ )
         {
-            sb.append( v[i] );
-            sb.append( " " );
+            sb.append( Math.round( v[i] * factor ) / factor );
+            if( i < v.length - 1 )
+                sb.append( ", " );
         }
+        sb.append( " ]" );
         return sb.toString();
     }
 

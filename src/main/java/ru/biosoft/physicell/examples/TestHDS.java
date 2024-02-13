@@ -183,7 +183,7 @@ public class TestHDS
 
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         // set default_cell_functions; 
-        cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based();
+        cd.functions.updatePhenotype = new StandardModels.O2based();
         //        cd.phenotype.secretion.sync_to_microenvironment( microenvironment );
         //        cd.phenotype.sync_to_functions( cd.functions );
 
@@ -191,8 +191,8 @@ public class TestHDS
         int oxygen_substrate_index = microenvironment.findDensityIndex( "oxygen" );
         int K1_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
         int K2_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
-        int apoptosis_model_index = cd.phenotype.death.find_death_model_index( "apoptosis" );
-        int necrosis_model_index = cd.phenotype.death.find_death_model_index( "necrosis" );
+        int apoptosis_model_index = cd.phenotype.death.findDeathModelIndex( "apoptosis" );
+        int necrosis_model_index = cd.phenotype.death.findDeathModelIndex( "necrosis" );
         // cells apoptose after about 7 days 
         cd.phenotype.death.rates.set( apoptosis_model_index, 1.0 / ( 7.0 * 24.0 * 60.0 ) );
         // initially no necrosis 

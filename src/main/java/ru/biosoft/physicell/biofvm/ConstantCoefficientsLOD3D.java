@@ -237,8 +237,5 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
             }
         }
         m.apply_dirichlet_conditions();
-        // reset gradient vectors 
-        //  M.reset_all_gradient_vectors(); 
-        return;
     }
 }

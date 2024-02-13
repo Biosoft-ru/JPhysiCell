@@ -3,11 +3,11 @@ package ru.biosoft.physicell.sample_projects.celltypes3;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.CellFunctions.update_phenotype;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 
-public class B_phenotype extends update_phenotype
+public class B_phenotype extends UpdatePhenotype
 {
     private Model model;
 
@@ -22,14 +22,14 @@ public class B_phenotype extends update_phenotype
         // housekeeping 
         Microenvironment microenvironment = pCell.getMicroenvironment();
         CellDefinition pCD = CellDefinition.getCellDefinition( "B" );
-        int nApoptosis = pCD.phenotype.death.find_death_model_index( "Apoptosis" );
-        int nNecrosis = pCD.phenotype.death.find_death_model_index( "Necrosis" );
+        int nApoptosis = pCD.phenotype.death.findDeathModelIndex( "Apoptosis" );
+        int nNecrosis = pCD.phenotype.death.findDeathModelIndex( "Necrosis" );
 
         if( phenotype.death.dead == true )
         {
             phenotype.secretion.setSecretionToZero();
             phenotype.secretion.setUptakeToZero();
-            phenotype.motility.is_motile = false;
+            phenotype.motility.isMotile = false;
             pCell.functions.updatePhenotype = null;
             return;
         }
@@ -100,7 +100,7 @@ public class B_phenotype extends update_phenotype
         sig.addEffect( B, model.getParameter( "B_speed_B" ) ); // B
         sig.addEffect( C, model.getParameter( "B_speed_C" ) );// C 
         sig.addEffect( C, model.getParameter( "B_speed_R" ) ); // R 
-        phenotype.motility.migration_speed = sig.computeEffect();
+        phenotype.motility.migrationSpeed = sig.computeEffect();
 
         // secretion 
         double base_secretion = model.getParameterDouble( "B_base_secretion" );

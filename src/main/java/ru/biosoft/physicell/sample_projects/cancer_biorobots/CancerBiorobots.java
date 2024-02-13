@@ -104,11 +104,11 @@ public class CancerBiorobots
         // cargo cells
         pCD = CellDefinition.getCellDefinition( "cargo cell" );
         // figure out mechanics parameters
-        pCD.phenotype.mechanics.relative_maximum_attachment_distance = pCD.custom_data.get( "max_attachment_distance" )
+        pCD.phenotype.mechanics.relMaxAttachmentDistance = pCD.custom_data.get( "max_attachment_distance" )
                 / pCD.phenotype.geometry.radius;
-        pCD.phenotype.mechanics.relative_detachment_distance = pCD.custom_data.get( "max_elastic_displacement" )
+        pCD.phenotype.mechanics.relDetachmentDistance = pCD.custom_data.get( "max_elastic_displacement" )
                 / pCD.phenotype.geometry.radius;
-        pCD.phenotype.mechanics.attachment_elastic_constant = pCD.custom_data.get( "elastic_coefficient" );
+        pCD.phenotype.mechanics.attachmentElasticConstant = pCD.custom_data.get( "elastic_coefficient" );
 
         // set functions
         pCD.functions.updatePhenotype = new CargoPhenotype();
@@ -118,12 +118,12 @@ public class CancerBiorobots
 
         // worker cells
         pCD = CellDefinition.getCellDefinition( "worker cell" );
-        pCD.phenotype.mechanics.relative_maximum_attachment_distance = pCD.custom_data.get( "max_attachment_distance" )
+        pCD.phenotype.mechanics.relMaxAttachmentDistance = pCD.custom_data.get( "max_attachment_distance" )
                 / pCD.phenotype.geometry.radius;
 
-        pCD.phenotype.mechanics.relative_detachment_distance = pCD.custom_data.get( "max_elastic_displacement" )
+        pCD.phenotype.mechanics.relDetachmentDistance = pCD.custom_data.get( "max_elastic_displacement" )
                 / pCD.phenotype.geometry.radius;
-        pCD.phenotype.mechanics.attachment_elastic_constant = pCD.custom_data.get( "elastic_coefficient" );
+        pCD.phenotype.mechanics.attachmentElasticConstant = pCD.custom_data.get( "elastic_coefficient" );
         pCD.functions.updatePhenotype = null; // worker_cell_rule;
         pCD.functions.custom_cell_rule = new WorkerCellRule();
         pCD.functions.contact_function = new BiorobotsContact();
@@ -145,7 +145,7 @@ public class CancerBiorobots
         double Ymax = microenvironment.mesh.boundingBox[4];
         double Zmax = microenvironment.mesh.boundingBox[5];
 
-        if( microenvironment.options.simulate_2D == true )
+        if( microenvironment.options.simulate2D == true )
         {
             Zmin = 0.0;
             Zmax = 0.0;

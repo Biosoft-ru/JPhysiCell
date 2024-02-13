@@ -349,9 +349,9 @@ public class Rules
         hypothesis_rulesets.get( pCD ).get( behavior ).max_value = max_value;
     }
 
-    void apply_ruleset(Cell pCell) throws Exception
+    static void apply_ruleset(Cell pCell) throws Exception
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.type_name );
+        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
         hypothesis_rulesets.get( pCD ).apply( pCell );
     }
 

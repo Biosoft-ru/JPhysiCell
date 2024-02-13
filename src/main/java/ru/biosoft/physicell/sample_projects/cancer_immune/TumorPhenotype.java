@@ -2,7 +2,7 @@ package ru.biosoft.physicell.sample_projects.cancer_immune;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.core.CellFunctions.update_phenotype;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.StandardModels;
@@ -10,7 +10,7 @@ import ru.biosoft.physicell.core.StandardModels;
 /**
  * Custom cell phenotype function to scale immunostimulatory factor with hypoxia 
  */
-public class TumorPhenotype extends update_phenotype
+public class TumorPhenotype extends UpdatePhenotype
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
@@ -18,7 +18,7 @@ public class TumorPhenotype extends update_phenotype
         Microenvironment m = pCell.getMicroenvironment();
         int cycle_start_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
         int cycle_end_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
-        int oncoprotein_i = pCell.custom_data.find_variable_index( "oncoprotein" );
+        int oncoprotein_i = pCell.custom_data.findVariableIndex( "oncoprotein" );
 
         // update secretion rates based on hypoxia 
         int o2_index = m.findDensityIndex( "oxygen" );
@@ -27,7 +27,7 @@ public class TumorPhenotype extends update_phenotype
 
         phenotype.secretion.secretionRates[immune_factor_index] = 10.0;
 
-        new StandardModels.update_cell_and_death_parameters_O2_based().execute( pCell, phenotype, dt );//TODO: use inheritance instead
+        new StandardModels.O2based().execute( pCell, phenotype, dt );//TODO: use inheritance instead
 
         // if cell is dead, don't bother with future phenotype changes, set it to secrete the immunostimulatory factor 
         if( phenotype.death.dead == true )

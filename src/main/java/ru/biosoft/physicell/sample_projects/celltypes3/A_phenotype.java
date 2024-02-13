@@ -3,11 +3,11 @@ package ru.biosoft.physicell.sample_projects.celltypes3;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.CellFunctions.update_phenotype;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 
-public class A_phenotype extends update_phenotype
+public class A_phenotype extends UpdatePhenotype
 {
     private Model model;
 
@@ -20,14 +20,14 @@ public class A_phenotype extends update_phenotype
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
         CellDefinition pCD = CellDefinition.getCellDefinition( "A" );
-        int nApoptosis = pCD.phenotype.death.find_death_model_index( "Apoptosis" );
-        int nNecrosis = pCD.phenotype.death.find_death_model_index( "Necrosis" );
+        int nApoptosis = pCD.phenotype.death.findDeathModelIndex( "Apoptosis" );
+        int nNecrosis = pCD.phenotype.death.findDeathModelIndex( "Necrosis" );
 
         if( phenotype.death.dead == true )
         {
             phenotype.secretion.setSecretionToZero();
             phenotype.secretion.setUptakeToZero();
-            phenotype.motility.is_motile = false;
+            phenotype.motility.isMotile = false;
             pCell.functions.updatePhenotype = null;
             return;
         }
@@ -50,11 +50,7 @@ public class A_phenotype extends update_phenotype
         phenotype.death.rates.set( nNecrosis, 0.0 );
 
         if( R < necrosis_threshold )
-        {
             phenotype.death.rates.set( nNecrosis, base_necrosis_rate * ( 1.0 - R / necrosis_threshold ) );
-            //                phenotype.death.rates[nNecrosis] = base_necrosis_rate;
-            //                phenotype.death.rates[nNecrosis] *= ( 1.0 - R / necrosis_threshold );
-        }
 
         // cycle rate 
         double param0 = model.getParameterDouble( "A_base_cycle" ) * R;
@@ -96,7 +92,7 @@ public class A_phenotype extends update_phenotype
         sig.addEffect( B, model.getParameter( "A_speed_B" ) );// B
         sig.addEffect( C, model.getParameter( "A_speed_C" ) );// C 
         sig.addEffect( C, model.getParameter( "A_speed_R" ) ); // R 
-        phenotype.motility.migration_speed = sig.computeEffect();
+        phenotype.motility.migrationSpeed = sig.computeEffect();
 
         // secretion 
         double base_secretion = model.getParameterDouble( "A_base_secretion" );

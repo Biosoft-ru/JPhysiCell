@@ -114,16 +114,16 @@ public class CancerImmune
         // reduce o2 uptake 
         cd.phenotype.secretion.uptakeRates[oxygen_ID] *= model.getParameterDouble( "immune_o2_relative_uptake" );
 
-        cd.phenotype.mechanics.cell_cell_adhesion_strength *= model.getParameterDouble( "immune_relative_adhesion" );
-        cd.phenotype.mechanics.cell_cell_repulsion_strength *= model.getParameterDouble( "immune_relative_repulsion" );
+        cd.phenotype.mechanics.cellCellAdhesionStrength *= model.getParameterDouble( "immune_relative_adhesion" );
+        cd.phenotype.mechanics.cellCellRepulsionStrength *= model.getParameterDouble( "immune_relative_repulsion" );
 
         // figure out mechanics parameters 
-        cd.phenotype.mechanics.relative_maximum_attachment_distance = cancerCellCD.custom_data.get( "max_attachment_distance" )
+        cd.phenotype.mechanics.relMaxAttachmentDistance = cancerCellCD.custom_data.get( "max_attachment_distance" )
                 / cd.phenotype.geometry.radius;
 
-        cd.phenotype.mechanics.attachment_elastic_constant = cancerCellCD.custom_data.get( "elastic_coefficient" );
+        cd.phenotype.mechanics.attachmentElasticConstant = cancerCellCD.custom_data.get( "elastic_coefficient" );
 
-        cd.phenotype.mechanics.relative_detachment_distance = cancerCellCD.custom_data.get( "max_attachment_distance" )
+        cd.phenotype.mechanics.relDetachmentDistance = cancerCellCD.custom_data.get( "max_attachment_distance" )
                 / cd.phenotype.geometry.radius;
 
         // set functions 
@@ -138,25 +138,16 @@ public class CancerImmune
         CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
         cd.parameters.o2_proliferation_saturation = 38.0;
         cd.parameters.o2_reference = 38.0;
-        cd.phenotype.mechanics.relative_maximum_attachment_distance = cd.custom_data.get( "max_attachment_distance" )
+        cd.phenotype.mechanics.relMaxAttachmentDistance = cd.custom_data.get( "max_attachment_distance" )
                 / cd.phenotype.geometry.radius;
-        cd.phenotype.mechanics.relative_detachment_distance = cd.custom_data.get( "max_attachment_distance" )
+        cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_attachment_distance" )
                 / cd.phenotype.geometry.radius;
-        cd.phenotype.mechanics.attachment_elastic_constant = cd.custom_data.get( "elastic_coefficient" );
+        cd.phenotype.mechanics.attachmentElasticConstant = cd.custom_data.get( "elastic_coefficient" );
         cd.functions.updatePhenotype = new TumorPhenotype();
         cd.functions.custom_cell_rule = null;
         cd.functions.contact_function = new AdhesionContact();
         cd.functions.update_migration_bias = null;
     }
-
-    //    static void create_cell_types(Model model) throws Exception
-    //    {
-    //        Microenvironment microenvironment = model.getMicroenvironment();
-    //        createImmuneCellType( model );
-    //        SignalBehavior.setup_signal_behavior_dictionaries( microenvironment );
-    //        Rules.setup_cell_rules( model );
-    //    }
-
 
 
     static List<double[]> createSpherePositions(double cellRadius, double sphereRadius)

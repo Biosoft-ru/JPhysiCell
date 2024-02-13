@@ -17,7 +17,7 @@ public class CancerImmunityVisualizer extends AgentVisualizer
     @Override
     public Color findColor(Cell cell)
     {
-        int oncoprotein_i = cell.custom_data.find_variable_index( "oncoprotein" );
+        int oncoprotein_i = cell.custom_data.findVariableIndex( "oncoprotein" );
         Color result = Color.black; // immune are black
 
         if( cell.type == 1 )

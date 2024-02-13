@@ -70,8 +70,8 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 */
 public class Phenotype implements Cloneable
 {
-    boolean flagged_for_division;
-    boolean flagged_for_removal;
+    boolean flaggedForDivision;
+    boolean flaggedForRemoval;
 
     public CycleModel cycle = new CycleModel();
     public Death death = new Death();
@@ -81,17 +81,9 @@ public class Phenotype implements Cloneable
     public Motility motility = new Motility();
     public Secretion secretion = new Secretion();
     public Molecular molecular = new Molecular();
-    public CellInteractions cell_interactions = new CellInteractions();
-    public CellTransformations cell_transformations = new CellTransformations();
-
-    // We need it to be a pointer to allow polymorphism
-    // then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
+    public CellInteractions cellInteractions = new CellInteractions();
+    public CellTransformations cellTransformations = new CellTransformations();
     public Intracellular intracellular = new Intracellular();
-
-    //    public void sync(CellFunctions functions)
-    //    {
-    //        cycle = functions.cycleModel;
-    //    }
 
     /**
      * Synchronize all parts with microenvironment (densities)  
@@ -109,33 +101,28 @@ public class Phenotype implements Cloneable
     public void sync()
     {
         this.initialize( CellDefinition.getDefinitionsCount() );
-        //        cell_interactions.sync_to_cell_definitions();
-        //        cell_transformations.sync_to_cell_definitions();
-        //        mechanics.sync_to_cell_definitions();
     }
 
     public void initialize(int cellDefinitionSize)
     {
-        cell_interactions.initialize( cellDefinitionSize );
-        cell_transformations.initialize( cellDefinitionSize );
+        cellInteractions.initialize( cellDefinitionSize );
+        cellTransformations.initialize( cellDefinitionSize );
         mechanics.initialize( cellDefinitionSize );
     }
 
     public Phenotype()
     {
-        flagged_for_division = false;
-        flagged_for_removal = false;
-
-        // sync the molecular stuff here automatically? 
-        intracellular = null;
+        flaggedForDivision = false;
+        flaggedForRemoval = false;
+        intracellular = null; // sync the molecular stuff here automatically? 
     }
 
     @Override
     public Phenotype clone()
     {
         Phenotype result = new Phenotype();
-        result.flagged_for_division = flagged_for_division;
-        result.flagged_for_removal = flagged_for_removal;
+        result.flaggedForDivision = flaggedForDivision;
+        result.flaggedForRemoval = flaggedForRemoval;
         result.cycle = cycle.clone();
         result.death = death.clone();
         result.volume = volume.clone();
@@ -144,31 +131,10 @@ public class Phenotype implements Cloneable
         result.motility = motility.clone();
         result.secretion = secretion.clone();
         result.molecular = molecular.clone();
-        result.cell_interactions = cell_interactions.clone();
-        result.cell_transformations = cell_transformations.clone();
+        result.cellInteractions = cellInteractions.clone();
+        result.cellTransformations = cellTransformations.clone();
         if( intracellular != null )
-        result.intracellular = intracellular.clone();//
-        //        flagged_for_division = p.flagged_for_division;
-        //        flagged_for_removal = p.flagged_for_removal;
-        //        cycle = p.cycle;
-        //        death = p.death;
-        //        volume = p.volume;
-        //        geometry = p.geometry;
-        //        mechanics = p.mechanics;
-        //        motility = p.motility;
-        //        secretion = p.secretion;
-
-        //        molecular = p.molecular;
-        //        
-        //        delete intracellular;
-        //        
-        //        if (p.intracellular != NULL)
-        //        { intracellular = p.intracellular->clone(); }
-        //        else
-        //        { intracellular = NULL; }
-        //        
-        //        cell_interactions = p.cell_interactions; 
-        //        cell_transformations = p.cell_transformations; 
+            result.intracellular = intracellular.clone();
         return result;
     }
 }

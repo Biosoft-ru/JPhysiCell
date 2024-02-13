@@ -78,18 +78,18 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 */
 public class CellContainer extends AgentContainer
 {
-    Set<Cell> cells_ready_to_divide; // the index of agents ready to divide
-    Set<Cell> cells_ready_to_die;
+    Set<Cell> cellsReadyToDivide; // the index of agents ready to divide
+    Set<Cell> cellsReadyToDie;
     int boundary_condition_for_pushed_out_agents; // what to do with pushed out cells
     boolean initialzed = false;
 
     CartesianMesh underlying_mesh = new CartesianMesh();
     double[] max_cell_interactive_distance_in_voxel;
-    public int num_divisions_in_current_step = 0;
-    public int num_deaths_in_current_step = 0;
+    public int numDivisionsCurStep = 0;
+    public int numDeathsCurStep = 0;
 
     double last_diffusion_time = 0.0;
-    double last_cell_cycle_time = 0.0;
+    double lastCellCycleTime = 0.0;
     double last_mechanics_time = 0.0;
 
     List<Set<Cell>> agent_grid;
@@ -98,8 +98,8 @@ public class CellContainer extends AgentContainer
     public CellContainer()
     {
         boundary_condition_for_pushed_out_agents = PhysiCellConstants.default_boundary_condition_for_pushed_out_agents;
-        cells_ready_to_divide = new HashSet<>();
-        cells_ready_to_die = new HashSet<>();
+        cellsReadyToDivide = new HashSet<>();
+        cellsReadyToDie = new HashSet<>();
     }
 
     void initialize(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end, double voxel_size)
@@ -112,8 +112,8 @@ public class CellContainer extends AgentContainer
     {
         //        allCells = BasicAgent.allBasicAgents;
         boundary_condition_for_pushed_out_agents = PhysiCellConstants.default_boundary_condition_for_pushed_out_agents;
-        cells_ready_to_divide = new HashSet<>();
-        cells_ready_to_die = new HashSet<>();
+        cellsReadyToDivide = new HashSet<>();
+        cellsReadyToDie = new HashSet<>();
         underlying_mesh.resize( x_start, x_end, y_start, y_end, z_start, z_end, dx, dy, dz );
         max_cell_interactive_distance_in_voxel = new double[underlying_mesh.voxels.length];
         agent_grid = new ArrayList<>();//[underlying_mesh.voxels.length];
@@ -135,7 +135,7 @@ public class CellContainer extends AgentContainer
         updateAllCells( m, t, dt, dt, dt );
     }
 
-    public void updateAllCells(Microenvironment m, double t, double phenotype_dt_, double mechanics_dt_, double diffusion_dt_)
+    public void updateAllCells(Microenvironment m, double t, double phenotypeDT, double mechanicsDT, double diffusionDT)
             throws Exception
     {
         // secretions and uptakes. Syncing with BioFVM is automated. 
@@ -145,13 +145,13 @@ public class CellContainer extends AgentContainer
         {
             if( !cell.isOutOfDomain )
             {
-                cell.phenotype.secretion.advance( cell, cell.phenotype, diffusion_dt_ );
+                cell.phenotype.secretion.advance( cell, cell.phenotype, diffusionDT );
             }
         }
         //if it is the time for running cell cycle, do it!
-        double time_since_last_cycle = t - last_cell_cycle_time;
-        double phenotype_dt_tolerance = 0.001 * phenotype_dt_;
-        double mechanics_dt_tolerance = 0.001 * mechanics_dt_;
+        double timeSinceLastCycle = t - lastCellCycleTime;
+        double phenotypeDTtolerance = 0.001 * phenotypeDT;
+        double mechanicsDTtolerance = 0.001 * mechanicsDT;
 
         // intracellular update. called for every diffusion_dt, but actually depends on the intracellular_dt of each cell (as it can be noisy)
         //            #pragma omp parallel for 
@@ -162,17 +162,17 @@ public class CellContainer extends AgentContainer
                 if( cell.phenotype.intracellular != null && cell.phenotype.intracellular.need_update() )
                 {
                     if( ( cell.functions.pre_update_intracellular != null ) )
-                        cell.functions.pre_update_intracellular.execute( cell, cell.phenotype, diffusion_dt_ );
+                        cell.functions.pre_update_intracellular.execute( cell, cell.phenotype, diffusionDT );
 
-                    cell.phenotype.intracellular.update( cell, cell.phenotype, diffusion_dt_ );
+                    cell.phenotype.intracellular.update( cell, cell.phenotype, diffusionDT );
 
                     if( cell.functions.post_update_intracellular != null )
-                        cell.functions.post_update_intracellular.execute( cell, cell.phenotype, diffusion_dt_ );
+                        cell.functions.post_update_intracellular.execute( cell, cell.phenotype, diffusionDT );
                 }
             }
         }
 
-        if( Math.abs( time_since_last_cycle - phenotype_dt_ ) < phenotype_dt_tolerance || !initialzed )
+        if( Math.abs( timeSinceLastCycle - phenotypeDT ) < phenotypeDTtolerance || !initialzed )
         {
             // Reset the max_radius in each voxel. It will be filled in set_total_volume
             // It might be better if we calculate it before mechanics each time 
@@ -180,7 +180,7 @@ public class CellContainer extends AgentContainer
 
             if( !initialzed )
             {
-                time_since_last_cycle = phenotype_dt_;
+                timeSinceLastCycle = phenotypeDT;
             }
 
             // new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
@@ -190,42 +190,39 @@ public class CellContainer extends AgentContainer
             {
                 if( !cell.isOutOfDomain )
                 {
-                    cell.advance_bundled_phenotype_functions( time_since_last_cycle );
+                    cell.advanceBundledPhenotype( timeSinceLastCycle );
                 }
             }
 
             // process divides / removes 
-            for( Cell cell : cells_ready_to_divide )
+            for( Cell cell : cellsReadyToDivide )
                 cell.divide();
 
-            for( Cell cell : cells_ready_to_die )
+            for( Cell cell : cellsReadyToDie )
                 cell.die();
 
-            num_divisions_in_current_step += cells_ready_to_divide.size();
-            num_deaths_in_current_step += cells_ready_to_die.size();
+            numDivisionsCurStep += cellsReadyToDivide.size();
+            numDeathsCurStep += cellsReadyToDie.size();
 
-            cells_ready_to_die.clear();
-            cells_ready_to_divide.clear();
-            last_cell_cycle_time = t;
+            cellsReadyToDie.clear();
+            cellsReadyToDivide.clear();
+            lastCellCycleTime = t;
         }
 
         double time_since_last_mechanics = t - last_mechanics_time;
 
-        // if( time_since_last_mechanics>= mechanics_dt || !initialzed)
-        if( Math.abs( time_since_last_mechanics - mechanics_dt_ ) < mechanics_dt_tolerance || !initialzed )
+        if( Math.abs( time_since_last_mechanics - mechanicsDT ) < mechanicsDTtolerance || !initialzed )
         {
             if( !initialzed )
             {
-                time_since_last_mechanics = mechanics_dt_;
+                time_since_last_mechanics = mechanicsDT;
             }
-            // new February 2018 
-            // if we need gradients, compute them
-            //                if( default_microenvironment_options.calculate_gradients ) 
-            //                { microenvironment.compute_all_gradient_vectors();  }
-            //            if( Microenvironment.get_default_microenvironment().options.calculate_gradients )
-            //            {
-            //                Microenvironment.get_default_microenvironment().compute_all_gradient_vectors();
-            //            }
+            // new February 2018  if we need gradients, compute them
+            if( m.options.calculate_gradients )
+            {
+                m.computeAllGradientVectors();
+            }
+
             //TOD: commented by now
             // end of new in Feb 2018 
             // perform interactions -- new in June 2020 
@@ -274,12 +271,6 @@ public class CellContainer extends AgentContainer
                             StandardModels.standard_elastic_contact_function( cell, cell.phenotype, pC1, pC1.phenotype,
                                     time_since_last_mechanics );
                         }
-                        //                            for( int j=0; j < pC.state.spring_attachments.size(); j++ )
-                        //                            {
-                        //                                Cell pC1 = pC.state.spring_attachments[j]; 
-                        //                                // standard_elastic_contact_function_confluent_rest_length(pC,pC.phenotype,pC1,pC1.phenotype,time_since_last_mechanics);  
-                        //                                standard_elastic_contact_function(pC,pC.phenotype,pC1,pC1.phenotype,time_since_last_mechanics);  
-                        //                            }
                     }
                 }
             }
@@ -294,7 +285,7 @@ public class CellContainer extends AgentContainer
             // super-critical to performance! clear the "dummy" cells from phagocytosis / fusion
             // otherwise, comptuational cost increases at polynomial rate VERY fast, as O(10,000) 
             // dummy cells of size zero are left ot interact mechanically, etc. 
-            if( cells_ready_to_die.size() > 0 )
+            if( cellsReadyToDie.size() > 0 )
             {
                 /*
                 std::cout << "\tClearing dummy cells from phagocytosis and fusion events ... " << std::endl; 
@@ -304,27 +295,26 @@ public class CellContainer extends AgentContainer
                 //                    for( int i=0; i < cells_ready_to_die.size(); i++ )
                 //                    { cells_ready_to_diei].die(); }
 
-                for( Cell cell : cells_ready_to_die )
+                for( Cell cell : cellsReadyToDie )
                     cell.die();
-                cells_ready_to_die.clear();
+                cellsReadyToDie.clear();
             }
             // update positions         
             //                #pragma omp parallel for 
             for( Cell cell : cells )
             {
-                if( cell.isOutOfDomain == false && cell.isMovable )
+                if( !cell.isOutOfDomain && cell.isMovable )
                 {
-                    cell.update_position( time_since_last_mechanics );
+                    cell.updatePosition( time_since_last_mechanics );
                 }
             }
 
             // When somebody reviews this code, let's add proper braces for clarity!!! 
-
             // Update cell indices in the container
             for( Cell cell : cells )
             {
                 if( !cell.isOutOfDomain && cell.isMovable )
-                    cell.update_voxel_in_container();
+                    cell.updateVoxelInContainer();
             }
             last_mechanics_time = t;
         }
@@ -339,19 +329,19 @@ public class CellContainer extends AgentContainer
         //        agent_grid[agent.get_current_mechanics_voxel_index()].push_back( agent );
     }
 
-    //
+
     @Override
     public void remove_agent(BasicAgent agent)
     {
         remove_agent_from_voxel( agent, agent.get_current_mechanics_voxel_index() );
         return;
     }
-    //
+
     @Override
     public void add_agent_to_outer_voxel(BasicAgent agent)
     {
         int escaping_face = find_escaping_face_index( agent );
-        agents_in_outer_voxels.get( escaping_face ).add( (Cell)agent );//.push_back(agent);
+        agents_in_outer_voxels.get( escaping_face ).add( (Cell)agent );
         ( (Cell)agent ).isOutOfDomain = true;
         return;
     }
@@ -418,29 +408,15 @@ public class CellContainer extends AgentContainer
         }
         return -1;
     }
-    //
+
     void flag_cell_for_division(Cell pCell)
     {
-        cells_ready_to_divide.add( pCell );
-        //            #pragma omp critical
-        //            {
-        //                auto result = std::find(std::begin(cells_ready_to_divide), std::end(cells_ready_to_divide), pCell );
-        //                if( result == std::end(cells_ready_to_divide) )
-        //                { cells_ready_to_divide.push_back( pCell ); }
-        //            } 
-        //            return; 
+        cellsReadyToDivide.add( pCell );
     }
 
     void flag_cell_for_removal(Cell pCell)
     {
-        cells_ready_to_die.add( pCell );
-        //            #pragma omp critical
-        //            {
-        //                auto result = std::find(std::begin(cells_ready_to_die), std::end(cells_ready_to_die), pCell );
-        //                if( result == std::end(cells_ready_to_die) )
-        //                { cells_ready_to_die.push_back( pCell ); }      
-        //            } 
-        //            return; 
+        cellsReadyToDie.add( pCell );
     }
 
     public static CellContainer createCellContainer(Microenvironment m, double mechanicsVoxelSize)

@@ -75,7 +75,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/heterogeneity/result";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/heterogeneity/result3";
 
     public static void main(String ... strings) throws Exception
     {
@@ -93,7 +93,7 @@ public class Main
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setLogFile( resultPath + "/log_no_apop.txt" );
-        model.addVisualizer( 0, "figure1_no_apop" ).setDrawDensity( false );//.setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "figure1_no_apop" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
 
         /* Users typically start modifying here. START USERMODS */
         Heterogeneity.init( model );

@@ -69,8 +69,8 @@ package ru.biosoft.physicell.core;
 public class Geometry implements Cloneable
 {
     public double radius;
-    double nuclear_radius;
-    double surface_area;
+    double nuclearRadius;
+    double surfaceArea;
     double polarity;
     static double four_thirds_pi = 4.188790204786391;
     static double the_constant = 4.835975862049409; // 4pi / (4pi/3)^(2/3)
@@ -79,41 +79,41 @@ public class Geometry implements Cloneable
     {
         // reference values for MCF-7, based on volume = 2494 cubic microns nuclear volume = 540 cubic microns 
         radius = 8.412710547954228;
-        nuclear_radius = 5.051670902881889;
-        surface_area = 889.3685284131693;
+        nuclearRadius = 5.051670902881889;
+        surfaceArea = 889.3685284131693;
         polarity = 0.0;
     }
 
-    void update_radius(Cell pCell, Phenotype phenotype, double dt)
+    void updateRadius(Cell pCell, Phenotype phenotype, double dt)
     {
         radius = phenotype.volume.total;
         radius /= four_thirds_pi;
         radius = Math.pow( radius, 0.333333333333333333333333333333333333333 );
     }
 
-    void update_nuclear_radius(Cell pCell, Phenotype phenotype, double dt)
+    void updateNuclearRadius(Cell pCell, Phenotype phenotype, double dt)
     {
-        nuclear_radius = phenotype.volume.nuclear;
-        nuclear_radius /= four_thirds_pi;
-        nuclear_radius = Math.pow( nuclear_radius, 0.333333333333333333333333333333333333333 );
+        nuclearRadius = phenotype.volume.nuclear;
+        nuclearRadius /= four_thirds_pi;
+        nuclearRadius = Math.pow( nuclearRadius, 0.333333333333333333333333333333333333333 );
     }
 
-    void update_surface_area(Cell pCell, Phenotype phenotype, double dt)
+    void updateSurfaceArea(Cell pCell, Phenotype phenotype, double dt)
     {
 
-        surface_area = Math.pow( phenotype.volume.total, 0.666666666666667 );
-        surface_area /= the_constant;
+        surfaceArea = Math.pow( phenotype.volume.total, 0.666666666666667 );
+        surfaceArea /= the_constant;
     }
 
     public void update(Cell pCell, Phenotype phenotype, double dt)
     {
-        update_radius( pCell, phenotype, dt );
-        update_nuclear_radius( pCell, phenotype, dt );
+        updateRadius( pCell, phenotype, dt );
+        updateNuclearRadius( pCell, phenotype, dt );
 
         // surface area = 4*pi*r^2 = (4/3)*pi*r^3 / (r/3)   
-        surface_area = phenotype.volume.total;
-        surface_area /= radius;
-        surface_area *= 3.0;
+        surfaceArea = phenotype.volume.total;
+        surfaceArea /= radius;
+        surfaceArea *= 3.0;
     }
 
     @Override

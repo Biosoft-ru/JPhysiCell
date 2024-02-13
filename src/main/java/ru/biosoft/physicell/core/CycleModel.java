@@ -241,6 +241,8 @@ public class CycleModel implements Cloneable
                 {
                     double prob = transition_rate * dt;
                     double r = PhysiCellUtilities.UniformRandom();
+                    //                    if( pCell.type_name.equals( "A" ) )
+                    //                        System.out.println( pCell + " " + prob + " " + r );
                     if( r < prob )
                     {
                         //                        System.out.println( "Random " + r + " , probability " + prob );
@@ -260,11 +262,11 @@ public class CycleModel implements Cloneable
                     // check if division or removal are required 
                     if( phases.get( i ).divisionAtExit )
                     {
-                        phenotype.flagged_for_division = true;
+                        phenotype.flaggedForDivision = true;
                     }
                     if( phases.get( i ).removalAtExit )
                     {
-                        phenotype.flagged_for_removal = true;
+                        phenotype.flaggedForRemoval = true;
                         return;
                     }
                     // move to the next phase, and reset the elapsed time 

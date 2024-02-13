@@ -19,9 +19,9 @@ public class CancerBiorobotsVisualizer extends AgentVisualizer
         public Color findColor(Cell cell)
         {
             Color c = Color.white;
-            double damage = SignalBehavior.get_single_signal( cell, "damage");
-            double max_damage = 1.0 * SignalBehavior.get_single_signal(cell, "custom:damage_rate")
-                    / ( 1e-16 + SignalBehavior.get_single_signal( cell, "custom:repair_rate" ) );
+            double damage = SignalBehavior.getSingleSignal( cell, "damage");
+            double max_damage = 1.0 * SignalBehavior.getSingleSignal(cell, "custom:damage_rate")
+                    / ( 1e-16 + SignalBehavior.getSingleSignal( cell, "custom:repair_rate" ) );
 
             CellDefinition pCD_cargo = CellDefinition.getCellDefinition( "cargo cell" );
             CellDefinition pCD_cancer = CellDefinition.getCellDefinition( "cancer cell" );
@@ -51,7 +51,7 @@ public class CancerBiorobotsVisualizer extends AgentVisualizer
                     //  }
                     //  
                     // apoptotic tumor - cyan 
-                    if( SignalBehavior.get_single_signal( cell, "apoptotic" ) > 0.5 ) // Apoptotic - cyan
+                    if( SignalBehavior.getSingleSignal( cell, "apoptotic" ) > 0.5 ) // Apoptotic - cyan
                     {
                         //                          output[0] = "cyan";
                         //                          output[2] = "darkcyan"; 
@@ -59,7 +59,7 @@ public class CancerBiorobotsVisualizer extends AgentVisualizer
                     }
                     //  
                     // Necrotic tumor - Brown
-                    if( SignalBehavior.get_single_signal( cell, "necrotic" ) > 0.5 )
+                    if( SignalBehavior.getSingleSignal( cell, "necrotic" ) > 0.5 )
                     {
 //                        output[0] = "rgb(250,138,38)";
 //                        output[2] = "rgb(139,69,19)";
@@ -68,7 +68,7 @@ public class CancerBiorobotsVisualizer extends AgentVisualizer
                     //  
                       // live tumor -- shade by level of damage 
                       // if live: color by damage 
-                      if( SignalBehavior.get_single_signal( cell, "dead") < 0.5 )
+                      if( SignalBehavior.getSingleSignal( cell, "dead") < 0.5 )
                       {
                           int damage_int = (int) Math.round( damage * 255.0 / max_damage ); 
                           return new Color( damage_int, 255 - damage_int, damage_int );

@@ -110,7 +110,7 @@ public class Heterogeneity
         double yMax = m.mesh.boundingBox[4];
         double zMax = m.mesh.boundingBox[5];
 
-        if( m.options.simulate_2D == true )
+        if( m.options.simulate2D == true )
         {
             zMin = 0.0;
             zMax = 0.0;
@@ -131,66 +131,61 @@ public class Heterogeneity
         }
 
         CellDefinition pCD = CellDefinition.getCellDefinition( "cancer cell" );
-        double cell_radius = pCD.phenotype.geometry.radius;
-        double cell_spacing = 0.95 * 2.0 * cell_radius;
-        double tumor_radius = 250;//model.getParameterDouble( "tumor_radius" ); // 250.0; 
+        double cellRadius = pCD.phenotype.geometry.radius;
+        double cellSpacing = 0.95 * 2.0 * cellRadius;
+        double tumorRadius = model.getParameterDouble( "tumor_radius" ); // 250.0; 
         double x = 0.0;
-        double x_outer = tumor_radius;
+        double xOuter = tumorRadius;
         double y = 0.0;
         double pMean = model.getParameterDouble( "oncoprotein_mean" );
         double pSD = model.getParameterDouble( "oncoprotein_sd" );
         double pMin = model.getParameterDouble( "oncoprotein_min" );
         double pMax = model.getParameterDouble( "oncoprotein_max" );
 
-        Cell pCell = Cell.createCell( pCD, m, new double[] {0, 0, 0.0} ); // tumor cell 
-        double p = 1;//PhysiCellUtilities.NormalRandom( pMean, pSD );
-        p = PhysiCellUtilities.restrict( p, pMin, pMax );
-        SignalBehavior.setSingleBehavior( pCell, CUSTOM_ONCOPROTEIN, p );
+        int n = 0;
+        while( y < tumorRadius )
+        {
+            x = 0.0;
+            if( n % 2 == 1 )
+            {
+                x = 0.5 * cellSpacing;
+            }
+            xOuter = Math.sqrt( tumorRadius * tumorRadius - y * y );
 
-        //        int n = 0;
-        //        while( y < tumor_radius )
-        //        {
-        //            x = 0.0;
-        //            if( n % 2 == 1 )
-        //            {
-        //                x = 0.5 * cell_spacing;
-        //            }
-        //            x_outer = Math.sqrt( tumor_radius * tumor_radius - y * y );
-        //
-        //            while( x < x_outer )
-        //            {
-        //                Cell pCell = Cell.createCell( pCD, m, new double[] {x, y, 0.0} ); // tumor cell 
-        //                double p = PhysiCellUtilities.NormalRandom( pMean, pSD );
-        //                p = PhysiCellUtilities.restrict( p, pMin, pMax );
-        //                SignalBehavior.setSingleBehavior( pCell, CUSTOM_ONCOPROTEIN, p );
-        //
-        //                if( Math.abs( y ) > 0.01 )
-        //                {
-        //                    Cell pCell2 = Cell.createCell( pCD, m, new double[] {x, -y, 0.0} ); // tumor cell 
-        //                    p = PhysiCellUtilities.NormalRandom( pMean, pSD );
-        //                    p = PhysiCellUtilities.restrict( p, pMin, pMax );
-        //                    SignalBehavior.setSingleBehavior( pCell2, CUSTOM_ONCOPROTEIN, p );
-        //                }
-        //                if( Math.abs( x ) > 0.01 )
-        //                {
-        //                    Cell pCell3 = Cell.createCell( pCD, m, new double[] { -x, y, 0} ); // tumor cell 
-        //                    p = PhysiCellUtilities.NormalRandom( pMean, pSD );
-        //                    p = PhysiCellUtilities.restrict( p, pMin, pMax );
-        //                    SignalBehavior.setSingleBehavior( pCell3, CUSTOM_ONCOPROTEIN, p );
-        //
-        //                    if( Math.abs( y ) > 0.01 )
-        //                    {
-        //                        Cell pCell4 = Cell.createCell( pCD, m, new double[] { -x, -y, 0} ); // tumor cell
-        //                        p = PhysiCellUtilities.NormalRandom( pMean, pSD );
-        //                        p = PhysiCellUtilities.restrict( p, pMin, pMax );
-        //                        SignalBehavior.setSingleBehavior( pCell4, CUSTOM_ONCOPROTEIN, p );
-        //                    }
-        //                }
-        //                x += cell_spacing;
-        //            }
-        //            y += cell_spacing * Math.sqrt( 3.0 ) / 2.0;
-        //            n++;
-        //        }
+            while( x < xOuter )
+            {
+                Cell pCell = Cell.createCell( pCD, m, new double[] {x, y, 0.0} ); // tumor cell 
+                double p = PhysiCellUtilities.NormalRandom( pMean, pSD );
+                p = PhysiCellUtilities.restrict( p, pMin, pMax );
+                SignalBehavior.setSingleBehavior( pCell, CUSTOM_ONCOPROTEIN, p );
+
+                if( Math.abs( y ) > 0.01 )
+                {
+                    Cell pCell2 = Cell.createCell( pCD, m, new double[] {x, -y, 0.0} ); // tumor cell 
+                    p = PhysiCellUtilities.NormalRandom( pMean, pSD );
+                    p = PhysiCellUtilities.restrict( p, pMin, pMax );
+                    SignalBehavior.setSingleBehavior( pCell2, CUSTOM_ONCOPROTEIN, p );
+                }
+                if( Math.abs( x ) > 0.01 )
+                {
+                    Cell pCell3 = Cell.createCell( pCD, m, new double[] { -x, y, 0} ); // tumor cell 
+                    p = PhysiCellUtilities.NormalRandom( pMean, pSD );
+                    p = PhysiCellUtilities.restrict( p, pMin, pMax );
+                    SignalBehavior.setSingleBehavior( pCell3, CUSTOM_ONCOPROTEIN, p );
+
+                    if( Math.abs( y ) > 0.01 )
+                    {
+                        Cell pCell4 = Cell.createCell( pCD, m, new double[] { -x, -y, 0} ); // tumor cell
+                        p = PhysiCellUtilities.NormalRandom( pMean, pSD );
+                        p = PhysiCellUtilities.restrict( p, pMin, pMax );
+                        SignalBehavior.setSingleBehavior( pCell4, CUSTOM_ONCOPROTEIN, p );
+                    }
+                }
+                x += cellSpacing;
+            }
+            y += cellSpacing * Math.sqrt( 3.0 ) / 2.0;
+            n++;
+        }
     }
 
     static void printSummary(Microenvironment m, String parameter)
@@ -200,7 +195,7 @@ public class Heterogeneity
         double max = -9e9;
         for( Cell cell : m.getAgents( Cell.class ) )
         {
-            double r = SignalBehavior.get_single_signal( cell, parameter );
+            double r = SignalBehavior.getSingleSignal( cell, parameter );
             sum += r;
             min = Math.min( r, min );
             max = Math.max( r, max );
@@ -211,7 +206,7 @@ public class Heterogeneity
         sum = 0.0;
         for( Cell cell : m.getAgents( Cell.class ) )
         {
-            double r = SignalBehavior.get_single_signal( cell, parameter );
+            double r = SignalBehavior.getSingleSignal( cell, parameter );
             sum += ( r - mean ) * ( r - mean );
         }
         double sd = Math.sqrt( sum / ( size - 1.0 + 1e-15 ) );

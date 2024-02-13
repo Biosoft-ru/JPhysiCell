@@ -440,11 +440,11 @@ public class HypothesisRule
     double[] signal_values = new double[signals.size()];//( signals.length , 0.0 ); 
     for( int i = 0; i < signals.size(); i++ )
     {
-        signal_values[i] = SignalBehavior.get_single_signal( pCell, signals.get(i) );
+        signal_values[i] = SignalBehavior.getSingleSignal( pCell, signals.get(i) );
     }
 
         // now, get live/dead value 
-        boolean dead = SignalBehavior.get_single_signal( pCell, "dead" ) != 0;
+        boolean dead = SignalBehavior.getSingleSignal( pCell, "dead" ) != 0;
 
         double out = evaluate( signal_values , dead ); 
 
@@ -452,7 +452,7 @@ public class HypothesisRule
         // if the rule was found to not apply, then just get the prior value 
         if( out < -9e90 )
         {
-            out = SignalBehavior.get_single_behavior( pCell, this.behavior );
+            out = SignalBehavior.getSinglBehavior( pCell, this.behavior );
         }
 
         return out; 

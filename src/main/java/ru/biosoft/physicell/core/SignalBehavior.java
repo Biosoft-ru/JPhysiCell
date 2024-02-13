@@ -231,7 +231,7 @@ public class SignalBehavior
         return -1;
     }
 
-    public static double get_single_signal(Cell pCell, String name)
+    public static double getSingleSignal(Cell pCell, String name)
     {
         return get_single_signal( pCell, find_signal_index( name ) );
     }
@@ -692,7 +692,7 @@ public class SignalBehavior
         int migration_speed_index = findBehaviorIndex( "migration speed" );
         if( index == migration_speed_index )
         {
-            pCell.phenotype.motility.migration_speed = parameter;
+            pCell.phenotype.motility.migrationSpeed = parameter;
             return;
         }
 
@@ -700,7 +700,7 @@ public class SignalBehavior
         int migration_bias_index = findBehaviorIndex( "migration bias" );
         if( index == migration_bias_index )
         {
-            pCell.phenotype.motility.migration_bias = parameter;
+            pCell.phenotype.motility.migrationBias = parameter;
             return;
         }
 
@@ -708,7 +708,7 @@ public class SignalBehavior
         int persistence_time_index = findBehaviorIndex( "migration persistence time" );
         if( index == persistence_time_index )
         {
-            pCell.phenotype.motility.persistence_time = parameter;
+            pCell.phenotype.motility.persistenceTime = parameter;
             return;
         }
 
@@ -716,7 +716,7 @@ public class SignalBehavior
         int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
         if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
         {
-            pCell.phenotype.motility.chemotactic_sensitivities[index - first_chemotaxis_index] = parameter;
+            pCell.phenotype.motility.chemotacticSensitivities[index - first_chemotaxis_index] = parameter;
             return;
         }
 
@@ -724,7 +724,7 @@ public class SignalBehavior
         int cca_index = findBehaviorIndex( "cell-cell adhesion" );
         if( index == cca_index )
         {
-            pCell.phenotype.mechanics.cell_cell_adhesion_strength = parameter;
+            pCell.phenotype.mechanics.cellCellAdhesionStrength = parameter;
             return;
         }
 
@@ -732,7 +732,7 @@ public class SignalBehavior
         int elastic_index = findBehaviorIndex( "cell-cell adhesion elastic constant" );
         if( index == elastic_index )
         {
-            pCell.phenotype.mechanics.attachment_elastic_constant = parameter;
+            pCell.phenotype.mechanics.attachmentElasticConstant = parameter;
             return;
         }
 
@@ -740,7 +740,7 @@ public class SignalBehavior
         int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_affinity_index && index < first_affinity_index + n )
         {
-            pCell.phenotype.mechanics.cell_adhesion_affinities[index - first_affinity_index] = parameter;
+            pCell.phenotype.mechanics.cellAdhesionAffinities[index - first_affinity_index] = parameter;
             return;
         }
 
@@ -748,7 +748,7 @@ public class SignalBehavior
         int max_adh_distance_index = findBehaviorIndex( "relative maximum adhesion distance" );
         if( index == max_adh_distance_index )
         {
-            pCell.phenotype.mechanics.relative_maximum_adhesion_distance = parameter;
+            pCell.phenotype.mechanics.relMaxAdhesionDistance = parameter;
             return;
         }
 
@@ -756,7 +756,7 @@ public class SignalBehavior
         int ccr_index = findBehaviorIndex( "cell-cell repulsion" );
         if( index == ccr_index )
         {
-            pCell.phenotype.mechanics.cell_cell_repulsion_strength = parameter;
+            pCell.phenotype.mechanics.cellCellRepulsionStrength = parameter;
             return;
         }
 
@@ -764,7 +764,7 @@ public class SignalBehavior
         int cba_index = findBehaviorIndex( "cell-BM adhesion" );
         if( index == cba_index )
         {
-            pCell.phenotype.mechanics.cell_BM_adhesion_strength = parameter;
+            pCell.phenotype.mechanics.cellBMAdhesionStrength = parameter;
             return;
         }
 
@@ -772,7 +772,7 @@ public class SignalBehavior
         int cbr_index = findBehaviorIndex( "cell-BM repulsion" );
         if( index == cbr_index )
         {
-            pCell.phenotype.mechanics.cell_BM_repulsion_strength = parameter;
+            pCell.phenotype.mechanics.cellBMRepulsionStrength = parameter;
             return;
         }
 
@@ -780,7 +780,7 @@ public class SignalBehavior
         int dead_phago_index = findBehaviorIndex( "phagocytose dead cell" );
         if( index == dead_phago_index )
         {
-            pCell.phenotype.cell_interactions.deadPhagocytosisRate = parameter;
+            pCell.phenotype.cellInteractions.deadPhagocytosisRate = parameter;
             return;
         }
 
@@ -788,7 +788,7 @@ public class SignalBehavior
         int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
         {
-            pCell.phenotype.cell_interactions.livePhagocytosisRates[index - first_phagocytosis_index] = parameter;
+            pCell.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index] = parameter;
             return;
         }
 
@@ -796,7 +796,7 @@ public class SignalBehavior
         int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_attack_index && index < first_attack_index + n )
         {
-            pCell.phenotype.cell_interactions.attackRates[index - first_attack_index] = parameter;
+            pCell.phenotype.cellInteractions.attackRates[index - first_attack_index] = parameter;
             return;
         }
 
@@ -804,7 +804,7 @@ public class SignalBehavior
         int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_fusion_index && index < first_fusion_index + n )
         {
-            pCell.phenotype.cell_interactions.fusionRates[index - first_fusion_index] = parameter;
+            pCell.phenotype.cellInteractions.fusionRates[index - first_fusion_index] = parameter;
             return;
         }
 
@@ -812,7 +812,7 @@ public class SignalBehavior
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
-            pCell.phenotype.cell_transformations.transformation_rates[index - first_transformation_index] = parameter;
+            pCell.phenotype.cellTransformations.transformation_rates[index - first_transformation_index] = parameter;
             return;
         }
 
@@ -835,7 +835,7 @@ public class SignalBehavior
         int first_immunogenicity_index = findBehaviorIndex( "immunogenicity to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_immunogenicity_index && index < first_immunogenicity_index + n )
         {
-            pCell.phenotype.cell_interactions.immunogenicities[index - first_immunogenicity_index] = parameter;
+            pCell.phenotype.cellInteractions.immunogenicities[index - first_immunogenicity_index] = parameter;
             return;
         }
 
@@ -843,28 +843,28 @@ public class SignalBehavior
         int attachment_rate_ind = findBehaviorIndex( "cell attachment rate" );
         if( index == attachment_rate_ind )
         {
-            pCell.phenotype.mechanics.attachment_rate = parameter;
+            pCell.phenotype.mechanics.attachmentRate = parameter;
         }
 
         // set cell detachment rate  
         int detachment_rate_ind = findBehaviorIndex( "cell detachment rate" );
         if( index == detachment_rate_ind )
         {
-            pCell.phenotype.mechanics.detachment_rate = parameter;
+            pCell.phenotype.mechanics.detachmentRate = parameter;
         }
 
         // maximum number of cell attachments 
         int max_attachments_ind = findBehaviorIndex( "maximum number of cell attachments" );
         if( index == max_attachments_ind )
         {
-            pCell.phenotype.mechanics.maximum_number_of_attachments = (int)parameter;
+            pCell.phenotype.mechanics.maxAttachments = (int)parameter;
         }
 
         // cell damage rate (for effector attack)
         int damage_rate_ind = findBehaviorIndex( "damage rate" );
         if( index == damage_rate_ind )
         {
-            pCell.phenotype.cell_interactions.damageRate = parameter;
+            pCell.phenotype.cellInteractions.damageRate = parameter;
         }
     }
 
@@ -886,7 +886,7 @@ public class SignalBehavior
         return findParameterIndex( response_name );
     }
 
-    public static double get_single_behavior(Cell pCell, String name) throws Exception
+    public static double getSinglBehavior(Cell pCell, String name) throws Exception
     {
         return getSingleBehavior( pCell, findBehaviorIndex( name ) );
     }
@@ -975,112 +975,112 @@ public class SignalBehavior
         int migr_spd_index = findBehaviorIndex( "migration speed" );
         if( index == migr_spd_index )
         {
-            return pCell.phenotype.motility.migration_speed;
+            return pCell.phenotype.motility.migrationSpeed;
         }
 
         // migration bias 
         int migr_bias_index = findBehaviorIndex( "migration bias" );
         if( index == migr_bias_index )
         {
-            return pCell.phenotype.motility.migration_bias;
+            return pCell.phenotype.motility.migrationBias;
         }
 
         // migration persistence time
         int migr_pt_index = findBehaviorIndex( "migration persistence time" );
         if( index == migr_pt_index )
         {
-            return pCell.phenotype.motility.persistence_time;
+            return pCell.phenotype.motility.persistenceTime;
         }
 
         // chemotactic sensitivities 
         int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
         if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
         {
-            return pCell.phenotype.motility.chemotactic_sensitivities[index - first_chemotaxis_index];
+            return pCell.phenotype.motility.chemotacticSensitivities[index - first_chemotaxis_index];
         }
 
         // cell-cell adhesion 
         int cca_index = findBehaviorIndex( "cell-cell adhesion" );
         if( index == cca_index )
         {
-            return pCell.phenotype.mechanics.cell_cell_adhesion_strength;
+            return pCell.phenotype.mechanics.cellCellAdhesionStrength;
         }
 
         // cell-cell "springs"
         int cca_spring_index = findBehaviorIndex( "cell-cell adhesion elastic constant" );
         if( index == cca_spring_index )
         {
-            return pCell.phenotype.mechanics.attachment_elastic_constant;
+            return pCell.phenotype.mechanics.attachmentElasticConstant;
         }
 
         // cell adhesion affinities 
         int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_affinity_index && index < first_affinity_index + n )
         {
-            return pCell.phenotype.mechanics.cell_adhesion_affinities[index - first_affinity_index];
+            return pCell.phenotype.mechanics.cellAdhesionAffinities[index - first_affinity_index];
         }
 
         // max relative maximum adhesion distance 
         int max_adh_index = findBehaviorIndex( "relative maximum adhesion distance" );
         if( index == max_adh_index )
         {
-            return pCell.phenotype.mechanics.relative_maximum_adhesion_distance;
+            return pCell.phenotype.mechanics.relMaxAdhesionDistance;
         }
 
         // cell-cell repulsion 
         int ccr_index = findBehaviorIndex( "cell-cell repulsion" );
         if( index == ccr_index )
         {
-            return pCell.phenotype.mechanics.cell_cell_repulsion_strength;
+            return pCell.phenotype.mechanics.cellCellRepulsionStrength;
         }
 
         // cell-BM adhesion 
         int cba_index = findBehaviorIndex( "cell-BM adhesion" );
         if( index == cba_index )
         {
-            return pCell.phenotype.mechanics.cell_BM_adhesion_strength;
+            return pCell.phenotype.mechanics.cellBMAdhesionStrength;
         }
 
         // cell-BM repulsion 
         int cbr_index = findBehaviorIndex( "cell-BM repulsion" );
         if( index == cbr_index )
         {
-            return pCell.phenotype.mechanics.cell_BM_repulsion_strength;
+            return pCell.phenotype.mechanics.cellBMRepulsionStrength;
         }
 
         // dead cell phagocytosis
         int dead_phag_index = findBehaviorIndex( "phagocytose dead cell" );
         if( index == dead_phag_index )
         {
-            return pCell.phenotype.cell_interactions.deadPhagocytosisRate;
+            return pCell.phenotype.cellInteractions.deadPhagocytosisRate;
         }
 
         // phagocytosis of each live cell type 
         int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
         {
-            return pCell.phenotype.cell_interactions.livePhagocytosisRates[index - first_phagocytosis_index];
+            return pCell.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index];
         }
 
         // attack of each live cell type 
         int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_attack_index && index < first_attack_index + n )
         {
-            return pCell.phenotype.cell_interactions.attackRates[index - first_attack_index];
+            return pCell.phenotype.cellInteractions.attackRates[index - first_attack_index];
         }
 
         // fusion 
         int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_fusion_index && index < first_fusion_index + n )
         {
-            return pCell.phenotype.cell_interactions.fusionRates[index - first_fusion_index];
+            return pCell.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         }
 
         // transformation 
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
-            return pCell.phenotype.cell_transformations.transformation_rates[index - first_transformation_index];
+            return pCell.phenotype.cellTransformations.transformation_rates[index - first_transformation_index];
         }
 
         // custom behavior
@@ -1110,34 +1110,34 @@ public class SignalBehavior
         int max_immunogenicity_ind = start_immunogenicity_ind + n;
         if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
         {
-            return pCell.phenotype.cell_interactions.immunogenicities[index - start_immunogenicity_ind];
+            return pCell.phenotype.cellInteractions.immunogenicities[index - start_immunogenicity_ind];
         }
 
 
         // set cell attachment rate  
         int attachment_rate_ind = findBehaviorIndex( "cell attachment rate" );
         if( index == attachment_rate_ind )
-            return pCell.phenotype.mechanics.attachment_rate;
+            return pCell.phenotype.mechanics.attachmentRate;
 
         // set cell detachment rate  
         int detachment_rate_ind = findBehaviorIndex( "cell detachment rate" );
         if( index == detachment_rate_ind )
         {
-            return pCell.phenotype.mechanics.detachment_rate;
+            return pCell.phenotype.mechanics.detachmentRate;
         }
 
         // maximum number of cell attachments 
         int max_attachments_ind = findBehaviorIndex( "maximum number of cell attachments" );
         if( index == max_attachments_ind )
         {
-            return pCell.phenotype.mechanics.maximum_number_of_attachments;
+            return pCell.phenotype.mechanics.maxAttachments;
         }
 
         // get damage rate 
         int damage_rate_ind = findBehaviorIndex( "damage rate" );
         if( index == damage_rate_ind )
         {
-            return pCell.phenotype.cell_interactions.damageRate;
+            return pCell.phenotype.cellInteractions.damageRate;
         }
 
         return -1;
@@ -1145,7 +1145,7 @@ public class SignalBehavior
 
     public static double[] get_base_behaviors(Cell pCell)
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.type_name );
+        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
 
         Microenvironment microenvironment = pCell.getMicroenvironment();
         int m = microenvironment.number_of_densities();
@@ -1215,89 +1215,89 @@ public class SignalBehavior
 
         // migration speed
         int migration_speed_index = findBehaviorIndex( "migration speed" );
-        parameters[migration_speed_index] = pCD.phenotype.motility.migration_speed;
+        parameters[migration_speed_index] = pCD.phenotype.motility.migrationSpeed;
 
         // migration bias 
         int migration_bias_index = findBehaviorIndex( "migration bias" );
-        parameters[migration_bias_index] = pCD.phenotype.motility.migration_bias;
+        parameters[migration_bias_index] = pCD.phenotype.motility.migrationBias;
 
         // migration persistence time
         int migration_pt_index = findBehaviorIndex( "migration persistence time" );
-        parameters[migration_pt_index] = pCD.phenotype.motility.persistence_time;
+        parameters[migration_pt_index] = pCD.phenotype.motility.persistenceTime;
 
         // chemotactic sensitivities 
         int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
-        System.arraycopy( pCD.phenotype.motility.chemotactic_sensitivities, 0, parameters, first_chemotaxis_index,
-                pCD.phenotype.motility.chemotactic_sensitivities.length );
+        System.arraycopy( pCD.phenotype.motility.chemotacticSensitivities, 0, parameters, first_chemotaxis_index,
+                pCD.phenotype.motility.chemotacticSensitivities.length );
         //        std::copy(  pCD.phenotype.motility.chemotactic_sensitivities.begin() ,
         //                    pCD.phenotype.motility.chemotactic_sensitivities.end() ,
         //                    parameters.begin()+first_chemotaxis_index ); 
 
         // cell-cell adhesion 
         int cca_index = findBehaviorIndex( "cell-cell adhesion" );
-        parameters[cca_index] = pCD.phenotype.mechanics.cell_cell_adhesion_strength;
+        parameters[cca_index] = pCD.phenotype.mechanics.cellCellAdhesionStrength;
 
         // cell-cell "springs"
         int cca_spring_index = findBehaviorIndex( "cell-cell adhesion elastic constant" );
-        parameters[cca_spring_index] = pCD.phenotype.mechanics.attachment_elastic_constant;
+        parameters[cca_spring_index] = pCD.phenotype.mechanics.attachmentElasticConstant;
 
         // cell adhesion affinities 
         String search_for1 = "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name;//CellDefinitions_by_type[0].name;
         int first_affinity_index = findBehaviorIndex( search_for1 );
-        System.arraycopy( pCD.phenotype.mechanics.cell_adhesion_affinities, 0, parameters, first_affinity_index,
-                pCD.phenotype.mechanics.cell_adhesion_affinities.length );
+        System.arraycopy( pCD.phenotype.mechanics.cellAdhesionAffinities, 0, parameters, first_affinity_index,
+                pCD.phenotype.mechanics.cellAdhesionAffinities.length );
         //        std::copy(  pCD.phenotype.mechanics.cell_adhesion_affinities.begin(), 
         //                    pCD.phenotype.mechanics.cell_adhesion_affinities.end() ,
         //                    parameters.begin()+first_affinity_index ); 
 
         // max relative maximum adhesion distance 
         int max_adhesion_distance_index = findBehaviorIndex( "relative maximum adhesion distance" );
-        parameters[max_adhesion_distance_index] = pCD.phenotype.mechanics.relative_maximum_adhesion_distance;
+        parameters[max_adhesion_distance_index] = pCD.phenotype.mechanics.relMaxAdhesionDistance;
 
         // cell-cell repulsion 
         int ccr_index = findBehaviorIndex( "cell-cell repulsion" );
-        parameters[ccr_index] = pCD.phenotype.mechanics.cell_cell_repulsion_strength;
+        parameters[ccr_index] = pCD.phenotype.mechanics.cellCellRepulsionStrength;
 
         // cell-BM adhesion 
         int cba_index = findBehaviorIndex( "cell-BM adhesion" );
-        parameters[cba_index] = pCD.phenotype.mechanics.cell_BM_adhesion_strength;
+        parameters[cba_index] = pCD.phenotype.mechanics.cellBMAdhesionStrength;
 
         // cell-BM repulsion 
         int cbr_index = findBehaviorIndex( "cell-BM repulsion" );
-        parameters[cbr_index] = pCD.phenotype.mechanics.cell_BM_repulsion_strength;
+        parameters[cbr_index] = pCD.phenotype.mechanics.cellBMRepulsionStrength;
 
         // dead cell phagocytosis
         int dead_phag_index = findBehaviorIndex( "phagocytose dead cell" );
-        parameters[dead_phag_index] = pCD.phenotype.cell_interactions.deadPhagocytosisRate;
+        parameters[dead_phag_index] = pCD.phenotype.cellInteractions.deadPhagocytosisRate;
 
         // phagocytosis of each live cell type 
         int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
-        System.arraycopy( pCD.phenotype.cell_interactions.livePhagocytosisRates, 0, parameters, first_phagocytosis_index,
-                pCD.phenotype.cell_interactions.livePhagocytosisRates.length );
+        System.arraycopy( pCD.phenotype.cellInteractions.livePhagocytosisRates, 0, parameters, first_phagocytosis_index,
+                pCD.phenotype.cellInteractions.livePhagocytosisRates.length );
         //        std::copy(  pCD.phenotype.cell_interactions.live_phagocytosis_rates.begin(), 
         //                    pCD.phenotype.cell_interactions.live_phagocytosis_rates.end(), 
         //                    parameters.begin()+first_phagocytosis_index );  
 
         // attack of each live cell type 
         int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
-        System.arraycopy( pCD.phenotype.cell_interactions.attackRates, 0, parameters, first_attack_index,
-                pCD.phenotype.cell_interactions.attackRates.length );
+        System.arraycopy( pCD.phenotype.cellInteractions.attackRates, 0, parameters, first_attack_index,
+                pCD.phenotype.cellInteractions.attackRates.length );
         //        std::copy(  pCD.phenotype.cell_interactions.attack_rates.begin(), 
         //                    pCD.phenotype.cell_interactions.attack_rates.end(), 
         //                    parameters.begin()+first_attack_index );    
 
         // fusion 
         int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
-        System.arraycopy( pCD.phenotype.cell_interactions.fusionRates, 0, parameters, first_fusion_index,
-                pCD.phenotype.cell_interactions.fusionRates.length );
+        System.arraycopy( pCD.phenotype.cellInteractions.fusionRates, 0, parameters, first_fusion_index,
+                pCD.phenotype.cellInteractions.fusionRates.length );
         //        std::copy(  pCD.phenotype.cell_interactions.fusion_rates.begin(), 
         //                    pCD.phenotype.cell_interactions.fusion_rates.end(), 
         //                    parameters.begin()+first_fusion_index );    
 
         // transformation 
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
-        System.arraycopy( pCD.phenotype.cell_transformations.transformation_rates, 0, parameters, first_transformation_index,
-                pCD.phenotype.cell_transformations.transformation_rates.length );
+        System.arraycopy( pCD.phenotype.cellTransformations.transformation_rates, 0, parameters, first_transformation_index,
+                pCD.phenotype.cellTransformations.transformation_rates.length );
         //        std::copy(  pCD.phenotype.cell_transformations.transformation_rates.begin(), 
         //                    pCD.phenotype.cell_transformations.transformation_rates.end(), 
         //                    parameters.begin()+first_transformation_index );    
@@ -1326,8 +1326,8 @@ public class SignalBehavior
 
         // vector of immunogenicity behaviors 
         int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + CellDefinition.getCellDefinition( 0 ).name );//[0].name );
-        System.arraycopy( pCD.phenotype.cell_interactions.immunogenicities, 0, parameters, start_immunogenicity_ind,
-                pCD.phenotype.cell_interactions.immunogenicities.length );
+        System.arraycopy( pCD.phenotype.cellInteractions.immunogenicities, 0, parameters, start_immunogenicity_ind,
+                pCD.phenotype.cellInteractions.immunogenicities.length );
         //        std::copy( pCD.phenotype.cell_interactions.immunogenicities.begin(),
         //                   pCD.phenotype.cell_interactions.immunogenicities.end(), 
         //                   parameters.begin()+start_immunogenicity_ind );  
@@ -1335,19 +1335,19 @@ public class SignalBehavior
 
         // set cell attachment rate  
         int attachment_rate_ind = findBehaviorIndex( "cell attachment rate" );
-        parameters[attachment_rate_ind] = pCD.phenotype.mechanics.attachment_rate;
+        parameters[attachment_rate_ind] = pCD.phenotype.mechanics.attachmentRate;
 
         // set cell detachment rate  
         int detachment_rate_ind = findBehaviorIndex( "cell detachment rate" );
-        parameters[detachment_rate_ind] = pCD.phenotype.mechanics.detachment_rate;
+        parameters[detachment_rate_ind] = pCD.phenotype.mechanics.detachmentRate;
 
         // maximum number of cell attachments 
         int max_attachments_ind = findBehaviorIndex( "maximum number of cell attachments" );
-        parameters[max_attachments_ind] = pCD.phenotype.mechanics.maximum_number_of_attachments;
+        parameters[max_attachments_ind] = pCD.phenotype.mechanics.maxAttachments;
 
         // cell damage rate (effector attack)
         int damage_rate_ind = findBehaviorIndex( "damage rate" );
-        parameters[damage_rate_ind] = pCD.phenotype.cell_interactions.damageRate;
+        parameters[damage_rate_ind] = pCD.phenotype.cellInteractions.damageRate;
 
         return parameters;
     }
@@ -1358,7 +1358,7 @@ public class SignalBehavior
         int m = microenvironment.number_of_densities();
         int n = CellDefinition.getDefinitionsCount();
 
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.type_name );
+        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
 
         if( index < 0 )
         {
@@ -1438,112 +1438,112 @@ public class SignalBehavior
         int migr_spd_index = findBehaviorIndex( "migration speed" );
         if( index == migr_spd_index )
         {
-            return pCD.phenotype.motility.migration_speed;
+            return pCD.phenotype.motility.migrationSpeed;
         }
 
         // migration bias 
         int migr_bias_index = findBehaviorIndex( "migration bias" );
         if( index == migr_bias_index )
         {
-            return pCD.phenotype.motility.migration_bias;
+            return pCD.phenotype.motility.migrationBias;
         }
 
         // migration persistence time
         int migr_pt_index = findBehaviorIndex( "migration persistence time" );
         if( index == migr_pt_index )
         {
-            return pCD.phenotype.motility.persistence_time;
+            return pCD.phenotype.motility.persistenceTime;
         }
 
         // chemotactic sensitivities 
         int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
         if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
         {
-            return pCD.phenotype.motility.chemotactic_sensitivities[index - first_chemotaxis_index];
+            return pCD.phenotype.motility.chemotacticSensitivities[index - first_chemotaxis_index];
         }
 
         // cell-cell adhesion 
         int cca_index = findBehaviorIndex( "cell-cell adhesion" );
         if( index == cca_index )
         {
-            return pCD.phenotype.mechanics.cell_cell_adhesion_strength;
+            return pCD.phenotype.mechanics.cellCellAdhesionStrength;
         }
 
         // cell-cell "springs"
         int cca_spring_index = findBehaviorIndex( "cell-cell adhesion elastic constant" );
         if( index == cca_spring_index )
         {
-            return pCD.phenotype.mechanics.attachment_elastic_constant;
+            return pCD.phenotype.mechanics.attachmentElasticConstant;
         }
 
         // cell adhesion affinities 
         int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name );//  CellDefinitions_by_type[0].name );
         if( index >= first_affinity_index && index < first_affinity_index + n )
         {
-            return pCD.phenotype.mechanics.cell_adhesion_affinities[index - first_affinity_index];
+            return pCD.phenotype.mechanics.cellAdhesionAffinities[index - first_affinity_index];
         }
 
         // max relative maximum adhesion distance 
         int max_adh_index = findBehaviorIndex( "relative maximum adhesion distance" );
         if( index == max_adh_index )
         {
-            return pCD.phenotype.mechanics.relative_maximum_adhesion_distance;
+            return pCD.phenotype.mechanics.relMaxAdhesionDistance;
         }
 
         // cell-cell repulsion 
         int ccr_index = findBehaviorIndex( "cell-cell repulsion" );
         if( index == ccr_index )
         {
-            return pCD.phenotype.mechanics.cell_cell_repulsion_strength;
+            return pCD.phenotype.mechanics.cellCellRepulsionStrength;
         }
 
         // cell-BM adhesion 
         int cba_index = findBehaviorIndex( "cell-BM adhesion" );
         if( index == cba_index )
         {
-            return pCD.phenotype.mechanics.cell_BM_adhesion_strength;
+            return pCD.phenotype.mechanics.cellBMAdhesionStrength;
         }
 
         // cell-BM repulsion 
         int cbr_index = findBehaviorIndex( "cell-BM repulsion" );
         if( index == cbr_index )
         {
-            return pCD.phenotype.mechanics.cell_BM_repulsion_strength;
+            return pCD.phenotype.mechanics.cellBMRepulsionStrength;
         }
 
         // dead cell phagocytosis
         int dead_phag_index = findBehaviorIndex( "phagocytose dead cell" );
         if( index == dead_phag_index )
         {
-            return pCD.phenotype.cell_interactions.deadPhagocytosisRate;
+            return pCD.phenotype.cellInteractions.deadPhagocytosisRate;
         }
 
         // phagocytosis of each live cell type 
         int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
         {
-            return pCD.phenotype.cell_interactions.livePhagocytosisRates[index - first_phagocytosis_index];
+            return pCD.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index];
         }
 
         // attack of each live cell type 
         int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_attack_index && index < first_attack_index + n )
         {
-            return pCD.phenotype.cell_interactions.attackRates[index - first_attack_index];
+            return pCD.phenotype.cellInteractions.attackRates[index - first_attack_index];
         }
 
         // fusion 
         int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_fusion_index && index < first_fusion_index + n )
         {
-            return pCD.phenotype.cell_interactions.fusionRates[index - first_fusion_index];
+            return pCD.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         }
 
         // transformation 
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
-            return pCD.phenotype.cell_transformations.transformation_rates[index - first_transformation_index];
+            return pCD.phenotype.cellTransformations.transformation_rates[index - first_transformation_index];
         }
 
         // custom behavior
@@ -1573,7 +1573,7 @@ public class SignalBehavior
         int max_immunogenicity_ind = start_immunogenicity_ind + n;
         if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
         {
-            return pCD.phenotype.cell_interactions.immunogenicities[index - start_immunogenicity_ind];
+            return pCD.phenotype.cellInteractions.immunogenicities[index - start_immunogenicity_ind];
         }
 
 
@@ -1581,28 +1581,28 @@ public class SignalBehavior
         int attachment_rate_ind = findBehaviorIndex( "cell attachment rate" );
         if( index == attachment_rate_ind )
         {
-            return pCD.phenotype.mechanics.attachment_rate;
+            return pCD.phenotype.mechanics.attachmentRate;
         }
 
         // set cell detachment rate  
         int detachment_rate_ind = findBehaviorIndex( "cell detachment rate" );
         if( index == detachment_rate_ind )
         {
-            return pCD.phenotype.mechanics.detachment_rate;
+            return pCD.phenotype.mechanics.detachmentRate;
         }
 
         // maximum number of cell attachments 
         int max_attachments_ind = findBehaviorIndex( "maximum number of cell attachments" );
         if( index == max_attachments_ind )
         {
-            return pCD.phenotype.mechanics.maximum_number_of_attachments;
+            return pCD.phenotype.mechanics.maxAttachments;
         }
 
         // cell damage rate (effector attack)
         int damage_rate_ind = findBehaviorIndex( "damage rate" );
         if( index == damage_rate_ind )
         {
-            return pCD.phenotype.cell_interactions.damageRate;
+            return pCD.phenotype.cellInteractions.damageRate;
         }
 
         return -1;
@@ -1699,112 +1699,112 @@ public class SignalBehavior
         int migr_spd_index = findBehaviorIndex( "migration speed" );
         if( index == migr_spd_index )
         {
-            return pCD.phenotype.motility.migration_speed;
+            return pCD.phenotype.motility.migrationSpeed;
         }
 
         // migration bias 
         int migr_bias_index = findBehaviorIndex( "migration bias" );
         if( index == migr_bias_index )
         {
-            return pCD.phenotype.motility.migration_bias;
+            return pCD.phenotype.motility.migrationBias;
         }
 
         // migration persistence time
         int migr_pt_index = findBehaviorIndex( "migration persistence time" );
         if( index == migr_pt_index )
         {
-            return pCD.phenotype.motility.persistence_time;
+            return pCD.phenotype.motility.persistenceTime;
         }
 
         // chemotactic sensitivities 
         int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
         if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
         {
-            return pCD.phenotype.motility.chemotactic_sensitivities[index - first_chemotaxis_index];
+            return pCD.phenotype.motility.chemotacticSensitivities[index - first_chemotaxis_index];
         }
 
         // cell-cell adhesion 
         int cca_index = findBehaviorIndex( "cell-cell adhesion" );
         if( index == cca_index )
         {
-            return pCD.phenotype.mechanics.cell_cell_adhesion_strength;
+            return pCD.phenotype.mechanics.cellCellAdhesionStrength;
         }
 
         // cell-cell "springs"
         int cca_spring_index = findBehaviorIndex( "cell-cell adhesion elastic constant" );
         if( index == cca_spring_index )
         {
-            return pCD.phenotype.mechanics.attachment_elastic_constant;
+            return pCD.phenotype.mechanics.attachmentElasticConstant;
         }
 
         // cell adhesion affinities 
         int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_affinity_index && index < first_affinity_index + n )
         {
-            return pCD.phenotype.mechanics.cell_adhesion_affinities[index - first_affinity_index];
+            return pCD.phenotype.mechanics.cellAdhesionAffinities[index - first_affinity_index];
         }
 
         // max relative maximum adhesion distance 
         int max_adh_index = findBehaviorIndex( "relative maximum adhesion distance" );
         if( index == max_adh_index )
         {
-            return pCD.phenotype.mechanics.relative_maximum_adhesion_distance;
+            return pCD.phenotype.mechanics.relMaxAdhesionDistance;
         }
 
         // cell-cell repulsion 
         int ccr_index = findBehaviorIndex( "cell-cell repulsion" );
         if( index == ccr_index )
         {
-            return pCD.phenotype.mechanics.cell_cell_repulsion_strength;
+            return pCD.phenotype.mechanics.cellCellRepulsionStrength;
         }
 
         // cell-BM adhesion 
         int cba_index = findBehaviorIndex( "cell-BM adhesion" );
         if( index == cba_index )
         {
-            return pCD.phenotype.mechanics.cell_BM_adhesion_strength;
+            return pCD.phenotype.mechanics.cellBMAdhesionStrength;
         }
 
         // cell-BM repulsion 
         int cbr_index = findBehaviorIndex( "cell-BM repulsion" );
         if( index == cbr_index )
         {
-            return pCD.phenotype.mechanics.cell_BM_repulsion_strength;
+            return pCD.phenotype.mechanics.cellBMRepulsionStrength;
         }
 
         // dead cell phagocytosis
         int dead_phag_index = findBehaviorIndex( "phagocytose dead cell" );
         if( index == dead_phag_index )
         {
-            return pCD.phenotype.cell_interactions.deadPhagocytosisRate;
+            return pCD.phenotype.cellInteractions.deadPhagocytosisRate;
         }
 
         // phagocytosis of each live cell type 
         int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
         {
-            return pCD.phenotype.cell_interactions.livePhagocytosisRates[index - first_phagocytosis_index];
+            return pCD.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index];
         }
 
         // attack of each live cell type 
         int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_attack_index && index < first_attack_index + n )
         {
-            return pCD.phenotype.cell_interactions.attackRates[index - first_attack_index];
+            return pCD.phenotype.cellInteractions.attackRates[index - first_attack_index];
         }
 
         // fusion 
         int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_fusion_index && index < first_fusion_index + n )
         {
-            return pCD.phenotype.cell_interactions.fusionRates[index - first_fusion_index];
+            return pCD.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         }
 
         // transformation 
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
-            return pCD.phenotype.cell_transformations.transformation_rates[index - first_transformation_index];
+            return pCD.phenotype.cellTransformations.transformation_rates[index - first_transformation_index];
         }
 
         // custom behavior
@@ -1834,7 +1834,7 @@ public class SignalBehavior
         int max_immunogenicity_ind = start_immunogenicity_ind + n;
         if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
         {
-            return pCD.phenotype.cell_interactions.immunogenicities[index - start_immunogenicity_ind];
+            return pCD.phenotype.cellInteractions.immunogenicities[index - start_immunogenicity_ind];
         }
 
 
@@ -1842,28 +1842,28 @@ public class SignalBehavior
         int attachment_rate_ind = findBehaviorIndex( "cell attachment rate" );
         if( index == attachment_rate_ind )
         {
-            return pCD.phenotype.mechanics.attachment_rate;
+            return pCD.phenotype.mechanics.attachmentRate;
         }
 
         // set cell detachment rate  
         int detachment_rate_ind = findBehaviorIndex( "cell detachment rate" );
         if( index == detachment_rate_ind )
         {
-            return pCD.phenotype.mechanics.detachment_rate;
+            return pCD.phenotype.mechanics.detachmentRate;
         }
 
         // maximum number of cell attachments 
         int max_attachments_ind = findBehaviorIndex( "maximum number of cell attachments" );
         if( index == max_attachments_ind )
         {
-            return pCD.phenotype.mechanics.maximum_number_of_attachments;
+            return pCD.phenotype.mechanics.maxAttachments;
         }
 
         // cell damage rate (effector attack)
         int damage_rate_ind = findBehaviorIndex( "damage rate" );
         if( index == damage_rate_ind )
         {
-            return pCD.phenotype.cell_interactions.damageRate;
+            return pCD.phenotype.cellInteractions.damageRate;
         }
 
         return -1;

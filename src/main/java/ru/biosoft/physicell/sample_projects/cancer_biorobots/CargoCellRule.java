@@ -9,7 +9,7 @@ public class CargoCellRule implements custom_cell_rule
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        if( SignalBehavior.get_single_signal( pCell, "dead" ) > 0.5 )
+        if( SignalBehavior.getSingleSignal( pCell, "dead" ) > 0.5 )
         {
             // the cell death functions don't automatically turn off custom functions, since those are part of mechanics.
             // Let's just fully disable now.

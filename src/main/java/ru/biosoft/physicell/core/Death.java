@@ -116,7 +116,7 @@ public class Death implements Cloneable
         return 0; //TODO??
     }
 
-    public int find_death_model_index(String name)
+    public int findDeathModelIndex(String name)
     {
         for( int i = 0; i < models.size(); i++ )
         {
@@ -130,9 +130,8 @@ public class Death implements Cloneable
 
     boolean checkForDeath(double dt)
     {
-        // If the cell is already dead, exit. 
         if( dead )
-            return false;
+            return false; // If the cell is already dead, exit.
 
         // If the cell is alive, evaluate all the death rates for each registered death type. 
         int i = 0;
@@ -152,10 +151,10 @@ public class Death implements Cloneable
         return dead;
     }
 
-    public void trigger_death(int death_model_index)
+    public void triggerDeath(int deathModelIndex)
     {
         dead = true;
-        currentDeathModelIndex = death_model_index;
+        currentDeathModelIndex = deathModelIndex;
 
         /*  
             // if so, change the cycle model to the current death model 
@@ -179,12 +178,12 @@ public class Death implements Cloneable
         */
     }
 
-    public DeathParameters current_parameters()
+    public DeathParameters currentParameters()
     {
         return parameters.get( currentDeathModelIndex );
     }
 
-    public CycleModel current_model()
+    public CycleModel currentModel()
     {
         return models.get( currentDeathModelIndex );
     }

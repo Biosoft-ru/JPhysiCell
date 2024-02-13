@@ -59,7 +59,7 @@ package ru.biosoft.physicell.biofvm;
 */
 public class Voxel
 {
-    int mesh_index; /*!< voxel's index in a General_Mesh */
+    int meshIndex; /*!< voxel's index in a General_Mesh */
     double volume; /*!< voxel's volume (cubic spatial units) */
     public double[] center; /*!< center of volume */
     boolean isDirichlet;
@@ -69,47 +69,28 @@ public class Voxel
 
     public Voxel()
     {
-        mesh_index = 0;
+        meshIndex = 0;
         volume = 10 * 10 * 10;
         center = new double[3];
         isDirichlet = false;
     }
-    //    std::ostream& operator<<(std::ostream& os, const Voxel& v)  
-    //    {
-    //        static std::string tabbing = "\t\t\t\t"; 
-    //        static std::string tabbing2 = "\t\t\t\t\t"; 
-    //        os  << tabbing << "<voxel ID=\"" << v.mesh_index << "\">"  << std::endl
-    //            << tabbing2 << "<center " << v.center << " />" << std::endl  
-    //            << tabbing2 << "<volume>" << v.volume << "</volume>" << std::endl  
-    //            << tabbing  << "</voxel>"; 
-    //
-    //     return os; 
-    //    }
+
     @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( tabbing + "<voxel ID=\"" + mesh_index + "\">\n" );
+        sb.append( tabbing + "<voxel ID=\"" + meshIndex + "\">\n" );
         sb.append( tabbing2 + "<center " + center[0] + "\t" + center[1] + "\t" + center[2] + "/>\n" );
         sb.append( tabbing2 + "<volume>" + volume + "</volume>\n" );
         sb.append( tabbing + "</voxel>" );
         return sb.toString();
     }
 
-    //    void Voxel::stream_output_with_units( std::ostream& os , std::string units ) const 
-    //    {
-    //        static std::string tabbing = "\t\t\t\t"; 
-    //        static std::string tabbing2 = "\t\t\t\t\t"; 
-    //        os  << tabbing << "<voxel ID=\"" << mesh_index << "\">"  << std::endl
-    //            << tabbing2 << "<center " << center << " units=\"" << units << "\" />" << std::endl 
-    //            << tabbing2 << "<volume units=\"cubic " << units << "\">" << volume << "</volume>" << std::endl
-    //            << tabbing  << "</voxel>"; 
-    //        return; 
-    //    }
+
     public String stream_output_with_units(String units)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( tabbing + "<voxel ID=\"" + mesh_index + "\">\n" );
+        sb.append( tabbing + "<voxel ID=\"" + meshIndex + "\">\n" );
         sb.append( tabbing2 + "<center " + center + " units=\"" + units + "\" />\n" );
         sb.append( tabbing2 + "<volume units=\"cubic " + units + "\">" + volume + "</volume>\n" );
         sb.append( tabbing + "</voxel>" );

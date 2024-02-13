@@ -111,12 +111,12 @@ public class TestVolume
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         CellDefinition.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.createAdvancedKi67();
-        cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based();
+        cd.functions.updatePhenotype = new StandardModels.O2based();
         //cell_defaults.functions.volume_update_function = standard_volume_update_function;
 
         // first find index for a few key variables. 
-        int apoptosisModelIndex = cd.phenotype.death.find_death_model_index( "Apoptosis" );
-        int necrosisModelIndex = cd.phenotype.death.find_death_model_index( "Necrosis" );
+        int apoptosisModelIndex = cd.phenotype.death.findDeathModelIndex( "Apoptosis" );
+        int necrosisModelIndex = cd.phenotype.death.findDeathModelIndex( "Necrosis" );
 
         int K1_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
         int K2_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
@@ -128,14 +128,14 @@ public class TestVolume
         if( type.equals( APOPTOSIS ) )
         {
             //            cell.phenotype.cycle.data.currentPhaseIndex = A_index;
-            cell.phenotype.death.trigger_death( apoptosisModelIndex );
-            cell.phenotype.cycle = cell.phenotype.death.current_model();
+            cell.phenotype.death.triggerDeath( apoptosisModelIndex );
+            cell.phenotype.cycle = cell.phenotype.death.currentModel();
         }
         else if( type.equals( NECROSIS ) )
         {
             //            cell.phenotype.cycle.data.currentPhaseIndex = N_index;
-            cell.phenotype.death.trigger_death( necrosisModelIndex );
-            cell.phenotype.cycle = cell.phenotype.death.current_model();
+            cell.phenotype.death.triggerDeath( necrosisModelIndex );
+            cell.phenotype.cycle = cell.phenotype.death.currentModel();
         }
         else
         {
@@ -175,7 +175,7 @@ public class TestVolume
                         else
                             toDelete = (Cell)agent;
                     }
-                    Cell.delete_cell( toDelete );
+                    Cell.deleteCell( toDelete );
                     bw.append( "New cell deleted \n" );
                 }
                 ( (CellContainer)m.agentContainer ).updateAllCells( m, t, dt, dt, dt );

@@ -70,53 +70,53 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 */
 public class Mechanics implements Cloneable
 {
-    public double cell_cell_adhesion_strength;
-    public double cell_BM_adhesion_strength;
-    public double cell_cell_repulsion_strength;
-    public double cell_BM_repulsion_strength;
-    public double[] cell_adhesion_affinities;
+    public double cellCellAdhesionStrength;
+    public double cellBMAdhesionStrength;
+    public double cellCellRepulsionStrength;
+    public double cellBMRepulsionStrength;
+    public double[] cellAdhesionAffinities;
 
-    public double relative_maximum_adhesion_distance; // this is a multiple of the cell (equivalent) radius
+    public double relMaxAdhesionDistance; // this is a multiple of the cell (equivalent) radius
     // double maximum_adhesion_distance; // needed? 
 
     /* for spring attachments */
-    int maximum_number_of_attachments;
-    public double attachment_elastic_constant;
+    int maxAttachments;
+    public double attachmentElasticConstant;
 
-    public double attachment_rate;
-    public double detachment_rate;
+    public double attachmentRate;
+    public double detachmentRate;
 
     /* to be deprecated */
-	public double relative_maximum_attachment_distance;
-	public double relative_detachment_distance;
-	public double maximum_attachment_rate;
+    public double relMaxAttachmentDistance;
+    public double relDetachmentDistance;
+    public double maxAttachmentRate;
 
     public Mechanics()
     {
-        cell_cell_adhesion_strength = 0.4;
-        cell_BM_adhesion_strength = 4.0;
+        cellCellAdhesionStrength = 0.4;
+        cellBMAdhesionStrength = 4.0;
 
-        cell_cell_repulsion_strength = 10.0;
-        cell_BM_repulsion_strength = 100.0;
+        cellCellRepulsionStrength = 10.0;
+        cellBMRepulsionStrength = 100.0;
 
-        cell_adhesion_affinities = new double[] {1};
+        cellAdhesionAffinities = new double[] {1};
 
         // this is a multiple of the cell (equivalent) radius
-        relative_maximum_adhesion_distance = 1.25;
+        relMaxAdhesionDistance = 1.25;
         // maximum_adhesion_distance = 0.0; 
 
         /* for spring attachments */
-        maximum_number_of_attachments = 12;
-        attachment_elastic_constant = 0.01;
+        maxAttachments = 12;
+        attachmentElasticConstant = 0.01;
 
-        attachment_rate = 0; // 10.0 prior ot March 2023
-        detachment_rate = 0;
+        attachmentRate = 0; // 10.0 prior ot March 2023
+        detachmentRate = 0;
 
         /* to be deprecated */
-        relative_maximum_attachment_distance = relative_maximum_adhesion_distance;
-        relative_detachment_distance = relative_maximum_adhesion_distance;
+        relMaxAttachmentDistance = relMaxAdhesionDistance;
+        relDetachmentDistance = relMaxAdhesionDistance;
 
-        maximum_attachment_rate = 1.0;
+        maxAttachmentRate = 1.0;
     }
 
     public void sync_to_cell_definitions()
@@ -126,29 +126,29 @@ public class Mechanics implements Cloneable
 
     public void initialize(int cellDinitionSize)
     {
-        cell_adhesion_affinities = VectorUtil.resize( cell_adhesion_affinities, cellDinitionSize, 1.0 );
+        cellAdhesionAffinities = VectorUtil.resize( cellAdhesionAffinities, cellDinitionSize, 1.0 );
     }
 
     double cell_adhesion_affinity(String type_name)
     {
         int n = CellDefinition.getCellDefinition( type_name ).type;
-        return cell_adhesion_affinities[n];
+        return cellAdhesionAffinities[n];
     }
 
-    void set_fully_heterotypic()
+    void setFullyHeterotypic()
     {
         //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
         int number_of_cell_defs = CellDefinition.getDefinitionsCount();
         //        cell_adhesion_affinities.assign( number_of_cell_defs, 1.0);
-        cell_adhesion_affinities = VectorUtil.assign( number_of_cell_defs, 1.0 );
+        cellAdhesionAffinities = VectorUtil.assign( number_of_cell_defs, 1.0 );
     }
 
-    void set_fully_homotypic(Cell pC)
+    void setFullyHomotypic(Cell pC)
     {
         //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
         int number_of_cell_defs = CellDefinition.getDefinitionsCount();
         //        cell_adhesion_affinities.assign( number_of_cell_defs, 0.0);
-        cell_adhesion_affinities = new double[number_of_cell_defs];
+        cellAdhesionAffinities = new double[number_of_cell_defs];
         // now find my type and set to 1 
         //  cell_adhesion_affinity( pC->type_name ) = 1.0; 
     }
@@ -156,93 +156,54 @@ public class Mechanics implements Cloneable
 
     // new on July 29, 2018
     // change the ratio without changing the repulsion strength or equilibrium spacing 
-    void set_relative_maximum_adhesion_distance(double new_value)
+    void setRelMaxAdhesionDistance(double newValue)
     {
         // get old equilibrium spacing, based on equilibriation of pairwise adhesive/repulsive forces at that distance. 
-
         // relative equilibrium spacing (relative to mean cell radius)
-        double s_relative = 2.0;
+        double temp1 = Math.sqrt( cellCellAdhesionStrength / cellCellRepulsionStrength );
+        double temp2 = 1.0 - temp1; //  1 - sqrt( alpha_CCA / alpha_CCR );
+        double sRelative = 2 * temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ); 
 
-        double temp1 = cell_cell_adhesion_strength;
-        temp1 /= cell_cell_repulsion_strength;
-        temp1 = Math.sqrt( temp1 );
-
-        double temp2 = 1.0;
-        temp2 -= temp1; //  1 - sqrt( alpha_CCA / alpha_CCR );
-
-
-        s_relative *= temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ); 
-
-        temp1 /= relative_maximum_adhesion_distance; // sqrt( alpha_CCA / alpha_CCR)/f;
-        temp2 = 1.0;
-        temp2 -= temp1; // 1 - sqrt( alpha_CCA / alpha_CCR )/f;
-
-        s_relative /= temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ) / ( 1-1/f) ; 
+        temp1 /= relMaxAdhesionDistance; // sqrt( alpha_CCA / alpha_CCR)/f;
+        temp2 = 1.0 - temp1; // 1 - sqrt( alpha_CCA / alpha_CCR )/f;
+        sRelative /= temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ) / ( 1-1/f) ; 
 
         // now, adjust the relative max adhesion distance 
-
-        relative_maximum_adhesion_distance = new_value;
+        relMaxAdhesionDistance = newValue;
 
         // adjust the adhesive coefficient to preserve the old equilibrium distance
-
-        temp1 = s_relative;
-        temp1 /= 2.0;
-
-        temp2 = 1.0;
-        temp2 -= temp1; // 1 - s_relative/2.0 
-
-        temp1 /= relative_maximum_adhesion_distance; // s_relative/(2*relative_maximum_adhesion_distance); 
-        temp1 *= -1.0; // -s_relative/(2*relative_maximum_adhesion_distance); 
-        temp1 += 1.0; // 1.0 -s_relative/(2*relative_maximum_adhesion_distance); 
-
+        temp1 = sRelative / 2.0;
+        temp2 = 1.0 - temp1; // 1 - s_relative/2.0 
+        temp1 = 1.0 - temp1 / relMaxAdhesionDistance; // 1.0 -s_relative/(2*relative_maximum_adhesion_distance); 
         temp2 /= temp1;
         temp2 *= temp2;
-
-        cell_cell_adhesion_strength = cell_cell_repulsion_strength;
-        cell_cell_adhesion_strength *= temp2;
-
-        return;
+        cellCellAdhesionStrength = cellCellRepulsionStrength * temp2;
     }
 
     // new on July 29, 2018
     // set the cell-cell equilibrium spacing, accomplished by changing the 
     // cell-cell adhesion strength, while leaving the cell-cell repulsion 
     // strength and the maximum adhesion distance unchanged 
-    public void set_relative_equilibrium_distance(double new_value)
+    public void setRelEquilibriumDistance(double newValue)
     {
-        if( new_value > 2.0 )
+        if( newValue > 2.0 )
         {
-            //            std::cout << "**** Warning in function " << __FUNCTION__ << " in " << __FILE__ << " : " << std::endl 
-            //                << "\tAttempted to set equilibrium distance exceeding two cell radii." << std::endl
-            //                << "\tWe will cap the equilibrium distance at 2.0 cell radii." << std::endl 
-            //                << "****" << std::endl << std::endl; 
-
-            new_value = 2.0;
+            System.out.println( "Warning in Mechanics function :\n" + "\tAttempted to set equilibrium distance exceeding two cell radii.\n"
+                    + "\tWe will cap the equilibrium distance at 2.0 cell radii.\n" + "****\n\n" );
+            newValue = 2.0;
         }
-
         // adjust the adhesive coefficient to achieve the new (relative) equilibrium distance
-        double temp1 = new_value;
-        temp1 /= 2.0;
-
-        double temp2 = 1.0;
-        temp2 -= temp1; // 1 - s_relative/2.0 
-
-        temp1 /= relative_maximum_adhesion_distance; // s_relative/(2*relative_maximum_adhesion_distance); 
-        temp1 *= -1.0; // -s_relative/(2*relative_maximum_adhesion_distance); 
-        temp1 += 1.0; // 1.0 -s_relative/(2*relative_maximum_adhesion_distance); 
-
+        double temp1 = newValue / 2.0;
+        double temp2 = 1.0 - temp1; // 1 - s_relative/2.0
+        temp1 = 1 - temp1 / relMaxAdhesionDistance; // 1.0 -s_relative/(2*relative_maximum_adhesion_distance);         
         temp2 /= temp1;
         temp2 *= temp2;
-
-        cell_cell_adhesion_strength = cell_cell_repulsion_strength;
-        cell_cell_adhesion_strength *= temp2;
-
-        return;
+        cellCellAdhesionStrength = cellCellRepulsionStrength * temp2;
     }
 
-    public void set_absolute_equilibrium_distance(Phenotype phenotype, double new_value)
+    public void setAbsEquilibriumDistance(Phenotype phenotype, double newValue)
     {
-        set_relative_equilibrium_distance( new_value / phenotype.geometry.radius );
+        setRelEquilibriumDistance( newValue / phenotype.geometry.radius );
     }
 
     @Override
@@ -251,7 +212,7 @@ public class Mechanics implements Cloneable
         try
         {
             Mechanics result = (Mechanics)super.clone();
-            result.cell_adhesion_affinities = cell_adhesion_affinities.clone();
+            result.cellAdhesionAffinities = cellAdhesionAffinities.clone();
             return result;
         }
         catch( CloneNotSupportedException e )

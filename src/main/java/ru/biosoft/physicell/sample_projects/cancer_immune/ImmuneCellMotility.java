@@ -18,13 +18,13 @@ public class ImmuneCellMotility implements update_migration_bias
         // if not docked, attempt biased chemotaxis 
         if( pCell.state.attachedCells.size() == 0 )
         {
-            phenotype.motility.is_motile = true;
-            phenotype.motility.migration_bias_direction = pCell.nearest_gradient( immuneFactorIndex ).clone();
-            VectorUtil.normalize( ( phenotype.motility.migration_bias_direction ) );
+            phenotype.motility.isMotile = true;
+            phenotype.motility.migrationBiasDirection = pCell.nearest_gradient( immuneFactorIndex ).clone();
+            VectorUtil.normalize( ( phenotype.motility.migrationBiasDirection ) );
         }
         else
         {
-            phenotype.motility.is_motile = false;
+            phenotype.motility.isMotile = false;
         }
     }
 }

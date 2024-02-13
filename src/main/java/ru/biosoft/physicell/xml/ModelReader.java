@@ -36,7 +36,7 @@ import ru.biosoft.physicell.core.Volume;
 
 public class ModelReader extends Constants
 {
-
+    private static final String OPTIONS = "options";
 
     public Model read(InputStream is) throws Exception
     {
@@ -127,9 +127,8 @@ public class ModelReader extends Constants
             }
         }
         m.resizeSpace( minX, maxX, minY, maxY, minZ, maxZ, dx, dy, dz );
-        //        efault_microenvironment_options.simulate_2D = xml_get_bool_value( node, "use_2D" ); 
-        //
-        if( m.options.simulate_2D )
+        m.options.simulate2D = use2D;
+        if( m.options.simulate2D )
         {
             minZ = -0.5 * dz;
             maxZ = 0.5 * dz;
@@ -141,7 +140,6 @@ public class ModelReader extends Constants
         m.options.dx = dx;
         m.options.dy = dy;
         m.options.dz = dz;
-        m.options.simulate_2D = use2D;
     }
 
     public void readOverall(Element physicell, Model model)
@@ -232,7 +230,7 @@ public class ModelReader extends Constants
                     if( intervalElement != null && enabled )
                     {
                         double interval = getDoubleVal( intervalElement );
-                        String intervalUnits = getAttr( intervalElement, "units" );
+                        String intervalUnits = getAttr( intervalElement, UNITS );
                     }
 
                     break;
@@ -249,7 +247,7 @@ public class ModelReader extends Constants
 
     public void readOptions(Element physicell)
     {
-        Element optionsElement = findElement( physicell, "options" );
+        Element optionsElement = findElement( physicell, OPTIONS );
         for( Element el : getAllElements( optionsElement ) )
         {
             switch( el.getTagName() )
@@ -311,14 +309,14 @@ public class ModelReader extends Constants
         {
             Element variableElement = variableElements.get( i );
             String name = getAttr( variableElement, "name" );
-            String units = getAttr( variableElement, "units" );
+            String units = getAttr( variableElement, UNITS );
             int id = getIntAttr( variableElement, "ID" );
             Element physicalElement = findElement( variableElement, "physical_parameter_set" );
             Element diffusionElement = findElement( physicalElement, "diffusion_coefficient" );
-            //            String diffusionUnits = getAttr( diffusionElement, "units" );
+            //            String diffusionUnits = getAttr( diffusionElement, UNITS );
             double diffusionValue = getDoubleVal( diffusionElement );
             Element decayElement = findElement( physicalElement, "decay_rate" );
-            //            String decayUnits = getAttr( diffusionElement, "units" );
+            //            String decayUnits = getAttr( diffusionElement, UNITS );
             double decayValue = getDoubleVal( decayElement );
 
             if( id == 0 )
@@ -327,11 +325,11 @@ public class ModelReader extends Constants
                 m.addDensity( name, units, diffusionValue, decayValue );
 
             Element initialConditionElement = findElement( variableElement, "initial_condition" );
-            //            String initialUnits = initialConditionElement.getAttribute( "units" );
+            //            String initialUnits = initialConditionElement.getAttribute( UNITS );
             initialValues[i] = getDoubleVal( initialConditionElement );
 
             Element DirichletBoundaryElement = findElement( variableElement, "Dirichlet_boundary_condition" );
-            //            String dirichletUnits = getAttr( DirichletBoundaryElement, "units" );
+            //            String dirichletUnits = getAttr( DirichletBoundaryElement, UNITS );
             boolean dirichletEnabled = getBoolAttr( DirichletBoundaryElement, "enabled" );
             double dirichletValue = getDoubleVal( DirichletBoundaryElement );
             Dirichlet_condition[i] = dirichletValue;
@@ -435,51 +433,6 @@ public class ModelReader extends Constants
         Microenvironment.initialize_microenvironment( m );
     }
 
-    //    void initialize_cell_definitions_from_pugixml(Element el)
-    //    {
-    //        //        pugi::xml_node node_options; 
-    //
-    //        //        node_options = xml_find_node( root , "options" ); 
-    //        //        if( node_options )
-    //        //        {
-    //        //            bool settings = 
-    //        //                xml_get_bool_value( node_options, "virtual_wall_at_domain_edge" ); 
-    //        //            if( settings )
-    //        //            {
-    //        //                std::cout << "virtual_wall_at_domain_edge: enabled" << std::endl; 
-    //        //                cell_defaults.functions.add_cell_basement_membrane_interactions = standard_domain_edge_avoidance_interactions;
-    //        //            }
-    //        //
-    //        //        }
-    //        //        
-    //        //        // first, let's pre-build the map. 
-    //        //        prebuild_cell_definition_index_maps(); 
-    //        //        
-    //        Element cdsElement = findElement( el, "cell_definitions" );
-    //
-    //        for( Element cdElement : findAllElements( cdsElement, "cell_definition" ) )
-    //        {
-    //            System.out.println( "Processing " + getAttr( cdElement, "name" ) + " ... " );
-    //
-    //            initialize_cell_definition_from_pugixml( cdElement );
-    //            build_cell_definitions_maps();
-    //        }
-    //    }
-    //    Map<String, Integer> cellDefinitions = null;
-    //    int cellDefinitionSize = 0;
-    //    public void preReadCellDefinitions(Element physicell, Microenvironment m) throws Exception
-    //    {
-    //        //        cellDefinitions = new HashMap<>();
-    //        Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
-    //        for( Element cdElement : findAllElements( cellDefinitionsElement, "cell_definition" ) )
-    //        {
-    //            cellDefinitionSize++;
-    //            //            String name = getAttr( cdElement, "name" );
-    //            //            Integer ID = getIntAttr( cdElement, "ID" );
-    //            //            cellDefinitions.put( name, ID );
-    //        }
-    //    }
-
     public void readCellDefinitions(Element physicell, Microenvironment m) throws Exception
     {
         Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
@@ -517,47 +470,8 @@ public class ModelReader extends Constants
         }
     }
 
-    //    public void readCellDefinitions2(Element physicell, Microenvironment m) throws Exception
-    //    {
-    //        Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
-    //        for( Element cdElement : findAllElements( cellDefinitionsElement, "cell_definition" ) )
-    //        {
-    //            CellDefinition cd;
-    //            String name = getAttr( cdElement, "name" );
-    //            Integer ID = getIntAttr( cdElement, "ID" );
-    //            int id = ID == null ? -1 : ID;
-    //            boolean defaultDefinition = name.equals( "default" ) || id == 0;
-    //            if( defaultDefinition ) //TODO: check ID=0 
-    //                cd = StandardModels.createDefaultCellDefinition( name, m );
-    //            else
-    //                cd = new CellDefinition( m, name );
-    //            cd.type = id;
-    //            CellDefinition.registerCellDefinition( cd );
-    //
-    //            CellDefinition parent = null;
-    //            String parentType = getAttr( cdElement, "parent_type" );
-    //            if( !parentType.isEmpty() )
-    //                parent = CellDefinition.getCellDefinition( parentType );
-    //            //            boolean use_default_as_parent_without_specifying = false;
-    //            if( parent == null && !defaultDefinition )
-    //            {
-    //                parent = StandardModels.createDefaultCellDefinition( "default", m );
-    //                //                use_default_as_parent_without_specifying = true;
-    //            }
-    //
-    //            // if we found something to inherit from, then do it! 
-    //            if( parent != null )
-    //            {
-    //                System.out.println( "\tCopying from type " + parent.name + " ... " );
-    //                cd = parent;
-    //                // but recover the name and ID (type)
-    //                cd.name = name;
-    //                cd.type = id;
-    //            }
     public void readPhenotypes(Element physicell, Microenvironment m) throws Exception
     {
-
-
         Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
         for( Element cdElement : findAllElements( cellDefinitionsElement, "cell_definition" ) )
         {
@@ -745,10 +659,6 @@ public class ModelReader extends Constants
                 alreadyExists = true;
             }
 
-            //            CycleModel model = new CycleModel();
-            //            model.name = name;
-            //            model.code = code;
-
             DeathParameters parameters = new DeathParameters();
             Element deathRateElement = findElement( modelElement, "death_rate" );
             double rateValue = getDoubleVal( deathRateElement );
@@ -851,37 +761,6 @@ public class ModelReader extends Constants
                 throw new Exception( "Warning: Unknown death model " );
             }
         }
-        //        <death>
-        //                <model code="100" name="apoptosis">
-        //                  <death_rate units="1/min">0</death_rate>
-        //                  <phase_durations units="min">
-        //                    <duration index="0" fixed_duration="true">516</duration>
-        //                  </phase_durations>
-        //                  <parameters>
-        //                    <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-        //                    <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-        //                    <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-        //                    <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-        //                    <calcification_rate units="1/min">0</calcification_rate>
-        //                    <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-        //                  </parameters>
-        //                </model>
-        //                <model code="101" name="necrosis">
-        //                  <death_rate units="1/min">0.0</death_rate>
-        //                  <phase_durations units="min">
-        //                    <duration index="0" fixed_duration="true">0</duration>
-        //                  <duration index="1" fixed_duration="true">86400</duration>
-        //                  </phase_durations>
-        //                  <parameters>
-        //                    <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
-        //                    <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
-        //                    <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
-        //                    <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
-        //                    <calcification_rate units="1/min">0</calcification_rate>
-        //                    <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-        //                  </parameters>
-        //                </model>
-        //              </death>
     }
 
     private void readVolume(Element el, Phenotype p)
@@ -931,17 +810,6 @@ public class ModelReader extends Constants
         }
         volume.adjust();
         p.geometry.update( null, p, 0.0 );
-        //              <volume>
-        //                <total units="micron^3">2494</total>
-        //                <fluid_fraction units="dimensionless">0.75</fluid_fraction>
-        //                <nuclear units="micron^3">540</nuclear>
-        //                <fluid_change_rate units="1/min">0.05</fluid_change_rate>
-        //                <cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
-        //                <nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
-        //                <calcified_fraction units="dimensionless">0</calcified_fraction>
-        //                <calcification_rate units="1/min">0</calcification_rate>
-        //                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-        //              </volume>
     }
 
     private void readMechanics(Element el, Phenotype p) throws Exception
@@ -952,35 +820,35 @@ public class ModelReader extends Constants
             switch( paramElement.getTagName() )
             {
                 case "cell_cell_adhesion_strength":
-                    mechanics.cell_cell_adhesion_strength = getDoubleVal( paramElement );
+                    mechanics.cellCellAdhesionStrength = getDoubleVal( paramElement );
                     //                    String cell_cell_adhesion_strength_units = getAttr( paramElement, "units" );
                     break;
                 case "cell_cell_repulsion_strength":
-                    mechanics.cell_cell_repulsion_strength = getDoubleVal( paramElement );
+                    mechanics.cellCellRepulsionStrength = getDoubleVal( paramElement );
                     //                    String cell_cell_repulsion_strength_units = getAttr( paramElement, "units" );
                     break;
                 case "relative_maximum_adhesion_distance":
-                    mechanics.relative_maximum_adhesion_distance = getDoubleVal( paramElement );
+                    mechanics.relMaxAdhesionDistance = getDoubleVal( paramElement );
                     //                    String relative_maximum_adhesion_distance_units = getAttr( paramElement, "units" );
                     break;
                 case "cell_BM_adhesion_strength":
-                    mechanics.cell_BM_adhesion_strength = getDoubleVal( paramElement );
+                    mechanics.cellBMAdhesionStrength = getDoubleVal( paramElement );
                     //                    String cell_BM_adhesion_strength_units = getAttr( paramElement, "units" );
                     break;
                 case "cell_BM_repulsion_strength":
-                    mechanics.cell_BM_repulsion_strength = getDoubleVal( paramElement );
+                    mechanics.cellBMRepulsionStrength = getDoubleVal( paramElement );
                     //                    String cell_BM_repulsion_strength_units = getAttr( paramElement, "units" );
                     break;
                 case "attachment_elastic_constant":
-                    mechanics.attachment_elastic_constant = getDoubleVal( paramElement );
+                    mechanics.attachmentElasticConstant = getDoubleVal( paramElement );
                     //                    String attachment_elastic_constant_units = getAttr( paramElement, "units" );
                     break;
                 case "attachment_rate":
-                    mechanics.attachment_rate = getDoubleVal( paramElement );
+                    mechanics.attachmentRate = getDoubleVal( paramElement );
                     //                    String attachment_rate_units = getAttr( paramElement, "units" );
                     break;
                 case "detachment_rate":
-                    mechanics.detachment_rate = getDoubleVal( paramElement );
+                    mechanics.detachmentRate = getDoubleVal( paramElement );
                     //                    String detachment_rate_units = getAttr( paramElement, "units" );
                     break;
                 case "cell_adhesion_affinities":
@@ -990,13 +858,13 @@ public class ModelReader extends Constants
                         double value = getDoubleVal( adhesionElement );
                         int ind = CellDefinition.findCellDefinitionIndex( target );
                         if( ind > -1 )
-                            mechanics.cell_adhesion_affinities[ind] = value;
+                            mechanics.cellAdhesionAffinities[ind] = value;
                         else
                             throw new Exception( "Unknown Cell Definition " + target );
                         //                                                { std::cout << "what?!?" << std::endl; }
                     }
                     break;
-                case "options":
+                case OPTIONS:
                     for( Element optionElement : getAllElements( paramElement ) )
                     {
                         switch( optionElement.getTagName() )
@@ -1006,37 +874,20 @@ public class ModelReader extends Constants
                                 boolean set_relative_equilibrium_distance_units_isEnabled = getBoolAttr( optionElement, "enabled" );
                                 double set_relative_equilibrium_distance_units_value = getDoubleVal( optionElement );
                                 if( set_relative_equilibrium_distance_units_isEnabled )
-                                    mechanics.set_relative_equilibrium_distance( set_relative_equilibrium_distance_units_value );
+                                    mechanics.setRelEquilibriumDistance( set_relative_equilibrium_distance_units_value );
+                                break;
                             case "set_absolute_equilibrium_distance":
                                 //                                String set_absolute_equilibrium_distance_units = getAttr( optionElement, "units" );
                                 boolean set_absolute_equilibrium_distance_units_isEnabled = getBoolAttr( optionElement, "enabled" );
                                 double set_absolute_equilibrium_distance_value = getDoubleVal( optionElement );
                                 if( set_absolute_equilibrium_distance_units_isEnabled )
-                                    mechanics.set_absolute_equilibrium_distance( p, set_absolute_equilibrium_distance_value );
+                                    mechanics.setAbsEquilibriumDistance( p, set_absolute_equilibrium_distance_value );
+                                break;
                         }
 
                     }
             }
         }
-        //              <mechanics>
-        //                <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
-        //                <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-        //                <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-        //                <cell_adhesion_affinities>
-        //                    <cell_adhesion_affinity name="director cell">1.0</cell_adhesion_affinity>
-        //                    <cell_adhesion_affinity name="cargo cell">1.0</cell_adhesion_affinity>
-        //                    <cell_adhesion_affinity name="worker cell">1.0</cell_adhesion_affinity>
-        //                    </cell_adhesion_affinities>
-        //                <options>
-        //                  <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
-        //                  <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
-        //                </options>
-        //                <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
-        //                <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
-        //                <attachment_elastic_constant units="1/min">0.5</attachment_elastic_constant>
-        //                <attachment_rate units="1/min">10.0</attachment_rate>
-        //                <detachment_rate units="1/min">0.0</detachment_rate>
-        //              </mechanics
     }
 
     private void readMotility(Element el, CellDefinition cd, Microenvironment m)
@@ -1049,32 +900,32 @@ public class ModelReader extends Constants
             switch( child.getTagName() )
             {
                 case "speed":
-                    motility.migration_speed = getDoubleVal( child );
+                    motility.migrationSpeed = getDoubleVal( child );
                     //                    String speed_units = getAttr( child, "units" );
                     break;
                 case "persistence_time":
-                    motility.persistence_time = getDoubleVal( child );
+                    motility.persistenceTime = getDoubleVal( child );
                     //                    String persistence_time_units = getAttr( child, "units" );
                     break;
                 case "migration_bias":
-                    motility.migration_bias = getDoubleVal( child );
+                    motility.migrationBias = getDoubleVal( child );
                     //                    String migration_bias_units = getAttr( child, "units" );
                     break;
-                case "options":
+                case OPTIONS:
                 {
                     Element enabledElement = findElement( child, "enabled" );
                     if( enabledElement != null )
-                        motility.is_motile = getBoolVal( enabledElement );
+                        motility.isMotile = getBoolVal( enabledElement );
 
                     Element use2dElement = findElement( child, "use_2D" );
                     if( use2dElement != null )
-                        motility.restrict_to_2D = getBoolVal( use2dElement );
+                        motility.restrictTo2D = getBoolVal( use2dElement );
 
-                    if( m.options.simulate_2D && !motility.restrict_to_2D )
+                    if( m.options.simulate2D && !motility.restrictTo2D )
                     {
                         System.out.println( "Note: Overriding to set cell motility for " + cd.name
                                 + " to 2D based on microenvironment domain settings ... " );
-                        motility.restrict_to_2D = true;
+                        motility.restrictTo2D = true;
                         break;
                     }
                     Element chemotaxisElement = findElement( child, "chemotaxis" );
@@ -1086,20 +937,20 @@ public class ModelReader extends Constants
                         // search for the right chemo index               
                         String substrate_name = getVal( findElement( chemotaxisElement, "substrate" ) );
 
-                        motility.chemotaxis_index = m.findDensityIndex( substrate_name );
-                        if( motility.chemotaxis_index < 0 )
+                        motility.chemotaxisIndex = m.findDensityIndex( substrate_name );
+                        if( motility.chemotaxisIndex < 0 )
                         {
                             System.out.println( "Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" );
                             System.out.println( "Substrate " + substrate_name + " was not found in the microenvironment." );
                         }
-                        String actual_name = m.density_names[motility.chemotaxis_index];
+                        String actual_name = m.density_names[motility.chemotaxisIndex];
                         if( !substrate_name.equals( actual_name ) )
                         {
                             System.out.println( "Error: attempted to set chemotaxis to \"" + substrate_name
                                     + "\", which was not found in the microenvironment."
                                     + " Please double-check your substrate name in the config file." );
                         }
-                        motility.chemotaxis_direction = getIntVal( findElement( chemotaxisElement, "direction" ) );
+                        motility.chemotaxisDirection = getIntVal( findElement( chemotaxisElement, "direction" ) );
                     }
                     Element advancedChemotaxisElement = findElement( child, "advanced_chemotaxis" );
                     if( advancedChemotaxisElement != null )
@@ -1141,7 +992,7 @@ public class ModelReader extends Constants
                                 }
                                 else
                                 {
-                                    cd.phenotype.motility.chemotactic_sensitivities[index] = getDoubleVal( sensEl );
+                                    cd.phenotype.motility.chemotacticSensitivities[index] = getDoubleVal( sensEl );
                                 }
                             }
                         }
@@ -1156,59 +1007,37 @@ public class ModelReader extends Constants
             }
         }
         // display summary for diagnostic help 
-        if( cd.functions.update_migration_bias instanceof StandardModels.chemotaxis_function && motility.is_motile )
+        if( cd.functions.update_migration_bias instanceof StandardModels.chemotaxis_function && motility.isMotile )
         {
             System.out.println( "Cells of type " + cd.name + " use standard chemotaxis: \n" + "\t d_bias (before normalization) = "
-                    + motility.chemotaxis_direction + " * grad(" + m.density_names[motility.chemotaxis_index] + ")" );
+                    + motility.chemotaxisDirection + " * grad(" + m.density_names[motility.chemotaxisIndex] + ")" );
         }
 
-        if( cd.functions.update_migration_bias instanceof StandardModels.advanced_chemotaxis_function && motility.is_motile )
+        if( cd.functions.update_migration_bias instanceof StandardModels.advanced_chemotaxis_function && motility.isMotile )
         {
             int number_of_substrates = m.density_names.length;
 
             System.out.println( "Cells of type " + cd.name + " use advanced chemotaxis: \n" + "\t d_bias (before normalization) = "
-                    + motility.chemotactic_sensitivities[0] + " * grad(" + m.density_names[0] + ")" );
+                    + motility.chemotacticSensitivities[0] + " * grad(" + m.density_names[0] + ")" );
 
             for( int n = 1; n < number_of_substrates; n++ )
-                System.out.println( motility.chemotactic_sensitivities[n] + " * grad(" + m.density_names[n] + ")" );
+                System.out.println( motility.chemotacticSensitivities[n] + " * grad(" + m.density_names[n] + ")" );
         }
 
-        if( cd.functions.update_migration_bias instanceof StandardModels.advanced_chemotaxis_function_normalized && motility.is_motile )
+        if( cd.functions.update_migration_bias instanceof StandardModels.advanced_chemotaxis_function_normalized && motility.isMotile )
         {
             int number_of_substrates = m.density_names.length;
 
             System.out.println( "Cells of type " + cd.name + " use normalized advanced chemotaxis: \n"
-                    + "\t d_bias (before normalization) = " + motility.chemotactic_sensitivities[0] + " * grad(" + m.density_names[0] + ")"
+                    + "\t d_bias (before normalization) = " + motility.chemotacticSensitivities[0] + " * grad(" + m.density_names[0] + ")"
                     + " / ||grad(" + m.density_names[0] + ")||" );
 
             for( int n = 1; n < number_of_substrates; n++ )
             {
-                System.out.println( motility.chemotactic_sensitivities[n] + " * grad(" + m.density_names[n] + ")" + " / ||grad("
+                System.out.println( motility.chemotacticSensitivities[n] + " * grad(" + m.density_names[n] + ")" + " / ||grad("
                         + m.density_names[n] + ")||" );
             }
         }
-        //              <motility>
-        //                <speed units="micron/min">1</speed>
-        //                <persistence_time units="min">1</persistence_time>
-        //                <migration_bias units="dimensionless">.5</migration_bias>
-        //                <options>
-        //                  <enabled>false</enabled>
-        //                  <use_2D>true</use_2D>
-        //                  <chemotaxis>
-        //                    <enabled>false</enabled>
-        //                    <substrate>director signal</substrate>
-        //                    <direction>1</direction>
-        //                  </chemotaxis>
-        //                  <advanced_chemotaxis>
-        //                    <enabled>false</enabled>
-        //                    <normalize_each_gradient>false</normalize_each_gradient>
-        //                    <chemotactic_sensitivities>
-        //                      <chemotactic_sensitivity substrate="director signal">0.0</chemotactic_sensitivity>
-        //                      <chemotactic_sensitivity substrate="cargo signal">0.0</chemotactic_sensitivity>
-        //                      </chemotactic_sensitivities>
-        //                    </advanced_chemotaxis>
-        //                </options>
-        //              </motility>
     }
 
     private void readSecretion(Element el, Phenotype p, Microenvironment m)
@@ -1248,29 +1077,11 @@ public class ModelReader extends Constants
                 }
             }
         }
-        //            // net export rate 
-        //            node_sec1 = node_sec.child( "net_export_rate" ); 
-        //            if( node_sec1 )
-        //            { pS->net_export_rates[index] = xml_get_my_double_value( node_sec1 ); }
-        //              <secretion>
-        //                <substrate name="director signal">
-        //                  <secretion_rate units="1/min">9.9</secretion_rate>
-        //                  <secretion_target units="substrate density">1</secretion_target>
-        //                  <uptake_rate units="1/min">0</uptake_rate>
-        //                  <net_export_rate units="total substrate/min">0</net_export_rate>
-        //                </substrate>
-        //                <substrate name="cargo signal">
-        //                  <secretion_rate units="1/min">0.0</secretion_rate>
-        //                  <secretion_target units="substrate density">1</secretion_target>
-        //                  <uptake_rate units="1/min">0.0</uptake_rate>
-        //                  <net_export_rate units="total substrate/min">0.0</net_export_rate>
-        //                </substrate>
-        //                </secretion>
     }
 
     private void readCellInteractions(Element el, CellDefinition cd)
     {
-        CellInteractions cellInteractions = cd.phenotype.cell_interactions;
+        CellInteractions cellInteractions = cd.phenotype.cellInteractions;
         Element dprElement = findElement( el, "dead_phagocytosis_rate" );
         if( dprElement != null )
         {
@@ -1346,33 +1157,11 @@ public class ModelReader extends Constants
                 //                String units = getAttr( damageRateElement, "units" );
             }
         }
-        //              <cell_interactions>
-        //                <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
-        //                <live_phagocytosis_rates>
-        //                    <phagocytosis_rate name="director cell" units="1/min">0.0</phagocytosis_rate>
-        //                    <phagocytosis_rate name="cargo cell" units="1/min">0.0</phagocytosis_rate>
-        //                    <phagocytosis_rate name="worker cell" units="1/min">0.0</phagocytosis_rate>
-        //                    </live_phagocytosis_rates>
-        //
-        //                <attack_rates>
-        //                      <attack_rate name="director cell" units="1/min">0.0</attack_rate>
-        //                      <attack_rate name="cargo cell" units="1/min">0.0</attack_rate>
-        //                      <attack_rate name="worker cell" units="1/min">0.0</attack_rate>
-        //                      </attack_rates>
-        //
-        //                <damage_rate units="1/min">1</damage_rate>
-        //                <fusion_rates>
-        //                      <fusion_rate name="director cell" units="1/min">0.0</fusion_rate>
-        //                      <fusion_rate name="cargo cell" units="1/min">0.0</fusion_rate>
-        //                      <fusion_rate name="worker cell" units="1/min">0.0</fusion_rate>
-        //                      </fusion_rates>
-        //
-        //              </cell_interactions>
     }
 
     private void readCellTransformations(Element el, CellDefinition cd)
     {
-        CellTransformations transformations = cd.phenotype.cell_transformations;
+        CellTransformations transformations = cd.phenotype.cellTransformations;
         Element ratesElement = findElement( el, "transformation_rates" );
         for( Element rateElement : findAllElements( ratesElement, "transformation_rate" ) )
         {
@@ -1397,13 +1186,6 @@ public class ModelReader extends Constants
 
             }
         }
-        //              <cell_transformations>
-        //                <transformation_rates>
-        //                    <transformation_rate name="director cell" units="1/min">0.0</transformation_rate>
-        //                    <transformation_rate name="cargo cell" units="1/min">0.0</transformation_rate>
-        //                    <transformation_rate name="worker cell" units="1/min">0.0</transformation_rate>
-        //                    </transformation_rates>
-        //                </cell_transformations>
     }
 
     private void readCustomData(Element el, CellDefinition cd) throws Exception
@@ -1431,7 +1213,7 @@ public class ModelReader extends Constants
             if( values.length == 1 )
             {
                 // find the variable 
-                int n = cd.custom_data.find_variable_index( name );
+                int n = cd.custom_data.findVariableIndex( name );
                 // if it exists, overwrite 
                 if( n > -1 )
                 {
@@ -1440,17 +1222,17 @@ public class ModelReader extends Constants
                 // otherwise, add 
                 else
                 {
-                    cd.custom_data.add_variable( name, units, values[0] );
-                    defaults.custom_data.add_variable( name, units, values[0] );
+                    cd.custom_data.addVariable( name, units, values[0] );
+                    defaults.custom_data.addVariable( name, units, values[0] );
                 }
 
-                n = cd.custom_data.find_variable_index( name );
+                n = cd.custom_data.findVariableIndex( name );
             }
             // or vector 
             else
             {
                 // find the variable 
-                int n = cd.custom_data.find_vector_variable_index( name );
+                int n = cd.custom_data.findVectorVariableIndex( name );
                 // if it exists, overwrite 
                 if( n > -1 )
                 {
@@ -1459,10 +1241,10 @@ public class ModelReader extends Constants
                 // otherwise, add 
                 else
                 {
-                    cd.custom_data.add_vector_variable( name, units, values );
+                    cd.custom_data.addVectorVariable( name, units, values );
                 }
 
-                n = cd.custom_data.find_vector_variable_index( name );
+                n = cd.custom_data.findVectorVariableIndex( name );
             }
         }
     }

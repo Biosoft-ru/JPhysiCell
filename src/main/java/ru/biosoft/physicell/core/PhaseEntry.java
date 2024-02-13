@@ -72,7 +72,7 @@ public interface PhaseEntry
             v.target_cytoplasmic_to_nuclear_ratio = 0.0;
 
             // change the rate parameters 
-            DeathParameters p = phenotype.death.current_parameters();
+            DeathParameters p = phenotype.death.currentParameters();
             v.cytoplasmic_biomass_change_rate = p.cytoplasmic_biomass_change_rate;
             v.nuclear_biomass_change_rate = p.nuclear_biomass_change_rate;
             v.fluid_change_rate = p.unlysed_fluid_change_rate;
@@ -98,7 +98,7 @@ public interface PhaseEntry
             v.target_cytoplasmic_to_nuclear_ratio = 0.0;
 
             // change the rate parameters   
-            DeathParameters p = phenotype.death.current_parameters();
+            DeathParameters p = phenotype.death.currentParameters();
             v.cytoplasmic_biomass_change_rate = p.cytoplasmic_biomass_change_rate;
             v.nuclear_biomass_change_rate = p.nuclear_biomass_change_rate;
             v.fluid_change_rate = p.unlysed_fluid_change_rate;
@@ -123,7 +123,7 @@ public interface PhaseEntry
             v.target_solid_nuclear = 0.0;
 
             // change the rate parameters 
-            DeathParameters p = phenotype.death.current_parameters();
+            DeathParameters p = phenotype.death.currentParameters();
             v.cytoplasmic_biomass_change_rate = p.cytoplasmic_biomass_change_rate;
             v.nuclear_biomass_change_rate = p.nuclear_biomass_change_rate;
             v.fluid_change_rate = p.lysed_fluid_change_rate;

@@ -49,14 +49,11 @@ package ru.biosoft.physicell.biofvm;
 */
 public class VoxelFace
 {
-    int mesh_index;
+    int meshIndex;
 
-    double surface_area;
-    //        std::vector<double> center; 
+    double surfaceArea;
     double[] center;
-    //        std::vector<double> outward_normal;
     double[] outward_normal;
-    //        std::vector<double> inward_normal;
     double[] inward_normal;
 
     static String tabbing = "\t\t\t\t";
@@ -64,59 +61,34 @@ public class VoxelFace
 
     public VoxelFace()
     {
-        mesh_index = 0;
-
-        surface_area = 10 * 10;
-        center = new double[3];//.assign( 3 , 0.0  ); 
-        outward_normal = new double[3];//.assign( 3 , 0.0 ); 
-        inward_normal = new double[3];//.assign( 3 , 0.0 ); 
+        meshIndex = 0;
+        surfaceArea = 10 * 10;
+        center = new double[3];
+        outward_normal = new double[3];
+        inward_normal = new double[3];
     }
 
-    //    std::ostream& operator<<(std::ostream& os, const Voxel_Face& vf)  
-    //    {
-    //        static std::string tabbing = "\t\t\t\t"; 
-    //        static std::string tabbing2 = "\t\t\t\t\t"; 
-    //        os  << tabbing << "<voxel_face ID=\"" << vf.mesh_index << "\">"  << std::endl
-    //            << tabbing2 << "<center " << vf.center << " />" << std::endl  
-    //            << tabbing2 << "<outward_normal " << vf.outward_normal << " />" << std::endl  
-    //            << tabbing2 << "<inward_normal " << vf.inward_normal << " />" << std::endl  
-    //            << tabbing2 << "<surface_area>" << vf.surface_area << "</surface_area>" << std::endl  
-    //            << tabbing  << "</voxel_face>"; 
-    //
-    //     return os; 
-    //    }
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( tabbing + "<voxel_face ID=\"" + mesh_index + "\">\n" );
+        sb.append( tabbing + "<voxel_face ID=\"" + meshIndex + "\">\n" );
         sb.append( tabbing2 + "<center " + center + " />\n" );
         sb.append( tabbing2 + "<outward_normal " + outward_normal + " />\n" );
         sb.append( tabbing2 + "<inward_normal " + inward_normal + " />\n" );
-        sb.append( tabbing2 + "<surface_area>" + surface_area + "</surface_area>\n" );
+        sb.append( tabbing2 + "<surface_area>" + surfaceArea + "</surface_area>\n" );
         sb.append( tabbing + "</voxel_face>" );
         return sb.toString();
     }
 
-    //
-    //    void Voxel_Face::stream_output_with_units( std::ostream& os , std::string units ) const
-    //    {
-    //        static std::string tabbing = "\t\t\t\t"; 
-    //        static std::string tabbing2 = "\t\t\t\t\t"; 
-    //        os  << tabbing << "<voxel_face ID=\"" << mesh_index << "\">"  << std::endl
-    //            << tabbing2 << "<center units=\"" << units << "\" " << center << " />" << std::endl  
-    //            << tabbing2 << "<outward_normal units=\"" << units << "\" " << outward_normal << " />" << std::endl  
-    //            << tabbing2 << "<inward_normal units=\"" << units << "\" " << inward_normal << " />" << std::endl  
-    //            << tabbing2 << "<surface_area units=\"square " << units << "\">" << surface_area << "</surface_area>" << std::endl  
-    //            << tabbing  << "</voxel_face>"; 
-    //    }
+
     public String stream_output_with_units(String units)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( tabbing + "<voxel_face ID=\"" + mesh_index + "\">\n" );
+        sb.append( tabbing + "<voxel_face ID=\"" + meshIndex + "\">\n" );
         sb.append( tabbing2 + "<center units=\"" + units + "\" " + center + " />\n" );
         sb.append( tabbing2 + "<outward_normal units=\"" + units + "\" " + outward_normal + " />\n" );
         sb.append( tabbing2 + "<inward_normal units=\"" + units + "\" " + inward_normal + " />\n" );
-        sb.append( tabbing2 + "<surface_area units=\"square " + units + "\">" + surface_area + "</surface_area>\n" );
+        sb.append( tabbing2 + "<surface_area units=\"square " + units + "\">" + surfaceArea + "</surface_area>\n" );
         sb.append( tabbing + "</voxel_face>" );
         return sb.toString();
     }

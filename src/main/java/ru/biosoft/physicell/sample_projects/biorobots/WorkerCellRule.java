@@ -3,12 +3,12 @@ package ru.biosoft.physicell.sample_projects.biorobots;
 import java.util.Set;
 
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.core.CellFunctions.update_phenotype;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.SignalBehavior;
 
-public class WorkerCellRule extends update_phenotype
+public class WorkerCellRule extends UpdatePhenotype
 {
     private double attachedMigrationBias;
     private double unattachedMigrationBias;
@@ -26,8 +26,8 @@ public class WorkerCellRule extends update_phenotype
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        double director_signal = SignalBehavior.get_single_signal( pCell, "director signal" );
-        double cargo_signal = SignalBehavior.get_single_signal( pCell, "cargo signal" );
+        double director_signal = SignalBehavior.getSingleSignal( pCell, "director signal" );
+        double cargo_signal = SignalBehavior.getSingleSignal( pCell, "cargo signal" );
 
         SignalBehavior.setSingleBehavior( pCell, "cell-cell adhesion elastic constant", elasticCoefficient );
 
@@ -40,7 +40,7 @@ public class WorkerCellRule extends update_phenotype
                 SignalBehavior.setSingleBehavior( pTemp, "custom:receptor", 0.0 );
                 SignalBehavior.setSingleBehavior( pTemp, "cycle entry", 0.0 );
             }
-            pCell.remove_all_attached_cells();
+            pCell.removeAllAttachedCells();
 
             SignalBehavior.setSingleBehavior( pCell, "chemotactic response to director signal", 0.0 );
             SignalBehavior.setSingleBehavior( pCell, "chemotactic response to cargo signal", 1.0 );
@@ -56,11 +56,11 @@ public class WorkerCellRule extends update_phenotype
                 // if it is expressing the receptor, dock with it set chemotaxis weights set migration bias 
                 if( cell == pCell )
                     continue;
-                double receptor = SignalBehavior.get_single_signal( cell, "custom:receptor" );
+                double receptor = SignalBehavior.getSingleSignal( cell, "custom:receptor" );
 
                 if( receptor > 0.5 )
                 {
-                    Cell.attach_cells( pCell, cell );
+                    Cell.attachcCells( pCell, cell );
                     SignalBehavior.setSingleBehavior( cell, "custom:receptor", 0.0 );
                     SignalBehavior.setSingleBehavior( cell, "director signal secretion", 0.0 );
                     SignalBehavior.setSingleBehavior( cell, "cargo signal secretion", 0.0 );

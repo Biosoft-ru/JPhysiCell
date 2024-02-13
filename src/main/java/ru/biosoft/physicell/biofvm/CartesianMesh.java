@@ -168,7 +168,7 @@ public class CartesianMesh extends GeneralMesh
                     voxels[n].center[0] = x_coordinates[i];
                     voxels[n].center[1] = y_coordinates[j];
                     voxels[n].center[2] = z_coordinates[k];
-                    voxels[n].mesh_index = n;
+                    voxels[n].meshIndex = n;
                     voxels[n].volume = dV;
                     n++;
                 }
@@ -412,7 +412,7 @@ public class CartesianMesh extends GeneralMesh
                     voxels[n].center[0] = x_coordinates[i];
                     voxels[n].center[1] = y_coordinates[j];
                     voxels[n].center[2] = z_coordinates[k];
-                    voxels[n].mesh_index = n;
+                    voxels[n].meshIndex = n;
                     voxels[n].volume = dV;
 
                     n++;
@@ -549,7 +549,7 @@ public class CartesianMesh extends GeneralMesh
                     voxels[n].center[0] = x_coordinates[i];
                     voxels[n].center[1] = y_coordinates[j];
                     voxels[n].center[2] = z_coordinates[k];
-                    voxels[n].mesh_index = n;
+                    voxels[n].meshIndex = n;
                     voxels[n].volume = dV;
 
                     n++;

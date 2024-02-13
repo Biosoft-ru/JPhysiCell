@@ -138,7 +138,7 @@ public class BasicAgent
         return radius;
     }
 
-    public void update_position(double dt)
+    public void updatePosition(double dt)
     {
         //make sure to update current_voxel_index if you are implementing this function
     };

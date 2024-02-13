@@ -10,7 +10,7 @@ import ru.biosoft.physicell.core.CellFunctions.add_cell_basement_membrane_intera
 import ru.biosoft.physicell.core.CellFunctions.calculate_distance_to_membrane;
 import ru.biosoft.physicell.core.CellFunctions.contact_function;
 import ru.biosoft.physicell.core.CellFunctions.update_migration_bias;
-import ru.biosoft.physicell.core.CellFunctions.update_phenotype;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 
 /*
 ###############################################################################
@@ -128,7 +128,7 @@ public class StandardModels
         defaults.phenotype.cycle = Ki67_advanced;
         defaults.functions.updateVolume = new standard_volume_update_function();
         //        result.functions.update_migration_bias = null;
-        defaults.functions.updatePhenotype = new update_cell_and_death_parameters_O2_based();
+        defaults.functions.updatePhenotype = new O2based();
         //        result.functions.custom_cell_rule = null;
         defaults.functions.updateVelocity = new standard_update_cell_velocity();
         //        result.functions.add_cell_basement_membrane_interactions = null;
@@ -448,7 +448,6 @@ public class StandardModels
 
     public static class standard_update_cell_velocity implements CellFunctions.update_velocity
     {
-
         @Override
         public void execute(Cell pCell, Phenotype phenotype, double dt)
         {
@@ -457,12 +456,7 @@ public class StandardModels
                 pCell.functions.add_cell_basement_membrane_interactions.execute( pCell, phenotype, dt );
             }
 
-            if( pCell.definition.name.contains( "worker" ) )
-            {
-                double a = 37;
-//                System.out.println( "" );
 
-            }
             pCell.state.simplePressure = 0.0;
             pCell.state.neighbors.clear(); // new 1.8.0
 
@@ -477,7 +471,7 @@ public class StandardModels
             Set<Cell> neighbors = container.agent_grid.get( pCell.get_current_mechanics_voxel_index() );
             for( Cell neighbor : neighbors )
             {
-                pCell.add_potentials( neighbor );
+                pCell.addPotentials( neighbor );
             }
             //        std::vector<int>::iterator neighbor_voxel_index;
             //        std::vector<int>::iterator neighbor_voxel_index_end = 
@@ -500,29 +494,29 @@ public class StandardModels
             int[] neighborVoxels = container.underlying_mesh.moore_connected_voxel_indices[voxelIndex];
             for( int neighbor_voxel_index : neighborVoxels )
             {
-                if( !Cell.is_neighbor_voxel( pCell, center, container.underlying_mesh.voxels[neighbor_voxel_index].center,
+                if( !Cell.isNeighborVoxel( pCell, center, container.underlying_mesh.voxels[neighbor_voxel_index].center,
                         neighbor_voxel_index ) )
                     continue;
                 for( Cell neighbor : container.agent_grid.get( neighbor_voxel_index ) )
                 {
-                    pCell.add_potentials( neighbor );
+                    pCell.addPotentials( neighbor );
                 }
             }
-            pCell.update_motility_vector( dt );
-            VectorUtil.sum( pCell.velocity, phenotype.motility.motility_vector );
+            pCell.updateMotilityVector( dt );
+            VectorUtil.sum( pCell.velocity, phenotype.motility.motilityVector );
         }
     }
 
     public static void dynamic_spring_attachments(Cell pCell, Phenotype phenotype, double dt)
     {
         // check for detachments 
-        double detachment_probability = phenotype.mechanics.detachment_rate * dt;
+        double detachment_probability = phenotype.mechanics.detachmentRate * dt;
 
         for( Cell pTest : pCell.state.springAttachments )
         {
             if( PhysiCellUtilities.UniformRandom() <= detachment_probability )
             {
-                Cell.detach_cells_as_spring( pCell, pTest );
+                Cell.detachCellsAsSpring( pCell, pTest );
             }
         }
         //        for( int j = 0; j < pCell.state.spring_attachments.size(); j++ )
@@ -535,30 +529,30 @@ public class StandardModels
         //        }
 
         // check if I have max number of attachments 
-        if( pCell.state.springAttachments.size() >= phenotype.mechanics.maximum_number_of_attachments )
+        if( pCell.state.springAttachments.size() >= phenotype.mechanics.maxAttachments )
         {
             return;
         }
 
         // check for new attachments; 
-        double attachment_probability = phenotype.mechanics.attachment_rate * dt;
+        double attachment_probability = phenotype.mechanics.attachmentRate * dt;
         boolean done = false;
         int j = 0;
 
         for( Cell pTest : pCell.state.neighbors )
         {
-            if( pTest.state.springAttachments.size() < pTest.phenotype.mechanics.maximum_number_of_attachments )
+            if( pTest.state.springAttachments.size() < pTest.phenotype.mechanics.maxAttachments )
             {
                 // std::string search_string = "adhesive affinity to " + pTest.type_name; 
                 // double affinity = get_single_behavior( pCell , search_string );
-                double affinity = phenotype.mechanics.cell_adhesion_affinity( pTest.type_name );
+                double affinity = phenotype.mechanics.cell_adhesion_affinity( pTest.typeName );
 
                 double prob = attachment_probability * affinity;
                 if( PhysiCellUtilities.UniformRandom() <= prob )
                 {
                     // attempt the attachment. testing for prior connection is already automated 
-                    Cell.attach_cells_as_spring( pCell, pTest );
-                    if( pCell.state.springAttachments.size() >= phenotype.mechanics.maximum_number_of_attachments )
+                    Cell.attachCellsAsSpring( pCell, pTest );
+                    if( pCell.state.springAttachments.size() >= phenotype.mechanics.maxAttachments )
                     {
                         done = true;
                         break;
@@ -590,7 +584,7 @@ public class StandardModels
         //        }
     }
 
-    public static class update_cell_and_death_parameters_O2_based extends update_phenotype
+    public static class O2based extends UpdatePhenotype
     {
         @Override
         public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
@@ -718,8 +712,8 @@ public class StandardModels
         // update May 2022 - effective adhesion 
         int ii = CellDefinition.getCellDefinitionIndex( pC1.type );
         int jj = CellDefinition.getCellDefinitionIndex( pC2.type );
-        double adhesion_ii = pC1.phenotype.mechanics.attachment_elastic_constant * pC1.phenotype.mechanics.cell_adhesion_affinities[jj];
-        double adhesion_jj = pC2.phenotype.mechanics.attachment_elastic_constant * pC2.phenotype.mechanics.cell_adhesion_affinities[ii];
+        double adhesion_ii = pC1.phenotype.mechanics.attachmentElasticConstant * pC1.phenotype.mechanics.cellAdhesionAffinities[jj];
+        double adhesion_jj = pC2.phenotype.mechanics.attachmentElasticConstant * pC2.phenotype.mechanics.cellAdhesionAffinities[ii];
         double effective_attachment_elastic_constant = Math.sqrt( adhesion_ii * adhesion_jj );
         VectorUtil.axpy( pC1.velocity, effective_attachment_elastic_constant, displacement );
     }
@@ -737,8 +731,8 @@ public class StandardModels
         int ii = CellDefinition.getCellDefinitionIndex( pC1.type );
         int jj = CellDefinition.getCellDefinitionIndex( pC2.type );
 
-        double adhesion_ii = pC1.phenotype.mechanics.attachment_elastic_constant * pC1.phenotype.mechanics.cell_adhesion_affinities[jj];
-        double adhesion_jj = pC2.phenotype.mechanics.attachment_elastic_constant * pC2.phenotype.mechanics.cell_adhesion_affinities[ii];
+        double adhesion_ii = pC1.phenotype.mechanics.attachmentElasticConstant * pC1.phenotype.mechanics.cellAdhesionAffinities[jj];
+        double adhesion_jj = pC2.phenotype.mechanics.attachmentElasticConstant * pC2.phenotype.mechanics.cellAdhesionAffinities[ii];
 
         double effective_attachment_elastic_constant = Math.sqrt( adhesion_ii * adhesion_jj );
         // axpy( &(pC1.velocity) , effective_attachment_elastic_constant , displacement ); 
@@ -796,7 +790,7 @@ public class StandardModels
         for( Cell pTarget : pCell.state.neighbors )
         {
             type = pTarget.type;
-            type_name = pTarget.type_name;
+            type_name = pTarget.typeName;
 
             if( pTarget.phenotype.volume.total < 1e-15 )
             {
@@ -806,7 +800,7 @@ public class StandardModels
             if( pTarget.phenotype.death.dead == true )
             {
                 // dead phagocytosis 
-                probability = phenotype.cell_interactions.deadPhagocytosisRate * dt;
+                probability = phenotype.cellInteractions.deadPhagocytosisRate * dt;
                 if( PhysiCellUtilities.UniformRandom() < probability )
                 {
                     pCell.ingest_cell( pTarget );
@@ -816,7 +810,7 @@ public class StandardModels
             {
                 // live phagocytosis
                 // assume you can only phagocytose one at a time for now 
-                probability = phenotype.cell_interactions.getLivePhagocytosisRate( type_name ) * dt; // s[type] * dt;  
+                probability = phenotype.cellInteractions.getLivePhagocytosisRate( type_name ) * dt; // s[type] * dt;  
                 if( PhysiCellUtilities.UniformRandom() < probability && !phagocytosed )
                 {
                     pCell.ingest_cell( pTarget );
@@ -827,23 +821,23 @@ public class StandardModels
                 // assume you can only attack one cell at a time 
                 // probability = phenotype.cell_interactions.attack_rate(type_name)*dt; // s[type] * dt;  
 
-                double attack_ij = phenotype.cell_interactions.getAttackRate( type_name );
-                double immunogenicity_ji = pTarget.phenotype.cell_interactions.getImmunogenicity( pCell.type_name );
+                double attack_ij = phenotype.cellInteractions.getAttackRate( type_name );
+                double immunogenicity_ji = pTarget.phenotype.cellInteractions.getImmunogenicity( pCell.typeName );
 
                 probability = attack_ij * immunogenicity_ji * dt;
 
                 if( PhysiCellUtilities.UniformRandom() < probability && !attacked )
                 {
-                    pCell.attack_cell( pTarget, dt );
+                    pCell.attackCell( pTarget, dt );
                     attacked = true;
                 }
 
                 // fusion 
                 // assume you can only fuse once cell at a time 
-                probability = phenotype.cell_interactions.getFusionRate( type_name ) * dt; // s[type] * dt;  
+                probability = phenotype.cellInteractions.getFusionRate( type_name ) * dt; // s[type] * dt;  
                 if( PhysiCellUtilities.UniformRandom() < probability && !fused )
                 {
-                    pCell.fuse_cell( pTarget );
+                    pCell.fuseCell( pTarget );
                     fused = true;
                 }
             }
@@ -858,9 +852,9 @@ public class StandardModels
         }
 
         double probability = 0.0;
-        for( int i = 0; i < phenotype.cell_transformations.transformation_rates.length; i++ )
+        for( int i = 0; i < phenotype.cellTransformations.transformation_rates.length; i++ )
         {
-            probability = phenotype.cell_transformations.transformation_rates[i] * dt;
+            probability = phenotype.cellTransformations.transformation_rates[i] * dt;
             if( PhysiCellUtilities.UniformRandom() <= probability )
             {
                 // std::cout << "Transforming from " << pCell.type_name << " to " << cell_definitions_by_index[i].name << std::endl; 
@@ -876,10 +870,10 @@ public class StandardModels
         public void execute(Cell pCell, Phenotype phenotype, double dt)
         {
             // bias direction is gradient for the indicated substrate 
-            phenotype.motility.migration_bias_direction = pCell.nearest_gradient( phenotype.motility.chemotaxis_index ).clone();
+            phenotype.motility.migrationBiasDirection = pCell.nearest_gradient( phenotype.motility.chemotaxisIndex ).clone();
             // move up or down gradient based on this direction 
-            VectorUtil.prod( phenotype.motility.migration_bias_direction, phenotype.motility.chemotaxis_direction );
-            VectorUtil.normalize( phenotype.motility.migration_bias_direction );
+            VectorUtil.prod( phenotype.motility.migrationBiasDirection, phenotype.motility.chemotaxisDirection );
+            VectorUtil.normalize( phenotype.motility.migrationBiasDirection );
         }
     }
 
@@ -889,7 +883,7 @@ public class StandardModels
         public void execute(Cell pCell, Phenotype phenotype, double dt)
         {
             // We'll work directly on the migration bias direction 
-            double[] pVec = phenotype.motility.migration_bias_direction;
+            double[] pVec = phenotype.motility.migrationBiasDirection;
             // reset to zero. use memset to be faster??
             for( int i = 0; i < 3; i++ )
                 pVec[i] = 0;
@@ -897,12 +891,12 @@ public class StandardModels
             // a place to put each gradient prior to normalizing it 
             double[] temp = new double[3];
             // weighted combination of the gradients 
-            for( int i = 0; i < phenotype.motility.chemotactic_sensitivities.length; i++ )
+            for( int i = 0; i < phenotype.motility.chemotacticSensitivities.length; i++ )
             {
                 // get and normalize ith gradient 
                 temp = pCell.nearest_gradient( i );
                 VectorUtil.normalize( temp );
-                VectorUtil.axpy( pVec, phenotype.motility.chemotactic_sensitivities[i], temp );
+                VectorUtil.axpy( pVec, phenotype.motility.chemotacticSensitivities[i], temp );
             }
             // normalize that 
             VectorUtil.normalize( pVec );
@@ -915,7 +909,7 @@ public class StandardModels
         public void execute(Cell pCell, Phenotype phenotype, double dt)
         {
             // We'll work directly on the migration bias direction 
-            double[] pVec = phenotype.motility.migration_bias_direction;
+            double[] pVec = phenotype.motility.migrationBiasDirection;
             // reset to zero. use memset to be faster??
 
             for( int i = 0; i < 3; i++ )
@@ -923,10 +917,10 @@ public class StandardModels
             //            pVec = new double[3];
 
             // weighted combination of the gradients 
-            for( int i = 0; i < phenotype.motility.chemotactic_sensitivities.length; i++ )
+            for( int i = 0; i < phenotype.motility.chemotacticSensitivities.length; i++ )
             {
                 // get and normalize ith gradient 
-                VectorUtil.axpy( pVec, phenotype.motility.chemotactic_sensitivities[i], pCell.nearest_gradient( i ) );
+                VectorUtil.axpy( pVec, phenotype.motility.chemotacticSensitivities[i], pCell.nearest_gradient( i ) );
             }
             // normalize that 
             VectorUtil.normalize( pVec );
@@ -951,8 +945,8 @@ public class StandardModels
             int ii = CellDefinition.getCellDefinitionIndex( pC1.type );
             int jj = CellDefinition.getCellDefinitionIndex( pC2.type );
 
-            double adhesion_ii = pC1.phenotype.mechanics.attachment_elastic_constant * pC1.phenotype.mechanics.cell_adhesion_affinities[jj];
-            double adhesion_jj = pC2.phenotype.mechanics.attachment_elastic_constant * pC2.phenotype.mechanics.cell_adhesion_affinities[ii];
+            double adhesion_ii = pC1.phenotype.mechanics.attachmentElasticConstant * pC1.phenotype.mechanics.cellAdhesionAffinities[jj];
+            double adhesion_jj = pC2.phenotype.mechanics.attachmentElasticConstant * pC2.phenotype.mechanics.cellAdhesionAffinities[ii];
 
             double effective_attachment_elastic_constant = Math.sqrt( adhesion_ii * adhesion_jj );
 
@@ -969,9 +963,9 @@ public class StandardModels
             {
                 pCell.functions.calculate_distance_to_membrane = new distance_to_domain_edge();
             }
-            phenotype.mechanics.cell_BM_repulsion_strength = 100;
+            phenotype.mechanics.cellBMRepulsionStrength = 100;
 
-            double max_interactive_distance = phenotype.mechanics.relative_maximum_adhesion_distance * phenotype.geometry.radius;
+            double max_interactive_distance = phenotype.mechanics.relMaxAdhesionDistance * phenotype.geometry.radius;
             double distance = pCell.functions.calculate_distance_to_membrane.execute( pCell, phenotype, dt );
             //Note that the distance_to_membrane function must set displacement values (as a normal vector)
 
@@ -981,7 +975,7 @@ public class StandardModels
             {
                 temp_r = ( 1 - distance / phenotype.geometry.radius );
                 temp_r *= temp_r;
-                temp_r *= phenotype.mechanics.cell_BM_repulsion_strength;
+                temp_r *= phenotype.mechanics.cellBMRepulsionStrength;
             }
             if( Math.abs( temp_r ) < 1e-16 )
                 return;
@@ -1029,7 +1023,7 @@ public class StandardModels
                 nearest_boundary = 3;
             }
 
-            if( m.options.simulate_2D == false )
+            if( m.options.simulate2D == false )
             {
                 // if in 3D, check against zL and zU
                 temp_distance = pCell.position[2] - m.mesh.boundingBox[2];

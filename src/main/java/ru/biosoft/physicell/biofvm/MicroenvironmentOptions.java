@@ -83,7 +83,7 @@ public class MicroenvironmentOptions
 
     public double[] initial_condition_vector = new double[0];
 
-    public boolean simulate_2D;
+    public boolean simulate2D;
     public double[] X_range;
     public double[] Y_range;
     public double[] Z_range;
@@ -129,7 +129,7 @@ public class MicroenvironmentOptions
         // set a far-field value for oxygen (assumed to be in the first field)
         Dirichlet_condition_vector[0] = 38.0;
 
-        simulate_2D = false;
+        simulate2D = false;
 
         X_range = new double[] { -500, 500};
         //        X_range.resize(2,500.0); 

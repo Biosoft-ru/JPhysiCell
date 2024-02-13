@@ -89,10 +89,7 @@ public class Model
         double curTime = 0;
         double next_full_save_time = 0;
         boolean enable_legacy_saves = false;
-
-        //        boolean enable_full_saves = false;
         File reportFile;
-        int full_output_index = 0;
 
         for( Visualizer listener : visualizers )
             listener.init();
@@ -123,21 +120,14 @@ public class Model
                 // save data if it's time. 
                 if( Math.abs( curTime - next_full_save_time ) < 0.01 * diffusion_dt || eventsFired )
                 {
-                    //                    display_simulation_status( std::cout ); 
-                    if( enable_legacy_saves )
-                    {
-                        //                                    log_output( curTime, full_output_index, m, reportFile);
-                    }
-
                     if( enableFullSaves )
                     {
                         for( Visualizer listener : visualizers )
                             listener.saveResult( m, curTime );
 
-                        double[] trans = getAverageTransition( this );
                         String info = PhysiCellUtilities.getCurrentTime() + "\tElapsed\t"
                                 + ( System.currentTimeMillis() - startTime ) / 1000 + "\tTime:\t" + (int)Math.round( curTime ) + "\tCells\t"
-                                + m.getAgentsCount() + "\t" + trans[0] + "\t" + trans[1];
+                                + m.getAgentsCount();
 
                         if( logFile != null )
                         {
@@ -148,72 +138,49 @@ public class Model
                             }
                         }
                         System.out.println( info );
-                        //                                    sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
-
-                        //                                    save_PhysiCell_to_MultiCellDS_v2( filename , m , curTime ); 
                     }
-
-                    full_output_index++;
+                    writeReport( resultFolder + "/step_" + curTime + ".txt", "name\ti1\ti2\tp\tpressure\tphase\telapsed\n" );
+                    for( Cell cell : m.getAgents( Cell.class ) )
+                    {
+                        String report = cell.typeName + "\t" + cell.get_current_mechanics_voxel_index() + "\t" + cell.currentVoxelIndex
+                                + "\t"
+                                + cell.nearest_density_vector()[0] + "\t" + cell.state.simplePressure + "\t"
+                                + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase + "\t"
+                                + cell.isOutOfDomain + "\n";
+                    //                        if( cell.phenotype.cycle.code == 5 )
+                    //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t"
+                    //                                    + cell.phenotype.cycle.transition_rate( 0, 0 ) + "\t" + cell.state.simplePressure + "\n";
+                    //                        else
+                    //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t0.0\t"
+                    //                                    + cell.state.simplePressure + "\n";
+                    //
+                    writeReport( resultFolder + "/step_" + curTime + ".txt", report );
+                }
                     next_full_save_time += full_save_interval;
                 }
-                //                
-                //                // save SVG plot if it's time
-                //                if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_SVG_save_time  ) < 0.01 * diffusion_dt )
-                //                {
-                //                    if( PhysiCell_settings.enable_SVG_saves == true )
-                //                    {   
-                //                        sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
-                //                        SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-                //                        
-                //                        PhysiCell_globals.SVG_output_index++; 
-                //                        PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
-                //                    }
-                //                }
-                //
-                // update the microenvironment
-                //                m.write_to_matlab( resultFolder + "/step_" + -1 + ".txt" );
                 m.simulate_diffusion_decay( diffusion_dt );
-                //                m.write_to_matlab( resultFolder + "/step_" + curTime + ".txt" );
-                // run PhysiCell 
-                //                m.write_to_matlab( resultFolder + "/step_" + 0 + ".txt" );
                 ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
-                //                m.write_to_matlab( resultFolder + "/step_" + 1 + ".txt" );
-                //                m.write_to_matlab( "C:/Users/Damag/BIOFVM/projects/cancer_immune/AFTERALL2_" + 1 + ".txt" );
-                /*
-                  Custom add-ons could potentially go here. 
-                */
                 curTime += diffusion_dt;
-
             }
 
             for( Visualizer listener : visualizers )
                 listener.finish();
-
-            if( enable_legacy_saves )
-            {
-                //                            log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file);
-                //                            report_file.close();
-            }
         }
-
-        //        
-        //        // save a final simulation snapshot 
-        //        
-        //        sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
-        //        save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
-        //        
-        //        sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
-        //        SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-        //        
-        //        // timer 
-        //        
-        //        std::cout << std::endl << "Total simulation runtime: " << std::endl; 
-        //        BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
         catch( Exception ex )
         {
             ex.printStackTrace();
         }
     }
+
+    private void writeReport(String name, String str) throws Exception
+    {
+        File f = new File( name );
+        try (BufferedWriter bw = new BufferedWriter( new FileWriter( f, true ) ))
+        {
+            bw.append( str );
+        }
+    }
+
 
     public double[] getAverageTransition(Model model)
     {

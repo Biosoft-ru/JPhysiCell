@@ -306,7 +306,7 @@ public class Microenvironment
         options.Dirichlet_xmax_values = VectorUtil.push_back( options.Dirichlet_xmax_values, 1.0 );
         options.Dirichlet_ymin_values = VectorUtil.push_back( options.Dirichlet_ymin_values, 1.0 );
         options.Dirichlet_ymax_values = VectorUtil.push_back( options.Dirichlet_ymax_values, 1.0 );
-        options.Dirichlet_zmin_values = VectorUtil.push_back( options.Dirichlet_zmin_values, 1.0 );       
+        options.Dirichlet_zmin_values = VectorUtil.push_back( options.Dirichlet_zmin_values, 1.0 );
         options.Dirichlet_zmax_values = VectorUtil.push_back( options.Dirichlet_zmax_values, 1.0 );
     }
 
@@ -628,7 +628,7 @@ public class Microenvironment
         return -1;
     }
 
-    public void compute_all_gradient_vectors()
+    public void computeAllGradientVectors()
     {
         double two_dx = mesh.dx;
         double two_dy = mesh.dy;
@@ -802,8 +802,6 @@ public class Microenvironment
         dirichlet_indices.push_back( voxel_index );
         dirichlet_value_vectors.push_back( value ); 
         */
-        if( value[0] == 1 )
-            System.out.println( "s" );
         dirichlet_value_vectors[voxel_index] = value.clone(); // .assign( mesh.voxels.size(), one ); 
     }
 
@@ -814,73 +812,73 @@ public class Microenvironment
         {
             compute_gradient_vector( n );
         }
-        
-        
+
+
         return gradient_vectors[n];
     }
 
-    void compute_gradient_vector( int n )
+    void compute_gradient_vector(int n)
     {
-        double two_dx = mesh.dx; 
-        double two_dy = mesh.dy; 
-        double two_dz = mesh.dz; 
-        boolean gradient_constants_defined = false; 
+        double two_dx = mesh.dx;
+        double two_dy = mesh.dy;
+        double two_dz = mesh.dz;
+        boolean gradient_constants_defined = false;
         int[] indices = new int[3];//(3,0);
-        
+
         if( gradient_constants_defined == false )
         {
-            two_dx *= 2.0; 
-            two_dy *= 2.0; 
+            two_dx *= 2.0;
+            two_dy *= 2.0;
             two_dz *= 2.0;
-            gradient_constants_defined = true; 
-        }   
-        
+            gradient_constants_defined = true;
+        }
+
         indices = cartesian_indices( n );
-        
+
         // d/dx 
-        if( indices[0] > 0 && indices[0] < mesh.x_coordinates.length-1 )
+        if( indices[0] > 0 && indices[0] < mesh.x_coordinates.length - 1 )
         {
-            for( int q=0; q < number_of_densities() ; q++ )
+            for( int q = 0; q < number_of_densities(); q++ )
             {
                 gradient_vectors[n][q][0] = ( density )[n + thomas_i_jump][q];
                 gradient_vectors[n][q][0] -= ( density )[n - thomas_i_jump][q];
-                gradient_vectors[n][q][0] /= two_dx; 
-                gradient_vector_computed[n] = true; 
+                gradient_vectors[n][q][0] /= two_dx;
+                gradient_vector_computed[n] = true;
             }
         }
-        
+
         // don't bother computing y and z component if there is no y-direction. (1D)
         if( mesh.y_coordinates.length == 1 )
-        return; 
-        
+            return;
+
         // d/dy 
-        if( indices[1] > 0 && indices[1] < mesh.y_coordinates.length-1 )
+        if( indices[1] > 0 && indices[1] < mesh.y_coordinates.length - 1 )
         {
             for( int q = 0; q < number_of_densities(); q++ )
             {
                 gradient_vectors[n][q][1] = ( density )[n + thomas_j_jump][q];
                 gradient_vectors[n][q][1] -= ( density )[n - thomas_j_jump][q];
-                gradient_vectors[n][q][1] /= two_dy; 
-                gradient_vector_computed[n] = true; 
+                gradient_vectors[n][q][1] /= two_dy;
+                gradient_vector_computed[n] = true;
             }
         }
-        
+
         // don't bother computing z component if there is no z-direction (2D) 
         if( mesh.z_coordinates.length == 1 )
-         return;
-        
+            return;
+
         // d/dz 
-        if( indices[2] > 0 && indices[2] < mesh.z_coordinates.length-1 )
+        if( indices[2] > 0 && indices[2] < mesh.z_coordinates.length - 1 )
         {
-            for( int q=0; q < number_of_densities() ; q++ )
+            for( int q = 0; q < number_of_densities(); q++ )
             {
                 gradient_vectors[n][q][2] = ( density )[n + thomas_k_jump][q];
                 gradient_vectors[n][q][2] -= ( density )[n - thomas_k_jump][q];
-                gradient_vectors[n][q][2] /= two_dz; 
-                gradient_vector_computed[n] = true; 
+                gradient_vectors[n][q][2] /= two_dz;
+                gradient_vector_computed[n] = true;
             }
         }
-        
+
     }
 
     int[] cartesian_indices(int n)
@@ -893,125 +891,123 @@ public class Microenvironment
         MicroenvironmentOptions default_microenvironment_options = microenvironment.options;
         //        Microenvironment microenvironment = new Microenvironment(m.name, m.timeUnits, m.spatialUnits);
         // register the diffusion solver 
-        if( microenvironment.options.simulate_2D == true )
+        if( microenvironment.options.simulate2D == true )
         {
-//            microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
+            //            microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
         }
         else
         {
             microenvironment.solver = new ConstantCoefficientsLOD3D();// diffusion_decay_solver__constant_coefficients_LOD_3D; 
         }
-        
-        // set the default substrate to oxygen (with typical units of mmHg)
-        //        if( microenvironment.options.use_oxygen_as_first_field == true )
-        //        {
-        //            microenvironment.setDensity(0, "oxygen" , "mmHg", 1E5, 0.1 );
-        ////            result.diffusion_coefficients[0] = 1e5; 
-        ////            result.decay_rates[0] = 0.1; 
-        //        }
-        
+
         // resize the microenvironment  
-        if( default_microenvironment_options.simulate_2D == true )
+        if( default_microenvironment_options.simulate2D == true )
         {
-            default_microenvironment_options.Z_range[0] = -default_microenvironment_options.dz/2.0; 
-            default_microenvironment_options.Z_range[1] = default_microenvironment_options.dz/2.0;
+            default_microenvironment_options.Z_range[0] = -default_microenvironment_options.dz / 2.0;
+            default_microenvironment_options.Z_range[1] = default_microenvironment_options.dz / 2.0;
         }
-        microenvironment.resizeSpace( default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
-            default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1], 
-            default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], 
-            default_microenvironment_options.dx,default_microenvironment_options.dy,default_microenvironment_options.dz );
-            
+        microenvironment.resizeSpace( default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1],
+                default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1],
+                default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1],
+                default_microenvironment_options.dx, default_microenvironment_options.dy, default_microenvironment_options.dz );
+
         // set units
-//        microenvironment.spatial_units = default_microenvironment_options.spatial_units;
-//        microenvironment.time_units = default_microenvironment_options.time_units;
+        //        microenvironment.spatial_units = default_microenvironment_options.spatial_units;
+        //        microenvironment.time_units = default_microenvironment_options.time_units;
         microenvironment.mesh.units = default_microenvironment_options.spatial_units;
 
         // set the initial densities to the values set in the initial_condition_vector
-        
+
         // if the initial condition vector has not been set, use the Dirichlet condition vector 
-        if( default_microenvironment_options.initial_condition_vector.length != 
-            microenvironment.number_of_densities() )
+        if( default_microenvironment_options.initial_condition_vector.length != microenvironment.number_of_densities() )
         {
-           System.out.println( "BioFVM Warning: Initial conditions not set. "
-                      + "                Using Dirichlet condition vector to set initial substrate values!" 
-                      + "                In the future, set default_microenvironment_options.initial_condition_vector.");  
-            default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector; 
+            System.out.println( "BioFVM Warning: Initial conditions not set. "
+                    + "                Using Dirichlet condition vector to set initial substrate values!"
+                    + "                In the future, set default_microenvironment_options.initial_condition_vector." );
+            default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector;
         }
 
         // set the initial condition 
-        for(  int n=0; n < microenvironment.number_of_voxels() ; n++ )
+        for( int n = 0; n < microenvironment.number_of_voxels(); n++ )
         {
             microenvironment.density[n] = default_microenvironment_options.initial_condition_vector.clone();
         }
 
         // now, figure out which sides have BCs (for at least one substrate): 
 
-        boolean xmin = false; 
-        boolean xmax = false; 
-        boolean ymin = false; 
-        boolean ymax = false; 
-        boolean zmin = false; 
-        boolean zmax = false; 
-        
+        boolean xmin = false;
+        boolean xmax = false;
+        boolean ymin = false;
+        boolean ymax = false;
+        boolean zmin = false;
+        boolean zmax = false;
+
         if( default_microenvironment_options.outer_Dirichlet_conditions == true )
         {
-            for( int n=0 ; n < microenvironment.number_of_densities() ; n++ )
+            for( int n = 0; n < microenvironment.number_of_densities(); n++ )
             {
-                if( default_microenvironment_options.Dirichlet_all[n] || 
-                    default_microenvironment_options.Dirichlet_xmin[n] )
-                    { xmin = true; }
-                
-                if( default_microenvironment_options.Dirichlet_all[n] || 
-                    default_microenvironment_options.Dirichlet_xmax[n] )
-                    { xmax = true; }
-                
-                if( default_microenvironment_options.Dirichlet_all[n] || 
-                    default_microenvironment_options.Dirichlet_ymin[n] )
-                    { ymin = true; }
-                
-                if( default_microenvironment_options.Dirichlet_all[n] || 
-                    default_microenvironment_options.Dirichlet_ymax[n] )
-                    { ymax = true; }
-                    
-                if( default_microenvironment_options.Dirichlet_all[n] || 
-                    default_microenvironment_options.Dirichlet_zmin[n] )
-                    { zmin = true; }
-                
-                if( default_microenvironment_options.Dirichlet_all[n] || 
-                    default_microenvironment_options.Dirichlet_zmax[n] )
-                    { zmax = true; }
+                if( default_microenvironment_options.Dirichlet_all[n] || default_microenvironment_options.Dirichlet_xmin[n] )
+                {
+                    xmin = true;
+                }
+
+                if( default_microenvironment_options.Dirichlet_all[n] || default_microenvironment_options.Dirichlet_xmax[n] )
+                {
+                    xmax = true;
+                }
+
+                if( default_microenvironment_options.Dirichlet_all[n] || default_microenvironment_options.Dirichlet_ymin[n] )
+                {
+                    ymin = true;
+                }
+
+                if( default_microenvironment_options.Dirichlet_all[n] || default_microenvironment_options.Dirichlet_ymax[n] )
+                {
+                    ymax = true;
+                }
+
+                if( default_microenvironment_options.Dirichlet_all[n] || default_microenvironment_options.Dirichlet_zmin[n] )
+                {
+                    zmin = true;
+                }
+
+                if( default_microenvironment_options.Dirichlet_all[n] || default_microenvironment_options.Dirichlet_zmax[n] )
+                {
+                    zmax = true;
+                }
             }
-            
+
             // add the Dirichlet nodes in the right places 
-            
+
         }
-        System.out.println( "which boundaries?"); 
-        System.out.println( xmin + " " + xmax + " " + ymin + " " + ymax + " " + zmin + " " + zmax);// << std::endl; 
+        System.out.println( "which boundaries?" );
+        System.out.println( xmin + " " + xmax + " " + ymin + " " + ymax + " " + zmin + " " + zmax );// << std::endl; 
 
         // add the Dirichlet nodes in the right places 
         // now, go in and set the values 
-        if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
+        if( default_microenvironment_options.outer_Dirichlet_conditions == true )
         {
             // set xmin if xmin = true or all = true 
             if( xmin == true )
             {
                 for( int k = 0; k < microenvironment.mesh.z_coordinates.length; k++ )
                 {
-                    int I = 0; 
+                    int I = 0;
                     // set Dirichlet conditions along the xmin outer edges 
                     for( int j = 0; j < microenvironment.mesh.y_coordinates.length; j++ )
                     {
                         // set the value 
-                        microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_xmin_values );
-                        
+                        microenvironment.add_dirichlet_node( microenvironment.voxel_index( I, j, k ),
+                                default_microenvironment_options.Dirichlet_xmin_values );
+
                         // set the activation 
-                        microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(I,j,k) , 
-                        default_microenvironment_options.Dirichlet_xmin ); 
-                        
+                        microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index( I, j, k ),
+                                default_microenvironment_options.Dirichlet_xmin );
+
                     }
                 }
-            }           
-            
+            }
+
             // set xmax if xmax = true or all = true 
             if( xmax == true )
             {
@@ -1023,15 +1019,16 @@ public class Microenvironment
                     for( int j = 0; j < microenvironment.mesh.y_coordinates.length; j++ )
                     {
                         // set the values 
-                        microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_xmax_values );
-                        
+                        microenvironment.add_dirichlet_node( microenvironment.voxel_index( I, j, k ),
+                                default_microenvironment_options.Dirichlet_xmax_values );
+
                         // set the activation 
-                        microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(I,j,k) , 
-                        default_microenvironment_options.Dirichlet_xmax ); 
+                        microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index( I, j, k ),
+                                default_microenvironment_options.Dirichlet_xmax );
                     }
                 }
-            }           
-            
+            }
+
             // set ymin if ymin = true or all = true 
             if( ymin == true )
             {
@@ -1042,15 +1039,16 @@ public class Microenvironment
                     for( int i = 0; i < microenvironment.mesh.x_coordinates.length; i++ )
                     {
                         // set the values 
-                        microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_ymin_values );
-                        
+                        microenvironment.add_dirichlet_node( microenvironment.voxel_index( i, J, k ),
+                                default_microenvironment_options.Dirichlet_ymin_values );
+
                         // set the activation 
-                        microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,J,k) , 
-                        default_microenvironment_options.Dirichlet_ymin ); 
+                        microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index( i, J, k ),
+                                default_microenvironment_options.Dirichlet_ymin );
                     }
                 }
-            }   
-            
+            }
+
             // set ymzx if ymax = true or all = true; 
             if( ymax == true )
             {
@@ -1062,17 +1060,18 @@ public class Microenvironment
                     for( int i = 0; i < microenvironment.mesh.x_coordinates.length; i++ )
                     {
                         // set the value 
-                        microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_ymax_values );
-                        
+                        microenvironment.add_dirichlet_node( microenvironment.voxel_index( i, J, k ),
+                                default_microenvironment_options.Dirichlet_ymax_values );
+
                         // set the activation 
-                        microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,J,k) , 
-                        default_microenvironment_options.Dirichlet_ymax ); 
+                        microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index( i, J, k ),
+                                default_microenvironment_options.Dirichlet_ymax );
                     }
                 }
-            }   
-            
+            }
+
             // if not 2D:
-            if( default_microenvironment_options.simulate_2D == false )
+            if( default_microenvironment_options.simulate2D == false )
             {
                 // set zmin if zmin = true or all = true 
                 if( zmin == true )
@@ -1084,15 +1083,16 @@ public class Microenvironment
                         for( int i = 0; i < microenvironment.mesh.x_coordinates.length; i++ )
                         {
                             // set the value 
-                            microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_zmin_values );
-                        
+                            microenvironment.add_dirichlet_node( microenvironment.voxel_index( i, j, K ),
+                                    default_microenvironment_options.Dirichlet_zmin_values );
+
                             // set the activation 
-                            microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,j,K) , 
-                            default_microenvironment_options.Dirichlet_zmin ); 
+                            microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index( i, j, K ),
+                                    default_microenvironment_options.Dirichlet_zmin );
                         }
                     }
-                }               
-                
+                }
+
                 // set zmax if zmax = true or all = true 
                 if( zmax == true )
                 {
@@ -1104,19 +1104,20 @@ public class Microenvironment
                         for( int i = 0; i < microenvironment.mesh.x_coordinates.length; i++ )
                         {
                             // set the value 
-                            microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_zmax_values );
-                            
+                            microenvironment.add_dirichlet_node( microenvironment.voxel_index( i, j, K ),
+                                    default_microenvironment_options.Dirichlet_zmax_values );
+
                             // set the activation 
-                            microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,j,K) , 
-                            default_microenvironment_options.Dirichlet_zmax );                      
+                            microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index( i, j, K ),
+                                    default_microenvironment_options.Dirichlet_zmax );
                         }
                     }
-                }               
+                }
             }
-            
+
         }
-        
-    /*
+
+        /*
         if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
         {
             
@@ -1151,8 +1152,8 @@ public class Microenvironment
             }
             
         }
-    */
-        
+        */
+
         // April 2023: no longer necessary after flipping our approach and doing an "additive" instead of "subtractive" DCs handling. I.e., we assume DC activation is false by default; make true on-demand.
 
         // // set the Dirichlet condition activation vector to match the microenvironment options 
@@ -1160,15 +1161,15 @@ public class Microenvironment
         // {
         //  microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
         // }
-        
+
         microenvironment.displayInformation();
     }
 
-    void set_substrate_dirichlet_activation( int substrate_index , boolean new_value )
+    void set_substrate_dirichlet_activation(int substrate_index, boolean new_value)
     {
-        dirichlet_activation_vector[substrate_index] = new_value; 
-        
-        for( int n = 0 ; n < mesh.voxels.length ; n++ )
+        dirichlet_activation_vector[substrate_index] = new_value;
+
+        for( int n = 0; n < mesh.voxels.length; n++ )
         {
             dirichlet_activation_vectors[n][substrate_index] = new_value;
         }
@@ -1178,4 +1179,17 @@ public class Microenvironment
     {
         dirichlet_activation_vectors[index] = new_value.clone();
     }
+
+    void reset_all_gradient_vectors()
+    {
+        for( int k = 0; k < mesh.voxels.length; k++ )
+        {
+            for( int i = 0; i < number_of_densities(); i++ )
+            {
+                gradient_vectors[k][i] = new double[3];
+            }
+        }
+        gradient_vector_computed = new boolean[mesh.voxels.length];
+    }
+
 }

@@ -12,7 +12,7 @@ public class WorkerCellRule implements custom_cell_rule
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
         // if I am dead, don't bother
-        if( SignalBehavior.get_single_signal( pCell, "dead" ) > 0.5 )
+        if( SignalBehavior.getSingleSignal( pCell, "dead" ) > 0.5 )
         {
             // the cell death functions don't automatically turn off custom functions,
             // since those are part of mechanics.
@@ -32,9 +32,9 @@ public class WorkerCellRule implements custom_cell_rule
                 if( nearbyCell == pCell )
                     continue;
                 // if it is expressing the receptor, dock with it
-                if( SignalBehavior.get_single_signal( nearbyCell, "custom:receptor" ) > 0.5 && attached == false )
+                if( SignalBehavior.getSingleSignal( nearbyCell, "custom:receptor" ) > 0.5 && attached == false )
                 {
-                    Cell.attach_cells( pCell, nearbyCell );
+                    Cell.attachcCells( pCell, nearbyCell );
                     // nearby[i].custom_data["receptor"] = 0.0; // put into cargo cell rule instead?
                     // nearby[i].phenotype.secretion.set_all_secretion_to_zero(); // put into cargo rule instead?
                     attached = true;
@@ -44,14 +44,14 @@ public class WorkerCellRule implements custom_cell_rule
         }
 
         // from prior motility function
-        double o2 = SignalBehavior.get_single_signal( pCell, "oxygen" );
-        double chemoattractant = SignalBehavior.get_single_signal( pCell, "chemoattractant" );
-        double detection_threshold = SignalBehavior.get_single_signal( pCell, "custom:motility_shutdown_detection_threshold" );
+        double o2 = SignalBehavior.getSingleSignal( pCell, "oxygen" );
+        double chemoattractant = SignalBehavior.getSingleSignal( pCell, "chemoattractant" );
+        double detection_threshold = SignalBehavior.getSingleSignal( pCell, "custom:motility_shutdown_detection_threshold" );
 
         // if attached, biased motility towards director chemoattractant
         // otherwise, biased motility towards cargo chemoattractant
-        double attached_worker_migration_bias = SignalBehavior.get_single_signal( pCell, "custom:attached_worker_migration_bias" );
-        double unattached_worker_migration_bias = SignalBehavior.get_single_signal( pCell, "custom:unattached_worker_migration_bias" );
+        double attached_worker_migration_bias = SignalBehavior.getSingleSignal( pCell, "custom:attached_worker_migration_bias" );
+        double unattached_worker_migration_bias = SignalBehavior.getSingleSignal( pCell, "custom:unattached_worker_migration_bias" );
 
         if( pCell.state.numberAttachedCells() > 0 )
         {

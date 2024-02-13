@@ -33,7 +33,7 @@ public class PhysiCellSettings
     boolean enable_intracellular_saves = false;
 
     // cell rules option
-    boolean rules_enabled = false;
+    static boolean rules_enabled = false;
     String rules_protocol = "Cell Behavior Hypothesis Grammar (CBHG)";
     String rules_protocol_version = "1.0";
 
@@ -63,14 +63,10 @@ public class PhysiCellSettings
         enable_intracellular_saves = false;
 
         // parallel options 
-
         omp_num_threads = 4;
 
         rules_enabled = false;
         rules_protocol = "Cell Behavior Hypothesis Grammar (CBHG)";
         rules_protocol_version = "1.0";
-
-        return;
     }
-
 }

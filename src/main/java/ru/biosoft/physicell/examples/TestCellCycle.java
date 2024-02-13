@@ -136,13 +136,13 @@ public class TestCellCycle
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         CellDefinition.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.Ki67_advanced; // set default cell cycle model 
-        cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based(); // set default_cell_functions; 
+        cd.functions.updatePhenotype = new StandardModels.O2based(); // set default_cell_functions; 
         cd.functions.updateVelocity = null;
         Phenotype defaultPhenotype = cd.phenotype;
 
         // first find index for a few key variables. 
-        int apoptosisModelIndex = defaultPhenotype.death.find_death_model_index( "Apoptosis" );
-        int necrosisModelIndex = defaultPhenotype.death.find_death_model_index( "Necrosis" );
+        int apoptosisModelIndex = defaultPhenotype.death.findDeathModelIndex( "Apoptosis" );
+        int necrosisModelIndex = defaultPhenotype.death.findDeathModelIndex( "Necrosis" );
         int oxygenSubstrateIndex = m.findDensityIndex( "oxygen" );
 
         int K1_index = cd.phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
@@ -193,8 +193,8 @@ public class TestCellCycle
             {
                 //                phaseIndex = A_index;
                 //                T = TA;
-                cell.phenotype.death.trigger_death( apoptosisModelIndex );
-                cell.phenotype.cycle = cell.phenotype.death.current_model();
+                cell.phenotype.death.triggerDeath( apoptosisModelIndex );
+                cell.phenotype.cycle = cell.phenotype.death.currentModel();
             }
             else
             {

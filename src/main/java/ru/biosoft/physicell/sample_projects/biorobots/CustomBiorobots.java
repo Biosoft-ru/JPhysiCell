@@ -59,7 +59,7 @@ public class CustomBiorobots
         double Xmax = m.mesh.boundingBox[3];
         double Ymax = m.mesh.boundingBox[4];
         double Zmax = m.mesh.boundingBox[5];
-        if( m.options.simulate_2D )
+        if( m.options.simulate2D )
         {
             Zmin = 0.0;
             Zmax = 0.0;

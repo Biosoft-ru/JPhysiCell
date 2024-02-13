@@ -21,7 +21,7 @@ public class HeterogeneityVisualizer extends AgentVisualizer
     @Override
     public Color findColor(Cell pCell)
     {
-        double p = SignalBehavior.get_single_signal( pCell, "custom:oncoprotein" );
+        double p = SignalBehavior.getSingleSignal( pCell, "custom:oncoprotein" );
 
         // immune are black
         Color output = Color.black;
@@ -48,7 +48,7 @@ public class HeterogeneityVisualizer extends AgentVisualizer
         }
 
         // if not, dead colors 
-        if( SignalBehavior.get_single_signal( pCell, "apoptotic" ) > 0.5 )
+        if( SignalBehavior.getSingleSignal( pCell, "apoptotic" ) > 0.5 )
         {
             output = new Color( 125, 0, 0 );
             //		output[0] = "rgb(255,0,0)";
@@ -56,7 +56,7 @@ public class HeterogeneityVisualizer extends AgentVisualizer
         }
 
         // Necrotic - Brown
-        if( SignalBehavior.get_single_signal( pCell, "necrotic" ) > 0.5 )
+        if( SignalBehavior.getSingleSignal( pCell, "necrotic" ) > 0.5 )
         {
             output = new Color( 139, 69, 19 );
             //		output[0] = "rgb(250,138,38)";

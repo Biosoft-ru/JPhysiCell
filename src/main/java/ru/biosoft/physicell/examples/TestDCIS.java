@@ -152,14 +152,14 @@ public class TestDCIS
         // set default cell cycle model 
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         // set default_cell_functions; 
-        cd.functions.updatePhenotype = new StandardModels.update_cell_and_death_parameters_O2_based();
+        cd.functions.updatePhenotype = new StandardModels.O2based();
 
         int Q_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_negative );
         int oxygen_substrate_index = m.findDensityIndex( "oxygen" );
         int K1_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
         int K2_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
-        int apoptosis_model_index = cd.phenotype.death.find_death_model_index( "apoptosis" );
-        int necrosis_model_index = cd.phenotype.death.find_death_model_index( "necrosis" );
+        int apoptosis_model_index = cd.phenotype.death.findDeathModelIndex( "apoptosis" );
+        int necrosis_model_index = cd.phenotype.death.findDeathModelIndex( "necrosis" );
         // cells apoptose after about 7 days 
         cd.phenotype.death.rates.set( apoptosis_model_index, 1.0 / ( 7.0 * 24.0 * 60.0 ) );
         // initially no necrosis 
@@ -249,13 +249,13 @@ public class TestDCIS
         StringBuilder sb = new StringBuilder();
         sb.append( "time: \n" );
         Set<BasicAgent> agents = m.getAgents();
-        num_new_cells = t == 0 ? m.getAgentsCount() : ( (CellContainer)m.agentContainer ).num_divisions_in_current_step;
-        num_deaths = ( (CellContainer)m.agentContainer ).num_deaths_in_current_step;
+        num_new_cells = t == 0 ? m.getAgentsCount() : ( (CellContainer)m.agentContainer ).numDivisionsCurStep;
+        num_deaths = ( (CellContainer)m.agentContainer ).numDeathsCurStep;
         sb.append( "total number of agents (newly born, deaths): " + agents.size() + "(" + num_new_cells + ", " + num_deaths + ")\n" );
         sb.append( t + "\t" + agents.size() + "\t" + num_new_cells + "\t" + num_deaths + "\n" );//+BioFVM::stopwatch_value()+ std::endl; 
 
-        ( (CellContainer)m.agentContainer ).num_divisions_in_current_step = 0;
-        ( (CellContainer)m.agentContainer ).num_deaths_in_current_step = 0;
+        ( (CellContainer)m.agentContainer ).numDivisionsCurStep = 0;
+        ( (CellContainer)m.agentContainer ).numDeathsCurStep = 0;
     }
 
     static List<double[]> createSphere(double cell_radius, double sphere_radius)

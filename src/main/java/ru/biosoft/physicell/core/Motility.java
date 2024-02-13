@@ -71,38 +71,38 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 */
 public class Motility implements Cloneable
 {
-    public boolean is_motile;
-    public double persistence_time; // mean time to keep going in one direction before resampling for a new direction. 
-    public double migration_speed; // migration speed along chosen direction, in absence of all other adhesive / repulsive forces 
-    public double[] migration_bias_direction = new double[0];; // a unit vector random motility is biased in this direction (e.g., chemotaxis)
-    public double migration_bias; // how biased is motility if 0, completely random. if 1, deterministic along the bias vector 
-    public boolean restrict_to_2D; // if true, set random motility to 2D only. 
-    double[] motility_vector = new double[0];;
-    public int chemotaxis_index;
-    public int chemotaxis_direction;
-    public double[] chemotactic_sensitivities = new double[0]; // advanced chemotaxis
+    public boolean isMotile;
+    public double persistenceTime; // mean time to keep going in one direction before resampling for a new direction. 
+    public double migrationSpeed; // migration speed along chosen direction, in absence of all other adhesive / repulsive forces 
+    public double[] migrationBiasDirection = new double[0];; // a unit vector random motility is biased in this direction (e.g., chemotaxis)
+    public double migrationBias; // how biased is motility if 0, completely random. if 1, deterministic along the bias vector 
+    public boolean restrictTo2D; // if true, set random motility to 2D only. 
+    double[] motilityVector = new double[0];;
+    public int chemotaxisIndex;
+    public int chemotaxisDirection;
+    public double[] chemotacticSensitivities = new double[0]; // advanced chemotaxis
 
     public Motility()
     {
-        is_motile = false;
-        persistence_time = 1.0;
-        migration_speed = 1.0;
-        migration_bias_direction = new double[3];
-        migration_bias = 0.0;
-        restrict_to_2D = false;
-        motility_vector = new double[3];
-        chemotaxis_index = 0;
-        chemotaxis_direction = 1;
+        isMotile = false;
+        persistenceTime = 1.0;
+        migrationSpeed = 1.0;
+        migrationBiasDirection = new double[3];
+        migrationBias = 0.0;
+        restrictTo2D = false;
+        motilityVector = new double[3];
+        chemotaxisIndex = 0;
+        chemotaxisDirection = 1;
     }
 
     void sync(Microenvironment m)
     {
-        chemotactic_sensitivities = VectorUtil.resize( chemotactic_sensitivities, m.number_of_densities(), 0 );
+        chemotacticSensitivities = VectorUtil.resize( chemotacticSensitivities, m.number_of_densities(), 0 );
     }
 
     public void setChemotacticSensitivity(int index, double value)
     {
-        chemotactic_sensitivities[index] = value;
+        chemotacticSensitivities[index] = value;
     }
 
     @Override
@@ -111,9 +111,9 @@ public class Motility implements Cloneable
         try
         {
             Motility result = (Motility)super.clone();
-            result.chemotactic_sensitivities = this.chemotactic_sensitivities.clone();
-            result.motility_vector = this.motility_vector.clone();
-            result.migration_bias_direction = this.migration_bias_direction.clone();
+            result.chemotacticSensitivities = this.chemotacticSensitivities.clone();
+            result.motilityVector = this.motilityVector.clone();
+            result.migrationBiasDirection = this.migrationBiasDirection.clone();
             return result;
         }
         catch( CloneNotSupportedException e )

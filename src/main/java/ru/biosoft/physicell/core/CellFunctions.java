@@ -68,13 +68,11 @@ package ru.biosoft.physicell.core;
 */
 public class CellFunctions
 {
-    //    public CycleModel cycleModel; TODO: temporarily commented
-
     public instantiate_cell instantiate_cell;
     public volume_update_function updateVolume;
     public update_migration_bias update_migration_bias;
     public custom_cell_rule custom_cell_rule;
-    public update_phenotype updatePhenotype;
+    public UpdatePhenotype updatePhenotype;
     public pre_update_intracellular pre_update_intracellular;
     public post_update_intracellular post_update_intracellular;
     public update_velocity updateVelocity;
@@ -82,16 +80,6 @@ public class CellFunctions
     public calculate_distance_to_membrane calculate_distance_to_membrane;
     public set_orientation set_orientation;
     public contact_function contact_function;
-
-    /* prototyping / beta in 1.5.0 */
-    /*  
-        void (*internal_substrate_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
-        void (*molecular_model_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
-    */
-
-
-    //           void (*plot_agent_SVG)(std::ofstream& os, Cell* pCell, double z_slice, std::vector<std::string> (*cell_coloring_function)(Cell*), double X_lower, double Y_lower);
-    //           void (*plot_agent_legend)(std::ofstream& os, Cell_Definition* cell_def, double& cursor_x, double& cursor_y, std::vector<std::string> (*cell_coloring_function)(Cell*), double temp_cell_radius);
 
     public CellFunctions clone()
     {
@@ -134,15 +122,15 @@ public class CellFunctions
         public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
-    public static abstract class update_phenotype implements Cloneable
+    public static abstract class UpdatePhenotype implements Cloneable
     {
         public abstract void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
 
-        public update_phenotype clone()
+        public UpdatePhenotype clone()
         {
             try
             {
-            return (update_phenotype)super.clone();
+                return (UpdatePhenotype)super.clone();
             }
             catch( Exception ex )
             {

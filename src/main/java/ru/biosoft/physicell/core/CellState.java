@@ -83,9 +83,9 @@ public class CellState
 
     public CellState()
     {
-        neighbors = new HashSet<Cell>();//.resize(0); 
-        springAttachments = new HashSet<>();//new Cell[0];//.resize(0); 
-        orientation = new double[3];//.resize( 3 , 0.0 ); 
+        neighbors = new HashSet<Cell>();
+        springAttachments = new HashSet<>();
+        orientation = new double[3];
         simplePressure = 0.0;
         attachedCells = new HashSet<>();
         numberNuclei = 1;

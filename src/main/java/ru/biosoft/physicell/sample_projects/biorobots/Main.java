@@ -93,7 +93,7 @@ public class Main
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
 
-        model.addVisualizer( 0, "figure1_3" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
+        model.addVisualizer( 0, "figure1" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
 
         /* Users typically start modifying here. START USERMODS */
         CustomBiorobots.init( model );

@@ -5,24 +5,24 @@ import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
 import ru.biosoft.physicell.core.SignalBehavior;
 import ru.biosoft.physicell.core.StandardModels;
-import ru.biosoft.physicell.core.CellFunctions.update_phenotype;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 
-public class TumorPhenotype extends update_phenotype
+public class TumorPhenotype extends UpdatePhenotype
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        double damage = SignalBehavior.get_single_signal( pCell, "damage" );
+        double damage = SignalBehavior.getSingleSignal( pCell, "damage" );
 
-        double damage_rate = SignalBehavior.get_single_signal( pCell, "custom:damage_rate" );
-        double repair_rate = SignalBehavior.get_single_signal( pCell, "custom:repair_rate" );
-        double drug_death_rate = SignalBehavior.get_single_signal( pCell, "custom:drug_death_rate" );
+        double damage_rate = SignalBehavior.getSingleSignal( pCell, "custom:damage_rate" );
+        double repair_rate = SignalBehavior.getSingleSignal( pCell, "custom:repair_rate" );
+        double drug_death_rate = SignalBehavior.getSingleSignal( pCell, "custom:drug_death_rate" );
 
-        double drug = SignalBehavior.get_single_signal( pCell, "therapeutic" );
+        double drug = SignalBehavior.getSingleSignal( pCell, "therapeutic" );
 
         double max_damage = 1.0 * damage_rate / ( 1e-16 + repair_rate );
 
         // if I'm dead, don't bother. disable my phenotype rule
-        if( SignalBehavior.get_single_signal( pCell, "dead" ) > 0.5 )
+        if( SignalBehavior.getSingleSignal( pCell, "dead" ) > 0.5 )
         {
             pCell.functions.updatePhenotype = null;
             return;
@@ -31,7 +31,7 @@ public class TumorPhenotype extends update_phenotype
         // first, vary the cell birth and death rates with oxygenation
 
         // std::cout << get_single_behavior( pCell , "cycle entry") << " vs ";
-        new StandardModels.update_cell_and_death_parameters_O2_based().execute( pCell, phenotype, dt );
+        new StandardModels.O2based().execute( pCell, phenotype, dt );
         // std::cout << get_single_behavior( pCell , "cycle entry") << std::endl;
 
         // the update the cell damage

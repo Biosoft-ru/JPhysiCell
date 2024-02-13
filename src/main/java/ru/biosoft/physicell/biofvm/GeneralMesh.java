@@ -138,8 +138,8 @@ public class GeneralMesh
 
         VoxelFace VF1 = new VoxelFace();
         int k = voxel_faces.length;
-        VF1.mesh_index = k;
-        VF1.surface_area = SA;
+        VF1.meshIndex = k;
+        VF1.surfaceArea = SA;
         VF1.outward_normal = VectorUtil.newDiff( voxels[j].center, voxels[i].center );
         VectorUtil.normalize( VF1.outward_normal );
         VF1.inward_normal = VF1.outward_normal.clone();
@@ -182,8 +182,8 @@ public class GeneralMesh
 
         VoxelFace VF1 = new VoxelFace();
         int k = voxel_faces.length;
-        VF1.mesh_index = k;
-        VF1.surface_area = SA;
+        VF1.meshIndex = k;
+        VF1.surfaceArea = SA;
         VF1.outward_normal = VectorUtil.newDiff( voxels[j].center, voxels[i].center );
         VectorUtil.normalize( VF1.outward_normal );
         VF1.inward_normal = VF1.outward_normal.clone();

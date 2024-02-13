@@ -120,7 +120,7 @@ public class Celltype3
         zMax = Math.min( zMax, maxRadius );
         zMin = Math.max( zMin, -maxRadius );
 
-        if( m.options.simulate_2D )
+        if( m.options.simulate2D )
         {
             zMin = 0.0;
             zMax = 0.0;
@@ -148,64 +148,6 @@ public class Celltype3
                 cell.phenotype.death.rates.set( k, 0.0 );
             }
         }
-
-        //        for( int n = 0; n < model.getParameterInt( "number_of_A" ); n++ )
-        //        {
-        //            double[] position = {0, 0, 0};
-        //            double r = max_radius + 1;
-        //            while( r > max_radius )
-        //            {
-        //                position[0] = PhysiCellUtilities.UniformRandom( Xmin, Xmax );
-        //                position[1] = PhysiCellUtilities.UniformRandom( Ymin, Ymax );
-        //                position[2] = PhysiCellUtilities.UniformRandom( Zmin, Zmax );
-        //                r = VectorUtil.norm( position );
-        //            }
-        //            Cell pC = Cell.createCell( aCD, m, position );
-        //            for( int k = 0; k < pC.phenotype.death.rates.size(); k++ )
-        //            {
-        //                pC.phenotype.death.rates.set( k, 0.0 );
-        //            }
-        //        }
-        //
-        //        // place B
-        //        for( int n = 0; n < model.getParameterInt( "number_of_B" ); n++ )
-        //        {
-        //            double[] position = {0, 0, 0};
-        //            double r = max_radius + 1;
-        //            while( r > max_radius )
-        //            {
-        //                position[0] = PhysiCellUtilities.UniformRandom( Xmin, Xmax );
-        //                position[1] = PhysiCellUtilities.UniformRandom( Ymin, Ymax );
-        //                position[2] = PhysiCellUtilities.UniformRandom( Zmin, Zmax );
-        //                r = VectorUtil.norm( position );
-        //            }
-        //            Cell pC = Cell.createCell( bCD, m, position );
-        //            for( int k = 0; k < pC.phenotype.death.rates.size(); k++ )
-        //            {
-        //                pC.phenotype.death.rates.set( k, 0.0 );
-        //            }
-        //        }
-        //
-        //        // place C
-        //
-        //        for( int n = 0; n < model.getParameterInt( "number_of_C" ); n++ )
-        //        {
-        //            double[] position = {0, 0, 0};
-        //            double r = max_radius + 1;
-        //            while( r > max_radius )
-        //            {
-        //                position[0] = PhysiCellUtilities.UniformRandom( Xmin, Xmax );
-        //                position[1] = PhysiCellUtilities.UniformRandom( Ymin, Ymax );
-        //                position[2] = PhysiCellUtilities.UniformRandom( Zmin, Zmax );
-        //                r = VectorUtil.norm( position );
-        //            }
-        //
-        //            Cell pC = Cell.createCell( cCD, m, position );
-        //            for( int k = 0; k < pC.phenotype.death.rates.size(); k++ )
-        //            {
-        //                pC.phenotype.death.rates.set( k, 0.0 );
-        //            }
-        //        }
     }
 
     /**
@@ -230,6 +172,7 @@ public class Celltype3
                 r = VectorUtil.norm( position );
             }
             Cell.createCell( cd, m, position );
+            System.out.println( cd.name + "\t" + position[0] + "\t" + position[1] + "\t" + position[2] );
         }
     }
 }

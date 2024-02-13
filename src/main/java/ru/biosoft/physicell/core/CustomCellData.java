@@ -89,7 +89,7 @@ public class CustomCellData
         nameToIndex = ccd.nameToIndex;
     }
 
-    int add_variable(Variable v)
+    int addVariable(Variable v)
     {
         int n = variables.size();
         variables.add( v );
@@ -97,7 +97,7 @@ public class CustomCellData
         return n;
     }
 
-    public int add_variable(String name, String units, double value)
+    public int addVariable(String name, String units, double value)
     {
         int n = variables.size();
         Variable variable = new Variable();
@@ -109,12 +109,12 @@ public class CustomCellData
         return n;
     }
 
-    int add_variable(String name, double value)
+    int addVariable(String name, double value)
     {
-        return add_variable( name, "dimensionless", value );
+        return addVariable( name, "dimensionless", value );
     }
 
-    int add_vector_variable(VectorVariable v)
+    int addVectorVariable(VectorVariable v)
     {
         int n = vectorVariables.size();
         vectorVariables.add( v );
@@ -122,28 +122,28 @@ public class CustomCellData
         return n;
     }
 
-    public int add_vector_variable(String name, String units, double[] value)
+    public int addVectorVariable(String name, String units, double[] value)
     {
         VectorVariable v = new VectorVariable();
         v.name = name;
         v.units = units;
         v.value = value.clone();
-        return add_vector_variable( v );
+        return addVectorVariable( v );
     }
 
-    int add_vector_variable(String name, double[] value)
+    int addVectorVariable(String name, double[] value)
     {
-        return add_vector_variable( name, "dimensionless", value );
+        return addVectorVariable( name, "dimensionless", value );
     }
 
-    public int find_variable_index(String name)
+    public int findVariableIndex(String name)
     {
         if( nameToIndex.containsKey( name ) )
             return nameToIndex.get( name );
         return -1;
     }
 
-    public int find_vector_variable_index(String name)
+    public int findVectorVariableIndex(String name)
     {
         for( int i = 0; i < vectorVariables.size(); i++ )
         {
