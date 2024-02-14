@@ -77,7 +77,7 @@ public class BasicSignaling
     //
     //    namespace PhysiCell{
 
-    double Hill_response_function(double s, double half_max, double hill_power)
+    public static double Hill_response_function(double s, double half_max, double hill_power)
     {
         // newer. only one expensive a^b operation. 45% less computationl expense. 
 
@@ -99,7 +99,7 @@ public class BasicSignaling
     }
 
 
-    double linear_response_function(double s, double s_min, double s_max)
+    public static double linear_response_function(double s, double s_min, double s_max)
     {
         if( s <= s_min )
         {
@@ -115,7 +115,7 @@ public class BasicSignaling
         return s;
     }
 
-    double decreasing_linear_response_function(double s, double s_min, double s_max)
+    public static double decreasing_linear_response_function(double s, double s_min, double s_max)
     {
         if( s <= s_min )
         {
@@ -134,7 +134,7 @@ public class BasicSignaling
         return s;
     }
 
-    double interpolate_behavior(double base_value, double max_changed_value, double response)
+    public static double interpolate_behavior(double base_value, double max_changed_value, double response)
     {
         double output = max_changed_value; // bM
         output -= base_value; // (bM-b0); 
@@ -162,7 +162,7 @@ public class BasicSignaling
         return temp2;
     }
 
-    double multivariate_linear_response_function(double[] signals, double[] min_thresholds, double[] max_thresholds)
+    public static double multivariate_linear_response_function(double[] signals, double[] min_thresholds, double[] max_thresholds)
     {
         double output = 0.0;
 
@@ -179,7 +179,7 @@ public class BasicSignaling
         return output;
     }
 
-    double[] linear_response_to_Hill_parameters(double s0, double s1)
+    public static double[] linear_response_to_Hill_parameters(double s0, double s1)
     {
         double tol = 0.1;
         double param1 = ( 1 - tol ) / tol;
@@ -198,7 +198,7 @@ public class BasicSignaling
         //    return output;
     }
 
-    double[] Hill_response_to_linear_parameters(double half_max, double Hill_power)
+    public static double[] Hill_response_to_linear_parameters(double half_max, double Hill_power)
     {
         double tol = 0.1;
         double param1 = ( 1 - tol ) / tol;
@@ -219,7 +219,4 @@ public class BasicSignaling
         //
         //    return output;
     }
-
-
-
-};
+}

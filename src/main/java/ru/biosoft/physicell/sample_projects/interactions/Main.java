@@ -1,7 +1,11 @@
-package ru.biosoft.physicell.core;
+package ru.biosoft.physicell.sample_projects.interactions;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.File;
+import java.io.InputStream;
+
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.ui.AgentVisualizer2;
+import ru.biosoft.physicell.xml.ModelReader;
 
 /*
 ###############################################################################
@@ -38,7 +42,7 @@ import java.util.Set;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -69,33 +73,39 @@ import java.util.Set;
 #                                                                             #
 ###############################################################################
 */
-public class CellState
+public class Main
 {
-    public Set<Cell> attachedCells;
-    Set<Cell> springAttachments;
-    public Set<Cell> neighbors;
-    double[] orientation;
-    public double simplePressure;
-    int numberNuclei;
-	public double damage;
-    double totalAttackTime;
-    boolean contactWithBasementMembrane; // not implemented yet 
 
-    public CellState()
-    {
-        neighbors = new HashSet<Cell>();
-        springAttachments = new HashSet<>();
-        orientation = new double[3];
-        simplePressure = 0.0;
-        attachedCells = new HashSet<>();
-        numberNuclei = 1;
-        damage = 0.0;
-        totalAttackTime = 0.0;
-        contactWithBasementMembrane = false;
-    }
+    private static String settingsPath = "config/PhysiCell_settings.xml";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/interactions/result";
 
-    public int numberAttachedCells()
+    public static void main(String ... strings) throws Exception
     {
-        return attachedCells.size();
+        if( strings != null && strings.length > 0 )
+            resultPath = strings[0];
+
+        if( !new File( resultPath ).exists() )
+            new File( resultPath ).mkdirs();
+
+        InputStream settings = Main.class.getResourceAsStream( settingsPath );
+
+        Model model = new ModelReader().read( settings );
+        double mechanics_voxel_size = 30;
+        model.createContainer( mechanics_voxel_size );
+        model.setResultFolder( resultPath );
+
+        model.addVisualizer( 0, "fig_resources" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "fig_toxin" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "fig_quorum" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "fig_pro_inflam" ).setStubstrateIndex( 3 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "fig_debris" ).setStubstrateIndex( 4 ).setMaxDensity( 1 );
+
+        model.getVisualizers().forEach( v -> v.setAgentVisualizer( new AgentVisualizer2() ) );
+
+        /* Users typically start modifying here. START USERMODS */
+        Interactions.init( model );
+        /* Users typically stop modifying here. END USERMODS */
+
+        model.simulate();
     }
 }

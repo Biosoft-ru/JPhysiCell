@@ -1128,18 +1128,18 @@ public class Cell extends BasicAgent
         {
             Rules.apply_ruleset( this );
         }
-        if( SignalBehavior.getSingleSignal( this, "necrotic" ) > 0.5 )
-        {
-            double rupture = this.phenotype.volume.rupture_volume;
-            double volume = this.phenotype.volume.total;
-            if( volume > rupture )
-            {
-                System.out.println( volume + " vs " + this.phenotype.volume.rupture_volume + " dead: "
-                        + SignalBehavior.getSingleSignal( this, "dead" ) );
-                System.out.println( this.phenotype.cycle.currentPhase().name + " " + this.phenotype.cycle.name );
-            }
-
-        }
+        //        if( SignalBehavior.getSingleSignal( this, "necrotic" ) > 0.5 )
+        //        {
+        //            double rupture = this.phenotype.volume.rupture_volume;
+        //            double volume = this.phenotype.volume.total;
+        //            if( volume > rupture )
+        //            {
+        //                System.out.println( volume + " vs " + this.phenotype.volume.rupture_volume + " dead: "
+        //                        + SignalBehavior.getSingleSignal( this, "dead" ) );
+        //                System.out.println( this.phenotype.cycle.currentPhase().name + " " + this.phenotype.cycle.name );
+        //            }
+        //
+        //        }
 
         // call the custom code to update the phenotype 
         if( functions.updatePhenotype != null )

@@ -75,7 +75,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/heterogeneity/result3";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/heterogeneity/result4";
 
     public static void main(String ... strings) throws Exception
     {

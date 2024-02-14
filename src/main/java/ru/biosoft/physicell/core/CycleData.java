@@ -162,7 +162,7 @@ public class CycleData
         transitionRates.get( start_phase_index ).set( index, basic * multiplier );
     }
 
-    double getExitRate(int phase_index)
+    public double getExitRate(int phase_index)
     {
         return transitionRates.get( phase_index ).get( 0 );
     }

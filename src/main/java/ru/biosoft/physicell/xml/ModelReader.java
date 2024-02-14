@@ -359,34 +359,39 @@ public class ModelReader extends Constants
                 for( Element el : findAllElements( dirichletOptionsElement, "boundary_value" ) )
                 {
                     boolean enabled = getBoolAttr( el, "enabled" );
-                    double value = getDoubleVal( el );
                     if( !enabled )
                         Dirichlet_all[i] = false;
                     switch( getAttr( el, "ID" ) )
                     {
                         case "xmin":
                             Dirichlet_xmin[i] = enabled;
-                            Dirichlet_xmin_values[i] = value;
+                            if( enabled )
+                                Dirichlet_xmin_values[i] = getDoubleVal( el );
                             break;
                         case "xmax":
                             Dirichlet_xmax[i] = enabled;
-                            Dirichlet_xmax_values[i] = value;
+                            if( enabled )
+                                Dirichlet_xmax_values[i] = getDoubleVal( el );
                             break;
                         case "ymin":
                             Dirichlet_ymin[i] = enabled;
-                            Dirichlet_ymin_values[i] = value;
+                            if( enabled )
+                                Dirichlet_ymin_values[i] = getDoubleVal( el );
                             break;
                         case "ymax":
                             Dirichlet_ymax[i] = enabled;
-                            Dirichlet_ymax_values[i] = value;
+                            if( enabled )
+                                Dirichlet_ymax_values[i] = getDoubleVal( el );
                             break;
                         case "zmin":
                             Dirichlet_zmin[i] = enabled;
-                            Dirichlet_zmin_values[i] = value;
+                            if( enabled )
+                                Dirichlet_zmin_values[i] = getDoubleVal( el );
                             break;
                         case "zmax":
                             Dirichlet_zmax[i] = enabled;
-                            Dirichlet_zmax_values[i] = value;
+                            if( enabled )
+                                Dirichlet_zmax_values[i] = getDoubleVal( el );
                             break;
                     }
                 }

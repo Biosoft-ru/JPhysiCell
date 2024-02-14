@@ -215,6 +215,11 @@ public class VectorUtil
             v1[i] /= a;
     }
 
+    public static String print(double[] v)
+    {
+        return print( v, 2 );
+    }
+
     /**
      * Returns String representing given array: "v[0] v[1] ... v[n]"
      */
