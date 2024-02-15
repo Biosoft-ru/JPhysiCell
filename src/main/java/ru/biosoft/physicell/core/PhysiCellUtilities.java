@@ -108,4 +108,10 @@ public class PhysiCellUtilities
         return center;
     }
 
+    public static double print(double v)
+    {
+        if( Double.isInfinite( v ) )
+            return v;
+        return Math.round( v * 2 ) / 2;
+    }
 }

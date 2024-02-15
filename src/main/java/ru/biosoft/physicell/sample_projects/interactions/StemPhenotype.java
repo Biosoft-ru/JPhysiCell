@@ -86,7 +86,7 @@ public class StemPhenotype extends UpdatePhenotype
         double signal = num_stem;
         double half_max = stem_diff_halfmax; // 0.1; 
         double hill = BasicSignaling.Hill_response_function( signal, half_max, 1.5 );
-        phenotype.cellTransformations.transformation_rates[diff_type] = base_val + ( max_val - base_val ) * hill;
+        phenotype.cellTransformations.transformationRates[diff_type] = base_val + ( max_val - base_val ) * hill;
 
         // contact with a differentiated cell reduces proliferation 
         // high rate of proliferation unless in contact with a differentiated cell 

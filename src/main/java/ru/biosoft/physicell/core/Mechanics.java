@@ -80,7 +80,7 @@ public class Mechanics implements Cloneable
     // double maximum_adhesion_distance; // needed? 
 
     /* for spring attachments */
-    int maxAttachments;
+    public int maxAttachments;
     public double attachmentElasticConstant;
 
     public double attachmentRate;
@@ -129,7 +129,7 @@ public class Mechanics implements Cloneable
         cellAdhesionAffinities = VectorUtil.resize( cellAdhesionAffinities, cellDinitionSize, 1.0 );
     }
 
-    double cell_adhesion_affinity(String type_name)
+    public double cell_adhesion_affinity(String type_name)
     {
         int n = CellDefinition.getCellDefinition( type_name ).type;
         return cellAdhesionAffinities[n];
@@ -219,5 +219,18 @@ public class Mechanics implements Cloneable
         {
             throw ( new InternalError( e ) );
         }
+    }
+
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "Mechanics:" );
+        sb.append( "\n--------------------------------" );
+        sb.append( "\n\tcell_cell_adhesion_strength: " + cellCellAdhesionStrength + "\n" + "\tcell_cell_repulsion_strength: "
+                + cellCellRepulsionStrength + "\n" + "\trel max adhesion dist: " + relMaxAdhesionDistance + "\n"
+                + "\tcell_BM_adhesion_strength: " + cellBMAdhesionStrength + "\n" + "\tcell_BM_repulsion_strength: "
+                + cellBMRepulsionStrength + "\n" + "\tattachment_elastic_constant: " + attachmentElasticConstant + "\n"
+                + "\tattachment_rate: " + attachmentRate + "\n" + "\tdetachment_rate: " + detachmentRate );
+        return sb.toString();
     }
 }

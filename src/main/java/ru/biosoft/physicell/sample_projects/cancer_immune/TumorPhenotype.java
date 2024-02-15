@@ -5,7 +5,8 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.StandardModels;
+import ru.biosoft.physicell.core.standard.O2based;
+import ru.biosoft.physicell.core.standard.StandardModels;
 
 /**
  * Custom cell phenotype function to scale immunostimulatory factor with hypoxia 
@@ -27,7 +28,7 @@ public class TumorPhenotype extends UpdatePhenotype
 
         phenotype.secretion.secretionRates[immune_factor_index] = 10.0;
 
-        new StandardModels.O2based().execute( pCell, phenotype, dt );//TODO: use inheritance instead
+        new O2based().execute( pCell, phenotype, dt );//TODO: use inheritance instead
 
         // if cell is dead, don't bother with future phenotype changes, set it to secrete the immunostimulatory factor 
         if( phenotype.death.dead == true )

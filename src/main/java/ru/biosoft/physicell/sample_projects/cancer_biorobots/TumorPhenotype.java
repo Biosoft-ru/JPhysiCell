@@ -1,11 +1,11 @@
 package ru.biosoft.physicell.sample_projects.cancer_biorobots;
 
 import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
 import ru.biosoft.physicell.core.SignalBehavior;
-import ru.biosoft.physicell.core.StandardModels;
-import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
+import ru.biosoft.physicell.core.standard.O2based;
 
 public class TumorPhenotype extends UpdatePhenotype
 {
@@ -31,7 +31,7 @@ public class TumorPhenotype extends UpdatePhenotype
         // first, vary the cell birth and death rates with oxygenation
 
         // std::cout << get_single_behavior( pCell , "cycle entry") << " vs ";
-        new StandardModels.O2based().execute( pCell, phenotype, dt );
+        new O2based().execute( pCell, phenotype, dt );
         // std::cout << get_single_behavior( pCell , "cycle entry") << std::endl;
 
         // the update the cell damage

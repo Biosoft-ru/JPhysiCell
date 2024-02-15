@@ -75,20 +75,20 @@ public class CellParameters implements Cloneable
     // o2_hypoxic_saturation < o2_hypoxic_threshold
 
 	public double o2_proliferation_saturation; // value at which extra o2 does not increase proliferation
-    double o2_proliferation_threshold; // value at which o2 is sufficient for proliferation
+    public double o2_proliferation_threshold; // value at which o2 is sufficient for proliferation
 
 	public double o2_reference; // physioxic reference value, in the linked reference Phenotype
     // o2_proliferation_threshold < o2_reference < o2_proliferation_saturation; 
 
-    double o2_necrosis_threshold; // value at which cells start experiencing necrotic death 
-    double o2_necrosis_max; // value at which necrosis reaches its maximum rate 
+    public double o2_necrosis_threshold; // value at which cells start experiencing necrotic death 
+    public double o2_necrosis_max; // value at which necrosis reaches its maximum rate 
     // o2_necrosis_max < o2_necrosis_threshold
 
     //    Phenotype pReference_live_phenotype; // reference live phenotype (typically physioxic) 
 
     // necrosis parameters (may evenually be moved into a reference necrotic phenotype 
     public double max_necrosis_rate; // deprecate
-    int necrosis_type; // deprecate 
+    public int necrosis_type; // deprecate 
 
     public CellParameters()
     {

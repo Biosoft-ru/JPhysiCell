@@ -14,7 +14,8 @@ import ru.biosoft.physicell.core.CellFunctions.calculate_distance_to_membrane;
 import ru.biosoft.physicell.core.Output;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.StandardModels;
+import ru.biosoft.physicell.core.standard.O2based;
+import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
 
@@ -152,7 +153,7 @@ public class TestDCIS
         // set default cell cycle model 
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         // set default_cell_functions; 
-        cd.functions.updatePhenotype = new StandardModels.O2based();
+        cd.functions.updatePhenotype = new O2based();
 
         int Q_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_negative );
         int oxygen_substrate_index = m.findDensityIndex( "oxygen" );

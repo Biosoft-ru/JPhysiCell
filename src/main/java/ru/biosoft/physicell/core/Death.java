@@ -140,10 +140,8 @@ public class Death implements Cloneable
             double rate = rates.get( i );
             if( rate != 0 && PhysiCellUtilities.UniformRandom() < rate * dt )
             {
-                // update the Death data structure 
                 dead = true;
                 currentDeathModelIndex = i;
-                // and set the cycle model to this death model 
                 return dead;
             }
             i++;
@@ -207,5 +205,35 @@ public class Death implements Cloneable
         {
             throw ( new InternalError( e ) );
         }
+    }
+
+    public String toString()
+    {
+        return display();
+    }
+
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "Death models: " );
+        sb.append( "\n--------------------------------" );
+        for( int k = 0; k < models.size(); k++ )
+        {
+            CycleModel deathModel = models.get( k );
+            CycleData data = models.get( k ).data;
+            double rate = rates.get( k );
+            sb.append( "\n\t" + k + " : " + deathModel.name + " (" + deathModel.code + ")" + ", rate " + rate + " 1/min" );
+            for( List<PhaseLink> links : deathModel.phaseLinks )
+            {
+                for( PhaseLink link : links )
+                {
+                    int start = link.startPhaseIndex;
+                    int end = link.endPhaseIndex;
+                    sb.append( "\n\t\t" + deathModel.phases.get( start ).name + " -> " + deathModel.phases.get( end ).name + ", duration "
+                            + PhysiCellUtilities.print( 1.0 / data.getTransitionRate( start, end ) ) + " min" );
+                }
+            }
+        }
+        return sb.toString();
     }
 }

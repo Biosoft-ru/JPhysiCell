@@ -1,5 +1,8 @@
 package ru.biosoft.physicell.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
@@ -76,10 +79,12 @@ public class Secretion implements Cloneable
     public double[] uptakeRates = new double[0];
     public double[] saturationDensities = new double[0];
     public double[] netExportRates = new double[0];
+    private String[] substrates = new String[0];
 
     public void sync(Microenvironment m)
     {
         int size = m.number_of_densities();
+        substrates = m.density_names;
         secretionRates = VectorUtil.resize( secretionRates, size );
         uptakeRates = VectorUtil.resize( uptakeRates, size );
         saturationDensities = VectorUtil.resize( saturationDensities, size );
@@ -160,5 +165,39 @@ public class Secretion implements Cloneable
         {
             throw ( new InternalError( e ) );
         }
+    }
+
+    public String display()
+    {
+        List<String> secretion = new ArrayList<>();
+        List<String> uptake = new ArrayList<>();
+        List<String> export = new ArrayList<>();
+        for( int i = 0; i < substrates.length; i++ )
+        {
+            if( secretionRates[i] != 0 )
+                secretion.add( substrates[i] + ", rate " + secretionRates[i] );
+            if( uptakeRates[i] != 0 )
+                uptake.add( substrates[i] + ", rate " + uptakeRates[i] );
+            if( netExportRates[i] != 0 )
+                export.add( substrates[i] + ", rate " + netExportRates[i] );
+        }
+        if( secretion.isEmpty() && uptake.isEmpty() && export.isEmpty() )
+            return "Secretion Disabled.\n--------------------------------";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append( "Secretion:\n--------------------------------" );
+        if( !secretion.isEmpty() )
+            sb.append( "\n\tSecretes " + secretion.get( 0 ) );
+        for( int i = 1; i < secretion.size(); i++ )
+            sb.append( "\n\t         " + secretion.get( i ) );
+        if( !uptake.isEmpty() )
+            sb.append( "\n\tUptakes " + uptake.get( 0 ) );
+        for( int i = 1; i < uptake.size(); i++ )
+            sb.append( "\n\t        " + uptake.get( i ) );
+        if( !export.isEmpty() )
+            sb.append( "\n\tExports " + export.get( 0 ) );
+        for( int i = 1; i < export.size(); i++ )
+            sb.append( "\n\t        " + export.get( i ) );
+        return sb.toString();
     }
 }

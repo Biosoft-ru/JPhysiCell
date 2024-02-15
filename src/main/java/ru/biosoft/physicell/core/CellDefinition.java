@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
+import ru.biosoft.physicell.core.CustomCellData.Variable;
+import ru.biosoft.physicell.core.CustomCellData.VectorVariable;
 
 /*
 ###############################################################################
@@ -213,152 +215,57 @@ public class CellDefinition
         return m;
     }
 
-    //    String display(  )
-    //    {
-    //        StringBuilder sb = new StringBuilder();
-    //            sb.append( " type:" + type + " name: " + name ); 
-    //
-    //            // summarize cycle model 
-    //            if( phenotype.cycle!= null )
-    //            {
-    //                sb.append( "\t cycle model: " + phenotype.cycle.name  
-    //                    + " (code=" + phenotype.cycle.code + ")" ); 
-    //                    
-    //                // let's show the transition rates 
-    //                CycleModel pCM = (phenotype.cycle ); 
-    //                CycleData pCMD = (phenotype.cycle.data ); 
-    //                for( int n=0 ; n < pCM.phases.size() ; n++ )
-    //                {
-    //                    sb.append( "\t\tPhase " + n + ": " + pCM.phases.get(n).name+"\n" ); 
-    //                }
-    //                sb.append( "\t\tCycle transitions: \n" 
-    //                   + "\t\t-----------------\n" ); 
-    //                for( int n=0 ; n < pCM.phase_links.size() ; n++ )
-    //                {
-    //                    for( int k=0; k < pCM.phase_links.get(n).size() ; k++ )
-    //                    {
-    //                        int start = pCM.phase_links[n][k].start_phase_index;
-    //                        int end = pCM.phase_links[n][k].end_phase_index; 
-    //                        sb.append( "\t\t" + pCM.phases[start].name + " -. " 
-    //                            + pCM.phases[end].name + " w mean duration " 
-    //                            + 1.0 / pCMD.transition_rate( start,end) + " min" ); 
-    //                    }
-    //                }           
-    //                
-    //            }
-    //            else
-    //            {   sb.append( "\t cycle model not initialized" ); } 
-    //
-    //            // summarize death models 
-    //            sb.append( "\t death models: " ); 
-    //            for( int k=0 ; k < phenotype.death.models.size(); k++ )
-    //            {
-    //                sb.append( "\t\t" + k + " : " + phenotype.death.models[k].name 
-    //                + " (code=" + phenotype.death.models[k].code + ")" 
-    //                + " with rate " + phenotype.death.rates[k] + " 1/min" ); 
-    //
-    //                CycleModel pCM = (phenotype.death.models[k] ); 
-    //                CycleData pCMD = (phenotype.death.models[k].data ); 
-    //
-    //                
-    //                sb.append( "\t\tdeath phase transitions: \n" ) 
-    //                   + "\t\t------------------------" ); 
-    //                for( int n=0 ; n < pCM.phase_links.size() ; n++ )
-    //                {
-    //                    for( int k=0; k < pCM.phase_links[n].size() ; k++ )
-    //                    {
-    //                        int start = pCM.phase_links[n][k].start_phase_index;
-    //                        int end = pCM.phase_links[n][k].end_phase_index; 
-    //                        sb.append( "\t\t" + pCM.phases[start].name + " -. " 
-    //                            + pCM.phases[end].name + " w mean duration " 
-    //                            + 1.0 / pCMD.transition_rate( start,end) + " min" ); 
-    //                    }
-    //                }           
-    //                
-    //                
-    //                
-    //            }
-    //            
-    //            // summarize functions 
-    //            CellFunctions pCF = (functions); 
-    //            sb.append( "\t key functions: " ); 
-    //            sb.append( "\t\t migration bias rule: "; display_ptr_as_bool( pCF.update_migration_bias  ); 
-    //            sb.append( "\n"); 
-    //            sb.append( "\t\t custom rule: "; display_ptr_as_bool( pCF.custom_cell_rule  ); 
-    //            sb.append( "\n");
-    //            sb.append( "\t\t phenotype rule: "; display_ptr_as_bool( pCF.update_phenotype ); 
-    //            sb.append( "\n"); 
-    //            sb.append( "\t\t volume update function: "; display_ptr_as_bool( pCF.volume_update_function  ); 
-    //            sb.append( "\n"); 
-    //            sb.append( "\t\t mechanics function: "; display_ptr_as_bool( pCF.update_velocity  ); 
-    //            sb.append( "\n");
-    //            sb.append( "\t\t contact function: "; display_ptr_as_bool( pCF.contact_function ); 
-    //            sb.append( "\n"); 
-    //            
-    //            // summarize motility 
-    //            
-    //            Motility pM = (phenotype.motility); 
-    //            String val = "true";
-    //            if( pM.isMotile == false )
-    //            { val = "false"; } 
-    //        
-    //            String dimen = "3D"; 
-    //            if( pM.restrictTo2D == true )
-    //            { dimen = "2D"; } 
-    //
-    //            sb.append( "\tmotility (enabled: " + val + " in " + dimen + ")\n" 
-    //                + "\t\tspeed: " + pM.migrationSpeed + " micron/min\n"  
-    //                + "\t\tbias: " + pM.migrationBias + " \n" 
-    //                + "\t\tpersistence time: " + pM.persistenceTime + " min\n"
-    //                + "\t\tchemotaxis (enabled: ");
-    //                
-    //                val = "true" ;
-    //                if( functions.update_migration_bias != chemotaxis_function )
-    //                { val = "false"; } 
-    //            sb.append( val + ")\n"); 
-    //                + "\t\t\talong " 
-    //                + pM.chemotaxis_direction + " * grad(" 
-    //                + microenvironment.density_names[ pM.chemotaxis_index ] + ") " ); 
-    //                
-    //            // secretion
-    //            
-    //            
-    //            
-    //            // mechanics
-    //
-    //            Mechanics pMech = (phenotype.mechanics); 
-    //
-    //            sb.append( "\tmechanics:\n" 
-    //                + "\t\tcell_cell_adhesion_strength: " + pMech.cellCellAdhesionStrength + "\n" 
-    //                + "\t\tcell_cell_repulsion_strength: " + pMech.cellCellRepulsionStrength + "\n" 
-    //                + "\t\trel max adhesion dist: " + pMech.relMaxAdhesionDistance + "\n" 
-    //                + "\t\tcell_BM_adhesion_strength: " + pMech.cellBMAdhesionStrength + "\n" 
-    //                + "\t\tcell_BM_repulsion_strength: " + pMech.cellBMRepulsionStrength + "\n" 
-    //                + "\t\tattachment_elastic_constant: " + pMech.attachmentElasticConstant + "\n" 
-    //                + "\t\tattachment_rate: " + pMech.attachmentRate + "\n" 
-    //                + "\t\tdetachment_rate: " + pMech.detachmentRate );
-    //            
-    //            // size 
-    //        
-    //
-    //            // intracellular
-    //            if (phenotype.intracellular != null)
-    //            {
-    //                phenotype.intracellular.display();
-    //            }
-    //            
-    //            CustomCellData pCCD = (custom_data); 
-    //            sb.append( "\tcustom data: " ); 
-    //            for( int k=0; k < pCCD.variables.size(); k++)
-    //            {
-    //                sb.append( "\t\t" + pCCD.variables.get(k) ); 
-    //            }
-    //            sb.append( "\tcustom vector data: " ); 
-    //            for( int k=0; k < pCCD.vectorVariables.size(); k++)
-    //            {
-    //                sb.append( "\t\t" + pCCD.vectorVariables.get(k) ); 
-    //            }
-    //            sb.append( "\t\t\tNOTE: custom vector data will eventually be merged with custom data" );
-    //            return sb.toString();
-    //    }
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "\n================================" );
+        sb.append( "\n\t" + name + " (" + type + ")" );
+        sb.append( "\n================================\n" );
+
+        if( phenotype.cycle != null )
+            sb.append( "\n" + phenotype.cycle.display() + "\n" );
+        else
+        {
+            sb.append( "\n\nCycle Model not initialized." );
+            sb.append( "\n--------------------------------" );
+        }
+
+        sb.append( "\n" + phenotype.death.display() + "\n" );
+        sb.append( "\n" + phenotype.motility.display() + "\n" );
+        sb.append( "\n" + phenotype.secretion.display() + "\n" );
+        sb.append( "\n" + phenotype.cellInteractions.display() + "\n" );
+        sb.append( "\n" + phenotype.cellTransformations.display() + "\n" );
+        sb.append( "\n" + phenotype.mechanics.display() + "\n" );
+        sb.append( "\n" + functions.display() + "\n" );
+
+        //        if( phenotype.intracellular != null )
+        //        {
+            //                    phenotype.intracellular.display();
+        //        }
+
+        CustomCellData pCCD = ( custom_data );
+        sb.append( "\nCustom data: " );
+        sb.append( "\n--------------------------------" );
+        for( Variable var : pCCD.variables )
+        {
+            if( var.value != 0 )
+                sb.append( "\n\t" + var );
+        }
+        if( !pCCD.vectorVariables.isEmpty() )
+        {
+            sb.append( "\n\nCustom vector data: " );
+            sb.append( "\n--------------------------------" );
+            if( !pCCD.vectorVariables.isEmpty() )
+            {
+                for( VectorVariable var : pCCD.vectorVariables )
+                    sb.append( "\n\t" + var );
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String display_ptr_as_bool(Object obj)
+    {
+        return obj == null ? "false" : "true";
+    }
 }

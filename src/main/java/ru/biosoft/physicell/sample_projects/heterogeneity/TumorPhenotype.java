@@ -3,7 +3,7 @@ package ru.biosoft.physicell.sample_projects.heterogeneity;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.SignalBehavior;
-import ru.biosoft.physicell.core.StandardModels.O2based;
+import ru.biosoft.physicell.core.standard.O2based;
 
 public class TumorPhenotype extends O2based
 {

@@ -1,5 +1,8 @@
 package ru.biosoft.physicell.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 
@@ -77,10 +80,11 @@ public class Motility implements Cloneable
     public double[] migrationBiasDirection = new double[0];; // a unit vector random motility is biased in this direction (e.g., chemotaxis)
     public double migrationBias; // how biased is motility if 0, completely random. if 1, deterministic along the bias vector 
     public boolean restrictTo2D; // if true, set random motility to 2D only. 
-    double[] motilityVector = new double[0];;
+    public double[] motilityVector = new double[0];;
     public int chemotaxisIndex;
     public int chemotaxisDirection;
     public double[] chemotacticSensitivities = new double[0]; // advanced chemotaxis
+    private String[] substrates;
 
     public Motility()
     {
@@ -91,18 +95,26 @@ public class Motility implements Cloneable
         migrationBias = 0.0;
         restrictTo2D = false;
         motilityVector = new double[3];
-        chemotaxisIndex = 0;
+        chemotaxisIndex = -1;
         chemotaxisDirection = 1;
+        substrates = new String[0];
     }
 
     void sync(Microenvironment m)
     {
         chemotacticSensitivities = VectorUtil.resize( chemotacticSensitivities, m.number_of_densities(), 0 );
+        substrates = m.density_names;
     }
 
     public void setChemotacticSensitivity(int index, double value)
     {
         chemotacticSensitivities[index] = value;
+    }
+
+    public void disable()
+    {
+        isMotile = false;
+        motilityVector = new double[3];
     }
 
     @Override
@@ -120,5 +132,34 @@ public class Motility implements Cloneable
         {
             throw ( new InternalError( e ) );
         }
+    }
+
+    public String display()
+    {
+        if( !isMotile )
+            return "Motility Disabled.\n--------------------------------";
+        StringBuilder sb = new StringBuilder();
+        sb.append( "Motility\n--------------------------------" );
+
+        sb.append( "\n\tIn " + ( restrictTo2D ? "2D" : "3D" ) );
+        sb.append( ", speed: " + migrationSpeed + " micron/min, bias: " + migrationBias + ", persistence: " + persistenceTime + " min" );
+        if( chemotaxisIndex != -1 )
+            sb.append( "\n\tChemotaxis along " + chemotaxisDirection + " * ( " + substrates[chemotaxisIndex] + " )" );
+
+        List<String> chemoSenses = new ArrayList<>();
+        for( int i = 0; i < chemotacticSensitivities.length; i++ )
+        {
+            double sens = chemotacticSensitivities[i];
+            if( sens != 0 )
+                chemoSenses.add( sens + " * ( " + substrates[i] + " )" );
+        }
+
+        if( !chemoSenses.isEmpty() )
+        {
+            sb.append( "\n\tChemotaxis along  " + chemoSenses.get( 0 ) );
+            for( int i = 1; i < chemoSenses.size(); i++ )
+                sb.append( "\n\t                 +" + chemoSenses.get( i ) );
+        }
+        return sb.toString();
     }
 }

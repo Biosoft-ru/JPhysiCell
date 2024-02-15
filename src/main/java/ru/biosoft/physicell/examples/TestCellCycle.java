@@ -14,7 +14,8 @@ import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.StandardModels;
+import ru.biosoft.physicell.core.standard.O2based;
+import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
 
@@ -136,7 +137,7 @@ public class TestCellCycle
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         CellDefinition.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.Ki67_advanced; // set default cell cycle model 
-        cd.functions.updatePhenotype = new StandardModels.O2based(); // set default_cell_functions; 
+        cd.functions.updatePhenotype = new O2based(); // set default_cell_functions; 
         cd.functions.updateVelocity = null;
         Phenotype defaultPhenotype = cd.phenotype;
 

@@ -192,4 +192,29 @@ public class CellFunctions
     {
         public Cell execute();
     }
+
+    @Override
+    public String toString()
+    {
+        return display();
+    }
+
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "Key functions: \n--------------------------------" );
+        if( update_migration_bias != null )
+            sb.append( "\n\tMigration bias rule: " + update_migration_bias.getClass().getSimpleName() );
+        if( custom_cell_rule != null )
+            sb.append( "\n\tCustom rule: " + custom_cell_rule.getClass().getSimpleName() );
+        if( updatePhenotype != null )
+            sb.append( "\n\tPhenotype rule: " + updatePhenotype.getClass().getSimpleName() );
+        if( updateVolume != null )
+            sb.append( "\n\tVolume update function: " + updateVolume.getClass().getSimpleName() );
+        if( updateVelocity != null )
+            sb.append( "\n\tMechanics function: " + updateVelocity.getClass().getSimpleName() );
+        if( contact_function != null )
+            sb.append( "\n\tContact function: " + contact_function.getClass().getSimpleName() );
+        return sb.toString();
+    }
 }

@@ -71,8 +71,8 @@ public class Phase
     int index; // an internal index for the cycle model
     public int code; // a global identifier code 
     public String name;
-    boolean divisionAtExit; // does this phase trigger division? 
-    boolean removalAtExit; // does this phase trigger removal? 
+    public boolean divisionAtExit; // does this phase trigger division? 
+    public boolean removalAtExit; // does this phase trigger removal? 
     public PhaseEntry entryFunction;
 
     public Phase(String name, int index, int code)

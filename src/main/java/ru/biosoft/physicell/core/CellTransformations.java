@@ -1,5 +1,8 @@
 package ru.biosoft.physicell.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.biosoft.physicell.biofvm.VectorUtil;
 
 /*
@@ -70,12 +73,11 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 */
 public class CellTransformations implements Cloneable
 {
-    // rates of transforming into different cell types 
-    public double[] transformation_rates;
+    public double[] transformationRates; // rates of transforming into different cell types 
 
     public CellTransformations()
     {
-        transformation_rates = new double[] {0.0};
+        transformationRates = new double[] {0.0};
     }
 
     void sync_to_cell_definitions()
@@ -85,28 +87,56 @@ public class CellTransformations implements Cloneable
 
     public void initialize(int cellDefinitionSize)
     {
-        transformation_rates = VectorUtil.resize( transformation_rates, cellDefinitionSize );
+        transformationRates = VectorUtil.resize( transformationRates, cellDefinitionSize );
     }
 
-    // ease of access 
-    //    double& transformation_rate( std::string type_name )
-    //    {
-    //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-    //        int n = cell_definition_indices_by_name[type_name]; 
-    //        return transformation_rates[n]; 
-    //    }
     @Override
     public CellTransformations clone()
     {
         try
         {
             CellTransformations result = (CellTransformations)super.clone();
-            result.transformation_rates = this.transformation_rates.clone();
+            result.transformationRates = this.transformationRates.clone();
             return result;
         }
         catch( CloneNotSupportedException e )
         {
             throw ( new InternalError( e ) );
         }
+    }
+
+    public String toString()
+    {
+        return display();
+    }
+
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        List<String> names = new ArrayList<>();
+        for( int i = 0; i < transformationRates.length; i++ )
+        {
+            if( transformationRates[i] != 0 )
+            {
+                names.add( CellDefinition.getCellDefinitionByIndex( i ).name );
+            }
+        }
+        if( names.isEmpty() )
+        {
+            sb.append( "Transformations Disabled." );
+            sb.append( "\n--------------------------------" );
+            return sb.toString();
+        }
+
+        sb.append( "Transformations:" );
+        sb.append( "\n--------------------------------" );
+        sb.append( "\ntTransforms to " );
+        for( int i = 0; i < names.size(); i++ )
+        {
+            if( i > 0 )
+                sb.append( "\n\t              " );
+            sb.append( names.get( i ) );
+        }
+        return sb.toString();
     }
 }

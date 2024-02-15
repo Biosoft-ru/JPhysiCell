@@ -96,11 +96,11 @@ public class Volume implements Cloneable
 
     public double calcification_rate;
 
-    double target_solid_cytoplasmic;
-    double target_solid_nuclear;
-    double target_fluid_fraction;
+    public double target_solid_cytoplasmic;
+    public double target_solid_nuclear;
+    public double target_fluid_fraction;
 
-    double target_cytoplasmic_to_nuclear_ratio;
+    public double target_cytoplasmic_to_nuclear_ratio;
 
     public double[] test = new double[] {3, 4};
     public double relative_rupture_volume;

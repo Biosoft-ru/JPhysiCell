@@ -10,7 +10,8 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.StandardModels;
+import ru.biosoft.physicell.core.standard.O2based;
+import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
 
@@ -183,7 +184,7 @@ public class TestHDS
 
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         // set default_cell_functions; 
-        cd.functions.updatePhenotype = new StandardModels.O2based();
+        cd.functions.updatePhenotype = new O2based();
         //        cd.phenotype.secretion.sync_to_microenvironment( microenvironment );
         //        cd.phenotype.sync_to_functions( cd.functions );
 

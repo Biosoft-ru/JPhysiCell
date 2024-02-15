@@ -1,16 +1,19 @@
-package ru.biosoft.physicell.core;
+package ru.biosoft.physicell.core.standard;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
-import ru.biosoft.physicell.core.CellFunctions.add_cell_basement_membrane_interactions;
-import ru.biosoft.physicell.core.CellFunctions.calculate_distance_to_membrane;
-import ru.biosoft.physicell.core.CellFunctions.contact_function;
-import ru.biosoft.physicell.core.CellFunctions.update_migration_bias;
-import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
+import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.CycleModel;
+import ru.biosoft.physicell.core.DeathParameters;
+import ru.biosoft.physicell.core.PhaseArrest;
+import ru.biosoft.physicell.core.PhaseEntry;
+import ru.biosoft.physicell.core.Phenotype;
+import ru.biosoft.physicell.core.PhysiCellConstants;
+import ru.biosoft.physicell.core.PhysiCellUtilities;
 
 /*
 ###############################################################################
@@ -212,15 +215,15 @@ public class StandardModels
         // add the main phase for this model, make sure it 
         // triggers the appropriate entry function, and note that 
         // it should trigger cell removal at its end 
-        apoptosis.add_phase( PhysiCellConstants.apoptotic, "Apoptotic" );
+        apoptosis.addPhase( PhysiCellConstants.apoptotic, "Apoptotic" );
         apoptosis.phases.get( 0 ).entryFunction = new PhaseEntry.standard_apoptosis_entry_function();
         apoptosis.phases.get( 0 ).removalAtExit = true;
 
         // add an empty junk debris phase for this model 
-        apoptosis.add_phase( PhysiCellConstants.debris, "Debris" );
+        apoptosis.addPhase( PhysiCellConstants.debris, "Debris" );
 
         // Add a link between these phases. Set the cell to be removed upon this transition. (So the "debris" phase should never be entered). 
-        apoptosis.add_phase_link( 0, 1, null );
+        apoptosis.addPhaseLink( 0, 1, null );
         apoptosis.setBasicTransitionRate( 0, 1, 1.0 / ( 8.6 * 60.0 ) );
         // Use the deterministic model, where this phase has fixed duration
         apoptosis.phase_link( 0, 1 ).fixedDuration = true;
@@ -242,18 +245,18 @@ public class StandardModels
         necrosis.name = "Necrosis";
         necrosis.code = PhysiCellConstants.necrosis_death_model;
 
-        necrosis.add_phase( PhysiCellConstants.necrotic_swelling, "Necrotic (swelling)" );
+        necrosis.addPhase( PhysiCellConstants.necrotic_swelling, "Necrotic (swelling)" );
         necrosis.phases.get( 0 ).entryFunction = new PhaseEntry.standard_necrosis_entry_function();
 
-        necrosis.add_phase( PhysiCellConstants.necrotic_lysed, "Necrotic (lysed)" );
+        necrosis.addPhase( PhysiCellConstants.necrotic_lysed, "Necrotic (lysed)" );
         necrosis.phases.get( 1 ).entryFunction = new PhaseEntry.standard_lysis_entry_function();
         necrosis.phases.get( 1 ).removalAtExit = true;
 
         // add an empty junk debris phase for this model 
-        necrosis.add_phase( PhysiCellConstants.debris, "Debris" );
+        necrosis.addPhase( PhysiCellConstants.debris, "Debris" );
 
-        necrosis.add_phase_link( 0, 1, new PhaseArrest.standard_necrosis_arrest_function() );
-        necrosis.add_phase_link( 1, 2, null );
+        necrosis.addPhaseLink( 0, 1, new PhaseArrest.standard_necrosis_arrest_function() );
+        necrosis.addPhaseLink( 1, 2, null );
 
         necrosis.setBasicTransitionRate( 0, 1, 9E9 ); // set high so it's always evaluating against the "arrest"
         necrosis.setBasicTransitionRate( 1, 2, 1.0 / ( 60.0 * 24.0 * 60.0 ) ); // 60 days max  
@@ -275,15 +278,15 @@ public class StandardModels
         Ki67_advanced.name = "Ki67 (advanced)";
         Ki67_advanced.data.timeUnits = "min";
 
-        Ki67_advanced.add_phase( PhysiCellConstants.Ki67_negative, "Ki67-" );
-        Ki67_advanced.add_phase( PhysiCellConstants.Ki67_positive_premitotic, "Ki67+ (premitotic)" );
-        Ki67_advanced.add_phase( PhysiCellConstants.Ki67_positive_postmitotic, "Ki67+ (postmitotic)" );
+        Ki67_advanced.addPhase( PhysiCellConstants.Ki67_negative, "Ki67-" );
+        Ki67_advanced.addPhase( PhysiCellConstants.Ki67_positive_premitotic, "Ki67+ (premitotic)" );
+        Ki67_advanced.addPhase( PhysiCellConstants.Ki67_positive_postmitotic, "Ki67+ (postmitotic)" );
 
         Ki67_advanced.phases.get( 1 ).divisionAtExit = true;
 
-        Ki67_advanced.add_phase_link( 0, 1, null ); // - to +
-        Ki67_advanced.add_phase_link( 1, 2, null ); // + (pre-mitotic) to + (post-mitotic) 
-        Ki67_advanced.add_phase_link( 2, 0, null ); // + to - 
+        Ki67_advanced.addPhaseLink( 0, 1, null ); // - to +
+        Ki67_advanced.addPhaseLink( 1, 2, null ); // + (pre-mitotic) to + (post-mitotic) 
+        Ki67_advanced.addPhaseLink( 2, 0, null ); // + to - 
 
         Ki67_advanced.phase_link( 1, 2 ).fixedDuration = true;
         Ki67_advanced.phase_link( 2, 0 ).fixedDuration = true;
@@ -304,12 +307,12 @@ public class StandardModels
         Ki67_basic.name = "Ki67 (basic)";
         Ki67_basic.data.timeUnits = "min";
 
-        Ki67_basic.add_phase( PhysiCellConstants.Ki67_negative, "Ki67-" );
-        Ki67_basic.add_phase( PhysiCellConstants.Ki67_positive, "Ki67+" );
+        Ki67_basic.addPhase( PhysiCellConstants.Ki67_negative, "Ki67-" );
+        Ki67_basic.addPhase( PhysiCellConstants.Ki67_positive, "Ki67+" );
         Ki67_basic.phases.get( 1 ).divisionAtExit = true;
 
-        Ki67_basic.add_phase_link( 0, 1, null ); // - to +
-        Ki67_basic.add_phase_link( 1, 0, null ); // + to - 
+        Ki67_basic.addPhaseLink( 0, 1, null ); // - to +
+        Ki67_basic.addPhaseLink( 1, 0, null ); // + to - 
 
         Ki67_basic.setBasicTransitionRate( 0, 1, 1.0 / ( 4.59 * 60.0 ) ); // MCF10A cells are ~4.59 hours in Ki67- state
         Ki67_basic.setBasicTransitionRate( 1, 0, 1.0 / ( 15.5 * 60.0 ) );// length of Ki67+ states in advanced model 
@@ -326,9 +329,9 @@ public class StandardModels
         live.code = PhysiCellConstants.live_cells_cycle_model;
         live.name = "Live";
         live.data.timeUnits = "min";
-        live.add_phase( PhysiCellConstants.live, "Live" );
+        live.addPhase( PhysiCellConstants.live, "Live" );
         live.phases.get( 0 ).divisionAtExit = true;
-        live.add_phase_link( 0, 0, null );
+        live.addPhaseLink( 0, 0, null );
         live.setBasicTransitionRate( 0, 0, 0.0432 / 60.0 ); // MCF10A have ~0.04 1/hr net birth rate
         live.phases.get( 0 ).entryFunction = new PhaseEntry.StandardLivePhaseEntry();
     }
@@ -341,15 +344,15 @@ public class StandardModels
 
         flow_cytometry_cycle_model.data.timeUnits = "min";
 
-        flow_cytometry_cycle_model.add_phase( PhysiCellConstants.G0G1_phase, "G0/G1" );
-        flow_cytometry_cycle_model.add_phase( PhysiCellConstants.S_phase, "S" );
-        flow_cytometry_cycle_model.add_phase( PhysiCellConstants.G2M_phase, "G2/M" );
+        flow_cytometry_cycle_model.addPhase( PhysiCellConstants.G0G1_phase, "G0/G1" );
+        flow_cytometry_cycle_model.addPhase( PhysiCellConstants.S_phase, "S" );
+        flow_cytometry_cycle_model.addPhase( PhysiCellConstants.G2M_phase, "G2/M" );
 
         flow_cytometry_cycle_model.phases.get( 2 ).divisionAtExit = true;
 
-        flow_cytometry_cycle_model.add_phase_link( 0, 1, null ); // G0/G1 to S
-        flow_cytometry_cycle_model.add_phase_link( 1, 2, null ); // S to G2/M
-        flow_cytometry_cycle_model.add_phase_link( 2, 0, null ); // G2/M to G0/G1 
+        flow_cytometry_cycle_model.addPhaseLink( 0, 1, null ); // G0/G1 to S
+        flow_cytometry_cycle_model.addPhaseLink( 1, 2, null ); // S to G2/M
+        flow_cytometry_cycle_model.addPhaseLink( 2, 0, null ); // G2/M to G0/G1 
 
         // need reference values! https://www.ncbi.nlm.nih.gov/books/NBK9876/
         flow_cytometry_cycle_model.setBasicTransitionRate( 0, 1, 0.00324 );// 5.15 hours in G0/G1 by fitting 
@@ -366,17 +369,17 @@ public class StandardModels
 
         flow_cytometry_separated_cycle_model.data.timeUnits = "min";
 
-        flow_cytometry_separated_cycle_model.add_phase( PhysiCellConstants.G0G1_phase, "G0/G1" );
-        flow_cytometry_separated_cycle_model.add_phase( PhysiCellConstants.S_phase, "S" );
-        flow_cytometry_separated_cycle_model.add_phase( PhysiCellConstants.G2_phase, "G2" );
-        flow_cytometry_separated_cycle_model.add_phase( PhysiCellConstants.M_phase, "M" );
+        flow_cytometry_separated_cycle_model.addPhase( PhysiCellConstants.G0G1_phase, "G0/G1" );
+        flow_cytometry_separated_cycle_model.addPhase( PhysiCellConstants.S_phase, "S" );
+        flow_cytometry_separated_cycle_model.addPhase( PhysiCellConstants.G2_phase, "G2" );
+        flow_cytometry_separated_cycle_model.addPhase( PhysiCellConstants.M_phase, "M" );
 
         flow_cytometry_separated_cycle_model.phases.get( 3 ).divisionAtExit = true;
 
-        flow_cytometry_separated_cycle_model.add_phase_link( 0, 1, null ); // G0/G1 to S
-        flow_cytometry_separated_cycle_model.add_phase_link( 1, 2, null ); // S to G2
-        flow_cytometry_separated_cycle_model.add_phase_link( 2, 3, null ); // G2 to M 
-        flow_cytometry_separated_cycle_model.add_phase_link( 3, 0, null ); // M to G0/G1 
+        flow_cytometry_separated_cycle_model.addPhaseLink( 0, 1, null ); // G0/G1 to S
+        flow_cytometry_separated_cycle_model.addPhaseLink( 1, 2, null ); // S to G2
+        flow_cytometry_separated_cycle_model.addPhaseLink( 2, 3, null ); // G2 to M 
+        flow_cytometry_separated_cycle_model.addPhaseLink( 3, 0, null ); // M to G0/G1 
 
         // need reference values! 
         flow_cytometry_separated_cycle_model.setBasicTransitionRate( 0, 1, 0.00335 );// 4.98 hours in G0/G1
@@ -396,11 +399,11 @@ public class StandardModels
         cycling_quiescent.code = PhysiCellConstants.cycling_quiescent_model;
         cycling_quiescent.name = "Cycling-Quiescent model";
         cycling_quiescent.data.timeUnits = "min";
-        cycling_quiescent.add_phase( PhysiCellConstants.quiescent, "Quiescent" );
-        cycling_quiescent.add_phase( PhysiCellConstants.cycling, "Cycling" );
+        cycling_quiescent.addPhase( PhysiCellConstants.quiescent, "Quiescent" );
+        cycling_quiescent.addPhase( PhysiCellConstants.cycling, "Cycling" );
         cycling_quiescent.phases.get( 1 ).divisionAtExit = true;
-        cycling_quiescent.add_phase_link( 0, 1, null ); // Q to C
-        cycling_quiescent.add_phase_link( 1, 0, null ); // C to Q 
+        cycling_quiescent.addPhaseLink( 0, 1, null ); // Q to C
+        cycling_quiescent.addPhaseLink( 1, 0, null ); // C to Q 
         cycling_quiescent.setBasicTransitionRate( 0, 1, 1.0 / ( 4.59 * 60.0 ) ); // MCF10A cells are ~4.59 hours in Ki67- state
         cycling_quiescent.setBasicTransitionRate( 1, 0, 1.0 / ( 15.5 * 60.0 ) );// length of Ki67+ states in advanced model 
         cycling_quiescent.phase_link( 1, 0 ).fixedDuration = true;
@@ -408,104 +411,6 @@ public class StandardModels
         cycling_quiescent.phases.get( 1 ).entryFunction = new PhaseEntry.StandardCyclingEntry();//standard_cycling_entry_function;
     }
 
-
-    public static class standard_volume_update_function implements CellFunctions.volume_update_function
-    {
-        public void execute(Cell pCell, Phenotype phenotype, double dt)
-        {
-            Volume v = phenotype.volume;
-            v.fluid += dt * v.fluid_change_rate * ( v.target_fluid_fraction * v.total - v.fluid );
-            if( v.fluid < 0.0 )
-                v.fluid = 0.0;
-
-            v.nuclear_fluid = ( v.nuclear / ( v.total + 1e-16 ) ) * ( v.fluid );
-            v.cytoplasmic_fluid = v.fluid - v.nuclear_fluid;
-
-            v.nuclear_solid += dt * v.nuclear_biomass_change_rate * ( v.target_solid_nuclear - v.nuclear_solid );
-            if( v.nuclear_solid < 0.0 )
-                v.nuclear_solid = 0.0;
-
-            v.target_solid_cytoplasmic = v.target_cytoplasmic_to_nuclear_ratio * v.target_solid_nuclear;// phenotype.volume.cytoplasmic_to_nuclear_fraction * 
-
-            v.cytoplasmic_solid += dt * v.cytoplasmic_biomass_change_rate * ( v.target_solid_cytoplasmic - v.cytoplasmic_solid );
-            if( v.cytoplasmic_solid < 0.0 )
-                v.cytoplasmic_solid = 0.0;
-
-            v.solid = v.nuclear_solid + v.cytoplasmic_solid;
-
-            v.nuclear = v.nuclear_solid + v.nuclear_fluid;
-            v.cytoplasmic = v.cytoplasmic_solid + v.cytoplasmic_fluid;
-
-            v.calcified_fraction += dt * v.calcification_rate * ( 1 - v.calcified_fraction );
-
-            v.total = v.cytoplasmic + v.nuclear;
-
-            v.fluid_fraction = v.fluid / ( 1e-16 + v.total );
-
-            phenotype.geometry.update( pCell, phenotype, dt );
-        }
-    }
-
-    public static class standard_update_cell_velocity implements CellFunctions.update_velocity
-    {
-        @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt)
-        {
-            if( pCell.functions.add_cell_basement_membrane_interactions != null )
-            {
-                pCell.functions.add_cell_basement_membrane_interactions.execute( pCell, phenotype, dt );
-            }
-
-
-            pCell.state.simplePressure = 0.0;
-            pCell.state.neighbors.clear(); // new 1.8.0
-
-            //First check the neighbors in my current voxel
-            //        std::vector<Cell*>::iterator neighbor;
-            //        std::vector<Cell*>::iterator end = pCell.get_container().agent_grid[pCell.get_current_mechanics_voxel_index()].end();
-            //        for(neighbor = pCell.get_container().agent_grid[pCell.get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
-            //        {
-            //            pCell.add_potentials(*neighbor);
-            //        }
-            CellContainer container = pCell.get_container();
-            Set<Cell> neighbors = container.agent_grid.get( pCell.get_current_mechanics_voxel_index() );
-            for( Cell neighbor : neighbors )
-            {
-                pCell.addPotentials( neighbor );
-            }
-            //        std::vector<int>::iterator neighbor_voxel_index;
-            //        std::vector<int>::iterator neighbor_voxel_index_end = 
-            //            pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()].end();               
-            //        for( neighbor_voxel_index = 
-            //            pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()].begin();
-            //            neighbor_voxel_index != neighbor_voxel_index_end; 
-            //            ++neighbor_voxel_index )
-            //        {
-            //            if(!is_neighbor_voxel(pCell, pCell.get_container().underlying_mesh.voxels[pCell.get_current_mechanics_voxel_index()].center, pCell.get_container().underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
-            //                continue;
-            //            end = pCell.get_container().agent_grid[*neighbor_voxel_index].end();
-            //            for(neighbor = pCell.get_container().agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
-            //            {
-            //                pCell.add_potentials(neighbor);
-            //            }
-            //        }
-            int voxelIndex = pCell.get_current_mechanics_voxel_index();
-            double[] center = container.underlying_mesh.voxels[voxelIndex].center;
-            int[] neighborVoxels = container.underlying_mesh.moore_connected_voxel_indices[voxelIndex];
-            for( int neighbor_voxel_index : neighborVoxels )
-            {
-                if( !Cell.isNeighborVoxel( pCell, center, container.underlying_mesh.voxels[neighbor_voxel_index].center,
-                        neighbor_voxel_index ) )
-                    continue;
-                for( Cell neighbor : container.agent_grid.get( neighbor_voxel_index ) )
-                {
-                    pCell.addPotentials( neighbor );
-                }
-            }
-            pCell.updateMotilityVector( dt );
-            VectorUtil.sum( pCell.velocity, phenotype.motility.motilityVector );
-        }
-    }
 
     public static void dynamic_spring_attachments(Cell pCell, Phenotype phenotype, double dt)
     {
@@ -582,125 +487,6 @@ public class StandardModels
         //            }
         //            j++;
         //        }
-    }
-
-    public static class O2based extends UpdatePhenotype
-    {
-        @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
-        {
-            // supported cycle models:
-            // advanced_Ki67_cycle_model= 0;
-            // basic_Ki67_cycle_model=1
-            // live_cells_cycle_model = 5; 
-
-            if( phenotype.death.dead == true )
-                return;
-
-            // set up shortcuts to find the Q and K(1) phases (assuming Ki67 basic or advanced model)
-            boolean indices_initiated = false;
-            int start_phase_index = 0; // Q_phase_index; 
-            int end_phase_index = 0; // K_phase_index;
-            int necrosis_index = 0;
-
-            int oxygen_substrate_index = pCell.getMicroenvironment().findDensityIndex( "oxygen" );
-
-            if( !indices_initiated )
-            {
-                // Ki67 models
-                if( phenotype.cycle.code == PhysiCellConstants.advanced_Ki67_cycle_model
-                        || phenotype.cycle.code == PhysiCellConstants.basic_Ki67_cycle_model )
-                {
-                    start_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_negative );
-                    necrosis_index = phenotype.death.findDeathModelIndex( PhysiCellConstants.necrosis_death_model );
-
-                    if( phenotype.cycle.code == PhysiCellConstants.basic_Ki67_cycle_model )
-                    {
-                        end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_positive );
-                        indices_initiated = true;
-                    }
-                    if( phenotype.cycle.code == PhysiCellConstants.advanced_Ki67_cycle_model )
-                    {
-                        end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
-                        indices_initiated = true;
-                    }
-                }
-
-                // live model 
-                if( phenotype.cycle.code == PhysiCellConstants.live_cells_cycle_model )
-                {
-                    start_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.live );
-                    necrosis_index = phenotype.death.findDeathModelIndex( PhysiCellConstants.necrosis_death_model );
-                    end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.live );
-                    indices_initiated = true;
-                }
-
-                // cytometry models 
-                if( phenotype.cycle.code == PhysiCellConstants.flow_cytometry_cycle_model
-                        || phenotype.cycle.code == PhysiCellConstants.flow_cytometry_separated_cycle_model )
-                {
-                    start_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.G0G1_phase );
-                    necrosis_index = phenotype.death.findDeathModelIndex( PhysiCellConstants.necrosis_death_model );
-                    end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.S_phase );
-                    indices_initiated = true;
-                }
-
-                if( phenotype.cycle.code == PhysiCellConstants.cycling_quiescent_model )
-                {
-                    start_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.quiescent );
-                    necrosis_index = phenotype.death.findDeathModelIndex( PhysiCellConstants.necrosis_death_model );
-                    end_phase_index = phenotype.cycle.findPhaseIndex( PhysiCellConstants.cycling );
-                    indices_initiated = true;
-                }
-
-            }
-
-            // don't continue if we never "figured out" the current cycle model. 
-            if( !indices_initiated )
-                return;
-
-            // sample the microenvironment to get the pO2 value 
-            double pO2 = ( pCell.nearest_density_vector() )[oxygen_substrate_index]; // PhysiCellConstants.oxygen_index]; 
-            int n = pCell.phenotype.cycle.data.currentPhaseIndex;
-
-            // this multiplier is for linear interpolation of the oxygen value 
-            double multiplier = 1.0;
-            if( pO2 < pCell.parameters.o2_proliferation_saturation )
-            {
-                multiplier = ( pO2 - pCell.parameters.o2_proliferation_threshold )
-                        / ( pCell.parameters.o2_proliferation_saturation - pCell.parameters.o2_proliferation_threshold );
-            }
-            if( pO2 < pCell.parameters.o2_proliferation_threshold )
-            {
-                multiplier = 0.0;
-            }
-
-            // now, update the appropriate cycle transition rate 
-            //            pCell.parameters.pReference_live_phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index )\
-            //            double base = pCell.parameters.pReference_live_phenotype.cycle.data.transition_rate( start_phase_index, end_phase_index );
-            //            System.out.println( pCell.toString() + " " + multiplier );
-            phenotype.cycle.data.modifyTransitionRate( start_phase_index, end_phase_index, multiplier );
-
-            // Update necrosis rate
-            multiplier = 0.0;
-            if( pO2 < pCell.parameters.o2_necrosis_threshold )
-            {
-                multiplier = ( pCell.parameters.o2_necrosis_threshold - pO2 )
-                        / ( pCell.parameters.o2_necrosis_threshold - pCell.parameters.o2_necrosis_max );
-            }
-            if( pO2 < pCell.parameters.o2_necrosis_max )
-            {
-                multiplier = 1.0;
-            }
-
-            // now, update the necrosis rate 
-            pCell.phenotype.death.rates.set( necrosis_index, multiplier * pCell.parameters.max_necrosis_rate );
-            // check for deterministic necrosis 
-            if( pCell.parameters.necrosis_type == PhysiCellConstants.deterministic_necrosis && multiplier > 1e-16 )
-            {
-                pCell.phenotype.death.rates.set( necrosis_index, 9e99 );
-            }
-        }
     }
 
     public static void standard_elastic_contact_function(Cell pC1, Phenotype p1, Cell pC2, Phenotype p2, double dt)
@@ -803,7 +589,7 @@ public class StandardModels
                 probability = phenotype.cellInteractions.deadPhagocytosisRate * dt;
                 if( PhysiCellUtilities.UniformRandom() < probability )
                 {
-                    pCell.ingest_cell( pTarget );
+                    pCell.ingestCell( pTarget );
                 }
             }
             else
@@ -813,7 +599,7 @@ public class StandardModels
                 probability = phenotype.cellInteractions.getLivePhagocytosisRate( type_name ) * dt; // s[type] * dt;  
                 if( PhysiCellUtilities.UniformRandom() < probability && !phagocytosed )
                 {
-                    pCell.ingest_cell( pTarget );
+                    pCell.ingestCell( pTarget );
                     phagocytosed = true;
                 }
 
@@ -852,300 +638,15 @@ public class StandardModels
         }
 
         double probability = 0.0;
-        for( int i = 0; i < phenotype.cellTransformations.transformation_rates.length; i++ )
+        for( int i = 0; i < phenotype.cellTransformations.transformationRates.length; i++ )
         {
-            probability = phenotype.cellTransformations.transformation_rates[i] * dt;
+            probability = phenotype.cellTransformations.transformationRates[i] * dt;
             if( PhysiCellUtilities.UniformRandom() <= probability )
             {
                 // std::cout << "Transforming from " << pCell.type_name << " to " << cell_definitions_by_index[i].name << std::endl; 
-                pCell.convert_to_cell_definition( CellDefinition.getCellDefinition( i ) );
+                pCell.convert( CellDefinition.getCellDefinition( i ) );
                 return;
             }
-        }
-    }
-
-    public static class chemotaxis_function implements update_migration_bias
-    {
-        @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt)
-        {
-            // bias direction is gradient for the indicated substrate 
-            phenotype.motility.migrationBiasDirection = pCell.nearest_gradient( phenotype.motility.chemotaxisIndex ).clone();
-            // move up or down gradient based on this direction 
-            VectorUtil.prod( phenotype.motility.migrationBiasDirection, phenotype.motility.chemotaxisDirection );
-            VectorUtil.normalize( phenotype.motility.migrationBiasDirection );
-        }
-    }
-
-    public static class advanced_chemotaxis_function_normalized implements update_migration_bias
-    {
-        @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt)
-        {
-            // We'll work directly on the migration bias direction 
-            double[] pVec = phenotype.motility.migrationBiasDirection;
-            // reset to zero. use memset to be faster??
-            for( int i = 0; i < 3; i++ )
-                pVec[i] = 0;
-
-            // a place to put each gradient prior to normalizing it 
-            double[] temp = new double[3];
-            // weighted combination of the gradients 
-            for( int i = 0; i < phenotype.motility.chemotacticSensitivities.length; i++ )
-            {
-                // get and normalize ith gradient 
-                temp = pCell.nearest_gradient( i );
-                VectorUtil.normalize( temp );
-                VectorUtil.axpy( pVec, phenotype.motility.chemotacticSensitivities[i], temp );
-            }
-            // normalize that 
-            VectorUtil.normalize( pVec );
-        }
-    }
-
-    public static class advanced_chemotaxis_function implements update_migration_bias
-    {
-        @Override
-        public void execute(Cell pCell, Phenotype phenotype, double dt)
-        {
-            // We'll work directly on the migration bias direction 
-            double[] pVec = phenotype.motility.migrationBiasDirection;
-            // reset to zero. use memset to be faster??
-
-            for( int i = 0; i < 3; i++ )
-                pVec[i] = 0;
-            //            pVec = new double[3];
-
-            // weighted combination of the gradients 
-            for( int i = 0; i < phenotype.motility.chemotacticSensitivities.length; i++ )
-            {
-                // get and normalize ith gradient 
-                VectorUtil.axpy( pVec, phenotype.motility.chemotacticSensitivities[i], pCell.nearest_gradient( i ) );
-            }
-            // normalize that 
-            VectorUtil.normalize( pVec );
-        }
-    }
-
-    public static class standard_elastic_contact_function implements contact_function
-    {
-        @Override
-        public void execute(Cell pC1, Phenotype p1, Cell pC2, Phenotype p2, double dt)
-        {
-            if( pC1.position.length != 3 || pC2.position.length != 3 )
-            {
-                return;
-            }
-
-            double[] displacement = VectorUtil.newDiff( pC2.position, pC1.position );
-            //        std::vector<double> displacement = pC2.position;
-            //        displacement -= pC1.position; 
-
-            // update May 2022 - effective adhesion 
-            int ii = CellDefinition.getCellDefinitionIndex( pC1.type );
-            int jj = CellDefinition.getCellDefinitionIndex( pC2.type );
-
-            double adhesion_ii = pC1.phenotype.mechanics.attachmentElasticConstant * pC1.phenotype.mechanics.cellAdhesionAffinities[jj];
-            double adhesion_jj = pC2.phenotype.mechanics.attachmentElasticConstant * pC2.phenotype.mechanics.cellAdhesionAffinities[ii];
-
-            double effective_attachment_elastic_constant = Math.sqrt( adhesion_ii * adhesion_jj );
-
-            // axpy( &(pC1.velocity) , p1.mechanics.attachment_elastic_constant , displacement ); 
-            VectorUtil.axpy( pC1.velocity, effective_attachment_elastic_constant, displacement );
-        }
-    }
-
-    public static class standard_domain_edge_avoidance_interactions implements add_cell_basement_membrane_interactions
-    {
-        public void execute(Cell pCell, Phenotype phenotype, double dt)
-        {
-            if( pCell.functions.calculate_distance_to_membrane == null )
-            {
-                pCell.functions.calculate_distance_to_membrane = new distance_to_domain_edge();
-            }
-            phenotype.mechanics.cellBMRepulsionStrength = 100;
-
-            double max_interactive_distance = phenotype.mechanics.relMaxAdhesionDistance * phenotype.geometry.radius;
-            double distance = pCell.functions.calculate_distance_to_membrane.execute( pCell, phenotype, dt );
-            //Note that the distance_to_membrane function must set displacement values (as a normal vector)
-
-            // Repulsion from basement membrane
-            double temp_r = 0;
-            if( distance < phenotype.geometry.radius )
-            {
-                temp_r = ( 1 - distance / phenotype.geometry.radius );
-                temp_r *= temp_r;
-                temp_r *= phenotype.mechanics.cellBMRepulsionStrength;
-            }
-            if( Math.abs( temp_r ) < 1e-16 )
-                return;
-
-            VectorUtil.axpy( ( pCell.velocity ), temp_r, pCell.displacement );
-        }
-    }
-
-    public static class distance_to_domain_edge implements calculate_distance_to_membrane
-    {
-        double tolerance = 1e-7;
-        double one_over_sqrt_2 = 0.70710678118;
-        double one_over_sqrt_3 = 0.57735026919;
-        public double execute(Cell pCell, Phenotype phenotype, double dummy)
-        {
-            Microenvironment m = pCell.getMicroenvironment();
-            double min_distance = 9e99;
-            int nearest_boundary = -1;
-
-            // check against xL and xU
-            double temp_distance = pCell.position[0] - m.mesh.boundingBox[0];
-            if( temp_distance < min_distance )
-            {
-                min_distance = temp_distance;
-                nearest_boundary = 0;
-            }
-            temp_distance = m.mesh.boundingBox[3] - pCell.position[0];
-            if( temp_distance < min_distance )
-            {
-                min_distance = temp_distance;
-                nearest_boundary = 1;
-            }
-
-            // check against yL and yU
-            temp_distance = pCell.position[1] - m.mesh.boundingBox[1];
-            if( temp_distance < min_distance )
-            {
-                min_distance = temp_distance;
-                nearest_boundary = 2;
-            }
-            temp_distance = m.mesh.boundingBox[4] - pCell.position[1];
-            if( temp_distance < min_distance )
-            {
-                min_distance = temp_distance;
-                nearest_boundary = 3;
-            }
-
-            if( m.options.simulate2D == false )
-            {
-                // if in 3D, check against zL and zU
-                temp_distance = pCell.position[2] - m.mesh.boundingBox[2];
-                if( temp_distance < min_distance )
-                {
-                    min_distance = temp_distance;
-                    nearest_boundary = 4;
-                }
-                temp_distance = m.mesh.boundingBox[5] - pCell.position[2];
-                if( temp_distance < min_distance )
-                {
-                    min_distance = temp_distance;
-                    nearest_boundary = 5;
-                }
-
-                // check for 3D exceptions 
-
-                // lines 
-                if( Math.abs( ( pCell.position[0] ) - ( pCell.position[1] ) ) < tolerance
-                        && Math.abs( ( pCell.position[1] ) - ( pCell.position[2] ) ) < tolerance
-                        && Math.abs( ( pCell.position[0] ) - ( pCell.position[2] ) ) < tolerance )
-                {
-                    if( pCell.position[0] > 0 )
-                    {
-                        if( pCell.position[0] > 0 && pCell.position[1] > 0 )
-                        {
-                            pCell.displacement = new double[] { -one_over_sqrt_3, -one_over_sqrt_3, -one_over_sqrt_3};
-                        }
-                        if( pCell.position[0] < 0 && pCell.position[1] > 0 )
-                        {
-                            pCell.displacement = new double[] {one_over_sqrt_3, -one_over_sqrt_3, -one_over_sqrt_3};
-                        }
-
-                        if( pCell.position[0] > 0 && pCell.position[1] < 0 )
-                        {
-                            pCell.displacement = new double[] { -one_over_sqrt_3, one_over_sqrt_3, -one_over_sqrt_3};
-                        }
-                        if( pCell.position[0] < 0 && pCell.position[1] < 0 )
-                        {
-                            pCell.displacement = new double[] {one_over_sqrt_3, one_over_sqrt_3, -one_over_sqrt_3};
-                        }
-                    }
-                    else
-                    {
-                        if( pCell.position[0] > 0 && pCell.position[1] > 0 )
-                        {
-                            pCell.displacement = new double[] { -one_over_sqrt_3, -one_over_sqrt_3, one_over_sqrt_3};
-                        }
-                        if( pCell.position[0] < 0 && pCell.position[1] > 0 )
-                        {
-                            pCell.displacement = new double[] {one_over_sqrt_3, -one_over_sqrt_3, one_over_sqrt_3};
-                        }
-
-                        if( pCell.position[0] > 0 && pCell.position[1] < 0 )
-                        {
-                            pCell.displacement = new double[] { -one_over_sqrt_3, one_over_sqrt_3, one_over_sqrt_3};
-                        }
-                        if( pCell.position[0] < 0 && pCell.position[1] < 0 )
-                        {
-                            pCell.displacement = new double[] {one_over_sqrt_3, one_over_sqrt_3, one_over_sqrt_3};
-                        }
-                    }
-                    return min_distance;
-                }
-
-                // planes - let's not worry for today 
-
-            }
-            else
-            {
-                // check for 2D  exceptions 
-
-                if( Math.abs( ( pCell.position[0] ) - ( pCell.position[1] ) ) < tolerance )
-                {
-                    if( pCell.position[0] > 0 && pCell.position[1] > 0 )
-                    {
-                        pCell.displacement = new double[] { -one_over_sqrt_2, -one_over_sqrt_2, 0};
-                    }
-                    if( pCell.position[0] < 0 && pCell.position[1] > 0 )
-                    {
-                        pCell.displacement = new double[] {one_over_sqrt_2, -one_over_sqrt_2, 0};
-                    }
-
-                    if( pCell.position[0] > 0 && pCell.position[1] < 0 )
-                    {
-                        pCell.displacement = new double[] { -one_over_sqrt_2, one_over_sqrt_2, 0};
-                    }
-                    if( pCell.position[0] < 0 && pCell.position[1] < 0 )
-                    {
-                        pCell.displacement = new double[] {one_over_sqrt_2, one_over_sqrt_2, 0};
-                    }
-                    return min_distance;
-                }
-            }
-
-            // no exceptions 
-            switch( nearest_boundary )
-            {
-                case 0:
-                    pCell.displacement = new double[] {1, 0, 0};
-                    return min_distance;
-                case 1:
-                    pCell.displacement = new double[] { -1, 0, 0};
-                    return min_distance;
-                case 2:
-                    pCell.displacement = new double[] {0, 1, 0};
-                    return min_distance;
-                case 3:
-                    pCell.displacement = new double[] {0, -1, 0};
-                    return min_distance;
-                case 4:
-                    pCell.displacement = new double[] {0, 0, 1};
-                    return min_distance;
-                case 5:
-                    pCell.displacement = new double[] {0, 0, -1};
-                    return min_distance;
-                default:
-                    pCell.displacement = new double[] {0, 0, 0};
-                    return 9e99;
-            }
-            //            pCell.displacement = new double[] {0, 0, 0};
-            //            return 9e99;
         }
     }
 }

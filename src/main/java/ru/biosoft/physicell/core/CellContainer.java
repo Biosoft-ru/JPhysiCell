@@ -9,6 +9,7 @@ import ru.biosoft.physicell.biofvm.AgentContainer;
 import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.CartesianMesh;
 import ru.biosoft.physicell.biofvm.Microenvironment;
+import ru.biosoft.physicell.core.standard.StandardModels;
 
 /*
 ###############################################################################
@@ -83,7 +84,7 @@ public class CellContainer extends AgentContainer
     int boundary_condition_for_pushed_out_agents; // what to do with pushed out cells
     boolean initialzed = false;
 
-    CartesianMesh underlying_mesh = new CartesianMesh();
+    public CartesianMesh underlying_mesh = new CartesianMesh();
     double[] max_cell_interactive_distance_in_voxel;
     public int numDivisionsCurStep = 0;
     public int numDeathsCurStep = 0;
@@ -92,7 +93,7 @@ public class CellContainer extends AgentContainer
     double lastCellCycleTime = 0.0;
     double last_mechanics_time = 0.0;
 
-    List<Set<Cell>> agent_grid;
+    public List<Set<Cell>> agent_grid;
     List<Set<Cell>> agents_in_outer_voxels;
 
     public CellContainer()

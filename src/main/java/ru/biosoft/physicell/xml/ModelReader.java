@@ -31,8 +31,13 @@ import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.PhysiCellSettings;
 import ru.biosoft.physicell.core.Secretion;
-import ru.biosoft.physicell.core.StandardModels;
 import ru.biosoft.physicell.core.Volume;
+import ru.biosoft.physicell.core.standard.StandardModels;
+import ru.biosoft.physicell.core.standard.advanced_chemotaxis_function;
+import ru.biosoft.physicell.core.standard.advanced_chemotaxis_function_normalized;
+import ru.biosoft.physicell.core.standard.chemotaxis_function;
+import ru.biosoft.physicell.core.standard.standard_domain_edge_avoidance_interactions;
+
 
 public class ModelReader extends Constants
 {
@@ -263,7 +268,7 @@ public class ModelReader extends Constants
                         boolean virtual_wall_at_domain_edge = getBoolVal( el );
                         if( virtual_wall_at_domain_edge )
                             StandardModels
-                                    .getDefaultCellDefinition().functions.add_cell_basement_membrane_interactions = new StandardModels.standard_domain_edge_avoidance_interactions();
+                                    .getDefaultCellDefinition().functions.add_cell_basement_membrane_interactions = new standard_domain_edge_avoidance_interactions();
                         break;
                     }
                     catch( Exception ex )
@@ -552,7 +557,7 @@ public class ModelReader extends Constants
         if( code < 0 )
             throw new Exception( "Error. Unable to identify cycle model\n" + "node.attribute(\"name\").value()\n" + "("
                     + getIntAttr( el, "code" ) + ")" );
-        model.add_phase( code, name );
+        model.addPhase( code, name );
 
         // Set the model, but only if it was specified. 
         if( getIntAttr( el, "code" ) != null )
@@ -638,7 +643,7 @@ public class ModelReader extends Constants
                 // set the transition rate 
                 p.cycle.data.setExitRate( start, 1.0 / ( value + 1e-16 ) );
                 // set it to fixed / non-fixed 
-                p.cycle.phase_links.get( start ).get( 0 ).fixedDuration = fixed;
+                p.cycle.phaseLinks.get( start ).get( 0 ).fixedDuration = fixed;
             }
         }
     }
@@ -678,7 +683,7 @@ public class ModelReader extends Constants
                     boolean fixedDuration = getBoolAttr( durationElement, "fixed_duration" );
                     double durationValue = getDoubleVal( durationElement );
                     p.death.models.get( death_index ).data.setExitRate( index, 1.0 / ( durationValue + 1e-16 ) );
-                    p.death.models.get( death_index ).phase_links.get( index ).get( 0 ).fixedDuration = fixedDuration;
+                    p.death.models.get( death_index ).phaseLinks.get( index ).get( 0 ).fixedDuration = fixedDuration;
                 }
             }
 
@@ -936,26 +941,29 @@ public class ModelReader extends Constants
                     Element chemotaxisElement = findElement( child, "chemotaxis" );
                     if( chemotaxisElement != null )
                     {
-                        if( getBoolVal( findElement( chemotaxisElement, "enabled" ) ) )// enabled? if so, set the standard chemotaxis function
-                            cd.functions.update_migration_bias = new StandardModels.chemotaxis_function();
-
-                        // search for the right chemo index               
-                        String substrate_name = getVal( findElement( chemotaxisElement, "substrate" ) );
-
-                        motility.chemotaxisIndex = m.findDensityIndex( substrate_name );
-                        if( motility.chemotaxisIndex < 0 )
+                        boolean enabled = getBoolVal( findElement( chemotaxisElement, "enabled" ) );
+                        if( enabled )
                         {
-                            System.out.println( "Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" );
-                            System.out.println( "Substrate " + substrate_name + " was not found in the microenvironment." );
+                            cd.functions.update_migration_bias = new chemotaxis_function();
+
+                            // search for the right chemo index               
+                            String substrate_name = getVal( findElement( chemotaxisElement, "substrate" ) );
+
+                            motility.chemotaxisIndex = m.findDensityIndex( substrate_name );
+                            if( motility.chemotaxisIndex < 0 )
+                            {
+                                System.out.println( "Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" );
+                                System.out.println( "Substrate " + substrate_name + " was not found in the microenvironment." );
+                            }
+                            String actual_name = m.density_names[motility.chemotaxisIndex];
+                            if( !substrate_name.equals( actual_name ) )
+                            {
+                                System.out.println( "Error: attempted to set chemotaxis to \"" + substrate_name
+                                        + "\", which was not found in the microenvironment."
+                                        + " Please double-check your substrate name in the config file." );
+                            }
+                            motility.chemotaxisDirection = getIntVal( findElement( chemotaxisElement, "direction" ) );
                         }
-                        String actual_name = m.density_names[motility.chemotaxisIndex];
-                        if( !substrate_name.equals( actual_name ) )
-                        {
-                            System.out.println( "Error: attempted to set chemotaxis to \"" + substrate_name
-                                    + "\", which was not found in the microenvironment."
-                                    + " Please double-check your substrate name in the config file." );
-                        }
-                        motility.chemotaxisDirection = getIntVal( findElement( chemotaxisElement, "direction" ) );
                     }
                     Element advancedChemotaxisElement = findElement( child, "advanced_chemotaxis" );
                     if( advancedChemotaxisElement != null )
@@ -963,7 +971,7 @@ public class ModelReader extends Constants
                         if( getBoolVal( findElement( advancedChemotaxisElement, "enabled" ) ) )
                         {
                             //                            cd.functions.update_migration_bias = new StandardModels.chemotaxis_function();
-                            if( cd.functions.update_migration_bias instanceof StandardModels.chemotaxis_function )
+                            if( cd.functions.update_migration_bias instanceof chemotaxis_function )
                             {
                                 System.out.println( "Warning: when processing motility for " + cd.name + " cells: \n"
                                         + "\tBoth chemotaxis and advanced_chemotaxis are enabled.\n"
@@ -971,54 +979,55 @@ public class ModelReader extends Constants
                             }
 
                             if( getBoolAttr( advancedChemotaxisElement, "normalize_each_gradient" ) )
-                                cd.functions.update_migration_bias = new StandardModels.advanced_chemotaxis_function_normalized();
+                                cd.functions.update_migration_bias = new advanced_chemotaxis_function_normalized();
                             else
-                                cd.functions.update_migration_bias = new StandardModels.advanced_chemotaxis_function();
-                        }
-                        Element sensitivityEl = findElement( advancedChemotaxisElement, "chemotactic_sensitivities" );
-                        if( sensitivityEl != null )
-                        {
-                            for( Element sensEl : findAllElements( sensitivityEl, "chemotactic_sensitivity" ) )
-                            {
-                                String substrate_name = getAttr( sensEl, "substrate" );
-                                int index = m.findDensityIndex( substrate_name );
-                                String actual_name = "";
-                                if( index > -1 )
-                                {
-                                    actual_name = m.density_names[index];
-                                }
+                                cd.functions.update_migration_bias = new advanced_chemotaxis_function();
 
-                                // error check 
-                                if( !substrate_name.equals( actual_name ) )
+                            Element sensitivityEl = findElement( advancedChemotaxisElement, "chemotactic_sensitivities" );
+                            if( sensitivityEl != null )
+                            {
+                                for( Element sensEl : findAllElements( sensitivityEl, "chemotactic_sensitivity" ) )
                                 {
-                                    System.out.println( "Warning: when processing advanced chemotaxis for " + cd.name + " cells: "
-                                            + "\tInvalid substrate " + substrate_name + " specified."
-                                            + "\tIgnoring this invalid substrate in the chemotaxis function .. " );
-                                }
-                                else
-                                {
-                                    cd.phenotype.motility.chemotacticSensitivities[index] = getDoubleVal( sensEl );
+                                    String substrate_name = getAttr( sensEl, "substrate" );
+                                    int index = m.findDensityIndex( substrate_name );
+                                    String actual_name = "";
+                                    if( index > -1 )
+                                    {
+                                        actual_name = m.density_names[index];
+                                    }
+
+                                    // error check 
+                                    if( !substrate_name.equals( actual_name ) )
+                                    {
+                                        System.out.println( "Warning: when processing advanced chemotaxis for " + cd.name + " cells: "
+                                                + "\tInvalid substrate " + substrate_name + " specified."
+                                                + "\tIgnoring this invalid substrate in the chemotaxis function .. " );
+                                    }
+                                    else
+                                    {
+                                        cd.phenotype.motility.chemotacticSensitivities[index] = getDoubleVal( sensEl );
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            System.out.println( "Warning: when processing motility for " + cd.name + " cells: "
-                                    + "\tAdvanced chemotaxis requries chemotactic_sensitivities."
-                                    + "\tBut you have none. Your migration bias will be the zero vector." );
+                            else
+                            {
+                                System.out.println( "Warning: when processing motility for " + cd.name + " cells: "
+                                        + "\tAdvanced chemotaxis requries chemotactic_sensitivities."
+                                        + "\tBut you have none. Your migration bias will be the zero vector." );
+                            }
                         }
                     }
                 }
             }
         }
         // display summary for diagnostic help 
-        if( cd.functions.update_migration_bias instanceof StandardModels.chemotaxis_function && motility.isMotile )
+        if( cd.functions.update_migration_bias instanceof chemotaxis_function && motility.isMotile )
         {
             System.out.println( "Cells of type " + cd.name + " use standard chemotaxis: \n" + "\t d_bias (before normalization) = "
                     + motility.chemotaxisDirection + " * grad(" + m.density_names[motility.chemotaxisIndex] + ")" );
         }
 
-        if( cd.functions.update_migration_bias instanceof StandardModels.advanced_chemotaxis_function && motility.isMotile )
+        if( cd.functions.update_migration_bias instanceof advanced_chemotaxis_function && motility.isMotile )
         {
             int number_of_substrates = m.density_names.length;
 
@@ -1029,7 +1038,7 @@ public class ModelReader extends Constants
                 System.out.println( motility.chemotacticSensitivities[n] + " * grad(" + m.density_names[n] + ")" );
         }
 
-        if( cd.functions.update_migration_bias instanceof StandardModels.advanced_chemotaxis_function_normalized && motility.isMotile )
+        if( cd.functions.update_migration_bias instanceof advanced_chemotaxis_function_normalized && motility.isMotile )
         {
             int number_of_substrates = m.density_names.length;
 
@@ -1182,7 +1191,7 @@ public class ModelReader extends Constants
                             + cd.name + " to " + name + " is not allowed.\n" + "\tIgnoring this cell transformation rate!" );
                 }
                 else
-                    transformations.transformation_rates[index] = rate;
+                    transformations.transformationRates[index] = rate;
             }
             else
             {

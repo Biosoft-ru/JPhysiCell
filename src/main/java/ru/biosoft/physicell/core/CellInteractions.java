@@ -1,5 +1,8 @@
 package ru.biosoft.physicell.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.biosoft.physicell.biofvm.VectorUtil;
 
 /*
@@ -135,5 +138,63 @@ public class CellInteractions implements Cloneable
         {
             throw ( new InternalError( e ) );
         }
+    }
+
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        List<String> attacks = new ArrayList<>();
+        List<String> fusions = new ArrayList<>();
+        List<String> phogocyte = new ArrayList<>();
+
+        for( int i = 0; i < attackRates.length; i++ )
+        {
+            String name = CellDefinition.getCellDefinitionByIndex( i ).name;
+            if( attackRates[i] != 0 )
+                attacks.add( name );
+            if( fusionRates[i] != 0 )
+                fusions.add( name );
+            if( livePhagocytosisRates[i] != 0 )
+                phogocyte.add( name );
+        }
+
+        if( attacks.isEmpty() && fusions.isEmpty() && phogocyte.isEmpty() )
+        {
+            sb.append( "Interactions Disabled." );
+            sb.append( "\n--------------------------------" );
+            return sb.toString();
+
+        }
+
+        sb.append( "Interactions:" );
+        sb.append( "\n--------------------------------" );
+        if( !attacks.isEmpty() )
+            sb.append( "\n\tAttacks " );
+
+        for( int i = 0; i < attacks.size(); i++ )
+        {
+            if( i > 0 )
+                sb.append( "\n\t        " );
+            sb.append( attacks.get( i ) );
+        }
+
+        if( !fusions.isEmpty() )
+            sb.append( "\n\tFuses " );
+        for( int i = 0; i < fusions.size(); i++ )
+        {
+            if( i > 0 )
+                sb.append( "\n\t      " );
+            sb.append( fusions.get( i ) );
+        }
+
+        if( !phogocyte.isEmpty() )
+            sb.append( "\n\tIngests " );
+        for( int i = 0; i < phogocyte.size(); i++ )
+        {
+            if( i > 0 )
+                sb.append( "\n\t         " );
+            sb.append( phogocyte.get( i ) );
+        }
+        return sb.toString();
     }
 }

@@ -73,7 +73,7 @@ public class CycleData
 {
     private CycleModel cycleModel;
 
-    String timeUnits;
+    public String timeUnits;
 
     public List<List<Double>> transitionRates;
 
@@ -125,9 +125,9 @@ public class CycleData
         int n = cycleModel.phases.size();
         resizeListList( transitionRates, n );
         resizeListList( basicRates, n );
-        for( int i = 0; i < cycleModel.phase_links.size(); i++ )
+        for( int i = 0; i < cycleModel.phaseLinks.size(); i++ )
         {
-            int size = cycleModel.phase_links.get( i ).size();
+            int size = cycleModel.phaseLinks.get( i ).size();
             for( int j = 0; j < size; j++ )
             {
                 List<Double> rates = transitionRates.get( i );

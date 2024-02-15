@@ -109,11 +109,9 @@ public class Geometry implements Cloneable
     {
         updateRadius( pCell, phenotype, dt );
         updateNuclearRadius( pCell, phenotype, dt );
-
-        // surface area = 4*pi*r^2 = (4/3)*pi*r^3 / (r/3)   
-        surfaceArea = phenotype.volume.total;
-        surfaceArea /= radius;
-        surfaceArea *= 3.0;
+        surfaceArea = 3 * phenotype.volume.total / radius; // surface area = 4*pi*r^2 = (4/3)*pi*r^3 / (r/3) 
+        //        surfaceArea /= radius;
+        //        surfaceArea *= 3.0;
     }
 
     @Override

@@ -78,7 +78,7 @@ public class PhysiCellConstants
     static int solid_boundary = 2;
     static int default_boundary_condition_for_pushed_out_agents = keep_pushed_out_cells_in_outer_voxel;
 
-    static int deterministic_necrosis = 0;
+    public static int deterministic_necrosis = 0;
     static int stochastic_necrosis = 1;
 
     public static int mesh_min_x_index = 0;
@@ -121,25 +121,25 @@ public class PhysiCellConstants
     public static int Ki67_positive_postmitotic = 1;
     public static int Ki67_positive = 2;
     public static int Ki67_negative = 3;
-    static int G0G1_phase = 4;
-    static int G0_phase = 5;
-    static int G1_phase = 6;
-    static int G1a_phase = 7;
-    static int G1b_phase = 8;
-    static int G1c_phase = 9;
-    static int S_phase = 10;
-    static int G2M_phase = 11;
-    static int G2_phase = 12;
-    static int M_phase = 13;
+    public static int G0G1_phase = 4;
+    public static int G0_phase = 5;
+    public static int G1_phase = 6;
+    public static int G1a_phase = 7;
+    public static int G1b_phase = 8;
+    public static int G1c_phase = 9;
+    public static int S_phase = 10;
+    public static int G2M_phase = 11;
+    public static int G2_phase = 12;
+    public static int M_phase = 13;
     public static int live = 14;
 
 
-    static int G1pm_phase = 15;
-    static int G1ps_phase = 16;
+    public static int G1pm_phase = 15;
+    public static int G1ps_phase = 16;
 
 
-    static int cycling = 17;
-    static int quiescent = 18;
+    public static int cycling = 17;
+    public static int quiescent = 18;
 
 
     static int custom_phase = 9999; // death phases
@@ -148,7 +148,7 @@ public class PhysiCellConstants
     public static int necrotic_swelling = 101;
     public static int necrotic_lysed = 102;
     public static int necrotic = 103;
-    static int debris = 104;
+    public static int debris = 104;
 
     private static Map<String, Integer> cycle_model_codes = new HashMap<>();
     {

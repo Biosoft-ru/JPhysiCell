@@ -812,7 +812,7 @@ public class SignalBehavior
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
-            pCell.phenotype.cellTransformations.transformation_rates[index - first_transformation_index] = parameter;
+            pCell.phenotype.cellTransformations.transformationRates[index - first_transformation_index] = parameter;
             return;
         }
 
@@ -1080,7 +1080,7 @@ public class SignalBehavior
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
-            return pCell.phenotype.cellTransformations.transformation_rates[index - first_transformation_index];
+            return pCell.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
         }
 
         // custom behavior
@@ -1296,8 +1296,8 @@ public class SignalBehavior
 
         // transformation 
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
-        System.arraycopy( pCD.phenotype.cellTransformations.transformation_rates, 0, parameters, first_transformation_index,
-                pCD.phenotype.cellTransformations.transformation_rates.length );
+        System.arraycopy( pCD.phenotype.cellTransformations.transformationRates, 0, parameters, first_transformation_index,
+                pCD.phenotype.cellTransformations.transformationRates.length );
         //        std::copy(  pCD.phenotype.cell_transformations.transformation_rates.begin(), 
         //                    pCD.phenotype.cell_transformations.transformation_rates.end(), 
         //                    parameters.begin()+first_transformation_index );    
@@ -1543,7 +1543,7 @@ public class SignalBehavior
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
-            return pCD.phenotype.cellTransformations.transformation_rates[index - first_transformation_index];
+            return pCD.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
         }
 
         // custom behavior
@@ -1804,7 +1804,7 @@ public class SignalBehavior
         int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
-            return pCD.phenotype.cellTransformations.transformation_rates[index - first_transformation_index];
+            return pCD.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
         }
 
         // custom behavior

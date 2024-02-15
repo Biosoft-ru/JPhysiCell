@@ -3,6 +3,7 @@ package ru.biosoft.physicell.sample_projects.interactions;
 import java.io.File;
 import java.io.InputStream;
 
+import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.ui.AgentVisualizer2;
 import ru.biosoft.physicell.xml.ModelReader;
@@ -106,6 +107,11 @@ public class Main
         Interactions.init( model );
         /* Users typically stop modifying here. END USERMODS */
 
+
+        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+            System.out.println( cd.display() );
+
+        System.out.println( "\nSimulation strated\n" );
         model.simulate();
     }
 }

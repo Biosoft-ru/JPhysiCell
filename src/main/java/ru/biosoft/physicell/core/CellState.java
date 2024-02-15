@@ -72,7 +72,7 @@ import java.util.Set;
 public class CellState
 {
     public Set<Cell> attachedCells;
-    Set<Cell> springAttachments;
+    public Set<Cell> springAttachments;
     public Set<Cell> neighbors;
     double[] orientation;
     public double simplePressure;

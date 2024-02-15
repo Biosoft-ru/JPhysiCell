@@ -81,8 +81,8 @@ public class CycleModel implements Cloneable
     List<Map<Integer, Integer>> inverse_index_maps;
     public String name;
     public int code;
-    List<Phase> phases;
-    public List<List<PhaseLink>> phase_links;
+    public List<Phase> phases;
+    public List<List<PhaseLink>> phaseLinks;
     int default_phase_index;
     public CycleData data; // this will be copied to individual cell agents 
 
@@ -91,7 +91,7 @@ public class CycleModel implements Cloneable
         inverse_index_maps = new ArrayList<>();//HashMap<Integer, Integer>();//.resize( 0 );
         name = "unnamed";
         phases = new ArrayList<>();
-        phase_links = new ArrayList<>();
+        phaseLinks = new ArrayList<>();
         data = new CycleData( this );// = this;
         code = PhysiCellConstants.custom_cycle_model;
         default_phase_index = 0;
@@ -102,33 +102,33 @@ public class CycleModel implements Cloneable
         return phases.get( data.currentPhaseIndex );
     }
 
-    public int add_phase(int code, String name)
+    public int addPhase(int code, String name)
     {
         int n = phases.size();
         phases.add( new Phase( name, n, code ) );
-        phase_links.add( new ArrayList<PhaseLink>() );
+        phaseLinks.add( new ArrayList<PhaseLink>() );
         inverse_index_maps.add( new HashMap<Integer, Integer>() );
         data.sync_to_cycle_model();
         return n;
     }
 
-    public int add_phase_link(int start_index, int end_index, PhaseArrest arrestFunction) throws Exception
+    public int addPhaseLink(int startIndex, int endIndex, PhaseArrest arrestFunction) throws Exception
     {
-        List<PhaseLink> links = phase_links.get( start_index );
+        List<PhaseLink> links = phaseLinks.get( startIndex );
         int n = links.size();
         PhaseArrest arrest = arrestFunction == null ? null : arrestFunction.getClass().newInstance();
-        Phase start = phases.get( start_index );
-        Phase end = phases.get( end_index );
-        links.add( new PhaseLink( start, start_index, end, end_index, arrest ) );
-        inverse_index_maps.get( start_index ).put( end_index, n );//link from start_index to end_index have index n        
+        Phase start = phases.get( startIndex );
+        Phase end = phases.get( endIndex );
+        links.add( new PhaseLink( start, startIndex, end, endIndex, arrest ) );
+        inverse_index_maps.get( startIndex ).put( endIndex, n );//link from start_index to end_index have index n        
         data.sync_to_cycle_model(); // lastly, make sure the transition rates are the right size;
         return n;
     }
 
-    public int add_phase_link(int start_index, int end_index, double rate, PhaseArrest arrestFunction) throws Exception
+    public int addPhaseLink(int startIndex, int endIndex, double rate, PhaseArrest arrestFunction) throws Exception
     {
-        int n = add_phase_link( start_index, end_index, arrestFunction );
-        data.setBasicTransitionRate( start_index, end_index, rate );
+        int n = addPhaseLink( startIndex, endIndex, arrestFunction );
+        data.setBasicTransitionRate( startIndex, endIndex, rate );
         return n;
     }
 
@@ -144,7 +144,7 @@ public class CycleModel implements Cloneable
         return -1;//?
     }
 
-    int find_phase_index(String name)
+    int findPhaseIndex(String name)
     {
         for( int i = 0; i < phases.size(); i++ )
         {
@@ -158,26 +158,47 @@ public class CycleModel implements Cloneable
 
     public String toString()
     {
+        return display();
+    }
+
+    public String display()
+    {
         StringBuilder sb = new StringBuilder();
-        sb.append( "Cycle Model: " + name + ". PhyCell code: " + code + "\n" );
-        sb.append( "Phases and links: (* denotes phase with cell division)\n" );
-        for (int i=0; i<phases.size(); i++)
+        sb.append( "Cycle Model: " + name + " (" + code + ")\n" );
+        sb.append( "--------------------------------" );
+
+        if( phases.size() == 1 )
         {
-            sb.append( "Phase " + i + " (" + phases.get( i ).name + ")" );
+            String name = phases.get( 0 ).name;
+            if( phases.get( 0 ).divisionAtExit )
+                name += "*";
+            sb.append( "\n\t" + name );
+            if( phaseLinks.get( 0 ).size() == 1 )
+            {
+                double duration = PhysiCellUtilities.print( 1.0 / data.getTransitionRate( 0, 0 ) );
+                sb.append( " -> " + name + ", duration: " + duration + " " + data.timeUnits );
+            }
+            return sb.toString();
+        }
+
+        for( int i = 0; i < phases.size(); i++ )
+        {
+            sb.append( "\n\t" + phases.get( i ).name );
             if( phases.get( i ).divisionAtExit )
                 sb.append( "*" );
-            sb.append( "\n" );
-            sb.append( " links to: \n" );
 
-            for( int k = 0; k < phase_links.get( i ).size(); k++ )
-            {
-                int j = phase_links.get( i ).get( k ).endPhaseIndex;
-                sb.append( "\tPhase " + " (" + phases.get( j ).name + "( with rate " + data.getTransitionRate( i, j ) + " "
-                        + data.timeUnits + "^-1; \n" );
-            }
             sb.append( "\n" );
+
+            for( int k = 0; k < phaseLinks.get( i ).size(); k++ )
+            {
+                int j = phaseLinks.get( i ).get( k ).endPhaseIndex;
+                double duration = PhysiCellUtilities.print( 1.0 / data.getTransitionRate( i, j ) );
+                sb.append( "-> " + phases.get( j ).name );
+                if( phases.get( j ).divisionAtExit )
+                    sb.append( "*" );
+                sb.append( ", duration: " + duration + " " + data.timeUnits );
+            }
         }
-        sb.append( "\n" );
         return sb.toString();
     }
 
@@ -202,7 +223,7 @@ public class CycleModel implements Cloneable
 
     public PhaseLink phase_link(int start_index, int end_index)
     {
-        return phase_links.get( start_index ).get( inverse_index_maps.get( start_index ).get( end_index ) );
+        return phaseLinks.get( start_index ).get( inverse_index_maps.get( start_index ).get( end_index ) );
     }
 
     public void advance(Cell pCell, Phenotype phenotype, double dt)
@@ -212,46 +233,46 @@ public class CycleModel implements Cloneable
         phenotype.cycle.data.elapsedTimePhase += dt;
 
         // Evaluate each linked phase: advance to that phase IF probabiltiy is in the range, and if the arrest function (if any) is false 
-        List<PhaseLink> links = phase_links.get( i );
+        List<PhaseLink> links = phaseLinks.get( i );
         int j;
         for( int k = 0; k < links.size(); k++ )
         {
             PhaseLink link = links.get( k );
             j = link.endPhaseIndex;
-            double transition_rate = phenotype.cycle.data.transitionRates.get( i ).get( k );
+            double transitionRate = phenotype.cycle.data.transitionRates.get( i ).get( k );
 
             // check for arrest. If arrested, skip to the next transition
-            boolean transition_arrested = false;
+            boolean transitionArrested = false;
             if( link.arrestFunction != null )
             {
-                transition_arrested = link.arrestFunction.isArrested( pCell, phenotype, dt );
+                transitionArrested = link.arrestFunction.isArrested( pCell, phenotype, dt );
             }
-            if( !transition_arrested )
+            if( !transitionArrested )
             {
                 // check to see if we should transition 
-                boolean continue_transition = false;
+                boolean continueTransition = false;
                 if( link.fixedDuration )
                 {
-                    if( phenotype.cycle.data.elapsedTimePhase > 1.0 / transition_rate )
+                    if( phenotype.cycle.data.elapsedTimePhase > 1.0 / transitionRate )
                     {
-                        continue_transition = true;
+                        continueTransition = true;
                     }
                 }
                 else
                 {
-                    double prob = transition_rate * dt;
+                    double prob = transitionRate * dt;
                     double r = PhysiCellUtilities.UniformRandom();
                     //                    if( pCell.type_name.equals( "A" ) )
                     //                        System.out.println( pCell + " " + prob + " " + r );
                     if( r < prob )
                     {
                         //                        System.out.println( "Random " + r + " , probability " + prob );
-                        continue_transition = true;
+                        continueTransition = true;
                     }
                 }
 
                 // if we should transition, check if we're not supposed to divide or die 
-                if( continue_transition )
+                if( continueTransition )
                 {
                     // if the phase transition has an exit function, execute it
                     if( link.exitFunction != null )
@@ -291,7 +312,7 @@ public class CycleModel implements Cloneable
         result.name = name;
         result.code = code;
         result.phases = new ArrayList<Phase>( phases );
-        result.phase_links = this.phase_links; //TODO: check
+        result.phaseLinks = this.phaseLinks; //TODO: check
         result.default_phase_index = this.default_phase_index;
         result.inverse_index_maps = this.inverse_index_maps;//TODO: check
         result.data = this.data.clone( result );

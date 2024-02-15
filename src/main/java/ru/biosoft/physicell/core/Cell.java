@@ -6,6 +6,7 @@ import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.CellFunctions.instantiate_cell;
+import ru.biosoft.physicell.core.standard.StandardModels;
 
 /*
 ###############################################################################
@@ -84,7 +85,7 @@ public class Cell extends BasicAgent
 
     CellDefinition definition;
     public CustomCellData custom_data;// = new CustomCellData();
-    CellParameters parameters;// = new CellParameters();
+    public CellParameters parameters;// = new CellParameters();
     public CellFunctions functions;// = new CellFunctions();
 
     public CellState state = new CellState();
@@ -614,7 +615,7 @@ public class Cell extends BasicAgent
         }
     }
 
-    void addPotentials(Cell other)
+    public void addPotentials(Cell other)
     {
         if( this.ID == other.ID )
             return;
@@ -838,7 +839,7 @@ public class Cell extends BasicAgent
         return getMicroenvironment().nearest_density_vector( this.currentVoxelIndex );//current_voxel_index );
     }
 
-    void ingest_cell(Cell pCell_to_eat)
+    public void ingestCell(Cell pCell_to_eat)
     {
         // don't ingest self 
         if( pCell_to_eat == this )
@@ -945,11 +946,9 @@ public class Cell extends BasicAgent
         pCell_to_eat.flagForRemoval();
         pCell_to_eat.removeAllAttachedCells();
         pCell_to_eat.removeAllSpringAttachments();
-
-        return;
     }
 
-    void attackCell(Cell pCellToAttack, double dt)
+    public void attackCell(Cell pCellToAttack, double dt)
     {
         if( pCellToAttack == this )
             return; // don't attack self 
@@ -966,7 +965,7 @@ public class Cell extends BasicAgent
         }
     }
 
-    void fuseCell(Cell pCellToFuse)
+    public void fuseCell(Cell pCellToFuse)
     {
 
         if( pCellToFuse.phenotype.volume.total < 1e-15 || this == pCellToFuse )
@@ -1099,7 +1098,7 @@ public class Cell extends BasicAgent
         pCellToFuse.removeAllSpringAttachments();
     }
 
-    public void convert_to_cell_definition(CellDefinition cd)
+    public void convert(CellDefinition cd)
     {
         // use the cell defaults; 
         type = cd.type;
@@ -1165,8 +1164,7 @@ public class Cell extends BasicAgent
             phenotype.cycle = phenotype.death.currentModel();
 
             // also, turn off motility.
-            phenotype.motility.isMotile = false;
-            phenotype.motility.motilityVector = new double[3];
+            phenotype.motility.disable();
             functions.update_migration_bias = null;
 
             // turn off secretion, and reduce uptake by a factor of 10 

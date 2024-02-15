@@ -11,7 +11,8 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.StandardModels;
+import ru.biosoft.physicell.core.standard.O2based;
+import ru.biosoft.physicell.core.standard.StandardModels;
 
 /*
 ###############################################################################
@@ -111,7 +112,7 @@ public class TestVolume
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
         CellDefinition.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.createAdvancedKi67();
-        cd.functions.updatePhenotype = new StandardModels.O2based();
+        cd.functions.updatePhenotype = new O2based();
         //cell_defaults.functions.volume_update_function = standard_volume_update_function;
 
         // first find index for a few key variables. 
