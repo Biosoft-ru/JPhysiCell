@@ -5,7 +5,7 @@ import ru.biosoft.physicell.core.CellFunctions;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.Volume;
 
-public class standard_volume_update_function implements CellFunctions.volume_update_function
+public class StandardVolumeUpdate implements CellFunctions.VolumeUpdate
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {

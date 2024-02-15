@@ -69,17 +69,17 @@ package ru.biosoft.physicell.core;
 public class CellFunctions
 {
     public instantiate_cell instantiate_cell;
-    public volume_update_function updateVolume;
-    public update_migration_bias update_migration_bias;
+    public VolumeUpdate updateVolume;
+    public UpdateMigrationBias update_migration_bias;
     public custom_cell_rule custom_cell_rule;
     public UpdatePhenotype updatePhenotype;
     public pre_update_intracellular pre_update_intracellular;
     public post_update_intracellular post_update_intracellular;
-    public update_velocity updateVelocity;
-    public add_cell_basement_membrane_interactions add_cell_basement_membrane_interactions;
-    public calculate_distance_to_membrane calculate_distance_to_membrane;
+    public UpdateVelocity updateVelocity;
+    public CellMembraneInteractions add_cell_basement_membrane_interactions;
+    public DistanceCalculator calculate_distance_to_membrane;
     public set_orientation set_orientation;
-    public contact_function contact_function;
+    public Contact contact_function;
 
     public CellFunctions clone()
     {
@@ -111,13 +111,13 @@ public class CellFunctions
     }
 
     @FunctionalInterface
-    public static interface volume_update_function
+    public static interface VolumeUpdate
     {
         public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
     @FunctionalInterface
-    public static interface update_migration_bias
+    public static interface UpdateMigrationBias
     {
         public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
@@ -140,7 +140,7 @@ public class CellFunctions
     }
 
     @FunctionalInterface
-    public static interface update_velocity
+    public static interface UpdateVelocity
     {
         public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
@@ -164,13 +164,13 @@ public class CellFunctions
     }
 
     @FunctionalInterface
-    public static interface add_cell_basement_membrane_interactions
+    public static interface CellMembraneInteractions
     {
         public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
     @FunctionalInterface
-    public static interface calculate_distance_to_membrane
+    public static interface DistanceCalculator
     {
         public double execute(Cell pCell, Phenotype phenotype, double dt);
     }
@@ -182,7 +182,7 @@ public class CellFunctions
     }
 
     @FunctionalInterface
-    public static interface contact_function
+    public static interface Contact
     {
 		public void execute(Cell pCell, Phenotype phenotype, Cell cell2, Phenotype phenotype2, double dt);
     }

@@ -8,7 +8,7 @@ import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellFunctions;
 import ru.biosoft.physicell.core.Phenotype;
 
-public class standard_update_cell_velocity implements CellFunctions.update_velocity
+public class StandardUpdateVelocity implements CellFunctions.UpdateVelocity
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)

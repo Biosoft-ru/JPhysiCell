@@ -4,9 +4,9 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.CellFunctions.contact_function;
+import ru.biosoft.physicell.core.CellFunctions.Contact;
 
-public class standard_elastic_contact_function implements contact_function
+public class StandardElasticContact implements Contact
 {
     @Override
     public void execute(Cell pC1, Phenotype p1, Cell pC2, Phenotype p2, double dt)

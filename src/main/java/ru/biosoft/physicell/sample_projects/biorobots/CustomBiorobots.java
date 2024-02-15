@@ -8,7 +8,7 @@ import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
 import ru.biosoft.physicell.core.SignalBehavior;
-import ru.biosoft.physicell.core.standard.standard_elastic_contact_function;
+import ru.biosoft.physicell.core.standard.StandardElasticContact;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.xml.ModelReader;
 
@@ -43,11 +43,11 @@ public class CustomBiorobots
 
         pCD = CellDefinition.getCellDefinition( "cargo cell" );
         pCD.functions.updatePhenotype = new CargoCellRule( m );
-        pCD.functions.contact_function = new standard_elastic_contact_function();
+        pCD.functions.contact_function = new StandardElasticContact();
 
         pCD = CellDefinition.getCellDefinition( "worker cell" );
         pCD.functions.updatePhenotype = new WorkerCellRule( m );
-        pCD.functions.contact_function = new standard_elastic_contact_function();
+        pCD.functions.contact_function = new StandardElasticContact();
     }
 
     static void setupTissue(Model model) throws Exception

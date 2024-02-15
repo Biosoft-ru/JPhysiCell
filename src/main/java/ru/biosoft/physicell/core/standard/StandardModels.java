@@ -129,11 +129,11 @@ public class StandardModels
 
         // set up the default functions 
         defaults.phenotype.cycle = Ki67_advanced;
-        defaults.functions.updateVolume = new standard_volume_update_function();
+        defaults.functions.updateVolume = new StandardVolumeUpdate();
         //        result.functions.update_migration_bias = null;
         defaults.functions.updatePhenotype = new O2based();
         //        result.functions.custom_cell_rule = null;
-        defaults.functions.updateVelocity = new standard_update_cell_velocity();
+        defaults.functions.updateVelocity = new StandardUpdateVelocity();
         //        result.functions.add_cell_basement_membrane_interactions = null;
         //        result.functions.calculate_distance_to_membrane = null;
         //        result.functions.set_orientation = null;

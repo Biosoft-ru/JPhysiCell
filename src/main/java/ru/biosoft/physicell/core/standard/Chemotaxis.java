@@ -3,9 +3,9 @@ package ru.biosoft.physicell.core.standard;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.CellFunctions.update_migration_bias;
+import ru.biosoft.physicell.core.CellFunctions.UpdateMigrationBias;
 
-public class chemotaxis_function implements update_migration_bias
+public class Chemotaxis implements UpdateMigrationBias
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)

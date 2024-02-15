@@ -3,9 +3,9 @@ package ru.biosoft.physicell.sample_projects.cancer_biorobots;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.CellFunctions.contact_function;
+import ru.biosoft.physicell.core.CellFunctions.Contact;
 
-public class BiorobotsContact implements contact_function
+public class BiorobotsContact implements Contact
 {
     public void execute(Cell pActingOn, Phenotype pao, Cell pAttachedTo, Phenotype pat, double dt)
     {

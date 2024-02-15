@@ -10,7 +10,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.CellFunctions.calculate_distance_to_membrane;
+import ru.biosoft.physicell.core.CellFunctions.DistanceCalculator;
 import ru.biosoft.physicell.core.Output;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
@@ -283,7 +283,7 @@ public class TestDCIS
     }
 
 
-    public static class distance_to_membrane_duct implements calculate_distance_to_membrane
+    public static class distance_to_membrane_duct implements DistanceCalculator
     {
         @Override
         public double execute(Cell pCell, Phenotype phenotype, double dummy)

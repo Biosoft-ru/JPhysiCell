@@ -3,15 +3,15 @@ package ru.biosoft.physicell.core.standard;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.CellFunctions.add_cell_basement_membrane_interactions;
+import ru.biosoft.physicell.core.CellFunctions.CellMembraneInteractions;
 
-public class standard_domain_edge_avoidance_interactions implements add_cell_basement_membrane_interactions
+public class DomainEdgeAvoidance implements CellMembraneInteractions
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
         if( pCell.functions.calculate_distance_to_membrane == null )
         {
-            pCell.functions.calculate_distance_to_membrane = new distance_to_domain_edge();
+            pCell.functions.calculate_distance_to_membrane = new DomainEdgeDistance();
         }
         phenotype.mechanics.cellBMRepulsionStrength = 100;
 

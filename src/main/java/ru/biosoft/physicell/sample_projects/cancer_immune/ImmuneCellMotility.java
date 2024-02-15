@@ -4,9 +4,9 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.CellFunctions.update_migration_bias;
+import ru.biosoft.physicell.core.CellFunctions.UpdateMigrationBias;
 
-public class ImmuneCellMotility implements update_migration_bias
+public class ImmuneCellMotility implements UpdateMigrationBias
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
