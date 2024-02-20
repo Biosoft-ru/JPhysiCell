@@ -81,7 +81,8 @@ public class VirusMacrophage
     public static void init(Model model) throws Exception
     {
         createCellTypes( model );
-        setup_tissue( model );
+        setupTissue( model );
+        model.getVisualizers().forEach( v -> v.setAgentVisualizer( new VirusVisualizer( model ) ) );
     }
 
     static void createCellTypes(Model model) throws Exception
@@ -185,7 +186,7 @@ public class VirusMacrophage
     //	return; 
     //}
 
-    static void setup_tissue(Model model)
+    static void setupTissue(Model model)
     {
         Microenvironment microenvironment = model.getMicroenvironment();
         int nVirus = microenvironment.findDensityIndex( "virus" );

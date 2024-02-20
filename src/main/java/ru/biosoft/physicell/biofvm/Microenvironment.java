@@ -362,16 +362,18 @@ public class Microenvironment
         return;
     }
 
-    public void write_to_matlab(String filename)
+    public void writeDensity(String filename)
     {
-        int number_of_data_entries = mesh.voxels.length;
-        int size_of_each_datum = 3 + 1 + density[0].length;
+        int dataEntries = mesh.voxels.length;
         File f = new File( filename );
         try (BufferedWriter bw = new BufferedWriter( new FileWriter( f ) ))
         {
-            write_matlab4_header( size_of_each_datum, number_of_data_entries, bw, "multiscale_microenvironment" );
-            // storing data as cols 
-            for( int i = 0; i < number_of_data_entries; i++ )
+            bw.append( "X\tY\tZ\tVolume" );
+            for( int i = 0; i < this.density_names.length; i++ )
+                bw.append( "\t" + density_names[i] );
+
+            bw.append( "\n" );
+            for( int i = 0; i < dataEntries; i++ )
             {
                 bw.append( String.valueOf( mesh.voxels[i].center[0] ) + "\t" );
                 bw.append( String.valueOf( mesh.voxels[i].center[1] ) + "\t" );

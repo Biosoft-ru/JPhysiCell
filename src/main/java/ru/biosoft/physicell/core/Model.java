@@ -30,6 +30,14 @@ public class Model
     private boolean enableFullSaves;
     private boolean hasEvents = false;
     private List<Event> events = new ArrayList<>();
+    private String densityFolder = null;
+    private String dataFolder = null;
+    private String modelFile = null;
+    private double curTime = 0;
+    private double next_full_save_time = 0;
+    private double startTime;
+    private boolean writeDensity = false;
+    private boolean writeData = false;
 
     public Iterable<Visualizer> getVisualizers()
     {
@@ -39,6 +47,10 @@ public class Model
     public void setResultFolder(String folder)
     {
         this.resultFolder = folder;
+        this.densityFolder = folder + "/density";
+        this.dataFolder = folder + "/data";
+        this.logFile = folder + "/log.txt";
+        this.modelFile = folder + "/model.txt";
     }
 
     public void addEvent(Event event)
@@ -46,10 +58,6 @@ public class Model
         this.events.add( event );
     }
 
-    public void setLogFile(String path)
-    {
-        this.logFile = path;
-    }
 
     public Visualizer addVisualizer(int zSlice, String name)
     {
@@ -84,96 +92,121 @@ public class Model
         CellContainer.createCellContainer( m, voxelSize );
     }
 
-    public void simulate() throws Exception
+    public void setWriteDensity(boolean writeDensity)
     {
-        double curTime = 0;
-        double next_full_save_time = 0;
-        boolean enable_legacy_saves = false;
-        File reportFile;
+        this.writeDensity = writeDensity;
+    }
+
+    public void setWriteData(boolean writeData)
+    {
+        this.writeData = writeData;
+    }
+
+    public void init() throws Exception
+    {
+        curTime = 0;
+        next_full_save_time = 0;
+
+        File f = new File( resultFolder );
+        if( f.exists() )
+            deleteDirectory( f );
+        if( writeDensity )
+            new File( densityFolder ).mkdirs();
+        if( writeData )
+            new File( dataFolder ).mkdirs();
+        f.mkdirs();
+
+        writeReport( modelFile, display() );
 
         for( Visualizer listener : visualizers )
             listener.init();
 
-        double startTime = System.currentTimeMillis();
-        boolean hasEvents = !events.isEmpty();
-        boolean eventsFired = false;
-        try
+        startTime = System.currentTimeMillis();
+        hasEvents = !events.isEmpty();
+    }
+
+    public static void deleteDirectory(File directoryToBeDeleted)
+    {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if( allContents != null )
         {
-            while( curTime < tMax + 0.1 * diffusion_dt )
+            for( File file : allContents )
             {
-                if( hasEvents )
-                {
-                    eventsFired = false;
-                    Set<Event> executedEvens = new HashSet<>();
-                    for( Event event : events )
-                    {
-                        if( curTime > event.executionTime - 0.01 * diffusion_dt )
-                        {
-                            event.execute( this );
-                            executedEvens.add( event );
-                        }
-                    }
-                    events.removeAll( executedEvens ); //events are one-time things
-                    hasEvents = !events.isEmpty();
-                }
-
-                // save data if it's time. 
-                if( Math.abs( curTime - next_full_save_time ) < 0.01 * diffusion_dt || eventsFired )
-                {
-                    if( enableFullSaves )
-                    {
-                        for( Visualizer listener : visualizers )
-                            listener.saveResult( m, curTime );
-
-                        String info = PhysiCellUtilities.getCurrentTime() + "\tElapsed\t"
-                                + ( System.currentTimeMillis() - startTime ) / 1000 + "\tTime:\t" + (int)Math.round( curTime ) + "\tCells\t"
-                                + m.getAgentsCount();
-
-                        if( logFile != null )
-                        {
-                            try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( logFile ), true ) ))
-                            {
-                                bw.append( info );
-                                bw.append( "\n" );
-                            }
-                        }
-                        System.out.println( info );
-                        //                        printMaxInterferon( this );
-                    }
-                    //                    writeReport( resultFolder + "/step_" + curTime + ".txt", "name\ti1\ti2\tp\tpressure\tphase\telapsed\n" );
-                    for( Cell cell : m.getAgents( Cell.class ) )
-                    {
-                        //                        String report = cell.typeName + "\t" + cell.get_current_mechanics_voxel_index() + "\t" + cell.currentVoxelIndex
-                        //                                + "\t" + cell.nearest_density_vector()[0] + "\t" + cell.state.simplePressure + "\t"
-                        //                                + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase + "\t"
-                        //                                + cell.isOutOfDomain + "\n";
-
-                        String report = "Substrates " + cell.phenotype.molecular.internalized_total_substrates[0] + " "
-                                + cell.phenotype.molecular.internalized_total_substrates[1];
-
-                        //                        if( cell.phenotype.cycle.code == 5 )
-                        //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t"
-                        //                                    + cell.phenotype.cycle.transition_rate( 0, 0 ) + "\t" + cell.state.simplePressure + "\n";
-                        //                        else
-                        //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t0.0\t"
-                        //                                    + cell.state.simplePressure + "\n";
-                        //
-                        writeReport( resultFolder + "/step_" + curTime + ".txt", report );
-                    }
-                    next_full_save_time += full_save_interval;
-                }
-                m.simulate_diffusion_decay( diffusion_dt );
-                ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
-                curTime += diffusion_dt;
+                deleteDirectory( file );
             }
+        }
+        directoryToBeDeleted.delete();
+    }
 
-            for( Visualizer listener : visualizers )
-                listener.finish();
-        }
-        catch( Exception ex )
+    public void simulate() throws Exception
+    {
+        init();
+
+        while( curTime < tMax + 0.1 * diffusion_dt )
         {
-            ex.printStackTrace();
+            boolean eventsFired = executeEvents( curTime );
+            if( Math.abs( curTime - next_full_save_time ) < 0.01 * diffusion_dt || eventsFired )
+            {
+                if( enableFullSaves )
+                    saveResults();
+                next_full_save_time += full_save_interval;
+            }
+            doStep();
         }
+
+        for( Visualizer listener : visualizers )
+            listener.finish();
+    }
+
+    private void doStep() throws Exception
+    {
+        m.simulate_diffusion_decay( diffusion_dt );
+        ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
+        curTime += diffusion_dt;
+    }
+
+    private void saveResults() throws Exception
+    {
+        for( Visualizer listener : visualizers )
+            listener.saveResult( m, curTime );
+
+        String info = PhysiCellUtilities.getCurrentTime() + "\tElapsed\t" + ( System.currentTimeMillis() - startTime ) / 1000 + "\tTime:\t"
+                + (int)Math.round( curTime ) + "\tCells\t" + m.getAgentsCount();
+
+        if( logFile != null )
+        {
+            try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( logFile ), true ) ))
+            {
+                bw.append( info );
+                bw.append( "\n" );
+            }
+        }
+        if( writeDensity )
+        {
+            getMicroenvironment().writeDensity( densityFolder + "/" + Math.round( curTime ) + ".txt" );
+        }
+        System.out.println( info );
+    }
+
+    private boolean executeEvents(double curTime) throws Exception
+    {
+        boolean eventsFired = false;
+        if( hasEvents )
+        {
+            Set<Event> executedEvens = new HashSet<>();
+            for( Event event : events )
+            {
+                if( curTime > event.executionTime - 0.01 * diffusion_dt )
+                {
+                    event.execute( this );
+                    executedEvens.add( event );
+                    eventsFired = true;
+                }
+            }
+            events.removeAll( executedEvens ); //events are one-time things
+            hasEvents = !events.isEmpty();
+        }
+        return eventsFired;
     }
 
     private void writeReport(String name, String str) throws Exception
@@ -282,11 +315,6 @@ public class Model
         }
     }
 
-    public void saveResult()
-    {
-
-    }
-
     public String display()
     {
         StringBuilder sb = new StringBuilder();
@@ -317,4 +345,23 @@ public class Model
                 result++;
         return result;
     }
+
+
+    //                    writeReport( resultFolder + "/step_" + curTime + ".txt", "name\ti1\ti2\tp\tpressure\tphase\telapsed\n" );
+    //                    for( Cell cell : m.getAgents( Cell.class ) )
+    //                    {
+    //                        String report = cell.typeName + "\t" + cell.get_current_mechanics_voxel_index() + "\t" + cell.currentVoxelIndex
+    //                                + "\t" + cell.nearest_density_vector()[0] + "\t" + cell.state.simplePressure + "\t"
+    //                                + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase + "\t"
+    //                                + cell.isOutOfDomain + "\n";
+
+    //                        if( cell.phenotype.cycle.code == 5 )
+    //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t"
+    //                                    + cell.phenotype.cycle.transition_rate( 0, 0 ) + "\t" + cell.state.simplePressure + "\n";
+    //                        else
+    //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t0.0\t"
+    //                                    + cell.state.simplePressure + "\n";
+    //
+    //                        writeReport( resultFolder + "/step_" + curTime + ".txt", report );
+    //                    }
 }

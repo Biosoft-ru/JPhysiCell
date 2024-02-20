@@ -92,7 +92,7 @@ public class Main
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
-        model.setLogFile( resultPath + "/log_no_apop.txt" );
+        model.setWriteDensity( true );
         model.addVisualizer( 0, "figure1_no_apop" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
 
         /* Users typically start modifying here. START USERMODS */

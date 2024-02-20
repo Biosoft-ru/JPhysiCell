@@ -93,7 +93,7 @@ public class Main
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
-
+        model.setWriteDensity( true );
         model.addVisualizer( 0, "fig_resources" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
         model.addVisualizer( 0, "fig_toxin" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
         model.addVisualizer( 0, "fig_quorum" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );

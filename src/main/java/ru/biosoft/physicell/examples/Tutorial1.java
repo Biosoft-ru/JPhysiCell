@@ -131,7 +131,7 @@ public class Tutorial1
         visualizer.init();
 
         if( outputTables )
-            m.write_to_matlab( resultPath + "/initial.txt" );
+            m.writeDensity( resultPath + "/initial.txt" );
 
         visualizer.saveResult( m, 0 );
         double t = 0.0;
@@ -147,7 +147,7 @@ public class Tutorial1
             if( Math.abs( t - nextOutputTime ) < 0.0001 )
             {
                 if( outputTables )
-                    m.write_to_matlab( resultPath + "/step_" + counter + ".txt" );
+                    m.writeDensity( resultPath + "/step_" + counter + ".txt" );
                 visualizer.saveResult( m, t );
                 nextOutputTime += outputInterval;
             }

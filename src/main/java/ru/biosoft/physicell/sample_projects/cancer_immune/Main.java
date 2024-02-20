@@ -93,7 +93,7 @@ public class Main
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
-        model.setLogFile( resultPath + "/log.txt" );
+        model.setWriteDensity( true );
         model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
 
         /* Users typically start modifying here. START USERMODS */

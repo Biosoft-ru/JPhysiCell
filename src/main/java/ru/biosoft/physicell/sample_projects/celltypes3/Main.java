@@ -92,11 +92,11 @@ public class Main
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
-
+        model.setWriteDensity( true );
         model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
-        //        model.addVisualizer( 0, "figureA" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
-        //        model.addVisualizer( 0, "figureB" ).setStubstrateIndex( 2 ).setMaxDensity( 0.5 );
-        //        model.addVisualizer( 0, "figureC" ).setStubstrateIndex( 3 ).setMaxDensity( 0.5 );
+        model.addVisualizer( 0, "figureA" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 );
+        model.addVisualizer( 0, "figureB" ).setStubstrateIndex( 2 ).setMaxDensity( 0.5 );
+        model.addVisualizer( 0, "figureC" ).setStubstrateIndex( 3 ).setMaxDensity( 0.5 );
 
         /* Users typically start modifying here. START USERMODS */
         Celltype3.init( model );

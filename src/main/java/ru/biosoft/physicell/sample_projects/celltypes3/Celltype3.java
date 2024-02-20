@@ -172,7 +172,6 @@ public class Celltype3
                 r = VectorUtil.norm( position );
             }
             Cell.createCell( cd, m, position );
-            System.out.println( cd.name + "\t" + position[0] + "\t" + position[1] + "\t" + position[2] );
         }
     }
 }
