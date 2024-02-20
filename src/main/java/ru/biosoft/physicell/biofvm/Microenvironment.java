@@ -173,6 +173,8 @@ public class Microenvironment
     double[][] supply_rates;
     double[][] uptake_rates;
 
+    public double time;
+
     public Microenvironment(String name, String timeUnits, String spatialUnits)
     {
         this();

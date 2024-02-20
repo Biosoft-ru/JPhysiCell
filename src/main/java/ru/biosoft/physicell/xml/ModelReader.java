@@ -17,7 +17,6 @@ import org.w3c.dom.NodeList;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.MicroenvironmentOptions;
 import ru.biosoft.physicell.biofvm.VectorUtil;
-import ru.biosoft.physicell.core.CellCSVReader;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CellInteractions;
 import ru.biosoft.physicell.core.CellTransformations;
@@ -1039,21 +1038,21 @@ public class ModelReader extends Constants
         //            for( int n = 1; n < number_of_substrates; n++ )
         //                System.out.println( motility.chemotacticSensitivities[n] + " * grad(" + m.density_names[n] + ")" );
         //        }
-
-        if( cd.functions.update_migration_bias instanceof AdvancedChemotaxisNormalized && motility.isMotile )
-        {
-            int number_of_substrates = m.density_names.length;
-
-            //            System.out.println( "Cells of type " + cd.name + " use normalized advanced chemotaxis: \n"
-            //                    + "\t d_bias (before normalization) = " + motility.chemotacticSensitivities[0] + " * grad(" + m.density_names[0] + ")"
-            //                    + " / ||grad(" + m.density_names[0] + ")||" );
-
-            for( int n = 1; n < number_of_substrates; n++ )
-            {
-                System.out.println( motility.chemotacticSensitivities[n] + " * grad(" + m.density_names[n] + ")" + " / ||grad("
-                        + m.density_names[n] + ")||" );
-            }
-        }
+        //
+        //        if( cd.functions.update_migration_bias instanceof AdvancedChemotaxisNormalized && motility.isMotile )
+        //        {
+        //            int number_of_substrates = m.density_names.length;
+        //
+        //            //            System.out.println( "Cells of type " + cd.name + " use normalized advanced chemotaxis: \n"
+        //            //                    + "\t d_bias (before normalization) = " + motility.chemotacticSensitivities[0] + " * grad(" + m.density_names[0] + ")"
+        //            //                    + " / ||grad(" + m.density_names[0] + ")||" );
+        //
+        //            for( int n = 1; n < number_of_substrates; n++ )
+        //            {
+        //                System.out.println( motility.chemotacticSensitivities[n] + " * grad(" + m.density_names[n] + ")" + " / ||grad("
+        //                        + m.density_names[n] + ")||" );
+        //            }
+        //        }
     }
 
     private void readSecretion(Element el, Phenotype p, Microenvironment m)
@@ -1288,9 +1287,10 @@ public class ModelReader extends Constants
             if( !enabled )
                 return;
             String folder = getVal( findElement( positionsElement, "folder" ) );
-            String fileName = getVal( findElement( positionsElement, "fileName" ) );
-            String input_filename = folder + "/" + fileName;
-            CellCSVReader.load_cells_csv( input_filename, m.getMicroenvironment() );
+            String fileName = getVal( findElement( positionsElement, "filename" ) );
+            String inputFilename = folder + "/" + fileName;
+            m.setInitialPath( inputFilename );
+            //            CellCSVReader.load_cells_csv( input_filename, m.getMicroenvironment() );
         }
     }
 
@@ -1401,6 +1401,5 @@ public class ModelReader extends Constants
             default:
                 return Color.white;
         }
-
     }
 }

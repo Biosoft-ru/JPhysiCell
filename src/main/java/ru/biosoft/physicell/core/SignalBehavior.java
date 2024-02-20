@@ -162,9 +162,9 @@ public class SignalBehavior
         int time_ind = find_signal_index( "time" );
         if( index == time_ind )
         {
-            //            out = PhysiCell_globals.current_time;      
-            //            out /= signal_scales[index]; //TODO: later
-            //            return out; 
+            out = pCell.getMicroenvironment().time;
+            out /= signal_scales[index]; //TODO: later
+            return out;
         }
 
         // custom signals 

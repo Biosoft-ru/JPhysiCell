@@ -38,6 +38,7 @@ public class Model
     private double startTime;
     private boolean writeDensity = false;
     private boolean writeData = false;
+    private String initialPath = null;
 
     public Iterable<Visualizer> getVisualizers()
     {
@@ -163,6 +164,7 @@ public class Model
         m.simulate_diffusion_decay( diffusion_dt );
         ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
         curTime += diffusion_dt;
+        m.time = curTime;
     }
 
     private void saveResults() throws Exception
@@ -346,6 +348,15 @@ public class Model
         return result;
     }
 
+    public void setInitialPath(String path)
+    {
+        this.initialPath = path;
+    }
+
+    public String getInitialPath()
+    {
+        return initialPath;
+    }
 
     //                    writeReport( resultFolder + "/step_" + curTime + ".txt", "name\ti1\ti2\tp\tpressure\tphase\telapsed\n" );
     //                    for( Cell cell : m.getAgents( Cell.class ) )

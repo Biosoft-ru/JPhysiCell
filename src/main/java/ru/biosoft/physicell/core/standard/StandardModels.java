@@ -417,13 +417,18 @@ public class StandardModels
         // check for detachments 
         double detachment_probability = phenotype.mechanics.detachmentRate * dt;
 
+        List<Cell> toDetach = new ArrayList<>();
         for( Cell pTest : pCell.state.springAttachments )
         {
             if( PhysiCellUtilities.UniformRandom() <= detachment_probability )
             {
-                Cell.detachCellsAsSpring( pCell, pTest );
+                toDetach.add( pTest );
+
             }
         }
+
+        for( Cell cell : toDetach )
+            Cell.detachCellsAsSpring( pCell, cell );
         //        for( int j = 0; j < pCell.state.spring_attachments.size(); j++ )
         //        {
         //            Cell pTest = pCell.state.spring_attachments[j];
