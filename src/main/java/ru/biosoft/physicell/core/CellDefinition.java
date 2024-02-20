@@ -204,6 +204,15 @@ public class CellDefinition
         return result;
     }
 
+    public static void copy(CellDefinition from, CellDefinition to)
+    {
+        to.isMovable = from.isMovable;
+        to.parameters = from.parameters.clone();
+        to.custom_data = from.custom_data.clone();
+        to.phenotype = from.phenotype.clone();
+        to.functions = from.functions.clone();
+    }
+
     @Override
     public String toString()
     {
@@ -218,7 +227,7 @@ public class CellDefinition
     public String display()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( "\n================================" );
+        sb.append( "================================" );
         sb.append( "\n\t" + name + " (" + type + ")" );
         sb.append( "\n================================\n" );
 

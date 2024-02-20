@@ -201,7 +201,7 @@ public class Cell extends BasicAgent
     {
         Cell pNew = custom_instantiate == null ? new Cell( cd, m ) : custom_instantiate.execute();
         pNew.index = m.getAgentsCount();
-        pNew.registerMicroenvironment( m );
+        //        pNew.registerMicroenvironment( m );
         // All the phenotype and other data structures are already set by virtue of the default Cell constructor. 
         pNew.setTotalVolume( pNew.phenotype.volume.total );
         pNew.assignPosition( position );
@@ -210,6 +210,7 @@ public class Cell extends BasicAgent
 
     public void die()
     {
+        //        System.out.println( "DIED " + this );
         deleteCell( this );
     }
 
@@ -619,7 +620,10 @@ public class Cell extends BasicAgent
     {
         if( this.ID == other.ID )
             return;
-
+        if( typeName.contains( "CD8" ) )
+        {
+            double a = 5;
+        }
         /*
         // new April 2022: don't interact with cells with 0 volume 
         // does not seem to really help 
@@ -1096,6 +1100,41 @@ public class Cell extends BasicAgent
         pCellToFuse.flagForRemoval();
         pCellToFuse.removeAllAttachedCells();
         pCellToFuse.removeAllSpringAttachments();
+    }
+
+    public void lyseCell()
+    {
+        // don't lyse a cell that's already lysed 
+        if( phenotype.volume.total < 1e-15 )
+        {
+            return;
+        }
+
+        // flag for removal 
+        flagForRemoval(); // should be safe now 
+
+        // mark it as dead 
+        phenotype.death.dead = true;
+
+        // set secretion and uptake to zero 
+        phenotype.secretion.setSecretionToZero();
+        phenotype.secretion.setUptakeToZero();
+
+        // deactivate all custom function 
+        functions.custom_cell_rule = null;
+        functions.updatePhenotype = null;
+        functions.contact_function = null;
+
+        // remove all adhesions 
+
+        removeAllAttachedCells();
+
+        // set volume to zero 
+        setTotalVolume( 0.0 );
+
+        // set cell as unmovable and non-secreting 
+        isMovable = false;
+        isActive = false;
     }
 
     public void convert(CellDefinition cd)

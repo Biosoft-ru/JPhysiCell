@@ -714,73 +714,41 @@ public class CartesianMesh extends GeneralMesh
         return voxels[nearest_voxel_index( position )];
     }
 
-    //        void Cartesian_Mesh::display_information( std::ostream& os )
-    //        {
-    //            os << std::endl << "Mesh information: " << std::endl;
-    //            if( uniform_mesh ) 
-    //            { os << "type: uniform Cartesian" << std::endl; }
-    //            else
-    //            {
-    //                if( regular_mesh )
-    //                { os << "type: regular Cartesian" << std::endl; }
-    //                else
-    //                { os << "type: general Cartesian" << std::endl; }
-    //            }
-    //            os << "Domain: " 
-    //            << "[" << bounding_box[0] << "," << bounding_box[3] << "] " <<  units << " x " 
-    //            << "[" << bounding_box[1] << "," << bounding_box[4] << "] " <<  units << " x " 
-    //            << "[" << bounding_box[2] << "," << bounding_box[5] << "] " <<  units << std::endl
-    //            << "   resolution: dx = " << dx << " " << units; 
-    //            if( !uniform_mesh )
-    //            {
-    //                os  << ", dy = " << dy << " " << units 
-    //                    << ", dz = " << dz << " " << units ; 
-    //            }
-    //            os << std::endl 
-    //            << "   voxels: " << voxels.size() << std::endl
-    //            << "   voxel faces: " << voxel_faces.size() << std::endl
-    //            << "   volume: " << ( bounding_box[3]-bounding_box[0] )*( bounding_box[4]-bounding_box[1] )*( bounding_box[5]-bounding_box[2] ) 
-    //                << " cubic " << units << std::endl;     
-    //
-    //            return; 
-    //        }
     @Override
     public String display_information()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( "\nMesh information\n" );
+        sb.append( "\n" );
         if( uniform_mesh )
         {
-            sb.append( "type: uniform Cartesian\n" );
+            sb.append( "Uniform Cartesian Mesh" );
         }
         else
         {
             if( regular_mesh )
             {
-                sb.append( "type: regular Cartesian\n" );
+                sb.append( "Regular Cartesian Mesh" );
             }
             else
             {
-                sb.append( "type: general Cartesian\n" );
+                sb.append( "General Cartesian Mesh" );
             }
         }
-        sb.append( "Domain: " );
-        sb.append( "[" + boundingBox[0] + "," + boundingBox[3] + "] " + units + " x " );
-        sb.append( "[" + boundingBox[1] + "," + boundingBox[4] + "] " + units + " x " );
+        sb.append( "\n--------------------------------" );
+        sb.append( "\n\t" );
+        sb.append( "[" + boundingBox[0] + "," + boundingBox[3] + "]" + "x" );
+        sb.append( "[" + boundingBox[1] + "," + boundingBox[4] + "]" + "x" );
         sb.append( "[" + boundingBox[2] + "," + boundingBox[5] + "] " + units + "\n" );
-        sb.append( "   resolution: dx = " + dx + " " + units );
+        sb.append( "\tResolution: dx = " + dx );
         if( !uniform_mesh )
         {
             sb.append( ", dy = " + dy + " " + units );
             sb.append( ", dz = " + dz + " " + units );
         }
-        sb.append( "\n" );
-        sb.append( "   voxels: " + voxels.length + "\n" );
-        sb.append( "   voxel faces: " + voxel_faces.length + "\n" );
-        sb.append( "   volume: "
+        sb.append( ",\tvoxels: " + voxels.length );
+        sb.append( ",\tvoxel faces: " + voxel_faces.length );
+        sb.append( ",\tvolume: "
                 + ( boundingBox[3] - boundingBox[0] ) * ( boundingBox[4] - boundingBox[1] ) * ( boundingBox[5] - boundingBox[2] ) );
-        sb.append( " cubic " + units + "\n" );
-
         return sb.toString();
     }
 

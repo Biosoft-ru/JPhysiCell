@@ -3,7 +3,6 @@ package ru.biosoft.physicell.sample_projects.interactions;
 import java.io.File;
 import java.io.InputStream;
 
-import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.ui.AgentVisualizer2;
 import ru.biosoft.physicell.xml.ModelReader;
@@ -78,7 +77,7 @@ public class Main
 {
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/interactions/result";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/interactions/result3";
 
     public static void main(String ... strings) throws Exception
     {
@@ -108,8 +107,7 @@ public class Main
         /* Users typically stop modifying here. END USERMODS */
 
 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
-            System.out.println( cd.display() );
+        System.out.println( model.display() );
 
         System.out.println( "\nSimulation strated\n" );
         model.simulate();

@@ -75,8 +75,9 @@ public class MacrophagePhenotype extends UpdatePhenotype
                 + secretion_debris_sensitivity * debris + secretion_quorum_sensitivity * Q;
         double half_max = pCD.custom_data.get( "secretion_halfmax" ); // 0.5; // 0.5; 
         double hill = BasicSignaling.Hill_response_function( signal, half_max, 1.5 );
-
-
+        double v = base_val + ( max_response - base_val ) * hill;
+        //        if( v != 0 )
+        //            System.out.println( v );
         phenotype.secretion.secretionRates[nPIF] = base_val + ( max_response - base_val ) * hill;
 
         /*	

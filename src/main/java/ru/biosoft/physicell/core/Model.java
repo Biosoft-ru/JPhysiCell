@@ -138,24 +138,28 @@ public class Model
                             }
                         }
                         System.out.println( info );
+                        //                        printMaxInterferon( this );
                     }
-                    writeReport( resultFolder + "/step_" + curTime + ".txt", "name\ti1\ti2\tp\tpressure\tphase\telapsed\n" );
+                    //                    writeReport( resultFolder + "/step_" + curTime + ".txt", "name\ti1\ti2\tp\tpressure\tphase\telapsed\n" );
                     for( Cell cell : m.getAgents( Cell.class ) )
                     {
-                        String report = cell.typeName + "\t" + cell.get_current_mechanics_voxel_index() + "\t" + cell.currentVoxelIndex
-                                + "\t"
-                                + cell.nearest_density_vector()[0] + "\t" + cell.state.simplePressure + "\t"
-                                + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase + "\t"
-                                + cell.isOutOfDomain + "\n";
-                    //                        if( cell.phenotype.cycle.code == 5 )
-                    //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t"
-                    //                                    + cell.phenotype.cycle.transition_rate( 0, 0 ) + "\t" + cell.state.simplePressure + "\n";
-                    //                        else
-                    //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t0.0\t"
-                    //                                    + cell.state.simplePressure + "\n";
-                    //
-                    writeReport( resultFolder + "/step_" + curTime + ".txt", report );
-                }
+                        //                        String report = cell.typeName + "\t" + cell.get_current_mechanics_voxel_index() + "\t" + cell.currentVoxelIndex
+                        //                                + "\t" + cell.nearest_density_vector()[0] + "\t" + cell.state.simplePressure + "\t"
+                        //                                + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase + "\t"
+                        //                                + cell.isOutOfDomain + "\n";
+
+                        String report = "Substrates " + cell.phenotype.molecular.internalized_total_substrates[0] + " "
+                                + cell.phenotype.molecular.internalized_total_substrates[1];
+
+                        //                        if( cell.phenotype.cycle.code == 5 )
+                        //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t"
+                        //                                    + cell.phenotype.cycle.transition_rate( 0, 0 ) + "\t" + cell.state.simplePressure + "\n";
+                        //                        else
+                        //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t0.0\t"
+                        //                                    + cell.state.simplePressure + "\n";
+                        //
+                        writeReport( resultFolder + "/step_" + curTime + ".txt", report );
+                    }
                     next_full_save_time += full_save_interval;
                 }
                 m.simulate_diffusion_decay( diffusion_dt );
@@ -181,6 +185,13 @@ public class Model
         }
     }
 
+    public void printMaxInterferon(Model model)
+    {
+        double sum = 0;
+        for( int i = 0; i < model.getMicroenvironment().number_of_voxels(); i++ )
+            sum += model.getMicroenvironment().getDensity( i )[0];
+        System.out.println( sum );
+    }
 
     public double[] getAverageTransition(Model model)
     {
@@ -274,5 +285,36 @@ public class Model
     public void saveResult()
     {
 
+    }
+
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "================================" );
+        sb.append( "\nSimulation Options" );
+        sb.append( "\n================================" );
+        sb.append( "\n\tMaximum Time: " + tMax );
+        sb.append( "\tSave interval " + full_save_interval );
+
+        sb.append( "\n\n" + getMicroenvironment().display() );
+        sb.append( "\n" );
+        sb.append( "\nCell Types: ( " + CellDefinition.getDefinitionsCount() + " total)" );
+        sb.append( "\n--------------------------------" );
+        for( int i = 0; i < CellDefinition.getDefinitionsCount(); i++ )
+            sb.append( "\n\t" + i + ". " + CellDefinition.getCellDefinitionByIndex( i ).name + " # "
+                    + calcCells( CellDefinition.getCellDefinitionByIndex( i ) ) );
+
+        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+            sb.append( "\n\n" + cd.display() );
+        return sb.toString();
+    }
+
+    public int calcCells(CellDefinition cd)
+    {
+        int result = 0;
+        for( Cell cell : m.getAgents( Cell.class ) )
+            if( cell.typeName.equals( cd.name ) )
+                result++;
+        return result;
     }
 }

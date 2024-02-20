@@ -1,4 +1,4 @@
-package ru.biosoft.physicell.sample_projects.cancer_biorobots;
+package ru.biosoft.physicell.sample_projects.virus_macrophage;
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,7 +41,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -74,8 +74,9 @@ import ru.biosoft.physicell.xml.ModelReader;
 */
 public class Main
 {
+
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_biorobots/result2";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/virus_macrophage/result";
 
     public static void main(String ... strings) throws Exception
     {
@@ -88,17 +89,22 @@ public class Main
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
 
         Model model = new ModelReader().read( settings );
-
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
 
-        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 38 );
+        model.addVisualizer( 0, "virus" ).setStubstrateIndex( 0 ).setMaxDensity( 1E-4 );
+        model.addVisualizer( 0, "interferon" ).setStubstrateIndex( 1 ).setMaxDensity( 1E-4 );
+
+        model.getVisualizers().forEach( v -> v.setAgentVisualizer( new VirusVisualizer( model ) ) );
 
         /* Users typically start modifying here. START USERMODS */
-        CancerBiorobots.init( model );
+        VirusMacrophage.init( model );
         /* Users typically stop modifying here. END USERMODS */
 
+        System.out.println( model.display() );
+
+        System.out.println( "\n\nSimulation strated\n" );
         model.simulate();
     }
 }

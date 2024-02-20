@@ -267,7 +267,8 @@ public class BasicAgent
         //            VectorUtil.sum( substrateChange, sourceSinkTemp1 ); // (1-c2)*rho+c1 
         //            VectorUtil.div( substrateChange, sourceSinkTemp2 );// ((1-c2)*rho+c1)/c2
         //            VectorUtil.prod( substrateChange, m.voxels( currentVoxelIndex ).volume );// W*((1-c2)*rho+c1)/c2 
-        //            VectorUtil.diff( internalizedSubstrates, substrateChange ); // opposite of net extracellular change
+        //            double b = 10;
+        //                    VectorUtil.diff( internalizedSubstrates, substrateChange ); // opposite of net extracellular change
         //        }
 
         //   p(n+1) = (  p(n) + temp1 )/temp2
@@ -281,9 +282,9 @@ public class BasicAgent
 
         if( m.options.track_internalized_substrates_in_each_agent )
         {
-            VectorUtil.diff( densityChange, density ); //calculate change in density
-            VectorUtil.prod( densityChange, m.voxels( currentVoxelIndex ).volume ); //recalcualte to volume
-            VectorUtil.diff( internalizedSubstrates, densityChange ); //apply source sink change
+            double[] diff = VectorUtil.newDiff( density, densityChange ); //calculate change in density
+            VectorUtil.prod( diff, m.voxels( currentVoxelIndex ).volume ); //recalcualte to volume
+            VectorUtil.diff( internalizedSubstrates, diff ); //apply source sink change
             VectorUtil.diff( internalizedSubstrates, sourceSinkExport1 ); //apply export change
         }
     }
@@ -306,6 +307,8 @@ public class BasicAgent
         //        *internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
         //        *internalized_substrates *= *fraction_released_at_death;  // what fraction is released? 
 
+        if( currentVoxelIndex == -1 )
+            return;
         VectorUtil.div( internalizedSubstrates, microenvironment.voxels( currentVoxelIndex ).volume );// turn to density 
         VectorUtil.prod( internalizedSubstrates, fraction_released_at_death );// what fraction is released? 
         // release this amount into the environment 

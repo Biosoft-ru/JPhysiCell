@@ -60,7 +60,7 @@ package ru.biosoft.physicell.biofvm;
 public class Voxel
 {
     int meshIndex; /*!< voxel's index in a General_Mesh */
-    double volume; /*!< voxel's volume (cubic spatial units) */
+    public double volume; /*!< voxel's volume (cubic spatial units) */
     public double[] center; /*!< center of volume */
     boolean isDirichlet;
 

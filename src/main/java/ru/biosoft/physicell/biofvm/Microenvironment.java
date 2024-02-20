@@ -808,7 +808,7 @@ public class Microenvironment
     public double[][] gradient_vector(int n)
     {
         // if the gradient has not yet been computed, then do it!
-        if( gradient_vector_computed[n] == false )
+        if( !gradient_vector_computed[n] )
         {
             compute_gradient_vector( n );
         }
@@ -980,8 +980,8 @@ public class Microenvironment
             // add the Dirichlet nodes in the right places 
 
         }
-        System.out.println( "which boundaries?" );
-        System.out.println( xmin + " " + xmax + " " + ymin + " " + ymax + " " + zmin + " " + zmax );// << std::endl; 
+        //        System.out.println( "which boundaries?" );
+        //        System.out.println( xmin + " " + xmax + " " + ymin + " " + ymax + " " + zmin + " " + zmax );// << std::endl; 
 
         // add the Dirichlet nodes in the right places 
         // now, go in and set the values 
@@ -1192,4 +1192,28 @@ public class Microenvironment
         gradient_vector_computed = new boolean[mesh.voxels.length];
     }
 
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "================================" );
+        sb.append( "\nMicroenvironment summary: " + name + ":" );
+        sb.append( "\n================================" );
+        sb.append( "\n" + mesh.display_information() + "\n" );
+        sb.append( "\nDensities: (" + number_of_densities() + " total)" );
+        sb.append( "\n--------------------------------" );
+        for( int i = 0; i < density_names.length; i++ )
+        {
+            sb.append( "\n\t" + i + ". " + density_names[i] + ":" );
+            //            if( !density_units[i].equals( "dimensionless" ) )
+            //                sb.append( "\n\tunits: " + density_units[i] );
+            sb.append( "\tinitial: " + options.initial_condition_vector[i] );
+            if( dirichlet_activation_vector[i] )
+                sb.append( "\tboundary: " + options.Dirichlet_condition_vector[i] );
+            sb.append( "\tdiffusion: " + diffusion_coefficients[i] );
+            sb.append( "\tdecay: " + decay_rates[i] );
+            //            sb.append( "\tdiffusion length scale: "
+            //                    + PhysiCellUtilities.print( Math.sqrt( diffusion_coefficients[i] / ( 1e-12 + decay_rates[i] ) ) ) );
+        }
+        return sb.toString();
+    }
 }

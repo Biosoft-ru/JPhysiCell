@@ -77,7 +77,7 @@ public class Interactions
 
     public static void init(Model model)
     {
-        createCellTypes( model);
+        createCellTypes( model );
         setupTissue( model );
     }
 
@@ -129,22 +129,21 @@ public class Interactions
 
     static void setupTissue(Model model)
     {
-        Microenvironment microenvironment = model.getMicroenvironment();
+        Microenvironment m = model.getMicroenvironment();
+        double xMin = m.mesh.boundingBox[0];
+        double yMin = m.mesh.boundingBox[1];
+        double zMin = m.mesh.boundingBox[2];
+        double xMax = m.mesh.boundingBox[3];
+        double yMax = m.mesh.boundingBox[4];
+        double zMax = m.mesh.boundingBox[5];
 
-        double xMin = microenvironment.mesh.boundingBox[0];
-        double yMin = microenvironment.mesh.boundingBox[1];
-        double zMin = microenvironment.mesh.boundingBox[2];
-
-        double xMax = microenvironment.mesh.boundingBox[3];
-        double yMax = microenvironment.mesh.boundingBox[4];
-        double zMax = microenvironment.mesh.boundingBox[5];
-
-        if( microenvironment.options.simulate2D == true )
+        if( m.options.simulate2D == true )
         {
             zMin = 0.0;
             zMax = 0.0;
         }
 
+        double[] box = new double[] {xMin, yMin, zMin, xMax, yMax, zMax};
         // create some of each type of cell 
         for( CellDefinition pCD : CellDefinition.getCellDefinitions() )
         {
@@ -152,105 +151,47 @@ public class Interactions
             if( num_cells > 0 )
             {
                 System.out.println( "Placing cells of type " + pCD.name + " ... " );
-                for( int n = 0; n < num_cells; n++ )
-                {
-                    double[] position = {0, 0, 0};
-                    position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-                    position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-                    position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-                    Cell.createCell( pCD, microenvironment, position );
-                }
+                placeInBox( box, pCD, num_cells, m );
             }
         }
-
-        // parameter-based placement 
-        // bacteria 
         CellDefinition pCD = CellDefinition.getCellDefinition( "bacteria" );
         System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        ;
-        for( int n = 0; n < model.getParameterInt( "number_of_bacteria" ); n++ )
-        {
-            double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-            position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-            position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-            Cell.createCell( pCD, microenvironment, position );
-        }
+        placeInBox( box, pCD, model.getParameterInt( "number_of_bacteria" ), m );
 
-        // blood vessels 
         pCD = CellDefinition.getCellDefinition( "blood vessel" );
         System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        ;
-        for( int n = 0; n < model.getParameterInt( "number_of_blood_vessels" ); n++ )
-        {
-            double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-            position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-            position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-            Cell.createCell( pCD, microenvironment, position );
-        }
+        placeInBox( box, pCD, model.getParameterInt( "number_of_blood_vessels" ), m );
 
-        // stem cells 
         pCD = CellDefinition.getCellDefinition( "stem" );
         System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        ;
-        for( int n = 0; n < model.getParameterInt( "number_of_stem_cells" ); n++ )
-        {
-            double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-            position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-            position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-            Cell.createCell( pCD, microenvironment, position );
-        }
+        placeInBox( box, pCD, model.getParameterInt( "number_of_stem_cells" ), m );
 
-        // differentiated cells 
         pCD = CellDefinition.getCellDefinition( "differentiated" );
         System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        for( int n = 0; n < model.getParameterInt( "number_of_differentiated_cells" ); n++ )
-        {
-            double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-            position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-            position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-            Cell.createCell( pCD, microenvironment, position );
-        }
+        placeInBox( box, pCD, model.getParameterInt( "number_of_differentiated_cells" ), m );
 
-        // macrophages 
         pCD = CellDefinition.getCellDefinition( "macrophage" );
         System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        ;
-        for( int n = 0; n < model.getParameterInt( "number_of_macrophages" ); n++ )
-        {
-            double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-            position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-            position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-            Cell.createCell( pCD, microenvironment, position );
-        }
+        placeInBox( box, pCD, model.getParameterInt( "number_of_macrophages" ), m );
 
-        // neutrophils  
         pCD = CellDefinition.getCellDefinition( "neutrophil" );
         System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        for( int n = 0; n < model.getParameterInt( "number_of_neutrophils" ); n++ )
-        {
-            double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-            position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-            position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-            Cell.createCell( pCD, microenvironment, position );
-        }
-
-        // CD8+ T cells   
+        placeInBox( box, pCD, model.getParameterInt( "number_of_neutrophils" ), m );
+ 
         pCD = CellDefinition.getCellDefinition( "CD8+ T cell" );
         System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        ;
-        for( int n = 0; n < model.getParameterInt( "number_of_CD8T_cells" ); n++ )
+        placeInBox( box, pCD, model.getParameterInt( "number_of_CD8T_cells" ), m );
+    }
+
+    private static void placeInBox(double[] box, CellDefinition cd, int number, Microenvironment m)
+    {
+        for( int i = 0; i < number; i++ )
         {
             double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-            position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-            position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-            Cell.createCell( pCD, microenvironment, position );
+            position[0] = PhysiCellUtilities.UniformRandom( box[0], box[3] );
+            position[1] = PhysiCellUtilities.UniformRandom( box[1], box[4] );
+            position[2] = PhysiCellUtilities.UniformRandom( box[2], box[5] );
+            Cell.createCell( cd, m, position );
         }
     }
 }

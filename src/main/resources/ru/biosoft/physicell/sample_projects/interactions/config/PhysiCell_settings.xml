@@ -1528,7 +1528,7 @@
         <number_of_stem_cells type="int" units="none" description="">50</number_of_stem_cells>
         <number_of_differentiated_cells type="int" units="" description="">400</number_of_differentiated_cells>
         <number_of_blood_vessels type="int" units="" description="">40</number_of_blood_vessels>
-        <number_of_bacteria type="int" units="" description="">20</number_of_bacteria>
+        <number_of_bacteria type="int" units="" description="">100</number_of_bacteria>
         <number_of_macrophages type="int" units="" description="">50</number_of_macrophages>
         <number_of_CD8T_cells type="int" units="" description="">50</number_of_CD8T_cells>
         <number_of_neutrophils type="int" units="" description="">50</number_of_neutrophils>

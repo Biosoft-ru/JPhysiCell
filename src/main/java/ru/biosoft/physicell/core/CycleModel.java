@@ -183,16 +183,16 @@ public class CycleModel implements Cloneable
 
         for( int i = 0; i < phases.size(); i++ )
         {
-            sb.append( "\n\t" + phases.get( i ).name );
+            sb.append( "\n\t" + phases.get( i ).name + " " );
             if( phases.get( i ).divisionAtExit )
                 sb.append( "*" );
-
-            sb.append( "\n" );
 
             for( int k = 0; k < phaseLinks.get( i ).size(); k++ )
             {
                 int j = phaseLinks.get( i ).get( k ).endPhaseIndex;
                 double duration = PhysiCellUtilities.print( 1.0 / data.getTransitionRate( i, j ) );
+                if( phaseLinks.get( i ).size() > 1 )
+                    sb.append( "\n" );
                 sb.append( "-> " + phases.get( j ).name );
                 if( phases.get( j ).divisionAtExit )
                     sb.append( "*" );

@@ -32,11 +32,11 @@ import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.PhysiCellSettings;
 import ru.biosoft.physicell.core.Secretion;
 import ru.biosoft.physicell.core.Volume;
-import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.core.standard.AdvancedChemotaxis;
 import ru.biosoft.physicell.core.standard.AdvancedChemotaxisNormalized;
 import ru.biosoft.physicell.core.standard.Chemotaxis;
 import ru.biosoft.physicell.core.standard.DomainEdgeAvoidance;
+import ru.biosoft.physicell.core.standard.StandardModels;
 
 
 public class ModelReader extends Constants
@@ -432,14 +432,17 @@ public class ModelReader extends Constants
         if( activated_Dirichlet_boundary_detected )
             options.outer_Dirichlet_conditions = true;
 
-        Element calculate_gradientsElement = findElement( microenvironmentSetupElement, "calculate_gradients" );
-        if( calculate_gradientsElement != null )
-            options.calculate_gradients = getBoolVal( calculate_gradientsElement );
+        Element optionsElement = findElement( microenvironmentSetupElement, "options" );
+        if( options != null )
+        {
+            Element calculate_gradientsElement = findElement( optionsElement, "calculate_gradients" );
+            if( calculate_gradientsElement != null )
+                options.calculate_gradients = getBoolVal( calculate_gradientsElement );
 
-        Element trackSubstrate = findElement( microenvironmentSetupElement, "track_internalized_substrates_in_each_agent" );
-        if( trackSubstrate != null )
-            options.track_internalized_substrates_in_each_agent = getBoolVal( trackSubstrate );
-
+            Element trackSubstrate = findElement( optionsElement, "track_internalized_substrates_in_each_agent" );
+            if( trackSubstrate != null )
+                options.track_internalized_substrates_in_each_agent = getBoolVal( trackSubstrate );
+        }
         Microenvironment.initialize_microenvironment( m );
     }
 
@@ -504,9 +507,8 @@ public class ModelReader extends Constants
             if( parent != null )
             {
                 System.out.println( "\tCopying from type " + parent.name + " ... " );
-                cd = parent.clone( name, cd.type, m );
+                CellDefinition.copy( parent, cd );
                 p = cd.phenotype;
-                CellDefinition.registerCellDefinition( cd );
             }
 
             p.sync( m );
@@ -1021,30 +1023,30 @@ public class ModelReader extends Constants
             }
         }
         // display summary for diagnostic help 
-        if( cd.functions.update_migration_bias instanceof Chemotaxis && motility.isMotile )
-        {
-            System.out.println( "Cells of type " + cd.name + " use standard chemotaxis: \n" + "\t d_bias (before normalization) = "
-                    + motility.chemotaxisDirection + " * grad(" + m.density_names[motility.chemotaxisIndex] + ")" );
-        }
+        //        if( cd.functions.update_migration_bias instanceof Chemotaxis && motility.isMotile )
+        //        {
+        //            System.out.println( "Cells of type " + cd.name + " use standard chemotaxis: \n" + "\t d_bias (before normalization) = "
+        //                    + motility.chemotaxisDirection + " * grad(" + m.density_names[motility.chemotaxisIndex] + ")" );
+        //        }
 
-        if( cd.functions.update_migration_bias instanceof AdvancedChemotaxis && motility.isMotile )
-        {
-            int number_of_substrates = m.density_names.length;
+        //        if( cd.functions.update_migration_bias instanceof AdvancedChemotaxis && motility.isMotile )
+        //        {
+        //            int number_of_substrates = m.density_names.length;
 
-            System.out.println( "Cells of type " + cd.name + " use advanced chemotaxis: \n" + "\t d_bias (before normalization) = "
-                    + motility.chemotacticSensitivities[0] + " * grad(" + m.density_names[0] + ")" );
+        //            System.out.println( "Cells of type " + cd.name + " use advanced chemotaxis: \n" + "\t d_bias (before normalization) = "
+        //                    + motility.chemotacticSensitivities[0] + " * grad(" + m.density_names[0] + ")" );
 
-            for( int n = 1; n < number_of_substrates; n++ )
-                System.out.println( motility.chemotacticSensitivities[n] + " * grad(" + m.density_names[n] + ")" );
-        }
+        //            for( int n = 1; n < number_of_substrates; n++ )
+        //                System.out.println( motility.chemotacticSensitivities[n] + " * grad(" + m.density_names[n] + ")" );
+        //        }
 
         if( cd.functions.update_migration_bias instanceof AdvancedChemotaxisNormalized && motility.isMotile )
         {
             int number_of_substrates = m.density_names.length;
 
-            System.out.println( "Cells of type " + cd.name + " use normalized advanced chemotaxis: \n"
-                    + "\t d_bias (before normalization) = " + motility.chemotacticSensitivities[0] + " * grad(" + m.density_names[0] + ")"
-                    + " / ||grad(" + m.density_names[0] + ")||" );
+            //            System.out.println( "Cells of type " + cd.name + " use normalized advanced chemotaxis: \n"
+            //                    + "\t d_bias (before normalization) = " + motility.chemotacticSensitivities[0] + " * grad(" + m.density_names[0] + ")"
+            //                    + " / ||grad(" + m.density_names[0] + ")||" );
 
             for( int n = 1; n < number_of_substrates; n++ )
             {

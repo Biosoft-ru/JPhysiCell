@@ -98,7 +98,7 @@ public class Main
         /* Users typically start modifying here. START USERMODS */
         CancerImmune.init( model );
         /* Users typically stop modifying here. END USERMODS */
-
+        System.out.println( model.display() );
         model.simulate();
     }
 }

@@ -330,6 +330,7 @@ public class Visualizer
                 if( density > actualMaxDensity )
                     actualMaxDensity = density;
 
+
                 double ratio = ( density / maxDensity );
                 ratio = Math.min( 1, ratio );
                 red = (int) ( ( 1 - ratio ) * 255 );
@@ -342,6 +343,8 @@ public class Visualizer
         {
             //            System.out.println( "Max density: " + actualMaxDensity );
             maxDensity = actualMaxDensity;
+            if( maxDensity < 1E-20 )
+                maxDensity = 1E-20;
         }
     }
 

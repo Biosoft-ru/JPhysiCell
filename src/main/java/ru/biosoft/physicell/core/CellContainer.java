@@ -144,6 +144,7 @@ public class CellContainer extends AgentContainer
         Set<Cell> cells = m.getAgents( Cell.class );
         for( Cell cell : cells )
         {
+
             if( !cell.isOutOfDomain )
             {
                 cell.phenotype.secretion.advance( cell, cell.phenotype, diffusionDT );
