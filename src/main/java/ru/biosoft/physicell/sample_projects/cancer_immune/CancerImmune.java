@@ -82,9 +82,7 @@ import ru.biosoft.physicell.ui.Visualizer;
 
 public class CancerImmune
 {
-    public static boolean use2D = false;
-
-    public static void init(Model model) throws Exception
+    public static void init(Model model, boolean use2D) throws Exception
     {
         // use the same random seed so that future experiments have the 
         // same initial histogram of oncoprotein, even if threading means 
@@ -94,7 +92,7 @@ public class CancerImmune
         SignalBehavior.setup_signal_behavior_dictionaries( model.getMicroenvironment() );
         createCancerCell();
         createImmuneCell( model );
-        setupTissue( model );
+        setupTissue( model, use2D );
         model.addEvent( new ImmunityEvent( model.getParameterDouble( "immune_activation_time" ) ) );
         for( Visualizer visualizer : model.getVisualizers() )
         {
@@ -138,10 +136,8 @@ public class CancerImmune
         CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
         cd.parameters.o2_proliferation_saturation = 38.0;
         cd.parameters.o2_reference = 38.0;
-        cd.phenotype.mechanics.relMaxAttachmentDistance = cd.custom_data.get( "max_attachment_distance" )
-                / cd.phenotype.geometry.radius;
-        cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_attachment_distance" )
-                / cd.phenotype.geometry.radius;
+        cd.phenotype.mechanics.relMaxAttachmentDistance = cd.custom_data.get( "max_attachment_distance" ) / cd.phenotype.geometry.radius;
+        cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_attachment_distance" ) / cd.phenotype.geometry.radius;
         cd.phenotype.mechanics.attachmentElasticConstant = cd.custom_data.get( "elastic_coefficient" );
         cd.functions.updatePhenotype = new TumorPhenotype();
         cd.functions.custom_cell_rule = null;
@@ -150,7 +146,7 @@ public class CancerImmune
     }
 
 
-    static List<double[]> createSpherePositions(double cellRadius, double sphereRadius)
+    static List<double[]> createSpherePositions(double cellRadius, double sphereRadius, boolean use2D)
     {
         List<double[]> cells = new ArrayList<>();
         int xc = 0, yc = 0, zc = 0;
@@ -200,7 +196,7 @@ public class CancerImmune
         return cells;
     }
 
-    static void setupTissue(Model model) throws Exception
+    static void setupTissue(Model model, boolean use2D) throws Exception
     {
         // place a cluster of tumor cells at the center 
         CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
@@ -209,7 +205,7 @@ public class CancerImmune
 
         double tumorRadius = model.getParameterDouble( "tumor_radius" );// 250.0;  
 
-        List<double[]> positions = createSpherePositions( cellRadius, tumorRadius );
+        List<double[]> positions = createSpherePositions( cellRadius, tumorRadius, use2D );
         System.out.println( "creating " + positions.size() + " closely-packed tumor cells ... " );
 
         double imm_mean = model.getParameterDouble( "tumor_mean_immunogenicity" );
