@@ -88,40 +88,7 @@ public class VirusMacrophage
     static void createCellTypes(Model model) throws Exception
     {
         Microenvironment microenvironment = model.getMicroenvironment();
-        // set the random seed 
         PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-
-        /* 
-           Put any modifications to default cell definition here if you 
-           want to have "inherited" by other cell types. 
-           
-           This is a good place to set default functions. 
-        */
-
-        //        initialize_default_cell_definition();
-        //        CellDefinition cell_defaults = StandardModels.getDefaultCellDefinition();
-        //        cell_defaults.phenotype.secretion.sync_to_microenvironment( microenvironment );
-        //
-        //        cell_defaults.functions.updateVolume = new StandardVolumeUpdate();
-        //        cell_defaults.functions.updateVelocity = new StandardUpdateVelocity();
-        //        cell_defaults.functions.update_migration_bias = null;
-        //        cell_defaults.functions.updatePhenotype = null;
-        //        cell_defaults.functions.custom_cell_rule = null;
-        //        cell_defaults.functions.add_cell_basement_membrane_interactions = null;
-        //        cell_defaults.functions.calculate_distance_to_membrane = null;
-
-        /*
-           This parses the cell definitions in the XML config file. 
-        */
-
-        //	initialize_cell_definitions_from_pugixml(); 
-
-        /* 
-           Put any modifications to individual cell definitions here. 
-           
-           This is a good place to set custom functions. 
-        */
-
         // first find index for a few key variables. 
         int virus_index = microenvironment.findDensityIndex( "virus" );
         int nInterferon = microenvironment.findDensityIndex( "interferon" );
@@ -144,47 +111,7 @@ public class VirusMacrophage
 
         pMacrophage.functions.updatePhenotype = new Macrophage();
         pMacrophage.functions.custom_cell_rule = new AvoidBoundaries();
-
-        // pMacrophage.phenotype.sync_to_functions( macrophage.functions ); 
-
-        /*
-           This builds the map of cell definitions and summarizes the setup. 
-        */
-
-        //        build_cell_definitions_maps();
-
-        /*
-           This intializes cell signal and response dictionaries 
-        */
-
-        //        setup_signal_behavior_dictionaries();
-
-        /*
-           Cell rule definitions 
-        */
-
-        //        setup_cell_rules();
-
-
-
-        //        	display_cell_definitions(  ); 
-        //	
-        //	return; 
     }
-
-    //    void setup_microenvironment()
-    //{
-    //	// set domain parameters 
-    //	
-    //	// put any custom code to set non-homogeneous initial conditions or 
-    //	// extra Dirichlet nodes here. 
-    //	
-    //	// initialize BioFVM 
-    //	
-    //	initialize_microenvironment(); 	
-    //	
-    //	return; 
-    //}
 
     static void setupTissue(Model model)
     {
@@ -240,11 +167,9 @@ public class VirusMacrophage
             VectorUtil.axpy( out, microenvironment.mesh.voxels[n].volume, microenvironment.get( n ) );
         }
 
-
         // inte
         for( Cell cell : microenvironment.getAgents( Cell.class ) )//int n = 0; n < ( all_cells ).size(); n++ )
         {
-            //            Cell pC = ( all_cells )[n];
             VectorUtil.sum( out, cell.phenotype.molecular.internalized_total_substrates );
         }
 

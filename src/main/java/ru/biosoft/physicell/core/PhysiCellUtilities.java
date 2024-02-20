@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Random;
 
 import ru.biosoft.physicell.biofvm.GeneralMesh;
+import ru.biosoft.physicell.biofvm.Microenvironment;
 
 public class PhysiCellUtilities
 {
@@ -113,5 +114,17 @@ public class PhysiCellUtilities
         if( Double.isInfinite( v ) )
             return v;
         return Math.round( v * 2 ) / 2;
+    }
+
+    public static void placeInBox(double[] box, CellDefinition cd, int number, Microenvironment m)
+    {
+        for( int i = 0; i < number; i++ )
+        {
+            double[] position = {0, 0, 0};
+            position[0] = PhysiCellUtilities.UniformRandom( box[0], box[3] );
+            position[1] = PhysiCellUtilities.UniformRandom( box[1], box[4] );
+            position[2] = PhysiCellUtilities.UniformRandom( box[2], box[5] );
+            Cell.createCell( cd, m, position );
+        }
     }
 }

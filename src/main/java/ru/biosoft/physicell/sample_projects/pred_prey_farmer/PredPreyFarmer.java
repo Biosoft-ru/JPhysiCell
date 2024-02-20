@@ -1,4 +1,14 @@
-package ru.biosoft.physicell.sample_projects.interactions;
+package ru.biosoft.physicell.sample_projects.pred_prey_farmer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import ru.biosoft.physicell.biofvm.Microenvironment;
+import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.core.PhysiCellUtilities;
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -34,7 +44,7 @@ package ru.biosoft.physicell.sample_projects.interactions;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,122 +75,114 @@ package ru.biosoft.physicell.sample_projects.interactions;
 #                                                                             #
 ###############################################################################
 */
-
-import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
-
-public class Interactions
+public class PredPreyFarmer
 {
-
     public static void init(Model model)
     {
         createCellTypes( model );
         setupTissue( model );
+        model.getVisualizers().forEach( v -> v.setAgentVisualizer( new PPFVisualizer() ) );
     }
 
     static void createCellTypes(Model model)
     {
-        // set the random seed 
         PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        // set up bacteria 
-        CellDefinition pCD = CellDefinition.getCellDefinition( "bacteria" );
-        pCD.functions.updatePhenotype = new BacteriaPhenotype();
-        // pCD.functions.update_migration_bias = advanced_chemotaxis_function; 
-        // pCD.phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
-        // pCD.phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
 
-        // set up blood vessels 
-        pCD = CellDefinition.getCellDefinition( "blood vessel" );
-        pCD.functions.updatePhenotype = null;
-        pCD.isMovable = false;
+        //	cell_defaults.functions.update_phenotype = phenotype_function; 
+        //	cell_defaults.functions.custom_cell_rule = custom_function; 
 
-        // set up stem cells 
-        pCD = CellDefinition.getCellDefinition( "stem" );
-        pCD.functions.updatePhenotype = new StemPhenotype( model );
-        // pCD.phenotype.cell_transformations.transformation_rate("differentiated") = 0.0001; 
+        CellDefinition pFarmerDef = CellDefinition.getCellDefinition( "farmer" );
+        CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
+        CellDefinition pPredDef = CellDefinition.getCellDefinition( "predator" );
 
-        // set up differentiated cells 
-        pCD = CellDefinition.getCellDefinition( "differentiated" );
-        pCD.functions.updatePhenotype = new DifferentiatedPhenotype();
+        pFarmerDef.functions.custom_cell_rule = new FarmerCustomRule();
+        pFarmerDef.functions.updatePhenotype = null;
+        pFarmerDef.functions.update_migration_bias = null;
+        // pFarmerDef.functions.update_phenotype = prey_phenotype_function; 
+        // pFarmerDef.functions.update_migration_bias = prey_motility_function; 
 
-        // set up macrophages 
-        pCD = CellDefinition.getCellDefinition( "macrophage" );
-        // pCD.phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
-        pCD.functions.updatePhenotype = new MacrophagePhenotype();
-        // pCD.functions.update_migration_bias = advanced_chemotaxis_function; 
-        // pCD.phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
-        // pCD.phenotype.motility.chemotactic_sensitivity( "quorum" ) = 1; 
+        pPreyDef.functions.custom_cell_rule = new PreyCustomRule();
+        pPreyDef.functions.updatePhenotype = new PreyPhenotype();
+        pPreyDef.functions.update_migration_bias = new PreyMotility();
 
-
-        // set up CD8+ T cells 
-        pCD = CellDefinition.getCellDefinition( "CD8+ T cell" );
-        pCD.functions.updatePhenotype = new CD8TcellPhenotype();
-        // pCD.phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
-
-        // set up neutrophil  
-        pCD = CellDefinition.getCellDefinition( "neutrophil" );
-        pCD.functions.updatePhenotype = new NeutrophilPhenotype();
-        // pCD.phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
-
+        pPredDef.functions.custom_cell_rule = new PredatorCustomRule();
+        pPredDef.functions.updatePhenotype = new PredatorPhenotype();
+        pPredDef.functions.update_migration_bias = new PredatorMotility();
     }
 
     static void setupTissue(Model model)
     {
-        Microenvironment m = model.getMicroenvironment();
-        double xMin = m.mesh.boundingBox[0];
-        double yMin = m.mesh.boundingBox[1];
-        double zMin = m.mesh.boundingBox[2];
-        double xMax = m.mesh.boundingBox[3];
-        double yMax = m.mesh.boundingBox[4];
-        double zMax = m.mesh.boundingBox[5];
+        Microenvironment microenvironment = model.getMicroenvironment();
+        double xMin = microenvironment.mesh.boundingBox[0];
+        double yMin = microenvironment.mesh.boundingBox[1];
+        double zMin = microenvironment.mesh.boundingBox[2];
 
-        if( m.options.simulate2D == true )
+        double xMax = microenvironment.mesh.boundingBox[3];
+        double yMax = microenvironment.mesh.boundingBox[4];
+        double zMax = microenvironment.mesh.boundingBox[5];
+
+        if( microenvironment.options.simulate2D )
         {
             zMin = 0.0;
             zMax = 0.0;
         }
 
+        //        double Xrange = Xmax - Xmin;
+        //        double Yrange = Ymax - Ymin;
+        //        double Zrange = Zmax - Zmin;
+
         double[] box = new double[] {xMin, yMin, zMin, xMax, yMax, zMax};
-        // create some of each type of cell 
-        for( CellDefinition pCD : CellDefinition.getCellDefinitions() )
-        {
-            int num_cells = model.getParameterInt( "number_of_cells" );
-            if( num_cells > 0 )
-            {
-                System.out.println( "Placing cells of type " + pCD.name + " ... " );
-                PhysiCellUtilities.placeInBox( box, pCD, num_cells, m );
-            }
-        }
-        CellDefinition pCD = CellDefinition.getCellDefinition( "bacteria" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_bacteria" ), m );
+        CellDefinition pCD = CellDefinition.getCellDefinition( "farmer" );
+        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_farmers" ), microenvironment );
 
-        pCD = CellDefinition.getCellDefinition( "blood vessel" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_blood_vessels" ), m );
+        //        for( int n = 0; n < model.getParameterInt( "number_of_farmers" ); n++ )
+        //        {
+        //            double[] position = {0, 0, 0};
+        //            position[0] = Xmin + PhysiCellUtilities.UniformRandom() * Xrange;
+        //            position[1] = Ymin + PhysiCellUtilities.UniformRandom() * Yrange;
+        //            position[2] = Zmin + PhysiCellUtilities.UniformRandom() * Zrange;
+        //            Cell.createCell( pCD, microenvironment, position );
+        //        }
 
-        pCD = CellDefinition.getCellDefinition( "stem" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_stem_cells" ), m );
+        // place prey 
+        pCD = CellDefinition.getCellDefinition( "prey" );
+        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_prey" ), microenvironment );
+        //        for( int n = 0; n < model.getParameterInt( "number_of_prey" ); n++ )
+        //        {
+        //            double[] position = {0, 0, 0};
+        //            position[0] = Xmin + PhysiCellUtilities.UniformRandom() * Xrange;
+        //            position[1] = Ymin + PhysiCellUtilities.UniformRandom() * Yrange;
+        //            position[2] = Zmin + PhysiCellUtilities.UniformRandom() * Zrange;
+        //            Cell.createCell( pCD, microenvironment, position );
+        //        }
 
-        pCD = CellDefinition.getCellDefinition( "differentiated" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_differentiated_cells" ), m );
-
-        pCD = CellDefinition.getCellDefinition( "macrophage" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_macrophages" ), m );
-
-        pCD = CellDefinition.getCellDefinition( "neutrophil" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_neutrophils" ), m );
- 
-        pCD = CellDefinition.getCellDefinition( "CD8+ T cell" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_CD8T_cells" ), m );
+        // place predators 
+        pCD = CellDefinition.getCellDefinition( "predator" );
+        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_predators" ), microenvironment );
+        //        for( int n = 0; n < model.getParameterInt( "number_of_predators" ); n++ )
+        //        {
+        //            double[] position = {0, 0, 0};
+        //            position[0] = Xmin + PhysiCellUtilities.UniformRandom() * Xrange;
+        //            position[1] = Ymin + PhysiCellUtilities.UniformRandom() * Yrange;
+        //            position[2] = Zmin + PhysiCellUtilities.UniformRandom() * Zrange;
+        //            Cell.createCell( pCD, microenvironment, position );
+        //        }
     }
 
-
+    public static List<Cell> get_possible_neighbors(Cell pCell)
+    {
+        List<Cell> neighbors = new ArrayList<>();
+        for( Cell neighbor : pCell.get_container().agent_grid.get( pCell.get_current_mechanics_voxel_index() ) )
+        {
+            neighbors.add( neighbor );
+        }
+        for( int ind : pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()] )
+        {
+            for( Cell neighbor : pCell.get_container().agent_grid.get( ind ) )
+            {
+                neighbors.add( neighbor );
+            }
+        }
+        return neighbors;
+    }
 }
