@@ -79,7 +79,7 @@ public class Tutorial1
         double[] center = PhysiCellUtilities.getCenter( m.mesh );
         double stddevSquared = size / cellSize;
         stddevSquared *= -stddevSquared;
-        for( int i = 0; i < m.number_of_voxels(); i++ )
+        for( int i = 0; i < m.numberVoxels(); i++ )
         {
             double[] displacement = VectorUtil.newDiff( m.voxels( i ).center, center );
             double coeff = VectorUtil.norm_squared( displacement ) / stddevSquared;
@@ -140,8 +140,8 @@ public class Tutorial1
         int counter = 0;
         while( t < tMax )
         {
-            m.simulate_cell_sources_and_sinks( dt );
-            m.simulate_diffusion_decay( dt );
+            m.simulateSourcesSinks( dt );
+            m.simulateDiffusionDecay( dt );
             t += dt;
             counter++;
             if( Math.abs( t - nextOutputTime ) < 0.0001 )

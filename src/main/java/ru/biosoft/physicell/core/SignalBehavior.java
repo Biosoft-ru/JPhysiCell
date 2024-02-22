@@ -19,7 +19,7 @@ public class SignalBehavior
     public static double get_single_signal(Cell pCell, int index)
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();//Microenvironment.get_default_microenvironment();
-        int m = microenvironment.number_of_densities();
+        int m = microenvironment.numberDensities();
         int n = CellDefinition.getDefinitionsCount();
 
         double out = 0.0;
@@ -30,7 +30,7 @@ public class SignalBehavior
         }
 
         // first m entries: extracellular concentration 
-        int start_substrate_ind = find_signal_index( microenvironment.density_names[0] );
+        int start_substrate_ind = find_signal_index( microenvironment.densityNames[0] );
         if( start_substrate_ind <= index && index < start_substrate_ind + m )
         {
             out = pCell.nearest_density_vector()[index - start_substrate_ind];
@@ -39,7 +39,7 @@ public class SignalBehavior
         }
 
         // second m entries: intracellular concentration 
-        int start_int_substrate_ind = find_signal_index( "intracellular " + microenvironment.density_names[0] );
+        int start_int_substrate_ind = find_signal_index( "intracellular " + microenvironment.densityNames[0] );
         if( start_int_substrate_ind <= index && index < start_int_substrate_ind + m )
         {
             out = pCell.phenotype.molecular.internalized_total_substrates[index - start_int_substrate_ind];
@@ -49,7 +49,7 @@ public class SignalBehavior
         }
 
         // next m entries: gradients 
-        int start_substrate_grad_ind = find_signal_index( microenvironment.density_names[0] + " gradient" );
+        int start_substrate_grad_ind = find_signal_index( microenvironment.densityNames[0] + " gradient" );
         if( start_substrate_grad_ind <= index && index < start_substrate_grad_ind + m )
         {
             out = VectorUtil.norm( pCell.nearest_gradient( index - start_substrate_grad_ind ) );
@@ -257,7 +257,7 @@ public class SignalBehavior
             return;
         setupDone = true;
 
-        int m = microenvironment.number_of_densities();
+        int m = microenvironment.numberDensities();
 
         signal_to_int.clear();
         int_to_signal.clear();
@@ -267,24 +267,24 @@ public class SignalBehavior
         // substrate densities 
         for( int i = 0; i < m; i++ )
         {
-            register( microenvironment.density_names[i], i );
+            register( microenvironment.densityNames[i], i );
         }
 
         // internalized substrates 
         int map_index = m;
         for( int i = 0; i < m; i++ )
         {
-            register( "intracellular " + microenvironment.density_names[i], m + i );
-            signal_to_int.put( "internalized " + microenvironment.density_names[i], m + i );//[ name ] = m+i; 
+            register( "intracellular " + microenvironment.densityNames[i], m + i );
+            signal_to_int.put( "internalized " + microenvironment.densityNames[i], m + i );//[ name ] = m+i; 
         }
 
         // substrate gradients 
         map_index = 2 * m;
         for( int i = 0; i < m; i++ )
         {
-            register( microenvironment.density_names[i] + " gradient", map_index );
-            signal_to_int.put( "grad(" + microenvironment.density_names[i] + ")", map_index );//[ name ] = map_index;
-            signal_to_int.put( "gradient of " + microenvironment.density_names[i], map_index );// ] = map_index;
+            register( microenvironment.densityNames[i] + " gradient", map_index );
+            signal_to_int.put( "grad(" + microenvironment.densityNames[i] + ")", map_index );//[ name ] = map_index;
+            signal_to_int.put( "gradient of " + microenvironment.densityNames[i], map_index );// ] = map_index;
             map_index++;
         }
 
@@ -388,7 +388,7 @@ public class SignalBehavior
         for( int i = 0; i < m; i++ )
         {
             map_index = i;
-            name = microenvironment.density_names[i];
+            name = microenvironment.densityNames[i];
 
             // secretion rate 
             registerBehavior( name + " " + "secretion", map_index );
@@ -441,8 +441,8 @@ public class SignalBehavior
         for( int i = 0; i < m; i++ )
         {
             map_index++;
-            registerBehavior( "chemotactic response to " + microenvironment.density_names[i], map_index );
-            behavior_to_int.put( "chemotactic sensitivity to " + microenvironment.density_names[i], map_index );
+            registerBehavior( "chemotactic response to " + microenvironment.densityNames[i], map_index );
+            behavior_to_int.put( "chemotactic sensitivity to " + microenvironment.densityNames[i], map_index );
         }
 
         // cell-cell adhesion 
@@ -608,7 +608,7 @@ public class SignalBehavior
     static void setSingleBehavior(Cell pCell, int index, double parameter) throws Exception
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
-        int m = microenvironment.number_of_densities();
+        int m = microenvironment.numberDensities();
         int n = CellDefinition.getDefinitionsCount();
 
         if( index < 0 )
@@ -620,7 +620,7 @@ public class SignalBehavior
         // substrate-related behaviors 
 
         // first m entries are secretion 
-        int first_secretion_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion" ); // 0; 
+        int first_secretion_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion" ); // 0; 
         if( index >= first_secretion_index && index < first_secretion_index + m )
         {
             pCell.phenotype.secretion.secretionRates[index - first_secretion_index] = parameter;
@@ -628,7 +628,7 @@ public class SignalBehavior
         }
 
         // next m entries are secretion targets
-        int first_secretion_target_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion target" ); // m; 
+        int first_secretion_target_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion target" ); // m; 
         if( index >= first_secretion_target_index && index < first_secretion_target_index + m )
         {
             pCell.phenotype.secretion.saturationDensities[index - first_secretion_target_index] = parameter;
@@ -636,7 +636,7 @@ public class SignalBehavior
         }
 
         // next m entries are uptake rates
-        int first_uptake_index = findBehaviorIndex( microenvironment.density_names[0] + " uptake" ); // 2*m; 
+        int first_uptake_index = findBehaviorIndex( microenvironment.densityNames[0] + " uptake" ); // 2*m; 
         if( index >= first_uptake_index && index < first_uptake_index + m )
         {
             pCell.phenotype.secretion.uptakeRates[index - first_uptake_index] = parameter;
@@ -644,7 +644,7 @@ public class SignalBehavior
         }
 
         // next m entries are net export rates 
-        int first_export_index = findBehaviorIndex( microenvironment.density_names[0] + " export" ); //  3*m; 
+        int first_export_index = findBehaviorIndex( microenvironment.densityNames[0] + " export" ); //  3*m; 
         if( index >= first_export_index && index < first_export_index + m )
         {
             pCell.phenotype.secretion.netExportRates[index - first_export_index] = parameter;
@@ -713,7 +713,7 @@ public class SignalBehavior
         }
 
         // chemotactic sensitivities 
-        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
+        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.densityNames[0] );
         if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
         {
             pCell.phenotype.motility.chemotacticSensitivities[index - first_chemotaxis_index] = parameter;
@@ -894,7 +894,7 @@ public class SignalBehavior
     static double getSingleBehavior(Cell pCell, int index) throws Exception
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
-        int m = microenvironment.number_of_densities();
+        int m = microenvironment.numberDensities();
         //        static int m = microenvironment.number_of_densities(); 
         int n = CellDefinition.getDefinitionsCount();//.size(); 
 
@@ -907,28 +907,28 @@ public class SignalBehavior
         // substrate-related behaviors 
 
         // first m entries are secretion 
-        int first_secretion_index = SignalBehavior.findBehaviorIndex( microenvironment.density_names[0] + " secretion" ); // 0; 
+        int first_secretion_index = SignalBehavior.findBehaviorIndex( microenvironment.densityNames[0] + " secretion" ); // 0; 
         if( index >= first_secretion_index && index < first_secretion_index + m )
         {
             return pCell.phenotype.secretion.secretionRates[index - first_secretion_index];
         }
 
         // next m entries are secretion targets
-        int first_secretion_target_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion target" ); // m; 
+        int first_secretion_target_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion target" ); // m; 
         if( index >= first_secretion_target_index && index < first_secretion_target_index + m )
         {
             return pCell.phenotype.secretion.saturationDensities[index - first_secretion_target_index];
         }
 
         // next m entries are uptake rates
-        int first_uptake_index = findBehaviorIndex( microenvironment.density_names[0] + " uptake" ); // 2*m; 
+        int first_uptake_index = findBehaviorIndex( microenvironment.densityNames[0] + " uptake" ); // 2*m; 
         if( index >= first_uptake_index && index < first_uptake_index + m )
         {
             return pCell.phenotype.secretion.uptakeRates[index - first_uptake_index];
         }
 
         // next m entries are net export rates 
-        int first_export_index = findBehaviorIndex( microenvironment.density_names[0] + " export" ); //  3*m; 
+        int first_export_index = findBehaviorIndex( microenvironment.densityNames[0] + " export" ); //  3*m; 
         if( index >= first_export_index && index < first_export_index + m )
         {
             return pCell.phenotype.secretion.netExportRates[index - first_export_index];
@@ -993,7 +993,7 @@ public class SignalBehavior
         }
 
         // chemotactic sensitivities 
-        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
+        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.densityNames[0] );
         if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
         {
             return pCell.phenotype.motility.chemotacticSensitivities[index - first_chemotaxis_index];
@@ -1148,7 +1148,7 @@ public class SignalBehavior
         CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
 
         Microenvironment microenvironment = pCell.getMicroenvironment();
-        int m = microenvironment.number_of_densities();
+        int m = microenvironment.numberDensities();
         int n = CellDefinition.getDefinitionsCount();//.size();  
 
         double[] parameters = new double[int_to_behavior.size()];//( int_to_behavior.size() , 0.0 ); 
@@ -1156,7 +1156,7 @@ public class SignalBehavior
         // substrate-related behaviors 
 
         // first m entries are secretion 
-        int first_secretion_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion" ); // 0; 
+        int first_secretion_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion" ); // 0; 
         System.arraycopy( pCD.phenotype.secretion.secretionRates, 0, parameters, first_secretion_index,
                 pCD.phenotype.secretion.secretionRates.length );
         //        std::copy(  pCD.phenotype.secretion.secretionRates.begin(), 
@@ -1165,7 +1165,7 @@ public class SignalBehavior
 
 
         // next m entries are secretion targets
-        int first_secretion_target_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion target" ); // m; 
+        int first_secretion_target_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion target" ); // m; 
         System.arraycopy( pCD.phenotype.secretion.saturationDensities, 0, parameters, first_secretion_target_index,
                 pCD.phenotype.secretion.saturationDensities.length );
         //        std::copy(  pCD.phenotype.secretion.saturation_densities.begin(), 
@@ -1173,7 +1173,7 @@ public class SignalBehavior
         //                    parameters.begin()+first_secretion_target_index ); 
 
         // next m entries are uptake rates
-        int first_uptake_index = findBehaviorIndex( microenvironment.density_names[0] + " uptake" ); // 2*m; 
+        int first_uptake_index = findBehaviorIndex( microenvironment.densityNames[0] + " uptake" ); // 2*m; 
         System.arraycopy( pCD.phenotype.secretion.uptakeRates, 0, parameters, first_uptake_index,
                 pCD.phenotype.secretion.uptakeRates.length );
         //        std::copy(  pCD.phenotype.secretion.uptake_rates.begin(), 
@@ -1181,7 +1181,7 @@ public class SignalBehavior
         //                    parameters.begin()+first_uptake_index ); 
 
         // next m entries are net export rates 
-        int first_export_index = findBehaviorIndex( microenvironment.density_names[0] + " export" ); //  3*m; 
+        int first_export_index = findBehaviorIndex( microenvironment.densityNames[0] + " export" ); //  3*m; 
         System.arraycopy( pCD.phenotype.secretion.netExportRates, 0, parameters, first_export_index,
                 pCD.phenotype.secretion.netExportRates.length );
         //        std::copy(  pCD.phenotype.secretion.net_export_rates.begin(), 
@@ -1226,7 +1226,7 @@ public class SignalBehavior
         parameters[migration_pt_index] = pCD.phenotype.motility.persistenceTime;
 
         // chemotactic sensitivities 
-        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
+        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.densityNames[0] );
         System.arraycopy( pCD.phenotype.motility.chemotacticSensitivities, 0, parameters, first_chemotaxis_index,
                 pCD.phenotype.motility.chemotacticSensitivities.length );
         //        std::copy(  pCD.phenotype.motility.chemotactic_sensitivities.begin() ,
@@ -1355,7 +1355,7 @@ public class SignalBehavior
     public static double get_single_base_behavior(Cell pCell, int index)
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
-        int m = microenvironment.number_of_densities();
+        int m = microenvironment.numberDensities();
         int n = CellDefinition.getDefinitionsCount();
 
         CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
@@ -1370,28 +1370,28 @@ public class SignalBehavior
         // substrate-related behaviors 
 
         // first m entries are secretion 
-        int first_secretion_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion" ); // 0; 
+        int first_secretion_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion" ); // 0; 
         if( index >= first_secretion_index && index < first_secretion_index + m )
         {
             return pCD.phenotype.secretion.secretionRates[index - first_secretion_index];
         }
 
         // next m entries are secretion targets
-        int first_secretion_target_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion target" ); // m; 
+        int first_secretion_target_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion target" ); // m; 
         if( index >= first_secretion_target_index && index < first_secretion_target_index + m )
         {
             return pCD.phenotype.secretion.saturationDensities[index - first_secretion_target_index];
         }
 
         // next m entries are uptake rates
-        int first_uptake_index = findBehaviorIndex( microenvironment.density_names[0] + " uptake" ); // 2*m; 
+        int first_uptake_index = findBehaviorIndex( microenvironment.densityNames[0] + " uptake" ); // 2*m; 
         if( index >= first_uptake_index && index < first_uptake_index + m )
         {
             return pCD.phenotype.secretion.uptakeRates[index - first_uptake_index];
         }
 
         // next m entries are net export rates 
-        int first_export_index = findBehaviorIndex( microenvironment.density_names[0] + " export" ); //  3*m; 
+        int first_export_index = findBehaviorIndex( microenvironment.densityNames[0] + " export" ); //  3*m; 
         if( index >= first_export_index && index < first_export_index + m )
         {
             return pCD.phenotype.secretion.netExportRates[index - first_export_index];
@@ -1456,7 +1456,7 @@ public class SignalBehavior
         }
 
         // chemotactic sensitivities 
-        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
+        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.densityNames[0] );
         if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
         {
             return pCD.phenotype.motility.chemotacticSensitivities[index - first_chemotaxis_index];
@@ -1616,7 +1616,7 @@ public class SignalBehavior
     public static double get_single_base_behavior(CellDefinition pCD, int index)
     {
         Microenvironment microenvironment = pCD.getMicroenvironment();
-        int m = microenvironment.number_of_densities();
+        int m = microenvironment.numberDensities();
         int n = CellDefinition.getDefinitionsCount();
 
         // CellDefinition* pCD = find_CellDefinition( pCell.type_name );     
@@ -1631,28 +1631,28 @@ public class SignalBehavior
         // substrate-related behaviors 
 
         // first m entries are secretion 
-        int first_secretion_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion" ); // 0; 
+        int first_secretion_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion" ); // 0; 
         if( index >= first_secretion_index && index < first_secretion_index + m )
         {
             return pCD.phenotype.secretion.secretionRates[index - first_secretion_index];
         }
 
         // next m entries are secretion targets
-        int first_secretion_target_index = findBehaviorIndex( microenvironment.density_names[0] + " secretion target" ); // m; 
+        int first_secretion_target_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion target" ); // m; 
         if( index >= first_secretion_target_index && index < first_secretion_target_index + m )
         {
             return pCD.phenotype.secretion.saturationDensities[index - first_secretion_target_index];
         }
 
         // next m entries are uptake rates
-        int first_uptake_index = findBehaviorIndex( microenvironment.density_names[0] + " uptake" ); // 2*m; 
+        int first_uptake_index = findBehaviorIndex( microenvironment.densityNames[0] + " uptake" ); // 2*m; 
         if( index >= first_uptake_index && index < first_uptake_index + m )
         {
             return pCD.phenotype.secretion.uptakeRates[index - first_uptake_index];
         }
 
         // next m entries are net export rates 
-        int first_export_index = findBehaviorIndex( microenvironment.density_names[0] + " export" ); //  3*m; 
+        int first_export_index = findBehaviorIndex( microenvironment.densityNames[0] + " export" ); //  3*m; 
         if( index >= first_export_index && index < first_export_index + m )
         {
             return pCD.phenotype.secretion.netExportRates[index - first_export_index];
@@ -1717,7 +1717,7 @@ public class SignalBehavior
         }
 
         // chemotactic sensitivities 
-        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.density_names[0] );
+        int first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + microenvironment.densityNames[0] );
         if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
         {
             return pCD.phenotype.motility.chemotacticSensitivities[index - first_chemotaxis_index];

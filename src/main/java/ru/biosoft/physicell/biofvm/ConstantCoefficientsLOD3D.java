@@ -70,9 +70,9 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
         m.thomas_denomz = new double[zLength][];
         m.thomas_cz = new double[zLength][];
 
-        m.thomas_i_jump = 1; //offset to get next x coordinate
-        m.thomas_j_jump = xLength; //offset to get next y coordinate
-        m.thomas_k_jump = m.thomas_j_jump * yLength; //offset to get next z coordinate
+        m.iJump = 1; //offset to get next x coordinate
+        m.jJump = xLength; //offset to get next y coordinate
+        m.kJump = m.jJump * yLength; //offset to get next z coordinate
 
         /*We solve tridiagonal matrix equation with each matrix element as a vector:
           
@@ -90,11 +90,11 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
                  
            Using Thomas algorithm
         */
-        m.thomas_constant1 = VectorUtil.newProd( m.diffusion_coefficients, dt ); // c1 = dt*D/dx^2  This is -a_i = -c_i, i=0,..,n
+        m.thomas_constant1 = VectorUtil.newProd( m.diffusionCoefficients, dt ); // c1 = dt*D/dx^2  This is -a_i = -c_i, i=0,..,n
         VectorUtil.div( m.thomas_constant1, m.mesh.dx );
         VectorUtil.div( m.thomas_constant1, m.mesh.dx );
         m.thomas_constant1a = VectorUtil.newProd( m.thomas_constant1, -1.0 ); // c1a = -dt*D/dx^2;  This is a_i = c_i, i=0,..,n
-        m.thomas_constant2 = VectorUtil.newProd( m.decay_rates, dt / 3.0 ); // c2 = (1/3)* dt*lambda 
+        m.thomas_constant2 = VectorUtil.newProd( m.decayRates, dt / 3.0 ); // c2 = (1/3)* dt*lambda 
         m.thomas_constant3 = VectorUtil.newSum( m.one, m.thomas_constant1 ); // c3 = 1 + 2*c1 + c2; //this is b_i, i=0,..,n-1
         VectorUtil.sum( m.thomas_constant3, m.thomas_constant1 );
         VectorUtil.sum( m.thomas_constant3, m.thomas_constant2 );
@@ -152,90 +152,90 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
             VectorUtil.axpy( m.thomas_denomz[i], m.thomas_constant1, m.thomas_cz[i - 1] );
             VectorUtil.div( m.thomas_cz[i], m.thomas_denomz[i] ); // the value at  size-1 is not actually used  
         }
-        m.diffusion_solver_setup_done = true;
+        m.solverSetup = true;
     }
 
     @Override
     public void solve(Microenvironment m, double dt) throws Exception
     {
-        if( m.mesh.regular_mesh == false || m.mesh.Cartesian_mesh == false )
+        if( m.mesh.regularMesh == false || m.mesh.cartesianMesh == false )
             throw new IllegalArgumentException( "Error: This algorithm is written for regular Cartesian meshes. Try: other solvers!" );
 
         // define constants and pre-computed quantities 
-        if( !m.diffusion_solver_setup_done )
+        if( !m.solverSetup )
             setup( m, dt );
 
 
         // x-diffusion 
-        m.apply_dirichlet_conditions();
+        m.applyDirichletConditions();
         for( int k = 0; k < zLength; k++ ) //        #pragma omp parallel for 
         {
             for( int j = 0; j < yLength; j++ )
             {
                 // Thomas solver, x-direction remaining part of forward sweep, using pre-computed quantities 
-                int n = m.voxel_index( 0, j, k );
+                int n = m.getVoxelIndex( 0, j, k );
                 VectorUtil.div( density[n], m.thomas_denomx[0] );
                 for( int i = 1; i < xLength; i++ )
                 {
-                    n = m.voxel_index( i, j, k );
-                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.thomas_i_jump] );
+                    n = m.getVoxelIndex( i, j, k );
+                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.iJump] );
                     VectorUtil.div( density[n], m.thomas_denomx[i] );
                 }
                 //back substitution
                 for( int i = xLength - 2; i >= 0; i-- )
                 {
-                    n = m.voxel_index( i, j, k );
-                    VectorUtil.naxpy( density[n], m.thomas_cx[i], density[n + m.thomas_i_jump] );
+                    n = m.getVoxelIndex( i, j, k );
+                    VectorUtil.naxpy( density[n], m.thomas_cx[i], density[n + m.iJump] );
                 }
             }
         }
         // y-diffusion 
-        m.apply_dirichlet_conditions();
+        m.applyDirichletConditions();
         for( int k = 0; k < zLength; k++ ) //        #pragma omp parallel for
         {
             for( int i = 0; i < xLength; i++ )
             {
                 // Thomas solver, y-direction remaining part of forward sweep, using pre-computed quantities  
-                int n = m.voxel_index( i, 0, k );
+                int n = m.getVoxelIndex( i, 0, k );
                 VectorUtil.div( density[n], m.thomas_denomy[0] );
                 for( int j = 1; j < yLength; j++ )
                 {
-                    n = m.voxel_index( i, j, k );
-                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.thomas_j_jump] );
+                    n = m.getVoxelIndex( i, j, k );
+                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.jJump] );
                     VectorUtil.div( density[n], m.thomas_denomy[j] );
                 }
                 // back substitution 
                 for( int j = yLength - 2; j >= 0; j-- )
                 {
-                    n = m.voxel_index( i, j, k );
-                    VectorUtil.naxpy( density[n], m.thomas_cy[j], density[n + m.thomas_j_jump] );
+                    n = m.getVoxelIndex( i, j, k );
+                    VectorUtil.naxpy( density[n], m.thomas_cy[j], density[n + m.jJump] );
                 }
             }
         }
         // z-diffusion 
-        m.apply_dirichlet_conditions();
+        m.applyDirichletConditions();
         for( int j = 0; j < yLength; j++ ) //     #pragma omp parallel for 
         {
             for( int i = 0; i < xLength; i++ )
             {
                 // Thomas solver, z-direction remaining part of forward sweep, using pre-computed quantities 
-                int n = m.voxel_index( i, j, 0 );
+                int n = m.getVoxelIndex( i, j, 0 );
                 VectorUtil.div( density[n], m.thomas_denomz[0] );
                 // should be an empty loop if mesh.z_coordinates.length < 2  
                 for( int k = 1; k < zLength; k++ )
                 {
-                    n = m.voxel_index( i, j, k );
-                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.thomas_k_jump] );
+                    n = m.getVoxelIndex( i, j, k );
+                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.kJump] );
                     VectorUtil.div( density[n], m.thomas_denomz[k] );
                 }
                 // back substitution
                 for( int k = zLength - 2; k >= 0; k-- )
                 {
-                    n = m.voxel_index( i, j, k );
-                    VectorUtil.naxpy( density[n], m.thomas_cz[k], density[n + m.thomas_k_jump] );
+                    n = m.getVoxelIndex( i, j, k );
+                    VectorUtil.naxpy( density[n], m.thomas_cz[k], density[n + m.kJump] );
                 }
             }
         }
-        m.apply_dirichlet_conditions();
+        m.applyDirichletConditions();
     }
 }

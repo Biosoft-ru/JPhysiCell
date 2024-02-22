@@ -68,7 +68,7 @@ public class BasicAgent
     public double[] sourceSinkTemp2;
     double[] sourceSinkExport1;
     double[] sourceSinkExport2;
-    protected double[] previous_velocity;
+    protected double[] prevVelocity;
 
     double[] substrateChange;
     protected boolean isActive;
@@ -87,8 +87,8 @@ public class BasicAgent
     public double[] velocity;
 
     public double[] internalizedSubstrates;
-    public double[] fraction_released_at_death;
-    public double[] fraction_transferred_when_ingested;
+    public double[] fractionReleasedDeath;
+    public double[] fractionTransferredIngested;
 
     public BasicAgent(Microenvironment m)
     {
@@ -101,7 +101,7 @@ public class BasicAgent
         volume = 1.0;
         position = new double[3];
         velocity = new double[3];
-        previous_velocity = new double[3];
+        prevVelocity = new double[3];
         // link into the microenvironment, if one is defined 
         secretionRates = new double[0];//new std::vector<double>(0);
         uptakeRates = new double[0];//= new std::vector<double>(0);
@@ -109,8 +109,8 @@ public class BasicAgent
         netExportRates = new double[0];// = new std::vector<double>(0); 
 
         internalizedSubstrates = new double[0];// = new std::vector<double>(0); // 
-        fraction_released_at_death = new double[0];// = new std::vector<double>(0); 
-        fraction_transferred_when_ingested = new double[0];// = new std::vector<double>(0); 
+        fractionReleasedDeath = new double[0];// = new std::vector<double>(0); 
+        fractionTransferredIngested = new double[0];// = new std::vector<double>(0); 
         registerMicroenvironment( m );
 
         // these are done in register_microenvironment
@@ -171,7 +171,7 @@ public class BasicAgent
             isActive = false;
             return;
         }
-        currentVoxelIndex = microenvironment.nearest_voxel_index( position );
+        currentVoxelIndex = microenvironment.nearestVoxelIndex( position );
     }
 
     public void registerMicroenvironment(Microenvironment microenvironment)
@@ -195,8 +195,8 @@ public class BasicAgent
         // new for internalized substrate tracking 
         internalizedSubstrates = VectorUtil.resize( internalizedSubstrates, length );
         substrateChange = VectorUtil.resize( substrateChange, length );
-        fraction_released_at_death = VectorUtil.resize( fraction_released_at_death, length );
-        fraction_transferred_when_ingested = VectorUtil.resize( fraction_transferred_when_ingested, length );
+        fractionReleasedDeath = VectorUtil.resize( fractionReleasedDeath, length );
+        fractionTransferredIngested = VectorUtil.resize( fractionTransferredIngested, length );
         return;
     }
 
@@ -294,7 +294,7 @@ public class BasicAgent
         return null;//TODO: implement
     }
 
-    public void release_internalized_substrates()
+    public void releaseSubstrates()
     {
         //        Microenvironment pS = Microenvironment.get_default_microenvironment(); 
 
@@ -310,7 +310,7 @@ public class BasicAgent
         if( currentVoxelIndex == -1 )
             return;
         VectorUtil.div( internalizedSubstrates, microenvironment.voxels( currentVoxelIndex ).volume );// turn to density 
-        VectorUtil.prod( internalizedSubstrates, fraction_released_at_death );// what fraction is released? 
+        VectorUtil.prod( internalizedSubstrates, fractionReleasedDeath );// what fraction is released? 
         // release this amount into the environment 
 
         //        pS.get( currentVoxelIndex ) += internalized_substrates;

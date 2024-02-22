@@ -424,7 +424,7 @@ public class ModelReader extends Constants
         options.Dirichlet_zmin_values = Dirichlet_zmin_values;
         options.Dirichlet_zmax_values = Dirichlet_zmax_values;
 
-        for( int i = 0; i < m.number_of_voxels(); i++ )
+        for( int i = 0; i < m.numberVoxels(); i++ )
             m.density[i] = options.initial_condition_vector.clone();
 
         // if any of the substrates have outer Dirichlet conditions enables, then set the outer_Dirichlet_conditions = true;       
@@ -442,7 +442,7 @@ public class ModelReader extends Constants
             if( trackSubstrate != null )
                 options.track_internalized_substrates_in_each_agent = getBoolVal( trackSubstrate );
         }
-        Microenvironment.initialize_microenvironment( m );
+        Microenvironment.initialize( m );
     }
 
     public void readCellDefinitions(Element physicell, Microenvironment m) throws Exception
@@ -956,7 +956,7 @@ public class ModelReader extends Constants
                                 System.out.println( "Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" );
                                 System.out.println( "Substrate " + substrate_name + " was not found in the microenvironment." );
                             }
-                            String actual_name = m.density_names[motility.chemotaxisIndex];
+                            String actual_name = m.densityNames[motility.chemotaxisIndex];
                             if( !substrate_name.equals( actual_name ) )
                             {
                                 System.out.println( "Error: attempted to set chemotaxis to \"" + substrate_name
@@ -994,7 +994,7 @@ public class ModelReader extends Constants
                                     String actual_name = "";
                                     if( index > -1 )
                                     {
-                                        actual_name = m.density_names[index];
+                                        actual_name = m.densityNames[index];
                                     }
 
                                     // error check 
@@ -1062,7 +1062,7 @@ public class ModelReader extends Constants
         {
             String name = getAttr( substrateElement, "name" );
             int index = m.findDensityIndex( name );
-            String actual_name = m.density_names[index];
+            String actual_name = m.densityNames[index];
             if( !name.equals( actual_name ) )
             {
                 System.out.println( "Error: attempted to set secretion/uptake/export for \"" + name

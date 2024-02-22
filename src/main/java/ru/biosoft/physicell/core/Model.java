@@ -161,7 +161,7 @@ public class Model
 
     private void doStep() throws Exception
     {
-        m.simulate_diffusion_decay( diffusion_dt );
+        m.simulateDiffusionDecay( diffusion_dt );
         ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
         curTime += diffusion_dt;
         m.time = curTime;
@@ -223,7 +223,7 @@ public class Model
     public void printMaxInterferon(Model model)
     {
         double sum = 0;
-        for( int i = 0; i < model.getMicroenvironment().number_of_voxels(); i++ )
+        for( int i = 0; i < model.getMicroenvironment().numberVoxels(); i++ )
             sum += model.getMicroenvironment().getDensity( i )[0];
         System.out.println( sum );
     }

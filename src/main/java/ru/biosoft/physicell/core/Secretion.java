@@ -83,8 +83,8 @@ public class Secretion implements Cloneable
 
     public void sync(Microenvironment m)
     {
-        int size = m.number_of_densities();
-        substrates = m.density_names;
+        int size = m.numberDensities();
+        substrates = m.densityNames;
         secretionRates = VectorUtil.resize( secretionRates, size );
         uptakeRates = VectorUtil.resize( uptakeRates, size );
         saturationDensities = VectorUtil.resize( saturationDensities, size );

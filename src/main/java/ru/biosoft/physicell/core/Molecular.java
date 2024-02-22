@@ -90,7 +90,7 @@ public class Molecular implements Cloneable
 
     void sync(Microenvironment m)
     {
-        int number_of_densities = m.number_of_densities();
+        int number_of_densities = m.numberDensities();
         internalized_total_substrates = VectorUtil.resize( internalized_total_substrates, number_of_densities );
         fraction_released_at_death = VectorUtil.resize( internalized_total_substrates, number_of_densities );
         fraction_transferred_when_ingested = VectorUtil.resize( fraction_transferred_when_ingested, number_of_densities );
@@ -104,11 +104,11 @@ public class Molecular implements Cloneable
 
         //                delete pCell.fraction_released_at_death;
         //                pCell.fraction_released_at_death = &fraction_released_at_death; 
-        pCell.fraction_released_at_death = fraction_released_at_death;
+        pCell.fractionReleasedDeath = fraction_released_at_death;
 
         //                delete pCell.fraction_transferred_when_ingested; 
         //                pCell.fraction_transferred_when_ingested = &fraction_transferred_when_ingested; 
-        pCell.fraction_transferred_when_ingested = fraction_transferred_when_ingested;
+        pCell.fractionTransferredIngested = fraction_transferred_when_ingested;
     }
 
     // ease of access 

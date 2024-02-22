@@ -116,12 +116,12 @@ public class MicroenvironmentOptions
         dz = 20;
 
         outer_Dirichlet_conditions = false;
-        Dirichlet_condition_vector = new double[pMicroenvironment.number_of_densities()];
+        Dirichlet_condition_vector = new double[pMicroenvironment.numberDensities()];
         for( int i = 0; i < Dirichlet_condition_vector.length; i++ )
             Dirichlet_condition_vector[i] = 1;
         //        Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 1.0 ); 
         //        Dirichlet_activation_vector.assign( pMicroenvironment->number_of_densities() , false ); 
-        Dirichlet_activation_vector = new boolean[pMicroenvironment.number_of_densities()];
+        Dirichlet_activation_vector = new boolean[pMicroenvironment.numberDensities()];
 
         initial_condition_vector = new double[0];
         //        initial_condition_vector.resize(0); //  = Dirichlet_condition_vector; 

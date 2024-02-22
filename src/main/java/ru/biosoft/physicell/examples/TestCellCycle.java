@@ -129,7 +129,7 @@ public class TestCellCycle
     {
         Microenvironment m = new Microenvironment( "substrate scale", size, cellSize, "minutes", "microns" );
         m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
-        for( int n = 0; n < m.number_of_voxels(); n++ )
+        for( int n = 0; n < m.numberVoxels(); n++ )
             m.getDensity( n )[0] = o2Сonc;
 
         CellContainer.createCellContainer( m, 30 );

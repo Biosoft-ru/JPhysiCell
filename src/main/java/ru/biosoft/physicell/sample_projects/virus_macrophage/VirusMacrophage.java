@@ -160,9 +160,9 @@ public class VirusMacrophage
         // start with 0 vector 
         //	std::vector<double> out( microenvironment.number_of_densities() , 0.0 ); 
         //        List<Double> out = new ArrayList<>();
-        double[] out = new double[microenvironment.number_of_densities()];
+        double[] out = new double[microenvironment.numberDensities()];
         // integrate extracellular substrates 
-        for( int n = 0; n < microenvironment.number_of_voxels(); n++ )
+        for( int n = 0; n < microenvironment.numberVoxels(); n++ )
         {
             // out = out + microenvironment(n) * dV(n) 
             VectorUtil.axpy( out, microenvironment.mesh.voxels[n].volume, microenvironment.get( n ) );

@@ -105,7 +105,7 @@ public class TestVolume
         CellContainer.createCellContainer( m, 30 );
 
         m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
-        for( int n = 0; n < m.number_of_voxels(); n++ )
+        for( int n = 0; n < m.numberVoxels(); n++ )
             m.getDensity( n )[0] = o2Conc;
 
         CellDefinition.clearCellDefinitions();

@@ -2,6 +2,8 @@ package ru.biosoft.physicell.biofvm;
 
 import java.util.Arrays;
 
+import ru.biosoft.physicell.core.PhysiCellUtilities;
+
 /*
 #############################################################################
 # If you use BioFVM in your project, please cite BioFVM and the version     #
@@ -70,10 +72,10 @@ public class CartesianMesh extends GeneralMesh
 
     public CartesianMesh()
     {
-        Cartesian_mesh = true;
-        uniform_mesh = true;
-        regular_mesh = true;
-        use_voxel_faces = false;
+        cartesianMesh = true;
+        uniformMesh = true;
+        regularMesh = true;
+        useVoxelFaces = false;
 
         x_coordinates = new double[1];//.assign( 1 , 0.0 ); 
         y_coordinates = new double[1];//.assign( 1 , 0.0 ); 
@@ -86,7 +88,7 @@ public class CartesianMesh extends GeneralMesh
 
         if( Math.abs( dx - dy ) > tolerance || Math.abs( dy - dz ) > tolerance || Math.abs( dx - dz ) > tolerance )
         {
-            uniform_mesh = false;
+            uniformMesh = false;
         }
 
         dV = dx * dy * dz;
@@ -123,9 +125,9 @@ public class CartesianMesh extends GeneralMesh
         dS_yz = dS;
         dS_xz = dS;
 
-        uniform_mesh = true;
-        regular_mesh = true;
-        use_voxel_faces = false;
+        uniformMesh = true;
+        regularMesh = true;
+        useVoxelFaces = false;
 
         for( int i = 0; i < x_coordinates.length; i++ )
         {
@@ -176,7 +178,7 @@ public class CartesianMesh extends GeneralMesh
         }
 
         // make connections 
-        connected_voxel_indices = VectorUtil.resize( connected_voxel_indices, voxels.length );
+        connectedVoxelIndices = VectorUtil.resize( connectedVoxelIndices, voxels.length );
         //                        connected_voxel_indices.resize(voxels.length);
 
         int i_jump = 1;
@@ -220,7 +222,7 @@ public class CartesianMesh extends GeneralMesh
             }
         }
 
-        if( use_voxel_faces )
+        if( useVoxelFaces )
         {
             create_voxel_faces();
         }
@@ -257,7 +259,7 @@ public class CartesianMesh extends GeneralMesh
     void create_voxel_faces()
     {
         // make connections 
-        connected_voxel_indices = VectorUtil.resize( connected_voxel_indices, voxels.length );
+        connectedVoxelIndices = VectorUtil.resize( connectedVoxelIndices, voxels.length );
         //         connected_voxel_indices.resize( voxels.length );
 
         int i_jump = 1;
@@ -352,20 +354,20 @@ public class CartesianMesh extends GeneralMesh
             dz = 1;
         }
 
-        uniform_mesh = true;
-        regular_mesh = true;
+        uniformMesh = true;
+        regularMesh = true;
 
         if( Math.abs( dx - dy ) > tol && x_nodes > 1 && y_nodes > 1 )
         {
-            uniform_mesh = false;
+            uniformMesh = false;
         }
         if( Math.abs( dy - dz ) > tol && y_nodes > 1 && z_nodes > 1 )
         {
-            uniform_mesh = false;
+            uniformMesh = false;
         }
         if( Math.abs( dx - dz ) > tol && x_nodes > 1 && z_nodes > 1 )
         {
-            uniform_mesh = false;
+            uniformMesh = false;
         }
 
         for( int i = 0; i < x_coordinates.length; i++ )
@@ -421,11 +423,11 @@ public class CartesianMesh extends GeneralMesh
         }
 
         // make connections 
-        connected_voxel_indices = Arrays.copyOf( connected_voxel_indices, voxels.length );
+        connectedVoxelIndices = Arrays.copyOf( connectedVoxelIndices, voxels.length );
         //            connected_voxel_indices.resize( voxels.length );
-        voxel_faces = new VoxelFace[0];//.clear(); 
+        voxelFaces = new VoxelFace[0];//.clear(); 
 
-        for( int i = 0; i < connected_voxel_indices.length; i++ )
+        for( int i = 0; i < connectedVoxelIndices.length; i++ )
         {
             //                connected_voxel_indices[i].clear();//TODO: check
         }
@@ -471,7 +473,7 @@ public class CartesianMesh extends GeneralMesh
             }
         }
 
-        if( use_voxel_faces )
+        if( useVoxelFaces )
         {
             create_voxel_faces();
         }
@@ -497,12 +499,12 @@ public class CartesianMesh extends GeneralMesh
         y_coordinates = new double[y_nodes];
         z_coordinates = new double[z_nodes];
 
-        uniform_mesh = true;
-        regular_mesh = true;
+        uniformMesh = true;
+        regularMesh = true;
         double tol = 1e-16;
         if( Math.abs( dx - dy ) > tol || Math.abs( dy - dz ) > tol || Math.abs( dx - dz ) > tol )
         {
-            uniform_mesh = false;
+            uniformMesh = false;
         }
 
         for( int i = 0; i < x_coordinates.length; i++ )
@@ -559,11 +561,11 @@ public class CartesianMesh extends GeneralMesh
 
         // make connections 
 
-        connected_voxel_indices = VectorUtil.resize( connected_voxel_indices, voxels.length );
+        connectedVoxelIndices = VectorUtil.resize( connectedVoxelIndices, voxels.length );
         //            connected_voxel_indices.resize( voxels.length );
-        voxel_faces = new VoxelFace[0];//.clear(); 
+        voxelFaces = new VoxelFace[0];//.clear(); 
 
-        for( int i = 0; i < connected_voxel_indices.length; i++ )
+        for( int i = 0; i < connectedVoxelIndices.length; i++ )
         {
             //connected_voxel_indices[i].clear();//TODO: check
         }
@@ -613,7 +615,7 @@ public class CartesianMesh extends GeneralMesh
             }
         }
 
-        if( use_voxel_faces )
+        if( useVoxelFaces )
         {
             create_voxel_faces();
         }
@@ -622,110 +624,57 @@ public class CartesianMesh extends GeneralMesh
         return;
     }
 
-    void resize(int x_nodes, int y_nodes, int z_nodes)
+    void resize(int xNodes, int yNodes, int zNodes)
     {
-        resize( 0 - .5, x_nodes - 1 + .5, 0 - .5, y_nodes - 1 + .5, 0 - .5, z_nodes - 1 + .5, x_nodes, y_nodes, z_nodes );
+        resize( 0 - .5, xNodes - 1 + .5, 0 - .5, xNodes - 1 + .5, 0 - .5, zNodes - 1 + .5, xNodes, yNodes, zNodes );
 
     }
 
-    void resize_uniform(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end, double dx_new)
+    void resizeUniform(double xStart, double xEnd, double yStart, double yEnd, double zStart, double zEnd, double dxNew)
     {
-        resize( x_start, x_end, y_start, y_end, z_start, z_end, dx_new, dx_new, dx_new );
+        resize( xStart, xEnd, yStart, yEnd, zStart, zEnd, dxNew, dxNew, dxNew );
     }
 
-    public int nearest_voxel_index(double[] position)
+    public int nearestVoxelIndex(double[] position)
     {
         int i = (int)Math.floor( ( position[0] - boundingBox[0] ) / dx );
         int j = (int)Math.floor( ( position[1] - boundingBox[1] ) / dy );
         int k = (int)Math.floor( ( position[2] - boundingBox[2] ) / dz );
-        //  add some bounds checking -- truncate to inside the computational domain   
-        if( i >= x_coordinates.length )
-        {
-            i = x_coordinates.length - 1;
-        }
-        if( i < 0 )
-        {
-            i = 0;
-        }
-
-        if( j >= y_coordinates.length )
-        {
-            j = y_coordinates.length - 1;
-        }
-        if( j < 0 )
-        {
-            j = 0;
-        }
-
-        if( k >= z_coordinates.length )
-        {
-            k = z_coordinates.length - 1;
-        }
-        if( k < 0 )
-        {
-            k = 0;
-        }
-
+        i = PhysiCellUtilities.restrict( i, 0, x_coordinates.length - 1 );
+        j = PhysiCellUtilities.restrict( j, 0, y_coordinates.length - 1 );
+        k = PhysiCellUtilities.restrict( k, 0, z_coordinates.length - 1 );
         return ( k * y_coordinates.length + j ) * x_coordinates.length + i;
     }
 
-    int[] nearest_cartesian_indices(double[] position)
+    int[] nearestCartesianIndices(double[] position)
     {
         int[] out = new int[3];
-
         out[0] = (int)Math.floor( ( position[0] - boundingBox[0] ) / dx );
         out[1] = (int)Math.floor( ( position[1] - boundingBox[1] ) / dy );
         out[2] = (int)Math.floor( ( position[2] - boundingBox[2] ) / dz );
-
-        //  add some bounds checking -- truncate to inside the computational domain  
-
-        if( out[0] >= x_coordinates.length )
-        {
-            out[0] = x_coordinates.length - 1;
-        }
-        if( out[0] < 0 )
-        {
-            out[0] = 0;
-        }
-
-        if( out[1] >= y_coordinates.length )
-        {
-            out[1] = y_coordinates.length - 1;
-        }
-        if( out[1] < 0 )
-        {
-            out[1] = 0;
-        }
-
-        if( out[2] >= z_coordinates.length )
-        {
-            out[2] = z_coordinates.length - 1;
-        }
-        if( out[2] < 0 )
-        {
-            out[2] = 0;
-        }
-
+        out[0] = PhysiCellUtilities.restrict( out[0], 0, x_coordinates.length - 1 );
+        out[1] = PhysiCellUtilities.restrict( out[1], 0, y_coordinates.length - 1 );
+        out[2] = PhysiCellUtilities.restrict( out[2], 0, z_coordinates.length - 1 );
         return out;
     }
 
     Voxel nearest_voxel(double[] position)
     {
-        return voxels[nearest_voxel_index( position )];
+        return voxels[nearestVoxelIndex( position )];
     }
 
     @Override
-    public String display_information()
+    public String display()
     {
         StringBuilder sb = new StringBuilder();
         sb.append( "\n" );
-        if( uniform_mesh )
+        if( uniformMesh )
         {
             sb.append( "Uniform Cartesian Mesh" );
         }
         else
         {
-            if( regular_mesh )
+            if( regularMesh )
             {
                 sb.append( "Regular Cartesian Mesh" );
             }
@@ -740,168 +689,15 @@ public class CartesianMesh extends GeneralMesh
         sb.append( "[" + boundingBox[1] + "," + boundingBox[4] + "]" + "x" );
         sb.append( "[" + boundingBox[2] + "," + boundingBox[5] + "] " + units + "\n" );
         sb.append( "\tResolution: dx = " + dx );
-        if( !uniform_mesh )
+        if( !uniformMesh )
         {
             sb.append( ", dy = " + dy + " " + units );
             sb.append( ", dz = " + dz + " " + units );
         }
         sb.append( ",\tvoxels: " + voxels.length );
-        sb.append( ",\tvoxel faces: " + voxel_faces.length );
+        sb.append( ",\tvoxel faces: " + voxelFaces.length );
         sb.append( ",\tvolume: "
                 + ( boundingBox[3] - boundingBox[0] ) * ( boundingBox[4] - boundingBox[1] ) * ( boundingBox[5] - boundingBox[2] ) );
         return sb.toString();
     }
-
-
-    //
-    //        void read_from_matlab(String filename )
-    //        {
-    //            int size_of_each_datum; 
-    //            int number_of_data_entries; 
-    //            FILE* fp = read_matlab_header( &size_of_each_datum, &number_of_data_entries,  filename ); 
-    //
-    //            voxel_faces.resize( 0 ); 
-    //            
-    //            connected_voxel_indices.resize( 1 ); 
-    //            connected_voxel_indices[0].clear(); 
-    //                
-    //            Cartesian_mesh = true; 
-    //            uniform_mesh = false; 
-    //            regular_mesh = true; 
-    //            use_voxel_faces = false; 
-    //
-    //            // resize the internal data structure 
-    //
-    //            voxels.resize( number_of_data_entries );
-    //            connected_voxel_indices.resize( voxels.length ); 
-    //            
-    //            x_coordinates.resize( number_of_data_entries );
-    //            y_coordinates.resize( number_of_data_entries );
-    //            z_coordinates.resize( number_of_data_entries );
-    //            
-    //            // read in the data
-    //            // assumes each column has: x,y,z, dV
-    //            
-    //            bounding_box[0] = 9e99; 
-    //            bounding_box[1] = 9e99; 
-    //            bounding_box[2] = 9e99; 
-    //
-    //            bounding_box[3] = -9e99; 
-    //            bounding_box[4] = -9e99; 
-    //            bounding_box[5] = -9e99; 
-    //         
-    //                size_t result;
-    //            for( unsigned int i=0; i < number_of_data_entries ; i++ )
-    //            {
-    //                result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
-    //                result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
-    //                result = fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
-    //                result = fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
-    //                
-    //                // estimate the bounding box; 
-    //                if( voxels[i].center[0] < bounding_box[0] )
-    //                { bounding_box[0] = voxels[i].center[0]; }
-    //                if( voxels[i].center[0] > bounding_box[3] )
-    //                { bounding_box[3] = voxels[i].center[0]; }
-    //
-    //                if( voxels[i].center[1] < bounding_box[1] )
-    //                { bounding_box[1] = voxels[i].center[1]; }
-    //                if( voxels[i].center[1] > bounding_box[4] )
-    //                { bounding_box[4] = voxels[i].center[1]; }
-    //
-    //                if( voxels[i].center[2] < bounding_box[2] )
-    //                { bounding_box[2] = voxels[i].center[2]; }
-    //                if( voxels[i].center[2] > bounding_box[5] )
-    //                { bounding_box[5] = voxels[i].center[2]; }
-    //            } 
-    //            
-    //            // figure out dx, dy, dz 
-    //
-    //            double xmin = bounding_box[0]; // voxels[0].center[0]; 
-    //            double ymin = bounding_box[1]; // voxels[0].center[1]; 
-    //            double zmin = bounding_box[2]; // voxels[0].center[2]; 
-    //
-    //            // int n = voxels.size(); 
-    //            double xmax = bounding_box[3]; // voxels[n-1].center[0]; 
-    //            double ymax = bounding_box[4]; // voxels[n-1].center[1]; 
-    //            double zmax = bounding_box[5]; // voxels[n-1].center[2]; 
-    //
-    //            // figure out number of x nodes  
-    //            int xnodes = 0; 
-    //            while( fabs( voxels[xnodes].center[0] - xmax ) > 1e-15 )
-    //            { xnodes++; }
-    //            xnodes++; 
-    //
-    //            // figure out number of y nodes 
-    //            int ynodes = 0; 
-    //
-    //            while( fabs( voxels[ynodes*xnodes].center[1] - ymax ) > 1e-15 )
-    //            { ynodes += 1; }
-    //            ynodes++;
-    //
-    //            // figure out number of z nodes 
-    //
-    //            int znodes = 0; 
-    //
-    //            while( fabs( voxels[ynodes*xnodes*znodes].center[2] - zmax ) > 1e-15 )
-    //            { znodes += 1; }
-    //            znodes++;
-    //
-    //            // figure out differentials
-    //
-    //            dx = ( xmax - xmin ) / ( (double) xnodes - 1.0  ); 
-    //            dy = ( ymax - ymin ) / ( (double) ynodes - 1.0  ); 
-    //            dz = ( zmax - zmin ) / ( (double) znodes - 1.0  ); 
-    //            
-    //            dV = dx*dy*dz; 
-    //            dS = dx*dy;
-    //
-    //            dS_xy = dx*dy;
-    //            dS_yz = dy*dz; 
-    //            dS_xz = dx*dz;
-    //
-    //            uniform_mesh = true; 
-    //            double tol = 1e-16; 
-    //            if( fabs( dx - dy ) > tol || fabs( dy - dz ) > tol || fabs( dx - dz ) > tol )
-    //            { uniform_mesh = false; }
-    //            
-    //            // correct the bounding box 
-    //            
-    //            double half_step = dx * 0.5; 
-    //            
-    //            bounding_box[0] -= half_step; 
-    //            bounding_box[3] += half_step;
-    //            
-    //            half_step = dy * 0.5; 
-    //            bounding_box[1] -= half_step; 
-    //            bounding_box[4] += half_step;
-    //            
-    //            half_step = dz * 0.5; 
-    //            bounding_box[2] -= half_step; 
-    //            bounding_box[5] += half_step;
-    //         
-    //            // write out the x,y,z coordinates; 
-    //            x_coordinates.resize( xnodes ); 
-    //            y_coordinates.resize( ynodes ); 
-    //            z_coordinates.resize( znodes ); 
-    //
-    //            for(  int i=0; i < x_coordinates.length ; i++ )
-    //            { x_coordinates[i] = xmin + i*dx ;   }
-    //
-    //            for(  int i=0; i < y_coordinates.length ; i++ )
-    //            { y_coordinates[i] = ymin + i*dy ; }
-    //
-    //            for(  int i=0; i < z_coordinates.length ; i++ )
-    //            { z_coordinates[i] = zmin + i*dz ; }
-    //
-    //            dV = dx*dy*dz; 
-    //            
-    //            units = "none";  
-    //            
-    //            // still need to figure out connected indices later 
-    //            std::cout << "Warning: Cartesian_Mesh::read_from_matlab is incomplete. No connection information read." << std::endl; 
-    //
-    //            fclose( fp) ; 
-    //            return; 
-    //        }
 }

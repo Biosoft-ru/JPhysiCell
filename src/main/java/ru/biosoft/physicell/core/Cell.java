@@ -245,19 +245,19 @@ public class Cell extends BasicAgent
         //        std::vector<double> old_position(position);
 
         VectorUtil.axpy( position, d1, velocity );
-        VectorUtil.axpy( position, d2, previous_velocity );
+        VectorUtil.axpy( position, d2, prevVelocity );
         // overwrite previous_velocity for future use 
         // if(sqrt(dist(old_position, position))>3* phenotype.geometry.radius)
         // std::cout<<sqrt(dist(old_position, position))<<"old_position: "<<old_position<<", new position: "<< position<<", velocity: "<<velocity<<", previous_velocity: "<< previous_velocity<<std::endl;
 
-        previous_velocity = velocity.clone();
+        prevVelocity = velocity.clone();
 
         velocity[0] = 0;
         velocity[1] = 0;
         velocity[2] = 0;
         if( get_container().underlying_mesh.isPositionValid( position[0], position[1], position[2] ) )
         {
-            updated_current_mechanics_voxel_index = get_container().underlying_mesh.nearest_voxel_index( position );
+            updated_current_mechanics_voxel_index = get_container().underlying_mesh.nearestVoxelIndex( position );
         }
         else
         {
@@ -282,7 +282,7 @@ public class Cell extends BasicAgent
         cell.removeAllSpringAttachments();
 
         // released internalized substrates (as of 1.5.x releases)
-        cell.release_internalized_substrates();
+        cell.releaseSubstrates();
 
         // performance goal: don't delete in the middle -- very expensive reallocation
         // alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
@@ -555,9 +555,9 @@ public class Cell extends BasicAgent
 
     public void setPreviousVelocity(double xV, double yV, double zV)
     {
-        previous_velocity[0] = xV;
-        previous_velocity[1] = yV;
-        previous_velocity[2] = zV;
+        prevVelocity[0] = xV;
+        prevVelocity[1] = yV;
+        prevVelocity[2] = zV;
     }
 
     @Override
@@ -570,7 +570,7 @@ public class Cell extends BasicAgent
         // update microenvironment current voxel index
         updateVoxelIndex();
         // update current_mechanics_voxel_index
-        currentMechanicsVoxelIndex = get_container().underlying_mesh.nearest_voxel_index( position );
+        currentMechanicsVoxelIndex = get_container().underlying_mesh.nearestVoxelIndex( position );
 
         // Since it is most likely our first position, we update the max_cell_interactive_distance_in_voxel
         // which was not initialized at cell creation
@@ -838,7 +838,7 @@ public class Cell extends BasicAgent
     {
         if( currentVoxelIndex == -1 )
             return new double[] { -1};
-        return getMicroenvironment().nearest_density_vector( this.currentVoxelIndex );//current_voxel_index );
+        return getMicroenvironment().nearestDensity( this.currentVoxelIndex );//current_voxel_index );
     }
 
     public void ingestCell(Cell pCell_to_eat)
@@ -926,7 +926,7 @@ public class Cell extends BasicAgent
             // multiply by the fraction that is supposed to be ingested (for each substrate) 
             //            *(pCell_to_eat.internalized_substrates) *= 
             //                *(pCell_to_eat.fraction_transferred_when_ingested); // 
-            VectorUtil.prod( pCell_to_eat.internalizedSubstrates, pCell_to_eat.fraction_transferred_when_ingested );
+            VectorUtil.prod( pCell_to_eat.internalizedSubstrates, pCell_to_eat.fractionTransferredIngested );
 
             //            *internalized_substrates += *(pCell_to_eat.internalized_substrates);
             VectorUtil.sum( internalizedSubstrates, pCell_to_eat.internalizedSubstrates );
@@ -1261,13 +1261,13 @@ public class Cell extends BasicAgent
 
     public double[] nearest_gradient(int substrate_index)
     {
-        return getMicroenvironment().gradient_vector( currentVoxelIndex )[substrate_index];
+        return getMicroenvironment().getGradient( currentVoxelIndex )[substrate_index];
     }
 
     public double[] nearestGradient(String substrate)
     {
         int index = getMicroenvironment().findDensityIndex( substrate );
-        return getMicroenvironment().gradient_vector( currentVoxelIndex )[index];
+        return getMicroenvironment().getGradient( currentVoxelIndex )[index];
     }
 
 

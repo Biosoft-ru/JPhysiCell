@@ -173,7 +173,7 @@ public class TestHDS
         double mechanics_voxel_size = 30;
         CellContainer.createCellContainer( microenvironment, mechanics_voxel_size );
 
-        for( int n = 0; n < microenvironment.number_of_voxels(); n++ )
+        for( int n = 0; n < microenvironment.numberVoxels(); n++ )
             microenvironment.getDensity( n )[0] = o2_conc;
 
         // register substrates properties 
@@ -228,7 +228,7 @@ public class TestHDS
         double max_z = microenvironment.mesh.boundingBox[5];
         double strip_width = 40;
 
-        for( int i = 0; i < microenvironment.number_of_voxels(); i++ )
+        for( int i = 0; i < microenvironment.numberVoxels(); i++ )
         {
             if( Math.abs( max_x - microenvironment.voxels( i ).center[0] ) < strip_width
                     || Math.abs( microenvironment.voxels( i ).center[0] - min_x ) < strip_width
@@ -237,7 +237,7 @@ public class TestHDS
                     || Math.abs( max_z - microenvironment.voxels( i ).center[2] ) < strip_width
                     || Math.abs( microenvironment.voxels( i ).center[2] - min_z ) < strip_width )
             {
-                microenvironment.add_dirichlet_node( i, dirichlet_o2 );
+                microenvironment.addDirichletNode( i, dirichlet_o2 );
             }
         }
 
@@ -285,8 +285,8 @@ public class TestHDS
                     listener.saveResult( microenvironment, t );
                 t_next_output_time += t_output_interval;
             }
-            microenvironment.simulate_cell_sources_and_sinks( dt );
-            microenvironment.simulate_diffusion_decay( dt );
+            microenvironment.simulateSourcesSinks( dt );
+            microenvironment.simulateDiffusionDecay( dt );
             ( (CellContainer)microenvironment.agentContainer ).updateAllCells( microenvironment, t, cell_cycle_dt, mechanics_dt, dt );
             t += dt;
             //                output_index++;

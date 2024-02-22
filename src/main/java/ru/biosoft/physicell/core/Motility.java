@@ -102,8 +102,8 @@ public class Motility implements Cloneable
 
     void sync(Microenvironment m)
     {
-        chemotacticSensitivities = VectorUtil.resize( chemotacticSensitivities, m.number_of_densities(), 0 );
-        substrates = m.density_names;
+        chemotacticSensitivities = VectorUtil.resize( chemotacticSensitivities, m.numberDensities(), 0 );
+        substrates = m.densityNames;
     }
 
     public void setChemotacticSensitivity(int index, double value)

@@ -148,7 +148,7 @@ public class TestDCIS
         double mechanics_voxel_size = 30;
         CellContainer.createCellContainer( m, mechanics_voxel_size );
 
-        for( int n = 0; n < m.number_of_voxels(); n++ )
+        for( int n = 0; n < m.numberVoxels(); n++ )
             m.getDensity( n )[0] = o2_conc;
 
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
@@ -189,18 +189,18 @@ public class TestDCIS
         //add Dirichlet node for all the voxels located outside of the duct
         //	std::vector<double> dirichlet_o2( 1 , o2_conc );
         double[] dirichlet_o2 = new double[] {o2_conc};
-        for( int i = 0; i < m.number_of_voxels(); i++ )
+        for( int i = 0; i < m.numberVoxels(); i++ )
         {
             if( m.voxels( i ).center[0] >= 0 )
             {
                 if( Math.sqrt( m.voxels( i ).center[1] * m.voxels( i ).center[1]
                         + m.voxels( i ).center[2] * m.voxels( i ).center[2] ) > duct_radius )
-                    m.add_dirichlet_node( i, dirichlet_o2 );
+                    m.addDirichletNode( i, dirichlet_o2 );
             }
             else
             {
                 if( VectorUtil.dist( m.voxels( i ).center, new double[] {0.0, 0.0, 0.0} ) > duct_radius )
-                    m.add_dirichlet_node( i, dirichlet_o2 );
+                    m.addDirichletNode( i, dirichlet_o2 );
             }
         }
 
@@ -235,8 +235,8 @@ public class TestDCIS
                 Output.writePov( m.getAgents( Cell.class ), t, 1000.0, resultPath + "/result_" + counter + ".pov" );
                 counter++;
             }
-            m.simulate_cell_sources_and_sinks( dt );
-            m.simulate_diffusion_decay( dt );
+            m.simulateSourcesSinks( dt );
+            m.simulateDiffusionDecay( dt );
             ( (CellContainer)m.agentContainer ).updateAllCells( m, t, cell_cycle_dt, mechanics_dt, dt );
             t += dt;
         }
