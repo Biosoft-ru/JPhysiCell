@@ -5,7 +5,7 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellFunctions.DistanceCalculator;
 import ru.biosoft.physicell.core.Phenotype;
 
-public class DomainEdgeDistance implements DistanceCalculator
+public class DomainEdgeDistance extends DistanceCalculator
 {
     double tolerance = 1e-7;
     double one_over_sqrt_2 = 0.70710678118;

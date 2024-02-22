@@ -54,6 +54,15 @@ import ru.biosoft.physicell.core.PhysiCellUtilities;
 public class VectorUtil
 {
     /**
+     * Zero out all array elements
+     * */
+    public static void zero(double[] v)
+    {
+        for( int i = 0; i < v.length; i++ )
+            v[i] = 0;
+    }
+
+    /**
     * Creates new array with values v1[i] - v2[i]
     */
     public static double[] newDiff(double[] v1, double[] v2)

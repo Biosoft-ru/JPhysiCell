@@ -3,11 +3,11 @@ package ru.biosoft.physicell.sample_projects.cancer_biorobots;
 import java.util.Set;
 
 import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellFunctions.CustomCellRule;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.SignalBehavior;
-import ru.biosoft.physicell.core.CellFunctions.custom_cell_rule;
 
-public class WorkerCellRule implements custom_cell_rule
+public class WorkerCellRule extends CustomCellRule
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
@@ -18,7 +18,7 @@ public class WorkerCellRule implements custom_cell_rule
             // since those are part of mechanics.
 
             // Let's just fully disable now.
-            pCell.functions.custom_cell_rule = null;
+            pCell.functions.customCellRule = null;
             return;
         }
 

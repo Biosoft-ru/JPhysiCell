@@ -3,10 +3,10 @@ package ru.biosoft.physicell.sample_projects.virus_macrophage;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellFunctions.CustomCellRule;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.CellFunctions.custom_cell_rule;
 
-public class AvoidBoundaries implements custom_cell_rule
+public class AvoidBoundaries extends CustomCellRule
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)

@@ -112,9 +112,9 @@ public class CancerBiorobots
 
         // set functions
         pCD.functions.updatePhenotype = new CargoPhenotype();
-        pCD.functions.custom_cell_rule = new CargoCellRule();
-        pCD.functions.contact_function = new BiorobotsContact();
-        pCD.functions.update_migration_bias = null;
+        pCD.functions.customCellRule = new CargoCellRule();
+        pCD.functions.contact = new BiorobotsContact();
+        pCD.functions.updateMigration = null;
 
         // worker cells
         pCD = CellDefinition.getCellDefinition( "worker cell" );
@@ -125,8 +125,8 @@ public class CancerBiorobots
                 / pCD.phenotype.geometry.radius;
         pCD.phenotype.mechanics.attachmentElasticConstant = pCD.custom_data.get( "elastic_coefficient" );
         pCD.functions.updatePhenotype = null; // worker_cell_rule;
-        pCD.functions.custom_cell_rule = new WorkerCellRule();
-        pCD.functions.contact_function = new BiorobotsContact();
+        pCD.functions.customCellRule = new WorkerCellRule();
+        pCD.functions.contact = new BiorobotsContact();
 
         /*
          * This builds the map of cell definitions and summarizes the setup.

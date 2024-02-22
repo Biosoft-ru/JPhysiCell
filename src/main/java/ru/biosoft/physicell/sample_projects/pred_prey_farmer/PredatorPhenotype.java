@@ -5,69 +5,42 @@ import java.util.List;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
+import ru.biosoft.physicell.core.Phenotype;
+import ru.biosoft.physicell.core.PhysiCellUtilities;
 
-/* predator functions */
+/**
+ * Predator phenotype:  
+ * 1. If prey is in range - eat it and gain energy 
+ * 2. Energy decays through time 
+ * 2. If low on energy - die 
+ */
 public class PredatorPhenotype extends UpdatePhenotype
 {
+    private double maxDetectionDistance = 2;
+    private double decayRate = 0.00025;
+    CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
+
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        CellDefinition pFarmerDef = CellDefinition.getCellDefinition( "farmer" );
-        CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
-        CellDefinition pPredDef = CellDefinition.getCellDefinition( "predator" );
-
-        // hunting 
-
-        double max_detection_distance = 2;
-
-        // see who is nearby 
-
-        List<Cell> nearby = PredPreyFarmer.get_possible_neighbors( pCell );
-
-        for( int i = 0; i < nearby.size(); i++ )
+        List<Cell> nearby = PhysiCellUtilities.getNeighbors( pCell );
+        for( Cell prey : nearby )
         {
-            Cell pC = nearby.get( i );
-            // is it prey ? 
-
-            if( pC.type == pPreyDef.type )
+            if( prey.type == pPreyDef.type )
             {
-                boolean eat_it = true;
-                // in range? 
-                double[] displacement = VectorUtil.newDiff( pC.position, pCell.position );
-                //			displacement -= pCell.position; 
-                double distance = VectorUtil.norm( displacement );
-                if( distance > pCell.phenotype.geometry.radius + pC.phenotype.geometry.radius + max_detection_distance )
+                double distance = VectorUtil.dist( prey.position, pCell.position );
+                if( distance <= pCell.phenotype.geometry.radius + prey.phenotype.geometry.radius + maxDetectionDistance )
                 {
-                    eat_it = false;
-                }
-
-                // am I hungry? 
-
-                if( eat_it == true )
-                {
-                    // eat it! 
-                    pCell.ingestCell( pC );
-
-                    // increase energy 
+                    pCell.ingestCell( prey );
                     pCell.custom_data.set( "energy", pCell.custom_data.get( "energy" ) + 100 );
-                    //                pCell.custom_data["energy"] += 100; 	
                 }
             }
         }
 
-        // update energy 
+        pCell.custom_data.set( "energy", pCell.custom_data.get( "energy" ) / ( 1.0 + dt * decayRate ) );
 
-        double decay_rate = 0.00025;
-        pCell.custom_data.set( "energy", pCell.custom_data.get( "energy" ) / ( 1.0 + dt * decay_rate ) );
-        //    pCell.custom_data["energy"] /= ( 1.0 + dt * decay_rate );
-
-        // low energy kills
-
-        // death based on food
         int nNecrosis = phenotype.death.findDeathModelIndex( "necrosis" );
-
         if( pCell.custom_data.get( "energy" ) < 0.1 )
         {
             pCell.startDeath( nNecrosis );

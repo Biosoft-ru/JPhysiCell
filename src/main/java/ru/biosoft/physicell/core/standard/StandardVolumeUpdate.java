@@ -1,11 +1,11 @@
 package ru.biosoft.physicell.core.standard;
 
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.core.CellFunctions;
+import ru.biosoft.physicell.core.CellFunctions.VolumeUpdate;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.Volume;
 
-public class StandardVolumeUpdate implements CellFunctions.VolumeUpdate
+public class StandardVolumeUpdate extends VolumeUpdate
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
@@ -39,5 +39,11 @@ public class StandardVolumeUpdate implements CellFunctions.VolumeUpdate
         v.fluid_fraction = v.fluid / ( 1e-16 + v.total );
 
         phenotype.geometry.update( pCell, phenotype, dt );
+    }
+
+    @Override
+    public String display()
+    {
+        return "Standard volume update.";
     }
 }

@@ -68,4 +68,9 @@ public class DifferentiatedPhenotype extends UpdatePhenotype
         phenotype.death.rates.set( nApoptosis, base_val + ( max_response - base_val ) * hill );
     }
 
+    @Override
+    public String display()
+    {
+        return "Resource reduces necrosis. " + "Toxin increases apoptosis.";
+    }
 }

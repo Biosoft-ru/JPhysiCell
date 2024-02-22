@@ -4,10 +4,10 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.BasicSignaling;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 
 public class StemPhenotype extends UpdatePhenotype
 {
@@ -41,7 +41,6 @@ public class StemPhenotype extends UpdatePhenotype
         double toxin = samples[nTox];
 
         // sample contacts 
-
         int stem_type = CellDefinition.getCellDefinition( "stem" ).type;
         int diff_type = CellDefinition.getCellDefinition( "differentiated" ).type;
         int bacteria_type = CellDefinition.getCellDefinition( "bacteria" ).type;
@@ -122,6 +121,12 @@ public class StemPhenotype extends UpdatePhenotype
 
         hill = BasicSignaling.Hill_response_function( signal, toxicity_halfmax, 1.5 );
         phenotype.death.rates.set( nApoptosis, base_val + ( max_val - base_val ) * hill );
+    }
 
+    @Override
+    public String display()
+    {
+        return "Contact with a stem cell increases differentiation." + " Contact with a differentiated cell reduces proliferation."
+                + " Toxin increases apoptosis.";
     }
 }

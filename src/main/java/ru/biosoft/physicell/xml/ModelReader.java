@@ -267,7 +267,7 @@ public class ModelReader extends Constants
                         boolean virtual_wall_at_domain_edge = getBoolVal( el );
                         if( virtual_wall_at_domain_edge )
                             StandardModels
-                                    .getDefaultCellDefinition().functions.add_cell_basement_membrane_interactions = new DomainEdgeAvoidance();
+                                    .getDefaultCellDefinition().functions.membraneInteraction = new DomainEdgeAvoidance();
                         break;
                     }
                     catch( Exception ex )
@@ -945,7 +945,7 @@ public class ModelReader extends Constants
                         boolean enabled = getBoolVal( findElement( chemotaxisElement, "enabled" ) );
                         if( enabled )
                         {
-                            cd.functions.update_migration_bias = new Chemotaxis();
+                            cd.functions.updateMigration = new Chemotaxis();
 
                             // search for the right chemo index               
                             String substrate_name = getVal( findElement( chemotaxisElement, "substrate" ) );
@@ -972,7 +972,7 @@ public class ModelReader extends Constants
                         if( getBoolVal( findElement( advancedChemotaxisElement, "enabled" ) ) )
                         {
                             //                            cd.functions.update_migration_bias = new StandardModels.chemotaxis_function();
-                            if( cd.functions.update_migration_bias instanceof Chemotaxis )
+                            if( cd.functions.updateMigration instanceof Chemotaxis )
                             {
                                 System.out.println( "Warning: when processing motility for " + cd.name + " cells: \n"
                                         + "\tBoth chemotaxis and advanced_chemotaxis are enabled.\n"
@@ -980,9 +980,9 @@ public class ModelReader extends Constants
                             }
 
                             if( getBoolAttr( advancedChemotaxisElement, "normalize_each_gradient" ) )
-                                cd.functions.update_migration_bias = new AdvancedChemotaxisNormalized();
+                                cd.functions.updateMigration = new AdvancedChemotaxisNormalized();
                             else
-                                cd.functions.update_migration_bias = new AdvancedChemotaxis();
+                                cd.functions.updateMigration = new AdvancedChemotaxis();
 
                             Element sensitivityEl = findElement( advancedChemotaxisElement, "chemotactic_sensitivities" );
                             if( sensitivityEl != null )

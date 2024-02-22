@@ -7,14 +7,17 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
 import ru.biosoft.physicell.core.Model.Event;
+import ru.biosoft.physicell.core.PhysiCellUtilities;
 
 public class ImmunityEvent extends Event
 {
-    public ImmunityEvent(double executionTime)
+    private boolean use2d;
+    
+    public ImmunityEvent(double executionTime, boolean use2d)
     {
         super( executionTime );
+        this.use2d = use2d;
     }
 
     @Override
@@ -22,10 +25,10 @@ public class ImmunityEvent extends Event
     {
         System.out.println( "Therapy started!" );
         model.setSaveInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 
-        introduceOmmuneCells( model );
+        introduceOmmuneCells( model, use2d );
     }
     
-    public static void introduceOmmuneCells(Model model)
+    public static void introduceOmmuneCells(Model model, boolean use2d)
     {
         CellDefinition cd = CellDefinition.getCellDefinition( "immune cell" );
         Microenvironment m = model.getMicroenvironment();
@@ -62,7 +65,7 @@ public class ImmunityEvent extends Event
         double mean_radius = 0.5 * ( radius_inner + radius_outer );
         double std_radius = 0.33 * ( radius_outer - radius_inner ) / 2.0;
 
-        if( CancerImmune.use2D )
+        if( use2d )
         {
             number_of_immune_cells /= 10;
             for( int i = 0; i < number_of_immune_cells; i++ )

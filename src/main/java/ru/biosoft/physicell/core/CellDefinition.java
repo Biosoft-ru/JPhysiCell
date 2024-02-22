@@ -164,14 +164,14 @@ public class CellDefinition
         // set up the default functions 
         functions.instantiate_cell = null;
         functions.updateVolume = null; // standard_volume_update_function;
-        functions.update_migration_bias = null;
+        functions.updateMigration = null;
 
         functions.updatePhenotype = null;
-        functions.custom_cell_rule = null;
+        functions.customCellRule = null;
 
         functions.updateVelocity = null; // standard_update_cell_velocity;
-        functions.add_cell_basement_membrane_interactions = null;
-        functions.calculate_distance_to_membrane = null;
+        functions.membraneInteraction = null;
+        functions.membraneDistanceCalculator = null;
         functions.set_orientation = null;
     }
 

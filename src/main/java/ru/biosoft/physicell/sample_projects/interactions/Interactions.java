@@ -76,15 +76,13 @@ public class Interactions
 
     public static void init(Model model)
     {
+        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
         createCellTypes( model );
         setupTissue( model );
     }
 
     static void createCellTypes(Model model)
     {
-        // set the random seed 
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        // set up bacteria 
         CellDefinition pCD = CellDefinition.getCellDefinition( "bacteria" );
         pCD.functions.updatePhenotype = new BacteriaPhenotype();
         // pCD.functions.update_migration_bias = advanced_chemotaxis_function; 
@@ -129,58 +127,12 @@ public class Interactions
     static void setupTissue(Model model)
     {
         Microenvironment m = model.getMicroenvironment();
-        double xMin = m.mesh.boundingBox[0];
-        double yMin = m.mesh.boundingBox[1];
-        double zMin = m.mesh.boundingBox[2];
-        double xMax = m.mesh.boundingBox[3];
-        double yMax = m.mesh.boundingBox[4];
-        double zMax = m.mesh.boundingBox[5];
-
-        if( m.options.simulate2D == true )
-        {
-            zMin = 0.0;
-            zMax = 0.0;
-        }
-
-        double[] box = new double[] {xMin, yMin, zMin, xMax, yMax, zMax};
-        // create some of each type of cell 
-        for( CellDefinition pCD : CellDefinition.getCellDefinitions() )
-        {
-            int num_cells = model.getParameterInt( "number_of_cells" );
-            if( num_cells > 0 )
-            {
-                System.out.println( "Placing cells of type " + pCD.name + " ... " );
-                PhysiCellUtilities.placeInBox( box, pCD, num_cells, m );
-            }
-        }
-        CellDefinition pCD = CellDefinition.getCellDefinition( "bacteria" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_bacteria" ), m );
-
-        pCD = CellDefinition.getCellDefinition( "blood vessel" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_blood_vessels" ), m );
-
-        pCD = CellDefinition.getCellDefinition( "stem" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_stem_cells" ), m );
-
-        pCD = CellDefinition.getCellDefinition( "differentiated" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_differentiated_cells" ), m );
-
-        pCD = CellDefinition.getCellDefinition( "macrophage" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_macrophages" ), m );
-
-        pCD = CellDefinition.getCellDefinition( "neutrophil" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_neutrophils" ), m );
- 
-        pCD = CellDefinition.getCellDefinition( "CD8+ T cell" );
-        System.out.println( "Placing cells of type " + pCD.name + " ... " );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_CD8T_cells" ), m );
+        PhysiCellUtilities.place( m, "bacteria", model.getParameterInt( "number_of_bacteria" ) );
+        PhysiCellUtilities.place( m, "blood vessel", model.getParameterInt( "number_of_blood_vessels" ) );
+        PhysiCellUtilities.place( m, "stem", model.getParameterInt( "number_of_stem_cells" ) );
+        PhysiCellUtilities.place( m, "differentiated", model.getParameterInt( "number_of_differentiated_cells" ) );
+        PhysiCellUtilities.place( m, "macrophage", model.getParameterInt( "number_of_macrophages" ) );
+        PhysiCellUtilities.place( m, "neutrophil", model.getParameterInt( "number_of_neutrophils" ) );
+        PhysiCellUtilities.place( m, "CD8+ T cell", model.getParameterInt( "number_of_CD8T_cells" ) );
     }
-
-
 }

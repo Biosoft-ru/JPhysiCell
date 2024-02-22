@@ -4,25 +4,23 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.BasicSignaling;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 
 public class BacteriaPhenotype extends UpdatePhenotype
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-
-        // find my cell definition 
         CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
 
-        Microenvironment microenvironment = pCell.getMicroenvironment();
+        Microenvironment m = pCell.getMicroenvironment();
         // sample resource, quorum, and toxin 
-        int nR = microenvironment.findDensityIndex( "resource" );
-        int nDebris = microenvironment.findDensityIndex( "debris" );
-        int nQuorum = microenvironment.findDensityIndex( "quorum" );
-        int nToxin = microenvironment.findDensityIndex( "toxin" );
+        int nR = m.findDensityIndex( "resource" );
+        int nDebris = m.findDensityIndex( "debris" );
+        int nQuorum = m.findDensityIndex( "quorum" );
+        int nToxin = m.findDensityIndex( "toxin" );
 
         // if dead: stop exporting quorum factor. 
         // also, replace phenotype function 
@@ -49,7 +47,6 @@ public class BacteriaPhenotype extends UpdatePhenotype
         phenotype.cycle.data.setExitRate( 0, max_val * BasicSignaling.linear_response_function( R, min_cycle_resource, 1 ) );
 
         // resource decreses necrosis
-
         max_val = 0.0028;
         int nNecrosis = phenotype.death.findDeathModelIndex( PhysiCellConstants.necrosis_death_model );
         double saturation_necrosis_resource = pCD.custom_data.get( "necrosis_saturation_resource" ); //0.075
@@ -58,7 +55,6 @@ public class BacteriaPhenotype extends UpdatePhenotype
                 * BasicSignaling.decreasing_linear_response_function( R, saturation_necrosis_resource, threshold_necrosis_resource ) );
 
         // resource decreases motile speed  
-
         double signal = R;
         base_val = pCD.phenotype.motility.migrationSpeed;
         double max_response = 0.0;
@@ -88,5 +84,12 @@ public class BacteriaPhenotype extends UpdatePhenotype
         // 36 // parameters.doubles("bacteria_damage_halfmax");
         hill = BasicSignaling.Hill_response_function( signal, damage_halfmax, 1.5 );
         phenotype.death.rates.set( nApoptosis, base_val + ( max_response - base_val ) * hill );
+    }
+
+    @Override
+    public String display()
+    {
+        return "Resource decrease necrosis and motility, also stimulate division." + " Resource AND quorum increase motility."
+                + " Damage stimulates apoptosis";
     }
 }

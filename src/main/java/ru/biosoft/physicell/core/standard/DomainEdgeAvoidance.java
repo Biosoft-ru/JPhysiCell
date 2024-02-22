@@ -2,21 +2,21 @@ package ru.biosoft.physicell.core.standard;
 
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellFunctions.MembraneInteractions;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.CellFunctions.CellMembraneInteractions;
 
-public class DomainEdgeAvoidance implements CellMembraneInteractions
+public class DomainEdgeAvoidance extends MembraneInteractions
 {
-    public void execute(Cell pCell, Phenotype phenotype, double dt)
+    public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        if( pCell.functions.calculate_distance_to_membrane == null )
+        if( pCell.functions.membraneDistanceCalculator == null )
         {
-            pCell.functions.calculate_distance_to_membrane = new DomainEdgeDistance();
+            pCell.functions.membraneDistanceCalculator = new DomainEdgeDistance();
         }
         phenotype.mechanics.cellBMRepulsionStrength = 100;
 
         double max_interactive_distance = phenotype.mechanics.relMaxAdhesionDistance * phenotype.geometry.radius;
-        double distance = pCell.functions.calculate_distance_to_membrane.execute( pCell, phenotype, dt );
+        double distance = pCell.functions.membraneDistanceCalculator.execute( pCell, phenotype, dt );
         //Note that the distance_to_membrane function must set displacement values (as a normal vector)
 
         // Repulsion from basement membrane

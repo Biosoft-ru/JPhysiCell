@@ -80,6 +80,7 @@ public class VirusMacrophage
 
     public static void init(Model model) throws Exception
     {
+        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
         createCellTypes( model );
         setupTissue( model );
         model.getVisualizers().forEach( v -> v.setAgentVisualizer( new VirusVisualizer( model ) ) );
@@ -88,7 +89,7 @@ public class VirusMacrophage
     static void createCellTypes(Model model) throws Exception
     {
         Microenvironment microenvironment = model.getMicroenvironment();
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
+
         // first find index for a few key variables. 
         int virus_index = microenvironment.findDensityIndex( "virus" );
         int nInterferon = microenvironment.findDensityIndex( "interferon" );
@@ -110,7 +111,7 @@ public class VirusMacrophage
         pMacrophage.phenotype.molecular.fraction_transferred_when_ingested[virus_index] = 0.0;
 
         pMacrophage.functions.updatePhenotype = new Macrophage();
-        pMacrophage.functions.custom_cell_rule = new AvoidBoundaries();
+        pMacrophage.functions.customCellRule = new AvoidBoundaries();
     }
 
     static void setupTissue(Model model)

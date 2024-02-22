@@ -1,10 +1,6 @@
 package ru.biosoft.physicell.sample_projects.pred_prey_farmer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
@@ -79,6 +75,7 @@ public class PredPreyFarmer
 {
     public static void init(Model model)
     {
+        //        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
         createCellTypes( model );
         setupTissue( model );
         model.getVisualizers().forEach( v -> v.setAgentVisualizer( new PPFVisualizer() ) );
@@ -86,103 +83,27 @@ public class PredPreyFarmer
 
     static void createCellTypes(Model model)
     {
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-
-        //	cell_defaults.functions.update_phenotype = phenotype_function; 
-        //	cell_defaults.functions.custom_cell_rule = custom_function; 
-
         CellDefinition pFarmerDef = CellDefinition.getCellDefinition( "farmer" );
-        CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
-        CellDefinition pPredDef = CellDefinition.getCellDefinition( "predator" );
-
-        pFarmerDef.functions.custom_cell_rule = new FarmerCustomRule();
+        pFarmerDef.functions.customCellRule = null;//new WrapBoundariesRule();//   AvoidBoundariesRule();
         pFarmerDef.functions.updatePhenotype = null;
-        pFarmerDef.functions.update_migration_bias = null;
-        // pFarmerDef.functions.update_phenotype = prey_phenotype_function; 
-        // pFarmerDef.functions.update_migration_bias = prey_motility_function; 
+        pFarmerDef.functions.updateMigration = null;//new WeightedMotility();
 
-        pPreyDef.functions.custom_cell_rule = new PreyCustomRule();
+        CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
+        pPreyDef.functions.customCellRule = new WrapBoundariesRule();//AvoidBoundariesRule();
         pPreyDef.functions.updatePhenotype = new PreyPhenotype();
-        pPreyDef.functions.update_migration_bias = new PreyMotility();
+        pPreyDef.functions.updateMigration = new WeightedMotility();
 
-        pPredDef.functions.custom_cell_rule = new PredatorCustomRule();
+        CellDefinition pPredDef = CellDefinition.getCellDefinition( "predator" );
+        pPredDef.functions.customCellRule = new WrapBoundariesRule();//AvoidBoundariesRule();
         pPredDef.functions.updatePhenotype = new PredatorPhenotype();
-        pPredDef.functions.update_migration_bias = new PredatorMotility();
+        pPredDef.functions.updateMigration = new WeightedMotility();
     }
 
     static void setupTissue(Model model)
     {
-        Microenvironment microenvironment = model.getMicroenvironment();
-        double xMin = microenvironment.mesh.boundingBox[0];
-        double yMin = microenvironment.mesh.boundingBox[1];
-        double zMin = microenvironment.mesh.boundingBox[2];
-
-        double xMax = microenvironment.mesh.boundingBox[3];
-        double yMax = microenvironment.mesh.boundingBox[4];
-        double zMax = microenvironment.mesh.boundingBox[5];
-
-        if( microenvironment.options.simulate2D )
-        {
-            zMin = 0.0;
-            zMax = 0.0;
-        }
-
-        //        double Xrange = Xmax - Xmin;
-        //        double Yrange = Ymax - Ymin;
-        //        double Zrange = Zmax - Zmin;
-
-        double[] box = new double[] {xMin, yMin, zMin, xMax, yMax, zMax};
-        CellDefinition pCD = CellDefinition.getCellDefinition( "farmer" );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_farmers" ), microenvironment );
-
-        //        for( int n = 0; n < model.getParameterInt( "number_of_farmers" ); n++ )
-        //        {
-        //            double[] position = {0, 0, 0};
-        //            position[0] = Xmin + PhysiCellUtilities.UniformRandom() * Xrange;
-        //            position[1] = Ymin + PhysiCellUtilities.UniformRandom() * Yrange;
-        //            position[2] = Zmin + PhysiCellUtilities.UniformRandom() * Zrange;
-        //            Cell.createCell( pCD, microenvironment, position );
-        //        }
-
-        // place prey 
-        pCD = CellDefinition.getCellDefinition( "prey" );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_prey" ), microenvironment );
-        //        for( int n = 0; n < model.getParameterInt( "number_of_prey" ); n++ )
-        //        {
-        //            double[] position = {0, 0, 0};
-        //            position[0] = Xmin + PhysiCellUtilities.UniformRandom() * Xrange;
-        //            position[1] = Ymin + PhysiCellUtilities.UniformRandom() * Yrange;
-        //            position[2] = Zmin + PhysiCellUtilities.UniformRandom() * Zrange;
-        //            Cell.createCell( pCD, microenvironment, position );
-        //        }
-
-        // place predators 
-        pCD = CellDefinition.getCellDefinition( "predator" );
-        PhysiCellUtilities.placeInBox( box, pCD, model.getParameterInt( "number_of_predators" ), microenvironment );
-        //        for( int n = 0; n < model.getParameterInt( "number_of_predators" ); n++ )
-        //        {
-        //            double[] position = {0, 0, 0};
-        //            position[0] = Xmin + PhysiCellUtilities.UniformRandom() * Xrange;
-        //            position[1] = Ymin + PhysiCellUtilities.UniformRandom() * Yrange;
-        //            position[2] = Zmin + PhysiCellUtilities.UniformRandom() * Zrange;
-        //            Cell.createCell( pCD, microenvironment, position );
-        //        }
-    }
-
-    public static List<Cell> get_possible_neighbors(Cell pCell)
-    {
-        List<Cell> neighbors = new ArrayList<>();
-        for( Cell neighbor : pCell.get_container().agent_grid.get( pCell.get_current_mechanics_voxel_index() ) )
-        {
-            neighbors.add( neighbor );
-        }
-        for( int ind : pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()] )
-        {
-            for( Cell neighbor : pCell.get_container().agent_grid.get( ind ) )
-            {
-                neighbors.add( neighbor );
-            }
-        }
-        return neighbors;
+        Microenvironment m = model.getMicroenvironment();
+        PhysiCellUtilities.place( m, "farmer", model.getParameterInt( "number_of_farmers" ) );
+        PhysiCellUtilities.place( m, "prey", model.getParameterInt( "number_of_prey" ) );
+        PhysiCellUtilities.place( m, "predator", model.getParameterInt( "number_of_predators" ) );
     }
 }

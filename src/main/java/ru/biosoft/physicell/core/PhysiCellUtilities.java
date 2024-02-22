@@ -1,7 +1,9 @@
 package ru.biosoft.physicell.core;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 
 import ru.biosoft.physicell.biofvm.GeneralMesh;
@@ -126,5 +128,46 @@ public class PhysiCellUtilities
             position[2] = PhysiCellUtilities.UniformRandom( box[2], box[5] );
             Cell.createCell( cd, m, position );
         }
+    }
+
+    public static void place(Microenvironment m, String type, int number)
+    {
+        double[] box = m.mesh.boundingBox.clone();
+        if( m.options.simulate2D )
+        {
+            box[2] = 0.0;
+            box[5] = 0.0;
+        }
+        placeInBox( box, type, number, m );
+    }
+
+    public static void placeInBox(double[] box, String type, int number, Microenvironment m)
+    {
+        CellDefinition cd = CellDefinition.getCellDefinition( type );
+        for( int i = 0; i < number; i++ )
+        {
+            double[] position = {0, 0, 0};
+            position[0] = PhysiCellUtilities.UniformRandom( box[0], box[3] );
+            position[1] = PhysiCellUtilities.UniformRandom( box[1], box[4] );
+            position[2] = PhysiCellUtilities.UniformRandom( box[2], box[5] );
+            Cell.createCell( cd, m, position );
+        }
+    }
+
+    public static List<Cell> getNeighbors(Cell pCell)
+    {
+        List<Cell> neighbors = new ArrayList<>();
+        for( Cell neighbor : pCell.get_container().agent_grid.get( pCell.get_current_mechanics_voxel_index() ) )
+        {
+            neighbors.add( neighbor );
+        }
+        for( int ind : pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()] )
+        {
+            for( Cell neighbor : pCell.get_container().agent_grid.get( ind ) )
+            {
+                neighbors.add( neighbor );
+            }
+        }
+        return neighbors;
     }
 }

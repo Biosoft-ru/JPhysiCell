@@ -231,7 +231,7 @@ public class CellContainer extends AgentContainer
             //                #pragma omp parallel for 
             for( Cell cell : cells )
             {
-                if( cell.functions.contact_function != null && !cell.isOutOfDomain )
+                if( cell.functions.contact != null && !cell.isOutOfDomain )
                 {
                     StandardModels.evaluate_interactions( cell, cell.phenotype, time_since_last_mechanics );
                 }
@@ -240,9 +240,9 @@ public class CellContainer extends AgentContainer
             //                #pragma omp parallel for 
             for( Cell cell : cells )
             {
-                if( cell.functions.custom_cell_rule != null && !cell.isOutOfDomain )
+                if( cell.functions.customCellRule != null && !cell.isOutOfDomain )
                 {
-                    cell.functions.custom_cell_rule.execute( cell, cell.phenotype, time_since_last_mechanics );
+                    cell.functions.customCellRule.execute( cell, cell.phenotype, time_since_last_mechanics );
                 }
             }
             // update velocities 

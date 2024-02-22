@@ -68,7 +68,7 @@ public class TumorPhenotype extends UpdatePhenotype
             // pCell.start_death( apoptosis_model_index );
             SignalBehavior.setSingleBehavior( pCell, "apoptosis", 9e99 );
             pCell.functions.updatePhenotype = null;
-            pCell.functions.custom_cell_rule = null;
+            pCell.functions.customCellRule = null;
         }
     }
 }

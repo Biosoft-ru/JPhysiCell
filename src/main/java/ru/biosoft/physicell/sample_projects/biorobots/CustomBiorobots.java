@@ -43,11 +43,11 @@ public class CustomBiorobots
 
         pCD = CellDefinition.getCellDefinition( "cargo cell" );
         pCD.functions.updatePhenotype = new CargoCellRule( m );
-        pCD.functions.contact_function = new StandardElasticContact();
+        pCD.functions.contact = new StandardElasticContact();
 
         pCD = CellDefinition.getCellDefinition( "worker cell" );
         pCD.functions.updatePhenotype = new WorkerCellRule( m );
-        pCD.functions.contact_function = new StandardElasticContact();
+        pCD.functions.contact = new StandardElasticContact();
     }
 
     static void setupTissue(Model model) throws Exception

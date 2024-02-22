@@ -104,7 +104,7 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">60</interval>
+			<interval units="min">10</interval>
 			<enable>true</enable>
 		</full_data>
 		
@@ -317,7 +317,7 @@
 				
 				<secretion>
 					<substrate name="food">
-						<secretion_rate units="1/min">100</secretion_rate>
+						<secretion_rate units="1/min">10</secretion_rate>
 						<secretion_target units="substrate density">1</secretion_target>
 						<uptake_rate units="1/min">0</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 

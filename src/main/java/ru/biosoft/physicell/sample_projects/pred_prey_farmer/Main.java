@@ -75,7 +75,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/perd_prey_farmer/result";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/perd_prey_farmer/wrap";
 
     public static void main(String ... strings) throws Exception
     {
@@ -92,9 +92,9 @@ public class Main
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addVisualizer( 0, "food" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "predator signal" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "prey signal" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "food" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
+        model.addVisualizer( 0, "prey signal" ).setStubstrateIndex( 1 ).setMaxDensity( 10 );
+        model.addVisualizer( 0, "predator signal" ).setStubstrateIndex( 2 ).setMaxDensity( 10 );
 
         /* Users typically start modifying here. START USERMODS */
         PredPreyFarmer.init( model );

@@ -2,22 +2,22 @@ package ru.biosoft.physicell.core.standard;
 
 import java.util.Set;
 
+import ru.biosoft.physicell.biofvm.CartesianMesh;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
-import ru.biosoft.physicell.core.CellFunctions;
+import ru.biosoft.physicell.core.CellFunctions.UpdateVelocity;
 import ru.biosoft.physicell.core.Phenotype;
 
-public class StandardUpdateVelocity implements CellFunctions.UpdateVelocity
+public class StandardUpdateVelocity extends UpdateVelocity
 {
     @Override
-    public void execute(Cell pCell, Phenotype phenotype, double dt)
+    public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        if( pCell.functions.add_cell_basement_membrane_interactions != null )
+        if( pCell.functions.membraneInteraction != null )
         {
-            pCell.functions.add_cell_basement_membrane_interactions.execute( pCell, phenotype, dt );
+            pCell.functions.membraneInteraction.execute( pCell, phenotype, dt );
         }
-
 
         pCell.state.simplePressure = 0.0;
         pCell.state.neighbors.clear(); // new 1.8.0
@@ -51,20 +51,27 @@ public class StandardUpdateVelocity implements CellFunctions.UpdateVelocity
         //                pCell.add_potentials(neighbor);
         //            }
         //        }
+        CartesianMesh mesh = container.underlying_mesh;
         int voxelIndex = pCell.get_current_mechanics_voxel_index();
-        double[] center = container.underlying_mesh.voxels[voxelIndex].center;
-        int[] neighborVoxels = container.underlying_mesh.moore_connected_voxel_indices[voxelIndex];
-        for( int neighbor_voxel_index : neighborVoxels )
+        double[] center = mesh.voxels[voxelIndex].center;
+        int[] neighborVoxels = mesh.moore_connected_voxel_indices[voxelIndex];
+        for( int neighborIndex : neighborVoxels )
         {
-            if( !Cell.isNeighborVoxel( pCell, center, container.underlying_mesh.voxels[neighbor_voxel_index].center,
-                    neighbor_voxel_index ) )
+            if( !Cell.isNeighborVoxel( pCell, center, mesh.voxels[neighborIndex].center,
+                    neighborIndex ) )
                 continue;
-            for( Cell neighbor : container.agent_grid.get( neighbor_voxel_index ) )
+            for( Cell neighbor : container.agent_grid.get( neighborIndex ) )
             {
                 pCell.addPotentials( neighbor );
             }
         }
         pCell.updateMotilityVector( dt );
         VectorUtil.sum( pCell.velocity, phenotype.motility.motilityVector );
+    }
+
+    @Override
+    public String display()
+    {
+        return "Standard velocity: cell-cell adhesion + biased motility";
     }
 }

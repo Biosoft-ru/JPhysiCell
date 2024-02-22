@@ -3,28 +3,33 @@ package ru.biosoft.physicell.sample_projects.cancer_immune;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.CellFunctions.UpdateMigrationBias;
+import ru.biosoft.physicell.core.Phenotype;
 
-public class ImmuneCellMotility implements UpdateMigrationBias
+/**
+ * If not attached move towards immunostimulatory factor, otherwise do not move
+ */
+public class ImmuneCellMotility extends UpdateMigrationBias
 {
+    @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
-        // if attached, biased motility towards director chemoattractant 
-        // otherwise, biased motility towards cargo chemoattractant 
         int immuneFactorIndex = microenvironment.findDensityIndex( "immunostimulatory factor" );
-
-        // if not docked, attempt biased chemotaxis 
         if( pCell.state.attachedCells.size() == 0 )
         {
             phenotype.motility.isMotile = true;
-            phenotype.motility.migrationBiasDirection = pCell.nearest_gradient( immuneFactorIndex ).clone();
-            VectorUtil.normalize( ( phenotype.motility.migrationBiasDirection ) );
+            phenotype.motility.migrationBiasDirection = VectorUtil.newNormalize( pCell.nearest_gradient( immuneFactorIndex ) );
         }
         else
         {
             phenotype.motility.isMotile = false;
         }
+    }
+
+    @Override
+    public String display()
+    {
+        return "If not attached move towards immunostimulatory factor, otherwise do not move";
     }
 }

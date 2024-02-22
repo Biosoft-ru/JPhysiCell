@@ -4,22 +4,18 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.BasicSignaling;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
+import ru.biosoft.physicell.core.Phenotype;
 
 public class CD8TcellPhenotype extends UpdatePhenotype
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-
-        // find my cell definition 
         CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
         Microenvironment microenvironment = pCell.getMicroenvironment();
-        // sample environment 
-
-        int nR = microenvironment.findDensityIndex( "resource" );
-        int nTox = microenvironment.findDensityIndex( "toxin" );
+        //        int nR = microenvironment.findDensityIndex( "resource" );
+        //        int nTox = microenvironment.findDensityIndex( "toxin" );
         int nDebris = microenvironment.findDensityIndex( "debris" );
         int nPIF = microenvironment.findDensityIndex( "pro-inflammatory" );
 
@@ -35,25 +31,17 @@ public class CD8TcellPhenotype extends UpdatePhenotype
         }
 
         // migration bias increases with pro-inflammatory 
-
-        double signal = PIF;
+        //        double signal = PIF;
         double base_val = pCD.phenotype.motility.migrationBias;
         double max_val = 0.75;
         double half_max = pCD.custom_data.get( "migration_bias_halfmax" ); // 0.05 // 0.25 
         double hill = BasicSignaling.Hill_response_function( PIF, half_max, 1.5 );
-
         phenotype.motility.migrationBias = base_val + ( max_val - base_val ) * hill;
+    }
 
-        /*	
-        	#pragma omp critical 
-        	{
-        		System.out.println( "signal: " + signal + " halfmax: " + half_max 
-        		+ " hill: " + hill);; 
-        		
-        		System.out.println( "\tbase: " + base_val 
-        		+ " max: " + max_val 
-        		+ " actual: " + phenotype.motility.migration_bias);; 
-        	}	
-        */
+    @Override
+    public String display()
+    {
+        return "Pro-inflammatory increases migration." + " Release debris upon death.";
     }
 }

@@ -3,10 +3,10 @@ package ru.biosoft.physicell.core.standard;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.CellFunctions.Contact;
+import ru.biosoft.physicell.core.Phenotype;
 
-public class StandardElasticContact implements Contact
+public class StandardElasticContact extends Contact
 {
     @Override
     public void execute(Cell pC1, Phenotype p1, Cell pC2, Phenotype p2, double dt)

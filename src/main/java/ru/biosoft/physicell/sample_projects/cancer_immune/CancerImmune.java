@@ -93,7 +93,7 @@ public class CancerImmune
         createCancerCell();
         createImmuneCell( model );
         setupTissue( model, use2D );
-        model.addEvent( new ImmunityEvent( model.getParameterDouble( "immune_activation_time" ) ) );
+        model.addEvent( new ImmunityEvent( model.getParameterDouble( "immune_activation_time" ), use2D ) );
         for( Visualizer visualizer : model.getVisualizers() )
         {
             visualizer.setAgentVisualizer( new CancerImmunityVisualizer() );
@@ -126,9 +126,9 @@ public class CancerImmune
 
         // set functions 
         cd.functions.updatePhenotype = null;
-        cd.functions.custom_cell_rule = new ImmuneCellRule();
-        cd.functions.update_migration_bias = new ImmuneCellMotility();
-        cd.functions.contact_function = new AdhesionContact();
+        cd.functions.customCellRule = new ImmuneCellRule();
+        cd.functions.updateMigration = new ImmuneCellMotility();
+        cd.functions.contact = new AdhesionContact();
     }
 
     public static void createCancerCell() throws Exception
@@ -140,9 +140,9 @@ public class CancerImmune
         cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_attachment_distance" ) / cd.phenotype.geometry.radius;
         cd.phenotype.mechanics.attachmentElasticConstant = cd.custom_data.get( "elastic_coefficient" );
         cd.functions.updatePhenotype = new TumorPhenotype();
-        cd.functions.custom_cell_rule = null;
-        cd.functions.contact_function = new AdhesionContact();
-        cd.functions.update_migration_bias = null;
+        cd.functions.customCellRule = null;
+        cd.functions.contact = new AdhesionContact();
+        cd.functions.updateMigration = null;
     }
 
 

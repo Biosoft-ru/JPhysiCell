@@ -5,7 +5,7 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellFunctions.Contact;
 import ru.biosoft.physicell.core.Phenotype;
 
-public class AdhesionContact implements Contact
+public class AdhesionContact extends Contact
 {
     public void execute(Cell pActingOn, Phenotype pao, Cell pAttachedTo, Phenotype pat, double dt)
     {

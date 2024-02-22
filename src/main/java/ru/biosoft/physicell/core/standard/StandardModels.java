@@ -541,7 +541,7 @@ public class StandardModels
 
     public static void evaluate_interactions(Cell pCell, Phenotype phenotype, double dt)
     {
-        if( pCell.functions.contact_function == null )
+        if( pCell.functions.contact == null )
         {
             return;
         }
@@ -549,7 +549,7 @@ public class StandardModels
         List<Cell> attached = new ArrayList<>( pCell.state.attachedCells );
         for( Cell cell : attached )
         {
-            pCell.functions.contact_function.execute( pCell, phenotype, cell, cell.phenotype, dt );
+            pCell.functions.contact.execute( pCell, phenotype, cell, cell.phenotype, dt );
         }
 
         //        for( int n = 0; n < pCell.state.attached_cells.size(); n++ )

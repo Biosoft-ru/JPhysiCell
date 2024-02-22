@@ -76,7 +76,7 @@ public class Main
 {
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/virus_macrophage/result";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/virus_macrophage/result2";
 
     public static void main(String ... strings) throws Exception
     {

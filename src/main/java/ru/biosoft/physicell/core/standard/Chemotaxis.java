@@ -5,7 +5,7 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellFunctions.UpdateMigrationBias;
 import ru.biosoft.physicell.core.Phenotype;
 
-public class Chemotaxis implements UpdateMigrationBias
+public class Chemotaxis extends UpdateMigrationBias
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
@@ -15,5 +15,11 @@ public class Chemotaxis implements UpdateMigrationBias
         // move up or down gradient based on this direction 
         VectorUtil.prod( phenotype.motility.migrationBiasDirection, phenotype.motility.chemotaxisDirection );
         VectorUtil.normalize( phenotype.motility.migrationBiasDirection );
+    }
+
+    @Override
+    public String display()
+    {
+        return "Chemotaxis";
     }
 }

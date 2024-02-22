@@ -19,6 +19,8 @@ import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
 
+
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -178,7 +180,7 @@ public class TestDCIS
         cd.parameters.max_necrosis_rate = 1.0 / ( 6.0 * 60.0 );
 
 
-        cd.functions.calculate_distance_to_membrane = new distance_to_membrane_duct();
+        cd.functions.membraneDistanceCalculator = new distance_to_membrane_duct();
         CellDefinition.registerCellDefinition( cd );
         double cell_radius = 10;
         double sphere_radius = duct_radius - 10;
@@ -283,7 +285,7 @@ public class TestDCIS
     }
 
 
-    public static class distance_to_membrane_duct implements DistanceCalculator
+    public static class distance_to_membrane_duct extends DistanceCalculator
     {
         @Override
         public double execute(Cell pCell, Phenotype phenotype, double dummy)

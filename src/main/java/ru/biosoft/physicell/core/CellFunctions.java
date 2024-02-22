@@ -70,16 +70,16 @@ public class CellFunctions
 {
     public instantiate_cell instantiate_cell;
     public VolumeUpdate updateVolume;
-    public UpdateMigrationBias update_migration_bias;
-    public custom_cell_rule custom_cell_rule;
+    public UpdateMigrationBias updateMigration;
+    public CustomCellRule customCellRule;
     public UpdatePhenotype updatePhenotype;
     public pre_update_intracellular pre_update_intracellular;
     public post_update_intracellular post_update_intracellular;
     public UpdateVelocity updateVelocity;
-    public CellMembraneInteractions add_cell_basement_membrane_interactions;
-    public DistanceCalculator calculate_distance_to_membrane;
+    public MembraneInteractions membraneInteraction;
+    public DistanceCalculator membraneDistanceCalculator;
     public set_orientation set_orientation;
-    public Contact contact_function;
+    public Contact contact;
 
     public CellFunctions clone()
     {
@@ -89,19 +89,19 @@ public class CellFunctions
         {
             result.instantiate_cell = instantiate_cell == null ? null : instantiate_cell.getClass().newInstance();
             result.updateVolume = updateVolume == null ? null : updateVolume.getClass().newInstance();
-            result.update_migration_bias = update_migration_bias == null ? null : update_migration_bias.getClass().newInstance();
+            result.updateMigration = updateMigration == null ? null : updateMigration.getClass().newInstance();
             result.updatePhenotype = updatePhenotype == null ? null : updatePhenotype.clone();
             result.pre_update_intracellular = pre_update_intracellular == null ? null : pre_update_intracellular.getClass().newInstance();
             result.post_update_intracellular = post_update_intracellular == null ? null
                     : post_update_intracellular.getClass().newInstance();
             result.updateVelocity = updateVelocity == null ? null : updateVelocity.getClass().newInstance();
-            result.add_cell_basement_membrane_interactions = add_cell_basement_membrane_interactions == null ? null
-                    : add_cell_basement_membrane_interactions.getClass().newInstance();
-            result.calculate_distance_to_membrane = calculate_distance_to_membrane == null ? null
-                    : calculate_distance_to_membrane.getClass().newInstance();
+            result.membraneInteraction = membraneInteraction == null ? null
+                    : membraneInteraction.getClass().newInstance();
+            result.membraneDistanceCalculator = membraneDistanceCalculator == null ? null
+                    : membraneDistanceCalculator.getClass().newInstance();
             result.set_orientation = set_orientation == null ? null : set_orientation.getClass().newInstance();
-            result.contact_function = contact_function == null ? null : contact_function.getClass().newInstance();
-            result.custom_cell_rule = custom_cell_rule == null ? null : custom_cell_rule.getClass().newInstance();
+            result.contact = contact == null ? null : contact.getClass().newInstance();
+            result.customCellRule = customCellRule == null ? null : customCellRule.getClass().newInstance();
         }
         catch( Exception ex )
         {
@@ -110,22 +110,8 @@ public class CellFunctions
         return result;
     }
 
-    @FunctionalInterface
-    public static interface VolumeUpdate
+    public static abstract class Function implements Cloneable
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
-    }
-
-    @FunctionalInterface
-    public static interface UpdateMigrationBias
-    {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
-    }
-
-    public static abstract class UpdatePhenotype implements Cloneable
-    {
-        public abstract void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
-
         public UpdatePhenotype clone()
         {
             try
@@ -137,42 +123,53 @@ public class CellFunctions
                 return null;
             }
         }
+
+        public String display()
+        {
+            return getClass().getSimpleName();
+        }
     }
 
-    @FunctionalInterface
-    public static interface UpdateVelocity
+    public static abstract class OneCellFunction extends Function
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
+        public abstract void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
     }
 
-    @FunctionalInterface
-    public static interface custom_cell_rule
+    public static abstract class VolumeUpdate extends OneCellFunction
     {
-		public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
+    }
+    
+    public static abstract class UpdateMigrationBias extends OneCellFunction
+    {
     }
 
-    @FunctionalInterface
-    public static interface pre_update_intracellular
+    public static abstract class UpdatePhenotype extends OneCellFunction
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
-    @FunctionalInterface
-    public static interface post_update_intracellular
+    public static abstract class UpdateVelocity extends OneCellFunction
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
-    @FunctionalInterface
-    public static interface CellMembraneInteractions
+    public static abstract class CustomCellRule extends OneCellFunction
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
-    @FunctionalInterface
-    public static interface DistanceCalculator
+    public static abstract class pre_update_intracellular extends OneCellFunction
     {
-        public double execute(Cell pCell, Phenotype phenotype, double dt);
+    }
+
+    public static abstract class post_update_intracellular extends OneCellFunction
+    {
+    }
+
+    public static abstract class MembraneInteractions extends OneCellFunction
+    {
+    }
+
+    public static abstract class DistanceCalculator extends Function
+    {
+        public abstract double execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
     }
 
     @FunctionalInterface
@@ -181,10 +178,9 @@ public class CellFunctions
         public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
-    @FunctionalInterface
-    public static interface Contact
+    public static abstract class Contact extends Function
     {
-		public void execute(Cell pCell, Phenotype phenotype, Cell cell2, Phenotype phenotype2, double dt);
+        public abstract void execute(Cell pCell, Phenotype phenotype, Cell cell2, Phenotype phenotype2, double dt);
     }
 
     @FunctionalInterface
@@ -203,18 +199,20 @@ public class CellFunctions
     {
         StringBuilder sb = new StringBuilder();
         sb.append( "Key functions: \n--------------------------------" );
-        if( update_migration_bias != null )
-            sb.append( "\n\tMigration bias rule: " + update_migration_bias.getClass().getSimpleName() );
-        if( custom_cell_rule != null )
-            sb.append( "\n\tCustom rule: " + custom_cell_rule.getClass().getSimpleName() );
+        if( updateMigration != null )
+            sb.append( "\n\tMigration bias rule: " + updateMigration.display() );
+        if( customCellRule != null )
+            sb.append( "\n\tCustom rule: " + customCellRule.display() );
         if( updatePhenotype != null )
-            sb.append( "\n\tPhenotype rule: " + updatePhenotype.getClass().getSimpleName() );
+            sb.append( "\n\tPhenotype rule: " + updatePhenotype.display() );
         if( updateVolume != null )
-            sb.append( "\n\tVolume update function: " + updateVolume.getClass().getSimpleName() );
+            sb.append( "\n\tVolume update function: " + updateVolume.display() );
         if( updateVelocity != null )
-            sb.append( "\n\tMechanics function: " + updateVelocity.getClass().getSimpleName() );
-        if( contact_function != null )
-            sb.append( "\n\tContact function: " + contact_function.getClass().getSimpleName() );
+            sb.append( "\n\tMechanics function: " + updateVelocity.display() );
+        if( contact != null )
+            sb.append( "\n\tContact function: " + contact.display() );
+        if( membraneDistanceCalculator != null )
+            sb.append( "\n\tMembrane distance: " + membraneDistanceCalculator.display() );
         return sb.toString();
     }
 }

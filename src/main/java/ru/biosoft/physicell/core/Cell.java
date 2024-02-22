@@ -367,7 +367,8 @@ public class Cell extends BasicAgent
         */
 
         double[] rand_vec = PhysiCellUtilities.UniformOnUnitSphere();//cell_division_orientation();
-
+        if( getMicroenvironment().options.simulate2D )
+            rand_vec[2] = 0;
         double multiplier = phenotype.geometry.polarity
                 * ( rand_vec[0] * state.orientation[0] + rand_vec[1] * state.orientation[1] + rand_vec[2] * state.orientation[2] );
 
@@ -452,7 +453,7 @@ public class Cell extends BasicAgent
         pCell_2.attachCellAsSpring( pCell_1 );
     }
 
-	public static void detachCells(Cell pCell_1, Cell pCell_2)
+    public static void detachCells(Cell pCell_1, Cell pCell_2)
     {
         pCell_1.detachCell( pCell_2 );
         pCell_2.detachCell( pCell_1 );
@@ -607,7 +608,7 @@ public class Cell extends BasicAgent
         // turn off motility.
         phenotype.motility.isMotile = false;
         phenotype.motility.motilityVector = new double[3];//.assign( 3, 0.0 ); 
-        functions.update_migration_bias = null;
+        functions.updateMigration = null;
 
         // make sure to run the death entry function 
         if( phenotype.cycle.data.currentPhase().entryFunction != null )
@@ -620,10 +621,7 @@ public class Cell extends BasicAgent
     {
         if( this.ID == other.ID )
             return;
-        if( typeName.contains( "CD8" ) )
-        {
-            double a = 5;
-        }
+
         /*
         // new April 2022: don't interact with cells with 0 volume 
         // does not seem to really help 
@@ -706,7 +704,7 @@ public class Cell extends BasicAgent
         VectorUtil.axpy( velocity, temp_r, displacement );
     }
 
-    public void updateMotilityVector(double dt_)
+    public void updateMotilityVector(double dt_) throws Exception
     {
         if( phenotype.motility.isMotile == false )
         {
@@ -749,9 +747,9 @@ public class Cell extends BasicAgent
             }
 
             // if the update_bias_vector function is set, use it  
-            if( functions.update_migration_bias != null )
+            if( functions.updateMigration != null )
             {
-                functions.update_migration_bias.execute( this, phenotype, dt_ );
+                functions.updateMigration.execute( this, phenotype, dt_ );
             }
 
             //            phenotype.motility.motility_vector = phenotype.motility.migration_bias_direction; // motiltiy = bias_vector
@@ -872,9 +870,9 @@ public class Cell extends BasicAgent
             pCell_to_eat.phenotype.secretion.setUptakeToZero();
 
             // deactivate all custom function 
-            pCell_to_eat.functions.custom_cell_rule = null;
+            pCell_to_eat.functions.customCellRule = null;
             pCell_to_eat.functions.updatePhenotype = null;
-            pCell_to_eat.functions.contact_function = null;
+            pCell_to_eat.functions.contact = null;
 
             // should set volume fuction to NULL too! 
             pCell_to_eat.functions.updateVolume = null;
@@ -1082,9 +1080,9 @@ public class Cell extends BasicAgent
             pCellToFuse.phenotype.secretion.setUptakeToZero();
 
             // deactivate all custom function 
-            pCellToFuse.functions.custom_cell_rule = null;
+            pCellToFuse.functions.customCellRule = null;
             pCellToFuse.functions.updatePhenotype = null;
-            pCellToFuse.functions.contact_function = null;
+            pCellToFuse.functions.contact = null;
             pCellToFuse.functions.updateVolume = null;
 
             // remove all adhesions 
@@ -1121,9 +1119,9 @@ public class Cell extends BasicAgent
         phenotype.secretion.setUptakeToZero();
 
         // deactivate all custom function 
-        functions.custom_cell_rule = null;
+        functions.customCellRule = null;
         functions.updatePhenotype = null;
-        functions.contact_function = null;
+        functions.contact = null;
 
         // remove all adhesions 
 
@@ -1204,7 +1202,7 @@ public class Cell extends BasicAgent
 
             // also, turn off motility.
             phenotype.motility.disable();
-            functions.update_migration_bias = null;
+            functions.updateMigration = null;
 
             // turn off secretion, and reduce uptake by a factor of 10 
             phenotype.secretion.setSecretionToZero();
@@ -1265,6 +1263,13 @@ public class Cell extends BasicAgent
     {
         return getMicroenvironment().gradient_vector( currentVoxelIndex )[substrate_index];
     }
+
+    public double[] nearestGradient(String substrate)
+    {
+        int index = getMicroenvironment().findDensityIndex( substrate );
+        return getMicroenvironment().gradient_vector( currentVoxelIndex )[index];
+    }
+
 
     @Override
     public String toString()

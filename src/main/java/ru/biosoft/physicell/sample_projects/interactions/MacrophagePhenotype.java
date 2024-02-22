@@ -37,33 +37,23 @@ public class MacrophagePhenotype extends UpdatePhenotype
         double Q = samples[nQ];
 
         // sample contacts 
-
         int bacteria_type = CellDefinition.getCellDefinition( "bacteria" ).type;
 
         int num_bacteria = 0;
         int num_dead = 0;
-        //    for(
-        //    int n = 0;n<pCell.state.neighbors.size();n++)
-        //    {
-        //		Cell pC = pCell.state.neighbors[n]; 
+
         for( Cell pC : pCell.state.neighbors )
         {
-            if( pC.phenotype.death.dead == true )
-            {
+            if( pC.phenotype.death.dead )
                 num_dead++;
-            }
             else
             {
                 if( pC.type == bacteria_type )
-                {
                     num_bacteria++;
-                }
             }
         }
 
-        // contact with dead cells or bacteria, or debris 
-        // increases secretion of pro-inflammatory 
-
+        // contact with dead cells or bacteria, or debris increases secretion of pro-inflammatory 
         double secretion_dead_sensitivity = 1;
         double secretion_bacteria_sensitivity = 1;
         double secretion_debris_sensitivity = 2;
@@ -75,23 +65,9 @@ public class MacrophagePhenotype extends UpdatePhenotype
                 + secretion_debris_sensitivity * debris + secretion_quorum_sensitivity * Q;
         double half_max = pCD.custom_data.get( "secretion_halfmax" ); // 0.5; // 0.5; 
         double hill = BasicSignaling.Hill_response_function( signal, half_max, 1.5 );
-        double v = base_val + ( max_response - base_val ) * hill;
-        //        if( v != 0 )
-        //            System.out.println( v );
         phenotype.secretion.secretionRates[nPIF] = base_val + ( max_response - base_val ) * hill;
 
-        /*	
-        	#pragma omp critical
-        	{
-        	System.out.println( "secretion index: " + nPIF + " base: " + base_val + " max: " + max_response + " actual: " + phenotype.secretion.secretion_rates[nPIF]);; 
-        	System.out.println( "\tsignal: " + signal + " vs halfmax: " + half_max);; 
-        	System.out.println( "\t\tdead: " + num_dead + " bac: " + num_bacteria + " debris: " + debris + " Q: " + Q);; 
-        	System.out.println( "\t\t\tsaturation: " + phenotype.secretion.saturation_densities[nPIF]+ std::endl; 
-        	}
-        */
-
         // chemotaxis bias increases with debris or quorum factor 
-
         double bias_debris_sensitivity = 0.1;
         double bias_quorum_sensitivity = 1;
 
@@ -102,18 +78,6 @@ public class MacrophagePhenotype extends UpdatePhenotype
         hill = BasicSignaling.Hill_response_function( signal, half_max, 1.5 );
         phenotype.motility.migrationBias = base_val + ( max_response - base_val ) * hill;
 
-        /*
-        	#pragma omp critical 
-        	{
-        	System.out.println( "signal: " + signal + " halfmax: " + half_max 
-        	+ " hill: " + hill);; 
-        	
-        	System.out.println( "\tbase: " + base_val 
-        	+ " max: " + max_response 
-        	+ " actual: " + phenotype.motility.migration_bias);; 
-        	}
-        */
-
         // migration speed slows down in the presence of debris or quorum factor 
         base_val = pCD.phenotype.motility.migrationSpeed;
         max_response = 0.1 * base_val;
@@ -121,5 +85,12 @@ public class MacrophagePhenotype extends UpdatePhenotype
         half_max = pCD.custom_data.get( "migration_speed_halfmax" ); // 0.1 // 0.05 
         hill = BasicSignaling.Hill_response_function( signal, half_max, 1.5 );
         phenotype.motility.migrationSpeed = base_val + ( max_response - base_val ) * hill;
+    }
+
+    @Override
+    public String display()
+    {
+        return "Contact with dead cells, bacteria or debris increases secretion of pro-inflammatory. "
+                + "Debris and quorum increase chemotaxis bias. " + "Migration speed slows down in the presence of debris or quorum factor.";
     }
 }
