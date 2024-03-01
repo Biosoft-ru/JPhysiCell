@@ -3,9 +3,11 @@ package ru.biosoft.physicell.sample_projects.virus_macrophage;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.biosoft.physicell.biofvm.CartesianMesh;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Phenotype;
@@ -15,91 +17,72 @@ public class Macrophage extends UpdatePhenotype
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        // bookkeeping 
         Microenvironment microenvironment = pCell.getMicroenvironment();
         int nVirus = microenvironment.findDensityIndex( "virus" );
 
         CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
 
         // digest virus particles inside me 
-        double implicit_Euler_constant = ( 1.0 + dt * pCell.custom_data.get( "virus_digestion_rate" ) );
-        phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant;
+        double implicitEulerConstant = ( 1.0 + dt * pCell.custom_data.get( "virus_digestion_rate" ) );
+        phenotype.molecular.internSubstrates[nVirus] /= implicitEulerConstant;
 
         // check for contact with a cell
-        Cell pTestCell = null;
+        //        Cell pTestCell = null;
         List<Cell> neighbors = get_possible_neighbors( pCell );
 
         //	for( int n=0; n < pCell.cells_in_my_container().size() ; n++ )
-        for( int n = 0; n < neighbors.size(); n++ )
+        for( Cell neighbor : neighbors )
         {
-            pTestCell = neighbors.get( n );
+            //            pTestCell = neighbors.get( n );
             // if it is not me and not a macrophage 
-            if( pTestCell != pCell && pTestCell.type != pMacrophage.type )
+            if( neighbor != pCell && neighbor.type != pMacrophage.type )
             {
                 // calculate distance to the cell 
-                double[] displacement = VectorUtil.newDiff( pTestCell.position, pCell.position );
-                double distance = VectorUtil.norm( displacement );
-                double max_distance = pCell.phenotype.geometry.radius + pTestCell.phenotype.geometry.radius;
-                max_distance *= 1.1;
+                //                double[] displacement = VectorUtil.newDiff( neighbor.position, pCell.position );
+                //                double distance = VectorUtil.norm( displacement );
+                double dist = VectorUtil.dist( neighbor.position, pCell.position );
+                double maxDistance = 1.1 * ( pCell.phenotype.geometry.radius + neighbor.phenotype.geometry.radius );
+                //                max_distance *= 1.1;
 
-                // if it is not a macrophage, test for viral load 
-                // if high viral load, eat it. 
-
-                if( pTestCell.phenotype.molecular.internalized_total_substrates[nVirus] > pCell.custom_data
-                        .get( "min_virion_detection_threshold" ) && distance < max_distance )
+                // if it is not a macrophage, test for viral load if high viral load, eat it. 
+                if( neighbor.phenotype.molecular.internSubstrates[nVirus] > pCell.custom_data.get( "min_virion_detection_threshold" )
+                        && dist < maxDistance )
                 {
-                    System.out.println( "\t\tnom nom nom" );
-                    pCell.ingestCell( pTestCell );
+                    //                    System.out.println( "\t\tnom nom nom" );
+                    pCell.ingestCell( neighbor );
                 }
             }
         }
     }
 
+    public String display()
+    {
+        return "";
+    }
+
     public static List<Cell> get_possible_neighbors(Cell pCell)
     {
-        List<Cell> neighbors = new ArrayList<>();
+        int mechanicsVoxelIndex = pCell.get_current_mechanics_voxel_index();
+        CellContainer container = pCell.get_container();
+        CartesianMesh mesh = container.mesh;
+        List<Cell> neighbors = new ArrayList<>( container.agentGrid.get( mechanicsVoxelIndex ) );
+        //        for( Cell neighbor : container.agent_grid.get( mechanicsVoxelIndex ) )
+        //        {
+        //            neighbors.add( neighbor );
+        //        }
 
-        // First check the neighbors in my current voxel
-        //  std::vector<Cell>::iterator neighbor;
-        //  std::vector<Cell>::iterator end =
-        //      pCell.get_container().agent_grid[pCell.get_current_mechanics_voxel_index()].end();
-        //  for( Cell neighbor = pCell.get_container().agent_grid[pCell.get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
-        //  { neighbors.push_back( neighbor ); }
-
-        for( Cell neighbor : pCell.get_container().agent_grid.get( pCell.get_current_mechanics_voxel_index() ) )
+        for( int neighborVoxel : mesh.moore_connected_voxel_indices[mechanicsVoxelIndex] )
         {
-            neighbors.add( neighbor );
-        }
+            if( !Cell.isNeighborVoxel( pCell,
+                    mesh.voxels[mechanicsVoxelIndex].center, mesh.voxels[neighborVoxel].center, neighborVoxel ) )
+                continue;
 
-        for( int ind : pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()] )
-        {
-            for( Cell neighbor : pCell.get_container().agent_grid.get( ind ) )
-            {
-                neighbors.add( neighbor );
-            }
+            neighbors.addAll( container.agentGrid.get( neighborVoxel ) );
+            //            for( Cell neighbor : container.agent_grid.get( neighborVoxel ) )
+            //            {
+            //                neighbors.add( neighbor );
+            //            }
         }
         return neighbors;
     }
-    //  for (Cell neighborVoxel: pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()])
-    //  {
-    //      
-    //  }
-    //  std::vector<int>::iterator neighbor_voxel_index;
-    //  std::vector<int>::iterator neighbor_voxel_index_end = 
-    //      pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()].end();
-
-    //  for( neighbor_voxel_index = 
-    //      pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()].begin();
-    //      neighbor_voxel_index != neighbor_voxel_index_end; 
-    //      ++neighbor_voxel_index )
-    //  {
-    //      if(!is_neighbor_voxel(pCell, pCell.get_container().underlying_mesh.voxels[pCell.get_current_mechanics_voxel_index()].center, pCell.get_container().underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
-    //          continue;
-    //      end = pCell.get_container().agent_grid[neighbor_voxel_index].end();
-    //      for(neighbor = pCell.get_container().agent_grid[neighbor_voxel_index].begin();neighbor != end; ++neighbor)
-    //      { neighbors.push_back( neighbor ); }
-    //  }
-
-    //  return neighbors; 
-    //}
 }

@@ -18,6 +18,12 @@ public class PhysiCellUtilities
         seed = val;
         r.setSeed( val );
     }
+
+    public static double getSeed()
+    {
+        return seed;
+    }
+
     public static double[] UniformOnUnitSphere()
     {
         double[] output = {0, 0, 0};
@@ -166,13 +172,13 @@ public class PhysiCellUtilities
     public static List<Cell> getNeighbors(Cell pCell)
     {
         List<Cell> neighbors = new ArrayList<>();
-        for( Cell neighbor : pCell.get_container().agent_grid.get( pCell.get_current_mechanics_voxel_index() ) )
+        for( Cell neighbor : pCell.get_container().agentGrid.get( pCell.get_current_mechanics_voxel_index() ) )
         {
             neighbors.add( neighbor );
         }
-        for( int ind : pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()] )
+        for( int ind : pCell.get_container().mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()] )
         {
-            for( Cell neighbor : pCell.get_container().agent_grid.get( ind ) )
+            for( Cell neighbor : pCell.get_container().agentGrid.get( ind ) )
             {
                 neighbors.add( neighbor );
             }

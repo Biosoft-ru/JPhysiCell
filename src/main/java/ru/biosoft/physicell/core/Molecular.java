@@ -74,49 +74,29 @@ public class Molecular implements Cloneable
 {
     Microenvironment pMicroenvironment;
 
-
     // we'll set this to replace BioFVM's version       
-    public double[] internalized_total_substrates = new double[0];// = new double[0];
+    public double[] internSubstrates = new double[0];
 
-    // for each substrate, a fraction 0 <= f <= 1 of the 
-    // total internalized substrate is released back inot
-    // the environment at death 
-    public double[] fraction_released_at_death = new double[0];// = new double[0];
+    // for each substrate, a fraction 0 <= f <= 1 of the total internalized substrate is released back inot the environment at death 
+    public double[] fractionReleasedDeath = new double[0];
 
-    // for each substrate, a fraction 0 <= f <= 1 of the 
-    // total internalized substrate is transferred to the  
-    // predatory cell when ingested 
-    public double[] fraction_transferred_when_ingested = new double[0];// = new double[0];
+    // for each substrate, a fraction 0 <= f <= 1 of the total internalized substrate is transferred to the  predatory cell when ingested 
+    public double[] fractionTransferredIngested = new double[0];
 
     void sync(Microenvironment m)
     {
         int number_of_densities = m.numberDensities();
-        internalized_total_substrates = VectorUtil.resize( internalized_total_substrates, number_of_densities );
-        fraction_released_at_death = VectorUtil.resize( internalized_total_substrates, number_of_densities );
-        fraction_transferred_when_ingested = VectorUtil.resize( fraction_transferred_when_ingested, number_of_densities );
+        internSubstrates = VectorUtil.resize( internSubstrates, number_of_densities );
+        fractionReleasedDeath = VectorUtil.resize( internSubstrates, number_of_densities );
+        fractionTransferredIngested = VectorUtil.resize( fractionTransferredIngested, number_of_densities );
     }
 
     void sync(BasicAgent pCell)
     {
-        //                delete pCell.internalized_substrates;
-        //                pCell.internalized_substrates = &internalized_total_substrates;
-        pCell.internalizedSubstrates = internalized_total_substrates;
-
-        //                delete pCell.fraction_released_at_death;
-        //                pCell.fraction_released_at_death = &fraction_released_at_death; 
-        pCell.fractionReleasedDeath = fraction_released_at_death;
-
-        //                delete pCell.fraction_transferred_when_ingested; 
-        //                pCell.fraction_transferred_when_ingested = &fraction_transferred_when_ingested; 
-        pCell.fractionTransferredIngested = fraction_transferred_when_ingested;
+        pCell.internalizedSubstrates = internSubstrates;
+        pCell.fractionReleasedDeath = fractionReleasedDeath;
+        pCell.fractionTransferredIngested = fractionTransferredIngested;
     }
-
-    // ease of access 
-    //            double& internalized_total_substrate( String name )
-    //            {
-    //                int index = microenvironment.find_density_index(name); 
-    //                return internalized_total_substrates[index]; 
-    //            }
 
     /*
     void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
@@ -162,20 +142,19 @@ public class Molecular implements Cloneable
     //  { pCell->functions.internal_substrate_function( pCell,phenotype,dt);  }
     //  if( pCell->functions.molecular_model_function )
     //  { pCell->functions.molecular_model_function( pCell,phenotype,dt);  }
-    
-    
         return; 
     }
     */
+
     @Override
     public Molecular clone()
     {
         try
         {
             Molecular result = (Molecular)super.clone();
-            result.internalized_total_substrates = this.internalized_total_substrates.clone();
-            result.fraction_released_at_death = this.fraction_released_at_death.clone();
-            result.fraction_transferred_when_ingested = this.fraction_transferred_when_ingested.clone();
+            result.internSubstrates = this.internSubstrates.clone();
+            result.fractionReleasedDeath = this.fractionReleasedDeath.clone();
+            result.fractionTransferredIngested = this.fractionTransferredIngested.clone();
             return result;
         }
         catch( CloneNotSupportedException e )

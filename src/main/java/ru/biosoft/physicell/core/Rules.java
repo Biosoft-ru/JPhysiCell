@@ -676,7 +676,7 @@ public class Rules
 
         // compare to base behavior value in cell def for discrepancies 
         CellDefinition pCD = CellDefinition.getCellDefinition( cell_type );
-        double ref_base_value = SignalBehavior.get_single_base_behavior( pCD, behavior );
+        double ref_base_value = SignalBehavior.getSingleBaseBehavior( pCD, behavior );
         if( Math.abs( ref_base_value - base_value ) > 1e-15 )
         {
             throw new Exception( "Error: Base value for " + behavior + " in cell type " + cell_type//  + std::endl 
@@ -819,7 +819,7 @@ public class Rules
 
         // compare to base behavior value in cell def for discrepancies 
         CellDefinition pCD = CellDefinition.getCellDefinition( cell_type );
-        double ref_base_value = SignalBehavior.get_single_base_behavior( pCD, behavior );
+        double ref_base_value = SignalBehavior.getSingleBaseBehavior( pCD, behavior );
         if( Math.abs( ref_base_value - base_value ) > 1e-15 )
         {
             throw new Exception( "Error: Base value for " + behavior + " in cell type " + cell_type + "\n" + "       has base value "
@@ -975,7 +975,7 @@ public class Rules
 
         // compare to base behavior value in cell def for discrepancies 
         CellDefinition pCD = CellDefinition.getCellDefinition( cell_type );
-        double ref_base_value = SignalBehavior.get_single_base_behavior( pCD, behavior );
+        double ref_base_value = SignalBehavior.getSingleBaseBehavior( pCD, behavior );
 
         set_behavior_base_value( cell_type, behavior, ref_base_value );
         if( response == "increases" )

@@ -99,16 +99,16 @@ public class VirusMacrophage
 
         pEpithelial.functions.updatePhenotype = new Epithelial();
 
-        pEpithelial.phenotype.molecular.fraction_released_at_death[virus_index] = model.getParameterDouble( "fraction_released_at_death" );
-        pEpithelial.phenotype.molecular.fraction_transferred_when_ingested[virus_index] = model
+        pEpithelial.phenotype.molecular.fractionReleasedDeath[virus_index] = model.getParameterDouble( "fraction_released_at_death" );
+        pEpithelial.phenotype.molecular.fractionTransferredIngested[virus_index] = model
                 .getParameterDouble( "fraction_transferred_when_ingested" );
         /*		
         	pEpithelial.phenotype.molecular.fraction_released_at_death[ nInterferon ] = 0;
         	pEpithelial.phenotype.molecular.fraction_transferred_when_ingested[ nInterferon ] = 0; 		
         */
         pMacrophage.phenotype.mechanics.cellCellAdhesionStrength *= model.getParameterDouble( "macrophage_relative_adhesion" );
-        pMacrophage.phenotype.molecular.fraction_released_at_death[virus_index] = 0.0;
-        pMacrophage.phenotype.molecular.fraction_transferred_when_ingested[virus_index] = 0.0;
+        pMacrophage.phenotype.molecular.fractionReleasedDeath[virus_index] = 0.0;
+        pMacrophage.phenotype.molecular.fractionTransferredIngested[virus_index] = 0.0;
 
         pMacrophage.functions.updatePhenotype = new Macrophage();
         pMacrophage.functions.customCellRule = new AvoidBoundaries();
@@ -133,7 +133,7 @@ public class VirusMacrophage
             double x = microenvironment.mesh.boundingBox[0] + PhysiCellUtilities.UniformRandom() * length_x;
             double y = microenvironment.mesh.boundingBox[1] + PhysiCellUtilities.UniformRandom() * length_y;
             Cell pC = Cell.createCell( pCD, microenvironment, new double[] {x, y, 0.0} );
-            pC.phenotype.molecular.internalized_total_substrates[nVirus] = 1;
+            pC.phenotype.molecular.internSubstrates[nVirus] = 1;
         }
 
         int number_of_uninfected_cells = model.getParameterInt( "number_of_uninfected_cells" );
@@ -171,7 +171,7 @@ public class VirusMacrophage
         // inte
         for( Cell cell : microenvironment.getAgents( Cell.class ) )//int n = 0; n < ( all_cells ).size(); n++ )
         {
-            VectorUtil.sum( out, cell.phenotype.molecular.internalized_total_substrates );
+            VectorUtil.sum( out, cell.phenotype.molecular.internSubstrates );
         }
 
         return out;

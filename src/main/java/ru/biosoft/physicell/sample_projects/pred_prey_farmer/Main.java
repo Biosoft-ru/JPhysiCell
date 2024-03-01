@@ -75,7 +75,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/perd_prey_farmer/wrap";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/perd_prey_farmer/r";
 
     public static void main(String ... strings) throws Exception
     {

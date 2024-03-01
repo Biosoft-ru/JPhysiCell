@@ -24,7 +24,7 @@ public class ImmunityEvent extends Event
     public void execute(Model model) throws Exception
     {
         System.out.println( "Therapy started!" );
-        model.setSaveInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 
+        model.setSaveFullInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 
         introduceOmmuneCells( model, use2d );
     }
     

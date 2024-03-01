@@ -78,7 +78,7 @@ public class CycleModel implements Cloneable
     * So, index_inverse_map[i][j] = k, corresponds to phases[i], phase_links[i][k] (which links from phase i to phase j)
     * transition_rates[i][k] (the transition rate from phase i to phase j
     */
-    List<Map<Integer, Integer>> inverse_index_maps;
+    List<Map<Integer, Integer>> startToEndToLink;
     public String name;
     public int code;
     public List<Phase> phases;
@@ -88,11 +88,11 @@ public class CycleModel implements Cloneable
 
     public CycleModel()
     {
-        inverse_index_maps = new ArrayList<>();//HashMap<Integer, Integer>();//.resize( 0 );
+        startToEndToLink = new ArrayList<>();
         name = "unnamed";
         phases = new ArrayList<>();
         phaseLinks = new ArrayList<>();
-        data = new CycleData( this );// = this;
+        data = new CycleData( this );
         code = PhysiCellConstants.custom_cycle_model;
         default_phase_index = 0;
     }
@@ -107,8 +107,8 @@ public class CycleModel implements Cloneable
         int n = phases.size();
         phases.add( new Phase( name, n, code ) );
         phaseLinks.add( new ArrayList<PhaseLink>() );
-        inverse_index_maps.add( new HashMap<Integer, Integer>() );
-        data.sync_to_cycle_model();
+        startToEndToLink.add( new HashMap<Integer, Integer>() );
+        data.syncToCycle();
         return n;
     }
 
@@ -120,8 +120,8 @@ public class CycleModel implements Cloneable
         Phase start = phases.get( startIndex );
         Phase end = phases.get( endIndex );
         links.add( new PhaseLink( start, startIndex, end, endIndex, arrest ) );
-        inverse_index_maps.get( startIndex ).put( endIndex, n );//link from start_index to end_index have index n        
-        data.sync_to_cycle_model(); // lastly, make sure the transition rates are the right size;
+        startToEndToLink.get( startIndex ).put( endIndex, n );//link from start_index to end_index have index n        
+        data.syncToCycle(); // lastly, make sure the transition rates are the right size;
         return n;
     }
 
@@ -223,7 +223,7 @@ public class CycleModel implements Cloneable
 
     public PhaseLink phase_link(int start_index, int end_index)
     {
-        return phaseLinks.get( start_index ).get( inverse_index_maps.get( start_index ).get( end_index ) );
+        return phaseLinks.get( start_index ).get( startToEndToLink.get( start_index ).get( end_index ) );
     }
 
     public void advance(Cell pCell, Phenotype phenotype, double dt)
@@ -314,7 +314,7 @@ public class CycleModel implements Cloneable
         result.phases = new ArrayList<Phase>( phases );
         result.phaseLinks = this.phaseLinks; //TODO: check
         result.default_phase_index = this.default_phase_index;
-        result.inverse_index_maps = this.inverse_index_maps;//TODO: check
+        result.startToEndToLink = this.startToEndToLink;//TODO: check
         result.data = this.data.clone( result );
         return result;
     }

@@ -41,9 +41,9 @@ public class VirusBarVisualizer extends AgentVisualizer
             //            		output[0] = "blue"; 
             //            		output[2] = "darkblue"; 
 
-            double virus = pCell.phenotype.molecular.internalized_total_substrates[nVirus];
+            double virus = pCell.phenotype.molecular.internSubstrates[nVirus];
 
-            if( pCell.phenotype.molecular.internalized_total_substrates[nVirus] >= min_virus )
+            if( pCell.phenotype.molecular.internSubstrates[nVirus] >= min_virus )
             {
                 double interp = ( virus - min_virus ) / denominator;
                 if( interp > 1.0 )

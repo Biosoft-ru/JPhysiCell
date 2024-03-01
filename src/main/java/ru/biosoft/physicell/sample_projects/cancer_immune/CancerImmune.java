@@ -89,7 +89,7 @@ public class CancerImmune
         // that future division and other events are still not identical 
         // for all runs 
         PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        SignalBehavior.setup_signal_behavior_dictionaries( model.getMicroenvironment() );
+        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
         createCancerCell();
         createImmuneCell( model );
         setupTissue( model, use2D );

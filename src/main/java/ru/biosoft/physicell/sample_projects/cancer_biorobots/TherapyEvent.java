@@ -14,7 +14,7 @@ public class TherapyEvent extends Event
     public void execute(Model model) throws Exception
     {
         System.out.println( "Therapy started!" );
-        model.setSaveInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 
+        model.setSaveFullInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 
         CancerBiorobots.introduce_biorobots( model );
     }
 }

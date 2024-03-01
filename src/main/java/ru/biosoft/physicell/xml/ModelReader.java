@@ -36,6 +36,7 @@ import ru.biosoft.physicell.core.standard.AdvancedChemotaxisNormalized;
 import ru.biosoft.physicell.core.standard.Chemotaxis;
 import ru.biosoft.physicell.core.standard.DomainEdgeAvoidance;
 import ru.biosoft.physicell.core.standard.StandardModels;
+import ru.biosoft.physicell.ode.IntracellularEuler;
 
 
 public class ModelReader extends Constants
@@ -44,21 +45,26 @@ public class ModelReader extends Constants
 
     public Model read(InputStream is) throws Exception
     {
+        return this.read( is, null );
+    }
+
+    public Model read(InputStream is, Class clazz) throws Exception
+    {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse( is );
-        return read( doc );
+        return read( doc, clazz );
     }
 
-    public Model read(File f) throws Exception
+    public Model read(File f, Class clazz) throws Exception
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse( f );
-        return read( doc );
+        return read( doc, clazz );
     }
 
-    public Model read(Document doc) throws Exception
+    public Model read(Document doc, Class clazz) throws Exception
     {
         NodeList nodes = doc.getChildNodes();
 
@@ -66,7 +72,7 @@ public class ModelReader extends Constants
         if( physicell == null )
             throw new Exception( "Physicell base element not found" );
 
-        Model model = new Model();
+        Model model = clazz != null ? (Model)clazz.newInstance() : null;
         Microenvironment m = model.getMicroenvironment();
         readDomain( physicell, m );
         readOverall( physicell, model );
@@ -80,6 +86,8 @@ public class ModelReader extends Constants
 
         return model;
     }
+
+
 
     private void readDomain(Element physicell, Microenvironment m)
     {
@@ -213,28 +221,28 @@ public class ModelReader extends Constants
                     Element enabledElement = findElement( el, "enable" );
                     if( enabledElement != null )
                     {
-                        model.setEnableFullSaves( getBoolVal( enabledElement ) );
+                        model.setSaveFull( getBoolVal( enabledElement ) );
                     }
                     if( intervalElement != null && model.isEnableFullSaves() )
                     {
                         double interval = getDoubleVal( intervalElement );
-                        String intervalUnits = getAttr( intervalElement, "units" );
-                        model.setSaveInterval( interval );
+                        //                        String intervalUnits = getAttr( intervalElement, "units" );
+                        model.setSaveFullInterval( interval );
                     }
 
                     break;
                 case "SVG":
                     intervalElement = findElement( el, "interval" );
                     enabledElement = findElement( el, "enable" );
-                    boolean enabled = false;
                     if( enabledElement != null )
                     {
-                        enabled = getBoolVal( enabledElement );
+                        model.setSaveImg( getBoolVal( enabledElement ) );
                     }
-                    if( intervalElement != null && enabled )
+                    if( intervalElement != null )
                     {
                         double interval = getDoubleVal( intervalElement );
-                        String intervalUnits = getAttr( intervalElement, UNITS );
+                        //                        String intervalUnits = getAttr( intervalElement, UNITS );
+                        model.setSaveImgInterval( interval );
                     }
 
                     break;
@@ -242,7 +250,7 @@ public class ModelReader extends Constants
                     enabledElement = findElement( el, "" );
                     if( enabledElement != null )
                     {
-                        enabled = getBoolVal( enabledElement );
+                        //                        enabled = getBoolVal( enabledElement );
                     }
                     break;
             }
@@ -266,8 +274,7 @@ public class ModelReader extends Constants
                     {
                         boolean virtual_wall_at_domain_edge = getBoolVal( el );
                         if( virtual_wall_at_domain_edge )
-                            StandardModels
-                                    .getDefaultCellDefinition().functions.membraneInteraction = new DomainEdgeAvoidance();
+                            StandardModels.getDefaultCellDefinition().functions.membraneInteraction = new DomainEdgeAvoidance();
                         break;
                     }
                     catch( Exception ex )
@@ -540,10 +547,43 @@ public class ModelReader extends Constants
                     case "cell_transformations":
                         readCellTransformations( el, cd );
                         break;
+                    case "intracellular":
+                        readIntracellular( el, cd );
+                        break;
                 }
             }
             Element customDataEl = findElement( cdElement, "custom_data" );
             readCustomData( customDataEl, cd );
+        }
+    }
+
+    private void readIntracellular(Element el, CellDefinition cd) throws Exception
+    {
+        Phenotype p = cd.phenotype;
+        p.intracellular = new IntracellularEuler();
+        for( Element child : getAllElements( el ) )
+        {
+            String tag = child.getTagName();
+            if( tag.equals( "intracellular_dt" ) )
+            {
+                double dt = getDoubleVal( child );
+                p.intracellular.setDT( dt );
+            }
+            else if( tag.equals( "map" ) )
+            {
+                String species = getAttr( child, "sbml_species" );
+
+                if( hasAttr( child, "PC_substrate" ) )
+                {
+                    String substrate = getAttr( child, "PC_substrate" );
+                    p.intracellular.addPhenotypeSpecies( substrate, species );
+                }
+                else if( hasAttr( child, "PC_phenotype" ) )
+                {
+                    String code = getAttr( child, "PC_phenotype" );
+                    p.intracellular.addPhenotypeSpecies( code, species );
+                }
+            }
         }
     }
 
@@ -1375,6 +1415,11 @@ public class ModelReader extends Constants
     private String getAttr(Element el, String name)
     {
         return el.getAttribute( name );
+    }
+
+    private boolean hasAttr(Element el, String name)
+    {
+        return el.hasAttribute( name );
     }
 
     private Integer getIntAttr(Element el, String name)

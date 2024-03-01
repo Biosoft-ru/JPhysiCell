@@ -80,7 +80,7 @@ public class Celltype3
     public static void init(Model model) throws Exception
     {
         PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        SignalBehavior.setup_signal_behavior_dictionaries( model.getMicroenvironment() );
+        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
         createCellTypes( model );
         setupTissue( model );
         for( Visualizer visualizer : model.getVisualizers() )

@@ -22,7 +22,7 @@ class Epithelial extends UpdatePhenotype
         //            double b = 5;
         //        }
 
-        double virus = phenotype.molecular.internalized_total_substrates[nVirus];
+        double virus = phenotype.molecular.internSubstrates[nVirus];
         if( virus >= pCell.custom_data.get( "burst_virion_count" ) )
         {
             System.out.println( "\t\tburst!" );
@@ -37,7 +37,7 @@ class Epithelial extends UpdatePhenotype
         {
             double new_virus = pCell.custom_data.get( "viral_replication_rate" );
             new_virus *= dt;
-            phenotype.molecular.internalized_total_substrates[nVirus] += new_virus;
+            phenotype.molecular.internSubstrates[nVirus] += new_virus;
         }
 
         if( virus >= pCell.custom_data.get( "virion_threshold_for_interferon" ) )

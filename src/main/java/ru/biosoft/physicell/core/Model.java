@@ -18,26 +18,35 @@ public class Model
 {
     private List<Visualizer> visualizers = new ArrayList<Visualizer>();
     private String logFile;
-
-    private Microenvironment m;
+    protected Microenvironment m;
     private Map<String, String> parameters = new HashMap<>();
+
     private double tMax;
+    protected double startTime;
+    protected double curTime = 0;
     private double diffusion_dt;
     private double mechanics_dt = 0.1;
     private double phenotype_dt = 6.0;
-    private double full_save_interval;
-    private String resultFolder;
-    private boolean enableFullSaves;
+    private double intracellular_dt = 0.01;
+    private double next_intracellular_update = intracellular_dt;
+
     private boolean hasEvents = false;
     private List<Event> events = new ArrayList<>();
+
+    private boolean saveFull = true;
+    private double saveFullInterval;
+    private double saveFullNext = 0;
+    private boolean saveDensity = false;
+    private boolean saveReport = true;
+    private boolean saveImg = true;
+    private double saveImgNext = 0;
+    private double saveImgInterval;
+
+    private String resultFolder;
     private String densityFolder = null;
-    private String dataFolder = null;
+    private String cellDataFolder = null;
     private String modelFile = null;
-    private double curTime = 0;
-    private double next_full_save_time = 0;
-    private double startTime;
-    private boolean writeDensity = false;
-    private boolean writeData = false;
+
     private String initialPath = null;
 
     public Iterable<Visualizer> getVisualizers()
@@ -49,7 +58,7 @@ public class Model
     {
         this.resultFolder = folder;
         this.densityFolder = folder + "/density";
-        this.dataFolder = folder + "/data";
+        this.cellDataFolder = folder + "/cells";
         this.logFile = folder + "/log.txt";
         this.modelFile = folder + "/model.txt";
     }
@@ -95,26 +104,21 @@ public class Model
 
     public void setWriteDensity(boolean writeDensity)
     {
-        this.writeDensity = writeDensity;
-    }
-
-    public void setWriteData(boolean writeData)
-    {
-        this.writeData = writeData;
+        this.saveDensity = writeDensity;
     }
 
     public void init() throws Exception
     {
         curTime = 0;
-        next_full_save_time = 0;
+        saveFullNext = 0;
 
         File f = new File( resultFolder );
         if( f.exists() )
             deleteDirectory( f );
-        if( writeDensity )
+        if( saveDensity )
             new File( densityFolder ).mkdirs();
-        if( writeData )
-            new File( dataFolder ).mkdirs();
+        if( saveReport )
+            new File( cellDataFolder ).mkdirs();
         f.mkdirs();
 
         writeReport( modelFile, display() );
@@ -141,16 +145,18 @@ public class Model
 
     public void simulate() throws Exception
     {
-        init();
-
         while( curTime < tMax + 0.1 * diffusion_dt )
         {
             boolean eventsFired = executeEvents( curTime );
-            if( Math.abs( curTime - next_full_save_time ) < 0.01 * diffusion_dt || eventsFired )
+            if( saveFull && ( Math.abs( curTime - saveFullNext ) < 0.01 * diffusion_dt || eventsFired ) )
             {
-                if( enableFullSaves )
-                    saveResults();
-                next_full_save_time += full_save_interval;
+                saveFull();
+                saveFullNext += saveFullInterval;
+            }
+            if( saveImg && ( Math.abs( curTime - saveImgNext ) < 0.01 * diffusion_dt || eventsFired ) )
+            {
+                saveImg();
+                saveImgNext += saveImgInterval;
             }
             doStep();
         }
@@ -163,31 +169,44 @@ public class Model
     {
         m.simulateDiffusionDecay( diffusion_dt );
         ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
+        if( curTime >= next_intracellular_update )
+        {
+            updateIntracellular();
+            next_intracellular_update += intracellular_dt;
+        }
         curTime += diffusion_dt;
         m.time = curTime;
     }
 
-    private void saveResults() throws Exception
+    private void saveImg() throws Exception
     {
         for( Visualizer listener : visualizers )
             listener.saveResult( m, curTime );
+    }
 
-        String info = PhysiCellUtilities.getCurrentTime() + "\tElapsed\t" + ( System.currentTimeMillis() - startTime ) / 1000 + "\tTime:\t"
-                + (int)Math.round( curTime ) + "\tCells\t" + m.getAgentsCount();
-
+    private void saveFull() throws Exception
+    {
         if( logFile != null )
         {
             try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( logFile ), true ) ))
             {
-                bw.append( info );
+                bw.append( getLogInfo() );
                 bw.append( "\n" );
             }
         }
-        if( writeDensity )
+        if( saveDensity )
         {
-            getMicroenvironment().writeDensity( densityFolder + "/" + Math.round( curTime ) + ".txt" );
+            getMicroenvironment().writeDensity( densityFolder + "/Density " + Math.round( curTime ) + ".txt" );
         }
-        System.out.println( info );
+        if( saveReport )
+        {
+            writeReport( cellDataFolder + "/Cells " + Math.round( curTime ) + ".txt", this.getReportHeader() );
+            for( Cell cell : getMicroenvironment().getAgents( Cell.class ) )
+            {
+                writeReport( cellDataFolder + "/Cells " + Math.round( curTime ) + ".txt", this.getReport( cell ) );
+            }
+        }
+        System.out.println( getLogInfo() );
     }
 
     private boolean executeEvents(double curTime) throws Exception
@@ -214,6 +233,8 @@ public class Model
     private void writeReport(String name, String str) throws Exception
     {
         File f = new File( name );
+        if( !f.exists() )
+            f.createNewFile();
         try (BufferedWriter bw = new BufferedWriter( new FileWriter( f, true ) ))
         {
             bw.append( str );
@@ -275,34 +296,44 @@ public class Model
         this.tMax = tMax;
     }
 
-    public void setDiffusionDt(double diffusion_dt)
+    public void setDiffusionDt(double dt)
     {
-        this.diffusion_dt = diffusion_dt;
+        this.diffusion_dt = dt;
     }
 
-    public void setMechanicsDt(double mechanics_dt)
+    public void setMechanicsDt(double dt)
     {
-        this.mechanics_dt = mechanics_dt;
+        this.mechanics_dt = dt;
     }
 
-    public void setPhenotypeDt(double phenotype_dt)
+    public void setPhenotypeDt(double dt)
     {
-        this.phenotype_dt = phenotype_dt;
+        this.phenotype_dt = dt;
     }
 
-    public void setSaveInterval(double full_save_interval)
+    public void setSaveFullInterval(double interval)
     {
-        this.full_save_interval = full_save_interval;
+        this.saveFullInterval = interval;
     }
 
-    public void setEnableFullSaves(boolean enable)
+    public void setSaveImgInterval(double interval)
     {
-        enableFullSaves = enable;
+        this.saveImgInterval = interval;
+    }
+
+    public void setSaveFull(boolean enable)
+    {
+        saveFull = enable;
+    }
+
+    public void setSaveImg(boolean enable)
+    {
+        saveImg = enable;
     }
 
     public boolean isEnableFullSaves()
     {
-        return enableFullSaves;
+        return saveFull;
     }
 
     public static abstract class Event
@@ -324,8 +355,8 @@ public class Model
         sb.append( "\nSimulation Options" );
         sb.append( "\n================================" );
         sb.append( "\n\tMaximum Time: " + tMax );
-        sb.append( "\tSave interval " + full_save_interval );
-
+        sb.append( "\tSave interval " + saveFullInterval );
+        sb.append( "\tSeed " + PhysiCellUtilities.getSeed() );
         sb.append( "\n\n" + getMicroenvironment().display() );
         sb.append( "\n" );
         sb.append( "\nCell Types: ( " + CellDefinition.getDefinitionsCount() + " total)" );
@@ -375,4 +406,26 @@ public class Model
     //
     //                        writeReport( resultFolder + "/step_" + curTime + ".txt", report );
     //                    }
+
+    public String getReport(Cell cell) throws Exception
+    {
+        return "\n" + cell.ID + "\t" + cell.position[0] + "\t" + cell.position[1] + "\t" + cell.position[2] + "\t"
+                + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase;
+    }
+
+    public String getReportHeader()
+    {
+        return "ID\tX\tY\tZ\tCycle\tElapsed";
+    }
+
+    public void updateIntracellular() throws Exception
+    {
+
+    }
+
+    public String getLogInfo() throws Exception
+    {
+        return PhysiCellUtilities.getCurrentTime() + "\tElapsed\t" + ( System.currentTimeMillis() - startTime ) / 1000 + "\tTime:\t"
+                + (int)Math.round( curTime ) + "\tCells\t" + m.getAgentsCount();
+    }
 }

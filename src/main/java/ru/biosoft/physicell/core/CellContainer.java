@@ -84,7 +84,7 @@ public class CellContainer extends AgentContainer
     int boundary_condition_for_pushed_out_agents; // what to do with pushed out cells
     boolean initialzed = false;
 
-    public CartesianMesh underlying_mesh = new CartesianMesh();
+    public CartesianMesh mesh = new CartesianMesh();
     double[] max_cell_interactive_distance_in_voxel;
     public int numDivisionsCurStep = 0;
     public int numDeathsCurStep = 0;
@@ -93,7 +93,7 @@ public class CellContainer extends AgentContainer
     double lastCellCycleTime = 0.0;
     double last_mechanics_time = 0.0;
 
-    public List<Set<Cell>> agent_grid;
+    public List<Set<Cell>> agentGrid;
     List<Set<Cell>> agents_in_outer_voxels;
 
     public CellContainer()
@@ -115,12 +115,12 @@ public class CellContainer extends AgentContainer
         boundary_condition_for_pushed_out_agents = PhysiCellConstants.default_boundary_condition_for_pushed_out_agents;
         cellsReadyToDivide = new HashSet<>();
         cellsReadyToDie = new HashSet<>();
-        underlying_mesh.resize( x_start, x_end, y_start, y_end, z_start, z_end, dx, dy, dz );
-        max_cell_interactive_distance_in_voxel = new double[underlying_mesh.voxels.length];
-        agent_grid = new ArrayList<>();//[underlying_mesh.voxels.length];
-        for( int i = 0; i < underlying_mesh.voxels.length; i++ )
-            agent_grid.add( new HashSet<Cell>() );
-        max_cell_interactive_distance_in_voxel = new double[underlying_mesh.voxels.length];
+        mesh.resize( x_start, x_end, y_start, y_end, z_start, z_end, dx, dy, dz );
+        max_cell_interactive_distance_in_voxel = new double[mesh.voxels.length];
+        agentGrid = new ArrayList<>();//[underlying_mesh.voxels.length];
+        for( int i = 0; i < mesh.voxels.length; i++ )
+            agentGrid.add( new HashSet<Cell>() );
+        max_cell_interactive_distance_in_voxel = new double[mesh.voxels.length];
         agents_in_outer_voxels = new ArrayList<>( 6 );
         for( int i = 0; i < 6; i++ )
             agents_in_outer_voxels.add( new HashSet<Cell>() );
@@ -161,7 +161,7 @@ public class CellContainer extends AgentContainer
         {
             if( !cell.isOutOfDomain && initialzed )
             {
-                if( cell.phenotype.intracellular != null && cell.phenotype.intracellular.need_update() )
+                if( cell.phenotype.intracellular != null && cell.phenotype.intracellular.need_update( t ) )
                 {
                     if( ( cell.functions.pre_update_intracellular != null ) )
                         cell.functions.pre_update_intracellular.execute( cell, cell.phenotype, diffusionDT );
@@ -327,7 +327,7 @@ public class CellContainer extends AgentContainer
     public void register_agent(BasicAgent agent)
     {
         int index = ( (Cell)agent ).get_current_mechanics_voxel_index();
-        agent_grid.get( index ).add( (Cell)agent );
+        agentGrid.get( index ).add( (Cell)agent );
         //        agent_grid[agent.get_current_mechanics_voxel_index()].push_back( agent );
     }
 
@@ -355,7 +355,7 @@ public class CellContainer extends AgentContainer
         {
             return;
         }
-        agent_grid.get( voxel_index ).remove( agent );
+        agentGrid.get( voxel_index ).remove( agent );
         //        int delete_index = 0;
         //        while( agent_grid[voxel_index][delete_index] != agent )
         //        {
@@ -373,38 +373,38 @@ public class CellContainer extends AgentContainer
     @Override
     public void add_agent_to_voxel(BasicAgent agent, int voxel_index)
     {
-        agent_grid.get( voxel_index ).add( (Cell)agent );//.push_back( agent );
+        agentGrid.get( voxel_index ).add( (Cell)agent );//.push_back( agent );
     }
     //
     boolean contain_any_cell(int voxel_index)
     {
         // Let's replace this with clearer statements. 
-        return agent_grid.get( voxel_index ).size() == 0 ? false : true;
+        return agentGrid.get( voxel_index ).size() == 0 ? false : true;
     }
 
     int find_escaping_face_index(BasicAgent agent)
     {
-        if( agent.position[0] <= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_min_x_index] )
+        if( agent.position[0] <= agent.get_container().mesh.boundingBox[PhysiCellConstants.mesh_min_x_index] )
         {
             return PhysiCellConstants.mesh_lx_face_index;
         }
-        if( agent.position[0] >= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_max_x_index] )
+        if( agent.position[0] >= agent.get_container().mesh.boundingBox[PhysiCellConstants.mesh_max_x_index] )
         {
             return PhysiCellConstants.mesh_ux_face_index;
         }
-        if( agent.position[1] <= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_min_y_index] )
+        if( agent.position[1] <= agent.get_container().mesh.boundingBox[PhysiCellConstants.mesh_min_y_index] )
         {
             return PhysiCellConstants.mesh_ly_face_index;
         }
-        if( agent.position[1] >= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_max_y_index] )
+        if( agent.position[1] >= agent.get_container().mesh.boundingBox[PhysiCellConstants.mesh_max_y_index] )
         {
             return PhysiCellConstants.mesh_uy_face_index;
         }
-        if( agent.position[2] <= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_min_z_index] )
+        if( agent.position[2] <= agent.get_container().mesh.boundingBox[PhysiCellConstants.mesh_min_z_index] )
         {
             return PhysiCellConstants.mesh_lz_face_index;
         }
-        if( agent.position[2] >= agent.get_container().underlying_mesh.boundingBox[PhysiCellConstants.mesh_max_z_index] )
+        if( agent.position[2] >= agent.get_container().mesh.boundingBox[PhysiCellConstants.mesh_max_z_index] )
         {
             return PhysiCellConstants.mesh_uz_face_index;
         }

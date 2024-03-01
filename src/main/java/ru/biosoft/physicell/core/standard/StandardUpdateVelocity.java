@@ -30,7 +30,7 @@ public class StandardUpdateVelocity extends UpdateVelocity
         //            pCell.add_potentials(*neighbor);
         //        }
         CellContainer container = pCell.get_container();
-        Set<Cell> neighbors = container.agent_grid.get( pCell.get_current_mechanics_voxel_index() );
+        Set<Cell> neighbors = container.agentGrid.get( pCell.get_current_mechanics_voxel_index() );
         for( Cell neighbor : neighbors )
         {
             pCell.addPotentials( neighbor );
@@ -51,7 +51,7 @@ public class StandardUpdateVelocity extends UpdateVelocity
         //                pCell.add_potentials(neighbor);
         //            }
         //        }
-        CartesianMesh mesh = container.underlying_mesh;
+        CartesianMesh mesh = container.mesh;
         int voxelIndex = pCell.get_current_mechanics_voxel_index();
         double[] center = mesh.voxels[voxelIndex].center;
         int[] neighborVoxels = mesh.moore_connected_voxel_indices[voxelIndex];
@@ -60,7 +60,7 @@ public class StandardUpdateVelocity extends UpdateVelocity
             if( !Cell.isNeighborVoxel( pCell, center, mesh.voxels[neighborIndex].center,
                     neighborIndex ) )
                 continue;
-            for( Cell neighbor : container.agent_grid.get( neighborIndex ) )
+            for( Cell neighbor : container.agentGrid.get( neighborIndex ) )
             {
                 pCell.addPotentials( neighbor );
             }

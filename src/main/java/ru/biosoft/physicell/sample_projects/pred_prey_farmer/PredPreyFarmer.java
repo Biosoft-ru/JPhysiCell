@@ -71,11 +71,11 @@ import ru.biosoft.physicell.core.PhysiCellUtilities;
 #                                                                             #
 ###############################################################################
 */
-public class PredPreyFarmer
+public class PredPreyFarmer extends Model
 {
     public static void init(Model model)
     {
-        //        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
+        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
         createCellTypes( model );
         setupTissue( model );
         model.getVisualizers().forEach( v -> v.setAgentVisualizer( new PPFVisualizer() ) );
@@ -84,17 +84,17 @@ public class PredPreyFarmer
     static void createCellTypes(Model model)
     {
         CellDefinition pFarmerDef = CellDefinition.getCellDefinition( "farmer" );
-        pFarmerDef.functions.customCellRule = null;//new WrapBoundariesRule();//   AvoidBoundariesRule();
+        pFarmerDef.functions.customCellRule = null;
         pFarmerDef.functions.updatePhenotype = null;
-        pFarmerDef.functions.updateMigration = null;//new WeightedMotility();
+        pFarmerDef.functions.updateMigration = null;
 
         CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
-        pPreyDef.functions.customCellRule = new WrapBoundariesRule();//AvoidBoundariesRule();
+        pPreyDef.functions.customCellRule = new AvoidBoundariesRule();
         pPreyDef.functions.updatePhenotype = new PreyPhenotype();
         pPreyDef.functions.updateMigration = new WeightedMotility();
 
         CellDefinition pPredDef = CellDefinition.getCellDefinition( "predator" );
-        pPredDef.functions.customCellRule = new WrapBoundariesRule();//AvoidBoundariesRule();
+        pPredDef.functions.customCellRule = new AvoidBoundariesRule();
         pPredDef.functions.updatePhenotype = new PredatorPhenotype();
         pPredDef.functions.updateMigration = new WeightedMotility();
     }

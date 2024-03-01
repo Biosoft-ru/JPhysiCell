@@ -1,5 +1,7 @@
 package ru.biosoft.physicell.core;
 
+import ru.biosoft.physicell.biofvm.Microenvironment;
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -66,7 +68,7 @@ package ru.biosoft.physicell.core;
 #                                                                             #
 ###############################################################################
 */
-public class Intracellular implements Cloneable
+public abstract class Intracellular implements Cloneable
 {
 
     String intracellular_type; // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
@@ -91,39 +93,25 @@ public class Intracellular implements Cloneable
 
     }
 
-    public boolean need_update()
+    public boolean need_update(double time)
     {
         return false;
     }
 
-    public void update()
-    {
+    public abstract void addPhenotypeSpecies(String code, String species);
 
-    }
+    public abstract void update() throws Exception;
+    public abstract void update(Cell cell, Phenotype phenotype, double dt);
+    public abstract void inherit(Cell cell);
 
-    public void update(Cell cell, Phenotype phenotype, double dt)
-    {
-
-    }
-
-    public void inherit(Cell cell)
-    {
-
-    }
-    //
-    //        // This function update the model for the time_step defined in the xml definition
-    //        virtual void update() = 0;
-    //        virtual void update(Cell* cell, Phenotype& phenotype, double dt) = 0;
-    //
-    //        // This function deals with inheritance from mother to daughter cells
-    //        virtual void inherit(Cell* cell) = 0;
-    //
     //        // Get value for model parameter
-    //        virtual double get_parameter_value(std::string name) = 0;
+    public abstract double getParameterValue(String name) throws Exception;
     //        
     //        // Set value for model parameter
-    //        virtual void set_parameter_value(std::string name, double value) = 0;
-    //
+    public abstract void setParameterValue(String name, double value) throws Exception;
+
+    public abstract void setDT(double dt);
+
     //        virtual std::string get_state() = 0;  
     //        
     //        virtual void display(std::ostream& os) = 0;
@@ -143,8 +131,9 @@ public class Intracellular implements Cloneable
     //        
     //
     //        // ================  specific to "roadrunner" ================
-    //        virtual int update_phenotype_parameters(PhysiCell::Phenotype& phenotype) = 0;
-    //        virtual int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype) = 0;
+    public abstract int updatePhenotypeParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception;
+
+    public abstract int validate_PhysiCell_tokens(Microenvironment microenvirionment, Phenotype phenotype) throws Exception;
     //        virtual int validate_SBML_species() = 0;
     //        virtual int create_custom_data_for_SBML(PhysiCell::Phenotype& phenotype) = 0;
     @Override
@@ -153,6 +142,7 @@ public class Intracellular implements Cloneable
         try
         {
             return (Intracellular)super.clone();
+
         }
         catch( CloneNotSupportedException e )
         {

@@ -13,10 +13,11 @@ public class SignalBehavior
     public static Map<Integer, String> int_to_behavior = new HashMap<>();
     static Map<Integer, String> int_to_signal = new HashMap<>();
     public static Map<String, Integer> signal_to_int = new HashMap<>();
-    public static double[] signal_scales = new double[0];
+    public static double[] signalScales = new double[0];
 
     private static boolean setupDone = false;
-    public static double get_single_signal(Cell pCell, int index)
+
+    public static double getSingleSignal(Cell pCell, int index)
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();//Microenvironment.get_default_microenvironment();
         int m = microenvironment.numberDensities();
@@ -30,54 +31,54 @@ public class SignalBehavior
         }
 
         // first m entries: extracellular concentration 
-        int start_substrate_ind = find_signal_index( microenvironment.densityNames[0] );
+        int start_substrate_ind = findSignalIndex( microenvironment.densityNames[0] );
         if( start_substrate_ind <= index && index < start_substrate_ind + m )
         {
             out = pCell.nearest_density_vector()[index - start_substrate_ind];
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // second m entries: intracellular concentration 
-        int start_int_substrate_ind = find_signal_index( "intracellular " + microenvironment.densityNames[0] );
+        int start_int_substrate_ind = findSignalIndex( "intracellular " + microenvironment.densityNames[0] );
         if( start_int_substrate_ind <= index && index < start_int_substrate_ind + m )
         {
-            out = pCell.phenotype.molecular.internalized_total_substrates[index - start_int_substrate_ind];
+            out = pCell.phenotype.molecular.internSubstrates[index - start_int_substrate_ind];
             out /= pCell.phenotype.volume.total;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // next m entries: gradients 
-        int start_substrate_grad_ind = find_signal_index( microenvironment.densityNames[0] + " gradient" );
+        int start_substrate_grad_ind = findSignalIndex( microenvironment.densityNames[0] + " gradient" );
         if( start_substrate_grad_ind <= index && index < start_substrate_grad_ind + m )
         {
             out = VectorUtil.norm( pCell.nearest_gradient( index - start_substrate_grad_ind ) );
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // mechanical pressure 
-        int pressure_ind = find_signal_index( "pressure" );
+        int pressure_ind = findSignalIndex( "pressure" );
         if( index == pressure_ind )
         {
             out = pCell.state.simplePressure;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // cell volume  
-        int volume_ind = find_signal_index( "volume" );
+        int volume_ind = findSignalIndex( "volume" );
         if( index == volume_ind )
         {
             out = pCell.phenotype.volume.total;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // physical contact with cells (of each type) 
         // individual contact signals are a bit costly 
-        int contact_ind = find_signal_index( "contact with " + CellDefinition.getCellDefinition( 0 ).name );
+        int contact_ind = findSignalIndex( "contact with " + CellDefinition.getCellDefinition( 0 ).name );
         if( contact_ind <= index && index < contact_ind + n + 2 )
         {
             int[] counts = new int[n];
@@ -102,82 +103,82 @@ public class SignalBehavior
             if( index < contact_ind + n )
             {
                 out = counts[index - contact_ind];
-                out /= signal_scales[index];
+                out /= signalScales[index];
                 return out;
             }
 
-            int live_contact_ind = find_signal_index( "contact with live cell" );
+            int live_contact_ind = findSignalIndex( "contact with live cell" );
             if( index == live_contact_ind )
             {
                 out = live_cells;
-                out /= signal_scales[index];
+                out /= signalScales[index];
                 return out;
             }
 
-            int dead_contact_ind = find_signal_index( "contact with dead cell" );
+            int dead_contact_ind = findSignalIndex( "contact with dead cell" );
             // index == dead_contact_ind TODO: check
             out = dead_cells;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // contact with BM 
-        int BM_contact_ind = find_signal_index( "contact with basement membrane" );
+        int BM_contact_ind = findSignalIndex( "contact with basement membrane" );
         if( index == BM_contact_ind )
         {
             //            out = (double) pCell.state.contact_with_basement_membrane; 
             out = pCell.state.contactWithBasementMembrane ? 1 : 0;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // damage
-        int damage_ind = find_signal_index( "damage" );
+        int damage_ind = findSignalIndex( "damage" );
         if( index == damage_ind )
         {
             out = pCell.state.damage;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // live / dead state 
-        int dead_ind = find_signal_index( "dead" );
+        int dead_ind = findSignalIndex( "dead" );
         if( index == dead_ind )
         {
             out = pCell.phenotype.death.dead ? 1 : 0;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // integrated total attack time 
-        int tot_attack_ind = find_signal_index( "total attack time" );
+        int tot_attack_ind = findSignalIndex( "total attack time" );
         if( index == tot_attack_ind )
         {
             out = pCell.state.totalAttackTime;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
         // time 
-        int time_ind = find_signal_index( "time" );
+        int time_ind = findSignalIndex( "time" );
         if( index == time_ind )
         {
             out = pCell.getMicroenvironment().time;
-            out /= signal_scales[index]; //TODO: later
+            out /= signalScales[index]; //TODO: later
             return out;
         }
 
         // custom signals 
-        int first_custom_ind = find_signal_index( "custom 0" );
+        int first_custom_ind = findSignalIndex( "custom 0" );
         int max_custom_ind = first_custom_ind + pCell.custom_data.variables.size();
         if( first_custom_ind > -1 && index >= first_custom_ind && index < max_custom_ind )
         {
             out = pCell.custom_data.variables.get( index - first_custom_ind ).value;
-            out /= signal_scales[index];
+            out /= signalScales[index];
             return out;
         }
 
-        int apoptotic_ind = find_signal_index( "apoptotic" );
+        int apoptotic_ind = findSignalIndex( "apoptotic" );
         if( index == apoptotic_ind )
         {
             if( pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.apoptotic )
@@ -190,7 +191,7 @@ public class SignalBehavior
             }
         }
 
-        int necrotic_ind = find_signal_index( "necrotic" );
+        int necrotic_ind = findSignalIndex( "necrotic" );
         if( index == necrotic_ind )
         {
             if( pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_swelling
@@ -223,17 +224,17 @@ public class SignalBehavior
         return 0.0;
     }
 
-    static int find_signal_index(String signal_name)
+    static int findSignalIndex(String name)
     {
-        if( signal_to_int.containsKey( signal_name ) )
-            return signal_to_int.get( signal_name );
-        System.out.println( "having trouble finding " + signal_name );
+        if( signal_to_int.containsKey( name ) )
+            return signal_to_int.get( name );
+        System.out.println( "having trouble finding " + name );
         return -1;
     }
 
     public static double getSingleSignal(Cell pCell, String name)
     {
-        return get_single_signal( pCell, find_signal_index( name ) );
+        return getSingleSignal( pCell, findSignalIndex( name ) );
     }
 
     private static void register(String name, int index)
@@ -248,7 +249,7 @@ public class SignalBehavior
         int_to_behavior.put( index, name );//] = name; 
     }
 
-    public static void setup_signal_behavior_dictionaries(Microenvironment microenvironment)
+    public static void setupDictionaries(Microenvironment microenvironment)
     {
         // set key parameters on number of signals, etc. 
         // make registry of signals 
@@ -559,7 +560,7 @@ public class SignalBehavior
 
         // resize scales; 
         //        signal_scales.resize( int_to_signal.size() , 1.0 ); 
-        signal_scales = VectorUtil.resize( signal_scales, int_to_signal.size(), 1.0 );
+        signalScales = VectorUtil.resize( signalScales, int_to_signal.size(), 1.0 );
         //        System.out.println();
         //        display_signal_dictionary(); 
         //        display_behavior_dictionary(); 
@@ -891,7 +892,7 @@ public class SignalBehavior
         return getSingleBehavior( pCell, findBehaviorIndex( name ) );
     }
 
-    static double getSingleBehavior(Cell pCell, int index) throws Exception
+    public static double getSingleBehavior(Cell pCell, int index) throws Exception
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
         int m = microenvironment.numberDensities();
@@ -1143,7 +1144,7 @@ public class SignalBehavior
         return -1;
     }
 
-    public static double[] get_base_behaviors(Cell pCell)
+    public static double[] getBaseBehaviors(Cell pCell)
     {
         CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
 
@@ -1352,7 +1353,7 @@ public class SignalBehavior
         return parameters;
     }
 
-    public static double get_single_base_behavior(Cell pCell, int index)
+    public static double getSingleBaseBehavior(Cell pCell, int index)
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
         int m = microenvironment.numberDensities();
@@ -1608,12 +1609,12 @@ public class SignalBehavior
         return -1;
     }
 
-    public static double get_single_base_behavior(CellDefinition pCD, String name)
+    public static double getSingleBaseBehavior(CellDefinition pCD, String name)
     {
-        return get_single_base_behavior( pCD, findBehaviorIndex( name ) );
+        return getSingleBaseBehavior( pCD, findBehaviorIndex( name ) );
     }
 
-    public static double get_single_base_behavior(CellDefinition pCD, int index)
+    public static double getSingleBaseBehavior(CellDefinition pCD, int index)
     {
         Microenvironment microenvironment = pCD.getMicroenvironment();
         int m = microenvironment.numberDensities();
@@ -1871,20 +1872,15 @@ public class SignalBehavior
 
     public static double get_single_base_behavior(Cell pCell, String name)
     {
-        return get_single_base_behavior( pCell, findBehaviorIndex( name ) );
+        return getSingleBaseBehavior( pCell, findBehaviorIndex( name ) );
     }
-
-    //    public static double get_single_base_behavior(CellDefinition pCD, String name)
-    //    {
-    //        return get_single_base_behavior( pCD, findBehaviorIndex( name ) );
-    //    }
 
     public static double[] get_base_behaviors(Cell pCell, int[] indices)
     {
         double[] parameters = new double[indices.length];//( indices.size() , 0.0 ); 
         for( int n = 0; n < indices.length; n++ )
         {
-            parameters[n] = get_single_base_behavior( pCell, indices[n] );
+            parameters[n] = getSingleBaseBehavior( pCell, indices[n] );
         }
         return parameters;
     }

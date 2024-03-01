@@ -86,7 +86,7 @@ public class Mechano
     static void createCellTypes(Model model)
     {
         PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        SignalBehavior.setup_signal_behavior_dictionaries( model.getMicroenvironment() );
+        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
         //        Rules.setup_cell_rules( model );
         CellDefinition pCD = CellDefinition.getCellDefinition( "cancer" );
         pCD.phenotype.mechanics.maxAttachments = 6;

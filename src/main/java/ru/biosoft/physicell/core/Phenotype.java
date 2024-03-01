@@ -83,7 +83,7 @@ public class Phenotype implements Cloneable
     public Molecular molecular = new Molecular();
     public CellInteractions cellInteractions = new CellInteractions();
     public CellTransformations cellTransformations = new CellTransformations();
-    public Intracellular intracellular = new Intracellular();
+    public Intracellular intracellular = null;//new Intracellular();
 
     /**
      * Synchronize all parts with microenvironment (densities)  

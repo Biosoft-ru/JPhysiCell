@@ -37,7 +37,7 @@ public class CustomBiorobots
 
     static void createCellTypes(Model m) throws Exception
     {
-        SignalBehavior.setup_signal_behavior_dictionaries( m.getMicroenvironment() );
+        SignalBehavior.setupDictionaries( m.getMicroenvironment() );
         CellDefinition pCD = CellDefinition.getCellDefinition( "director cell" );
         pCD.functions.updatePhenotype = new DirectorCellRule();
 

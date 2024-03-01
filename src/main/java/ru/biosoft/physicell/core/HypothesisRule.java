@@ -320,7 +320,7 @@ public class HypothesisRule
     void add_signal(String signal, double half_max, double hill_power, String response) throws Exception
     {
         // check: is this a valid signal? (is it in the dictionary?)
-        if( SignalBehavior.find_signal_index( signal ) < 0 )
+        if( SignalBehavior.findSignalIndex( signal ) < 0 )
         {
             throw new Exception( "Warning! Attempted to add signal " + signal + " which is not in the dictionary."
                     + "Either fix your model or add the missing signal to the simulation." );
@@ -475,7 +475,7 @@ public class HypothesisRule
         //        pCellDefinition = pCD;
 
         // sync base behavior 
-        base_value = SignalBehavior.get_single_base_behavior( pCD, behavior );
+        base_value = SignalBehavior.getSingleBaseBehavior( pCD, behavior );
     }
 
     void sync_to_CellDefinition(String cell_name)

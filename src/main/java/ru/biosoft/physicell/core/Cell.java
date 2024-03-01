@@ -109,7 +109,7 @@ public class Cell extends BasicAgent
         currentMechanicsVoxelIndex = -1;
         updated_current_mechanics_voxel_index = 0;
 
-        isMovable = true;
+        isMovable = cd.isMovable;
         isOutOfDomain = false;
         displacement = new double[3];// state? 
 
@@ -255,9 +255,9 @@ public class Cell extends BasicAgent
         velocity[0] = 0;
         velocity[1] = 0;
         velocity[2] = 0;
-        if( get_container().underlying_mesh.isPositionValid( position[0], position[1], position[2] ) )
+        if( get_container().mesh.isPositionValid( position[0], position[1], position[2] ) )
         {
-            updated_current_mechanics_voxel_index = get_container().underlying_mesh.nearestVoxelIndex( position );
+            updated_current_mechanics_voxel_index = get_container().mesh.nearestVoxelIndex( position );
         }
         else
         {
@@ -397,7 +397,7 @@ public class Cell extends BasicAgent
 
         //If this cell has been moved outside of the boundaries, mark it as such.
         //(If the child cell is outside of the boundaries, that has been taken care of in the assign_position function.)
-        if( !get_container().underlying_mesh.isPositionValid( position[0], position[1], position[2] ) )
+        if( !get_container().mesh.isPositionValid( position[0], position[1], position[2] ) )
         {
             isOutOfDomain = true;
             isActive = false;
@@ -570,7 +570,7 @@ public class Cell extends BasicAgent
         // update microenvironment current voxel index
         updateVoxelIndex();
         // update current_mechanics_voxel_index
-        currentMechanicsVoxelIndex = get_container().underlying_mesh.nearestVoxelIndex( position );
+        currentMechanicsVoxelIndex = get_container().mesh.nearestVoxelIndex( position );
 
         // Since it is most likely our first position, we update the max_cell_interactive_distance_in_voxel
         // which was not initialized at cell creation
@@ -584,7 +584,7 @@ public class Cell extends BasicAgent
 
         get_container().register_agent( this );
 
-        if( !get_container().underlying_mesh.isPositionValid( x, y, z ) )
+        if( !get_container().mesh.isPositionValid( x, y, z ) )
         {
             isOutOfDomain = true;
             isActive = false;
@@ -1256,7 +1256,7 @@ public class Cell extends BasicAgent
 
     public Set<Cell> cells_in_my_container()
     {
-        return getContainer().agent_grid.get( get_current_mechanics_voxel_index() );
+        return getContainer().agentGrid.get( get_current_mechanics_voxel_index() );
     }
 
     public double[] nearest_gradient(int substrate_index)

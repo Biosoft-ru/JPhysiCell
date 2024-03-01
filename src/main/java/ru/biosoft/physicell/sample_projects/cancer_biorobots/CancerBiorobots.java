@@ -81,7 +81,7 @@ public class CancerBiorobots
 
     public static void init(Model model) throws Exception
     {
-        SignalBehavior.setup_signal_behavior_dictionaries( model.getMicroenvironment() );
+        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
         create_cell_types( model );
         setup_tissue( model );
         model.addEvent( new TherapyEvent( model.getParameterDouble( "therapy_activation_time" ) ) );

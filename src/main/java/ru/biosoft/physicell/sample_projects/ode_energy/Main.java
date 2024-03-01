@@ -1,8 +1,7 @@
-package ru.biosoft.physicell.core;
+package ru.biosoft.physicell.sample_projects.ode_energy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.xml.ModelReader;
 
 /*
 ###############################################################################
@@ -39,7 +38,7 @@ import java.util.Map;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,129 +69,28 @@ import java.util.Map;
 #                                                                             #
 ###############################################################################
 */
-public class CycleData
+public class Main
 {
-    private CycleModel cycleModel;
+    private static String settingsPath = "config/PhysiCell_settings.xml";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/ode_energy/result";
 
-    public String timeUnits;
-
-    public List<List<Double>> transitionRates;
-
-    public List<List<Double>> basicRates;
-
-    public int currentPhaseIndex;
-    public double elapsedTimePhase;
-
-    public CycleData(CycleModel model)
+    public static void main(String ... strings) throws Exception
     {
-        cycleModel = model;
-        timeUnits = "min";
-        transitionRates = new ArrayList<>();
-        basicRates = new ArrayList<>();
-        currentPhaseIndex = 0;
-        elapsedTimePhase = 0.0;
-    }
+        if( strings != null && strings.length > 0 )
+            resultPath = strings[0];
 
-    private void resizeListList(List<List<Double>> list, int n)
-    {
-        if( n < list.size() )
-        {
-            for( int i = n; i < list.size(); i++ )
-                list.remove( i );
-        }
-        else if( n > list.size() )
-        {
-            for( int i = 0; i < n - list.size(); i++ )
-                list.add( new ArrayList<Double>() );
-        }
-    }
+        Model model = new ModelReader().read( Main.class.getResourceAsStream( settingsPath ), OdeEnergy.class );
+        double mechanics_voxel_size = 30;
+        model.createContainer( mechanics_voxel_size );
+        model.setResultFolder( resultPath );
+        model.setWriteDensity( true );
+        model.setSaveFull( true );
+        model.addVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 38 );
+        model.addVisualizer( 0, "glucose" ).setStubstrateIndex( 1 ).setMaxDensity( 50 );
+        model.addVisualizer( 0, "lactate" ).setStubstrateIndex( 2 ).setMaxDensity( 50 );
 
-    private void resizeList(List<Double> list, int n)
-    {
-        if( n < list.size() )
-        {
-            for( int i = n; i < list.size(); i++ )
-                list.remove( i );
-        }
-        else if( n > list.size() )
-        {
-            for( int i = 0; i < n - list.size(); i++ )
-                list.add( 0.0 );
-        }
-    }
-
-    public void syncToCycle()
-    {
-        int n = cycleModel.phases.size();
-        resizeListList( transitionRates, n );
-        resizeListList( basicRates, n );
-        for( int i = 0; i < cycleModel.phaseLinks.size(); i++ )
-        {
-            int size = cycleModel.phaseLinks.get( i ).size();
-            for( int j = 0; j < size; j++ )
-            {
-                List<Double> rates = transitionRates.get( i );
-                resizeList( rates, size );
-                resizeList( basicRates.get( i ), size );
-            }
-        }
-    }
-
-    public double getTransitionRate(int start_phase_index, int end_phase_index)
-    {
-        int index = cycleModel.startToEndToLink.get( start_phase_index ).get( end_phase_index );
-        return transitionRates.get( start_phase_index ).get( index );
-    }
-
-    public void setBasicTransitionRate(int start_phase_index, int end_phase_index, double rate)
-    {
-        int index = cycleModel.startToEndToLink.get( start_phase_index ).get( end_phase_index );
-        basicRates.get( start_phase_index ).set( index, rate );
-    }
-
-    public void setTransitionRate(int start_phase_index, int end_phase_index, double rate)
-    {
-        Map<Integer, Integer> transitions = cycleModel.startToEndToLink.get( start_phase_index );
-        if( transitions == null || !transitions.containsKey( end_phase_index ) )
-            return;
-        int index = transitions.get( end_phase_index );
-        transitionRates.get( start_phase_index ).set( index, rate );
-    }
-
-    public void modifyTransitionRate(int start_phase_index, int end_phase_index, double multiplier)
-    {
-        int index = cycleModel.startToEndToLink.get( start_phase_index ).get( end_phase_index );
-        double basic = this.basicRates.get( start_phase_index ).get( index );
-        transitionRates.get( start_phase_index ).set( index, basic * multiplier );
-    }
-
-    public double getExitRate(int phase_index)
-    {
-        return transitionRates.get( phase_index ).get( 0 );
-    }
-    public void setExitRate(int phase_exit, double rate)
-    {
-        transitionRates.get( phase_exit ).set( 0, rate );
-    }
-
-    public Phase currentPhase()
-    {
-        return cycleModel.phases.get( currentPhaseIndex );
-    }
-
-    public CycleData clone(CycleModel model)
-    {
-        CycleData result = new CycleData( model );
-        result.timeUnits = this.timeUnits;
-        result.currentPhaseIndex = this.currentPhaseIndex;
-        result.elapsedTimePhase = this.elapsedTimePhase;
-        result.transitionRates = new ArrayList<>();
-        result.basicRates = new ArrayList<>();
-        for( int i = 0; i < transitionRates.size(); i++ )
-        {
-            result.transitionRates.add( new ArrayList<Double>( transitionRates.get( i ) ) );
-            result.basicRates.add( new ArrayList<Double>( basicRates.get( i ) ) );
-        }
-        return result;
+        model.init();
+        System.out.println( model.display() );
+        model.simulate();
     }
 }
