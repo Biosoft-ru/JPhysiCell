@@ -32,9 +32,9 @@ public class CargoPhenotype extends UpdatePhenotype
         // if attached and oxygen high, secrete nothing, receptor off
         // if attached and oxygen low, dettach, start secreting chemo, receptor off
         double o2 = SignalBehavior.getSingleSignal( pCell, "oxygen" );
-        double o2_drop = SignalBehavior.getSingleSignal( pCell, "custom:cargo_release_o2_threshold" );
+        double o2Drop = SignalBehavior.getSingleSignal( pCell, "custom:cargo_release_o2_threshold" );
 
-        if( o2 > o2_drop )
+        if( o2 > o2Drop )
         {
             SignalBehavior.setSingleBehavior( pCell, "chemoattractant secretion", 0 );
             SignalBehavior.setSingleBehavior( pCell, "therapeutic secretion", 0 );

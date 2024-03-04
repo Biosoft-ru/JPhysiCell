@@ -80,40 +80,42 @@ import ru.biosoft.physicell.ui.Visualizer;
 ###############################################################################
 */
 
-public class CancerImmune
+public class CancerImmune extends Model
 {
-    public static void init(Model model, boolean use2D) throws Exception
+    private boolean use2D = true;
+
+    @Override
+    public void init() throws Exception
     {
         // use the same random seed so that future experiments have the 
         // same initial histogram of oncoprotein, even if threading means 
         // that future division and other events are still not identical 
         // for all runs 
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        SignalBehavior.setupDictionaries( getMicroenvironment() );
         createCancerCell();
-        createImmuneCell( model );
-        setupTissue( model, use2D );
-        model.addEvent( new ImmunityEvent( model.getParameterDouble( "immune_activation_time" ), use2D ) );
-        for( Visualizer visualizer : model.getVisualizers() )
+        createImmuneCell();
+        setupTissue( use2D );
+        addEvent( new ImmunityEvent( getParameterDouble( "immune_activation_time" ), use2D ) );
+        for( Visualizer visualizer : getVisualizers() )
         {
             visualizer.setAgentVisualizer( new CancerImmunityVisualizer() );
         }
     }
 
-    static void createImmuneCell(Model model)
+    void createImmuneCell()
     {
-        Microenvironment microenvironment = model.getMicroenvironment();
         CellDefinition cd = CellDefinition.getCellDefinition( "immune cell" );
         CellDefinition cancerCellCD = CellDefinition.getCellDefinition( "cancer cell" );
 
-        int oxygen_ID = microenvironment.findDensityIndex( "oxygen" );
-        int immuno_ID = microenvironment.findDensityIndex( "immunostimulatory factor" );
+        int oxygen_ID = m.findDensityIndex( "oxygen" );
+        int immuno_ID = m.findDensityIndex( "immunostimulatory factor" );
 
         // reduce o2 uptake 
-        cd.phenotype.secretion.uptakeRates[oxygen_ID] *= model.getParameterDouble( "immune_o2_relative_uptake" );
+        cd.phenotype.secretion.uptakeRates[oxygen_ID] *= getParameterDouble( "immune_o2_relative_uptake" );
 
-        cd.phenotype.mechanics.cellCellAdhesionStrength *= model.getParameterDouble( "immune_relative_adhesion" );
-        cd.phenotype.mechanics.cellCellRepulsionStrength *= model.getParameterDouble( "immune_relative_repulsion" );
+        cd.phenotype.mechanics.cellCellAdhesionStrength *= getParameterDouble( "immune_relative_adhesion" );
+        cd.phenotype.mechanics.cellCellRepulsionStrength *= getParameterDouble( "immune_relative_repulsion" );
 
         // figure out mechanics parameters 
         cd.phenotype.mechanics.relMaxAttachmentDistance = cancerCellCD.custom_data.get( "max_attachment_distance" )
@@ -131,7 +133,7 @@ public class CancerImmune
         cd.functions.contact = new AdhesionContact();
     }
 
-    public static void createCancerCell() throws Exception
+    public void createCancerCell() throws Exception
     {
         CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
         cd.parameters.o2_proliferation_saturation = 38.0;
@@ -196,27 +198,26 @@ public class CancerImmune
         return cells;
     }
 
-    static void setupTissue(Model model, boolean use2D) throws Exception
+    void setupTissue(boolean use2D) throws Exception
     {
         // place a cluster of tumor cells at the center 
         CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
         double cellRadius = cd.phenotype.geometry.radius;
         //        double cell_spacing = 0.95 * 2.0 * cell_radius;
 
-        double tumorRadius = model.getParameterDouble( "tumor_radius" );// 250.0;  
+        double tumorRadius = getParameterDouble( "tumor_radius" );// 250.0;  
 
         List<double[]> positions = createSpherePositions( cellRadius, tumorRadius, use2D );
         System.out.println( "creating " + positions.size() + " closely-packed tumor cells ... " );
 
-        double imm_mean = model.getParameterDouble( "tumor_mean_immunogenicity" );
-        double imm_sd = model.getParameterDouble( "tumor_immunogenicity_standard_deviation" );
+        double imm_mean = getParameterDouble( "tumor_mean_immunogenicity" );
+        double imm_sd = getParameterDouble( "tumor_immunogenicity_standard_deviation" );
 
-        Microenvironment m = model.getMicroenvironment();
         for( double[] position : positions )
         {
             Cell pCell = Cell.createCell( cd, m, position ); // tumor cell 
             double oncoprotein = Math.max( 0, PhysiCellUtilities.NormalRandom( imm_mean, imm_sd ) );
-            pCell.custom_data.set( "oncoprotein", oncoprotein );
+            pCell.customData.set( "oncoprotein", oncoprotein );
         }
         printSummary( m, "oncoprotein" );
     }
@@ -229,7 +230,7 @@ public class CancerImmune
         Set<Cell> cells = m.getAgents( Cell.class );
         for( Cell cell : cells )
         {
-            double r = cell.custom_data.get( property );
+            double r = cell.customData.get( property );
             sum += r;
             min = Math.min( min, r );
             max = Math.max( max, r );
@@ -239,7 +240,7 @@ public class CancerImmune
         sum = 0.0;
         for( Cell cell : cells )
         {
-            sum += ( cell.custom_data.get( property ) - mean ) * ( cell.custom_data.get( property ) - mean );
+            sum += ( cell.customData.get( property ) - mean ) * ( cell.customData.get( property ) - mean );
         }
         double standardDeviation = Math.sqrt( sum / ( cells.size() - 1.0 + 1e-15 ) );
 

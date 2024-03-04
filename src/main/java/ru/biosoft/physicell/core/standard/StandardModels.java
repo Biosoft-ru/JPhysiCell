@@ -10,7 +10,6 @@ import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CycleModel;
 import ru.biosoft.physicell.core.DeathParameters;
 import ru.biosoft.physicell.core.PhaseArrest;
-import ru.biosoft.physicell.core.PhaseEntry;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
@@ -216,7 +215,7 @@ public class StandardModels
         // triggers the appropriate entry function, and note that 
         // it should trigger cell removal at its end 
         apoptosis.addPhase( PhysiCellConstants.apoptotic, "Apoptotic" );
-        apoptosis.phases.get( 0 ).entryFunction = new PhaseEntry.standard_apoptosis_entry_function();
+        apoptosis.phases.get( 0 ).entryFunction = new standard_apoptosis_entry_function();
         apoptosis.phases.get( 0 ).removalAtExit = true;
 
         // add an empty junk debris phase for this model 
@@ -246,10 +245,10 @@ public class StandardModels
         necrosis.code = PhysiCellConstants.necrosis_death_model;
 
         necrosis.addPhase( PhysiCellConstants.necrotic_swelling, "Necrotic (swelling)" );
-        necrosis.phases.get( 0 ).entryFunction = new PhaseEntry.standard_necrosis_entry_function();
+        necrosis.phases.get( 0 ).entryFunction = new StandardNecrosisEntry();
 
         necrosis.addPhase( PhysiCellConstants.necrotic_lysed, "Necrotic (lysed)" );
-        necrosis.phases.get( 1 ).entryFunction = new PhaseEntry.standard_lysis_entry_function();
+        necrosis.phases.get( 1 ).entryFunction = new StandardLysisEntry();
         necrosis.phases.get( 1 ).removalAtExit = true;
 
         // add an empty junk debris phase for this model 
@@ -296,7 +295,7 @@ public class StandardModels
         Ki67_advanced.setBasicTransitionRate( 2, 0, 1.0 / ( 2.5 * 60.0 ) );
 
         Ki67_advanced.phases.get( 0 ).entryFunction = null; // standard_Ki67_negative_phase_entry_function;
-        Ki67_advanced.phases.get( 1 ).entryFunction = new PhaseEntry.standard_Ki67_positive_phase_entry_function();
+        Ki67_advanced.phases.get( 1 ).entryFunction = new StandardKi67PositiveEntry();
         return Ki67_advanced;
     }
 
@@ -319,7 +318,7 @@ public class StandardModels
         Ki67_basic.phase_link( 1, 0 ).fixedDuration = true;
 
         Ki67_basic.phases.get( 0 ).entryFunction = null; // standard_Ki67_negative_phase_entry_function;
-        Ki67_basic.phases.get( 1 ).entryFunction = new PhaseEntry.standard_Ki67_positive_phase_entry_function();
+        Ki67_basic.phases.get( 1 ).entryFunction = new StandardKi67PositiveEntry();
         return Ki67_basic;
     }
 
@@ -333,7 +332,7 @@ public class StandardModels
         live.phases.get( 0 ).divisionAtExit = true;
         live.addPhaseLink( 0, 0, null );
         live.setBasicTransitionRate( 0, 0, 0.0432 / 60.0 ); // MCF10A have ~0.04 1/hr net birth rate
-        live.phases.get( 0 ).entryFunction = new PhaseEntry.StandardLivePhaseEntry();
+        live.phases.get( 0 ).entryFunction = new StandardLivePhaseEntry();
     }
 
     static void create_cytometry_cycle_models() throws Exception
@@ -360,7 +359,7 @@ public class StandardModels
         flow_cytometry_cycle_model.setBasicTransitionRate( 2, 0, 0.00333 );// 5 hours in G2/M 
 
         flow_cytometry_cycle_model.phases.get( 0 ).entryFunction = null; //  ;
-        flow_cytometry_cycle_model.phases.get( 1 ).entryFunction = new PhaseEntry.SPhaseEntry();// S_phase_entry_function; // Double nuclear volume ;
+        flow_cytometry_cycle_model.phases.get( 1 ).entryFunction = new SPhaseEntry();// S_phase_entry_function; // Double nuclear volume ;
         flow_cytometry_cycle_model.phases.get( 2 ).entryFunction = null;
 
         // expanded flow cytometry model 
@@ -388,7 +387,7 @@ public class StandardModels
         flow_cytometry_separated_cycle_model.setBasicTransitionRate( 3, 0, 0.0167 );// 1 hour in M 
 
         flow_cytometry_separated_cycle_model.phases.get( 0 ).entryFunction = null; //  ;
-        flow_cytometry_separated_cycle_model.phases.get( 1 ).entryFunction = new PhaseEntry.SPhaseEntry(); // Double nuclear volume ;
+        flow_cytometry_separated_cycle_model.phases.get( 1 ).entryFunction = new SPhaseEntry(); // Double nuclear volume ;
         flow_cytometry_separated_cycle_model.phases.get( 2 ).entryFunction = null;
         flow_cytometry_separated_cycle_model.phases.get( 3 ).entryFunction = null;
     }
@@ -408,7 +407,7 @@ public class StandardModels
         cycling_quiescent.setBasicTransitionRate( 1, 0, 1.0 / ( 15.5 * 60.0 ) );// length of Ki67+ states in advanced model 
         cycling_quiescent.phase_link( 1, 0 ).fixedDuration = true;
         cycling_quiescent.phases.get( 0 ).entryFunction = null;
-        cycling_quiescent.phases.get( 1 ).entryFunction = new PhaseEntry.StandardCyclingEntry();//standard_cycling_entry_function;
+        cycling_quiescent.phases.get( 1 ).entryFunction = new StandardCyclingEntry();//standard_cycling_entry_function;
     }
 
 

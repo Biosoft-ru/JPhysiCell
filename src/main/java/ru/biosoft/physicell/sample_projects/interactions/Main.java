@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.interactions;
 
-import java.io.File;
 import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
@@ -84,12 +83,8 @@ public class Main
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        if( !new File( resultPath ).exists() )
-            new File( resultPath ).mkdirs();
-
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
-
-        Model model = new ModelReader().read( settings );
+        Model model = new ModelReader().read( settings, Interactions.class );
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
@@ -99,17 +94,9 @@ public class Main
         model.addVisualizer( 0, "fig_quorum" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );
         model.addVisualizer( 0, "fig_pro_inflam" ).setStubstrateIndex( 3 ).setMaxDensity( 1 );
         model.addVisualizer( 0, "fig_debris" ).setStubstrateIndex( 4 ).setMaxDensity( 1 );
-
         model.getVisualizers().forEach( v -> v.setAgentVisualizer( new AgentVisualizer2() ) );
-
-        /* Users typically start modifying here. START USERMODS */
-        Interactions.init( model );
-        /* Users typically stop modifying here. END USERMODS */
-
-
+        model.init();
         System.out.println( model.display() );
-
-        System.out.println( "\nSimulation strated\n" );
         model.simulate();
     }
 }

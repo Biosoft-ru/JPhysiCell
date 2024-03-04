@@ -23,7 +23,7 @@ public class Macrophage extends UpdatePhenotype
         CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
 
         // digest virus particles inside me 
-        double implicitEulerConstant = ( 1.0 + dt * pCell.custom_data.get( "virus_digestion_rate" ) );
+        double implicitEulerConstant = ( 1.0 + dt * pCell.customData.get( "virus_digestion_rate" ) );
         phenotype.molecular.internSubstrates[nVirus] /= implicitEulerConstant;
 
         // check for contact with a cell
@@ -45,7 +45,7 @@ public class Macrophage extends UpdatePhenotype
                 //                max_distance *= 1.1;
 
                 // if it is not a macrophage, test for viral load if high viral load, eat it. 
-                if( neighbor.phenotype.molecular.internSubstrates[nVirus] > pCell.custom_data.get( "min_virion_detection_threshold" )
+                if( neighbor.phenotype.molecular.internSubstrates[nVirus] > pCell.customData.get( "min_virion_detection_threshold" )
                         && dist < maxDistance )
                 {
                     //                    System.out.println( "\t\tnom nom nom" );

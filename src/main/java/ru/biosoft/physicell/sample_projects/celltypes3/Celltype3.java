@@ -75,36 +75,37 @@ import ru.biosoft.physicell.ui.Visualizer;
 #                                                                             #
 ###############################################################################
 */
-public class Celltype3
+public class Celltype3 extends Model
 {
-    public static void init(Model model) throws Exception
+    @Override
+    public void init() throws Exception
     {
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
-        createCellTypes( model );
-        setupTissue( model );
-        for( Visualizer visualizer : model.getVisualizers() )
+        super.init();
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        SignalBehavior.setupDictionaries( m );
+        createCellTypes();
+        setupTissue();
+        for( Visualizer visualizer : getVisualizers() )
         {
-            visualizer.setAgentVisualizer( new RegularAgentVisualizer( model ) );
+            visualizer.setAgentVisualizer( new RegularAgentVisualizer( this ) );
         }
     }
 
     /**
      * Modifies CellDefinitions
      */
-    static void createCellTypes(Model model) throws Exception
+    void createCellTypes() throws Exception
     {
-        CellDefinition.getCellDefinition( "A" ).functions.updatePhenotype = new A_phenotype( model );
-        CellDefinition.getCellDefinition( "B" ).functions.updatePhenotype = new B_phenotype( model );
-        CellDefinition.getCellDefinition( "C" ).functions.updatePhenotype = new C_phenotype( model );
+        CellDefinition.getCellDefinition( "A" ).functions.updatePhenotype = new A_phenotype( this );
+        CellDefinition.getCellDefinition( "B" ).functions.updatePhenotype = new B_phenotype( this );
+        CellDefinition.getCellDefinition( "C" ).functions.updatePhenotype = new C_phenotype( this );
     }
 
     /**
      * Creates all cells for the model
      */
-    static void setupTissue(Model model)
+    void setupTissue()
     {
-        Microenvironment m = model.getMicroenvironment();
         double xMin = m.mesh.boundingBox[0];
         double yMin = m.mesh.boundingBox[1];
         double zMin = m.mesh.boundingBox[2];
@@ -112,7 +113,7 @@ public class Celltype3
         double yMax = m.mesh.boundingBox[4];
         double zMax = m.mesh.boundingBox[5];
 
-        double maxRadius = model.getParameterDouble( "max_distance_from_origin" );
+        double maxRadius = getParameterDouble( "max_distance_from_origin" );
         xMax = Math.min( xMax, maxRadius );
         xMin = Math.max( xMin, -maxRadius );
         yMax = Math.min( yMax, maxRadius );
@@ -132,13 +133,13 @@ public class Celltype3
         CellDefinition bCD = CellDefinition.getCellDefinition( "B" );
         CellDefinition cCD = CellDefinition.getCellDefinition( "C" );
 
-        int number = model.getParameterInt( "number_of_A" );
+        int number = getParameterInt( "number_of_A" );
         placeInRadius( aCD, m, number, range, maxRadius );
 
-        number = model.getParameterInt( "number_of_B" );
+        number = getParameterInt( "number_of_B" );
         placeInRadius( bCD, m, number, range, maxRadius );
 
-        number = model.getParameterInt( "number_of_C" );
+        number = getParameterInt( "number_of_C" );
         placeInRadius( cCD, m, number, range, maxRadius );
 
         for( Cell cell : m.getAgents( Cell.class ) )

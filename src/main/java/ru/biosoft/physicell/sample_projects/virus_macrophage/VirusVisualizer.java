@@ -25,8 +25,8 @@ public class VirusVisualizer extends AgentVisualizer
         Color output = Color.magenta;
         //            int nVirus = microenvironment.find_density_index( "virus" );
 
-        double min_virus = pCell.custom_data.get( "min_virion_count" );
-        double max_virus = pCell.custom_data.get( "burst_virion_count" );
+        double min_virus = pCell.customData.get( "min_virion_count" );
+        double max_virus = pCell.customData.get( "burst_virion_count" );
         double denominator = max_virus - min_virus + 1e-15;
 
         CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );

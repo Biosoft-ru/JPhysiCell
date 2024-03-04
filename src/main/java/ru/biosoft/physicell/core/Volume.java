@@ -85,7 +85,7 @@ public class Volume implements Cloneable
 
     double cytoplasmic_to_nuclear_ratio;
 
-    double rupture_volume; // in volume units 
+    public double rupture_volume; // in volume units 
 
     //
     // parameters that can be set by users 

@@ -23,7 +23,7 @@ class Epithelial extends UpdatePhenotype
         //        }
 
         double virus = phenotype.molecular.internSubstrates[nVirus];
-        if( virus >= pCell.custom_data.get( "burst_virion_count" ) )
+        if( virus >= pCell.customData.get( "burst_virion_count" ) )
         {
             System.out.println( "\t\tburst!" );
             pCell.lyseCell(); // start_death( apoptosis_model_index );
@@ -33,16 +33,16 @@ class Epithelial extends UpdatePhenotype
 
         // replicate virus particles inside me 
 
-        if( virus >= pCell.custom_data.get( "min_virion_count" ) )
+        if( virus >= pCell.customData.get( "min_virion_count" ) )
         {
-            double new_virus = pCell.custom_data.get( "viral_replication_rate" );
+            double new_virus = pCell.customData.get( "viral_replication_rate" );
             new_virus *= dt;
             phenotype.molecular.internSubstrates[nVirus] += new_virus;
         }
 
-        if( virus >= pCell.custom_data.get( "virion_threshold_for_interferon" ) )
+        if( virus >= pCell.customData.get( "virion_threshold_for_interferon" ) )
         {
-            phenotype.secretion.secretionRates[nInterferon] = pCell.custom_data.get( "max_interferon_secretion_rate" );
+            phenotype.secretion.secretionRates[nInterferon] = pCell.customData.get( "max_interferon_secretion_rate" );
         }
 
         //	 double implicit_Euler_constant = 

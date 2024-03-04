@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.pred_prey_farmer;
 
-import java.io.File;
 import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
@@ -82,12 +81,8 @@ public class Main
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        if( !new File( resultPath ).exists() )
-            new File( resultPath ).mkdirs();
-
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
-
-        Model model = new ModelReader().read( settings );
+        Model model = new ModelReader().read( settings, PredPreyFarmer.class );
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
@@ -95,11 +90,7 @@ public class Main
         model.addVisualizer( 0, "food" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
         model.addVisualizer( 0, "prey signal" ).setStubstrateIndex( 1 ).setMaxDensity( 10 );
         model.addVisualizer( 0, "predator signal" ).setStubstrateIndex( 2 ).setMaxDensity( 10 );
-
-        /* Users typically start modifying here. START USERMODS */
-        PredPreyFarmer.init( model );
-        /* Users typically stop modifying here. END USERMODS */
-
+        model.init();
         System.out.println( model.display() );
         model.simulate();
     }

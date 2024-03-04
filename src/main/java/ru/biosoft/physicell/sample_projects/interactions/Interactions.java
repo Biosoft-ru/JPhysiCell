@@ -66,22 +66,23 @@ package ru.biosoft.physicell.sample_projects.interactions;
 ###############################################################################
 */
 
-import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
 
-public class Interactions
+public class Interactions extends Model
 {
 
-    public static void init(Model model)
+    @Override
+    public void init() throws Exception
     {
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        createCellTypes( model );
-        setupTissue( model );
+        super.init();
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        createCellTypes();
+        setupTissue();
     }
 
-    static void createCellTypes(Model model)
+    void createCellTypes()
     {
         CellDefinition pCD = CellDefinition.getCellDefinition( "bacteria" );
         pCD.functions.updatePhenotype = new BacteriaPhenotype();
@@ -96,7 +97,7 @@ public class Interactions
 
         // set up stem cells 
         pCD = CellDefinition.getCellDefinition( "stem" );
-        pCD.functions.updatePhenotype = new StemPhenotype( model );
+        pCD.functions.updatePhenotype = new StemPhenotype( this );
         // pCD.phenotype.cell_transformations.transformation_rate("differentiated") = 0.0001; 
 
         // set up differentiated cells 
@@ -124,15 +125,14 @@ public class Interactions
 
     }
 
-    static void setupTissue(Model model)
+    void setupTissue()
     {
-        Microenvironment m = model.getMicroenvironment();
-        PhysiCellUtilities.place( m, "bacteria", model.getParameterInt( "number_of_bacteria" ) );
-        PhysiCellUtilities.place( m, "blood vessel", model.getParameterInt( "number_of_blood_vessels" ) );
-        PhysiCellUtilities.place( m, "stem", model.getParameterInt( "number_of_stem_cells" ) );
-        PhysiCellUtilities.place( m, "differentiated", model.getParameterInt( "number_of_differentiated_cells" ) );
-        PhysiCellUtilities.place( m, "macrophage", model.getParameterInt( "number_of_macrophages" ) );
-        PhysiCellUtilities.place( m, "neutrophil", model.getParameterInt( "number_of_neutrophils" ) );
-        PhysiCellUtilities.place( m, "CD8+ T cell", model.getParameterInt( "number_of_CD8T_cells" ) );
+        PhysiCellUtilities.place( m, "bacteria", getParameterInt( "number_of_bacteria" ) );
+        PhysiCellUtilities.place( m, "blood vessel", getParameterInt( "number_of_blood_vessels" ) );
+        PhysiCellUtilities.place( m, "stem", getParameterInt( "number_of_stem_cells" ) );
+        PhysiCellUtilities.place( m, "differentiated", getParameterInt( "number_of_differentiated_cells" ) );
+        PhysiCellUtilities.place( m, "macrophage", getParameterInt( "number_of_macrophages" ) );
+        PhysiCellUtilities.place( m, "neutrophil", getParameterInt( "number_of_neutrophils" ) );
+        PhysiCellUtilities.place( m, "CD8+ T cell", getParameterInt( "number_of_CD8T_cells" ) );
     }
 }

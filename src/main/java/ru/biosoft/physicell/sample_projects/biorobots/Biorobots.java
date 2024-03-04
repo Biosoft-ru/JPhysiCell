@@ -12,14 +12,14 @@ import ru.biosoft.physicell.core.standard.StandardElasticContact;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.xml.ModelReader;
 
-public class CustomBiorobots
+public class Biorobots extends Model
 {
-    public static void setColors(Model model) throws Exception
+    public void setColors() throws Exception
     {
-        Color cargoColor = ModelReader.readColor( model.getParameter( "cargo_color" ) );
-        Color workerColor = ModelReader.readColor( model.getParameter( "worker_color" ) );
-        Color directorColor = ModelReader.readColor( model.getParameter( "director_color" ) );
-        for( Visualizer visualizer : model.getVisualizers() )
+        Color cargoColor = ModelReader.readColor( getParameter( "cargo_color" ) );
+        Color workerColor = ModelReader.readColor( getParameter( "worker_color" ) );
+        Color directorColor = ModelReader.readColor( getParameter( "director_color" ) );
+        for( Visualizer visualizer : getVisualizers() )
         {
             visualizer.setColorType( CellDefinition.getCellDefinition( "cargo cell" ).type, cargoColor );
             visualizer.setColorType( CellDefinition.getCellDefinition( "worker cell" ).type, workerColor );
@@ -27,63 +27,44 @@ public class CustomBiorobots
         }
     }
 
-    public static void init(Model m) throws Exception
+    @Override
+    public void init() throws Exception
     {
-        PhysiCellUtilities.setSeed( m.getParameterInt( "random_seed" ) );
-        createCellTypes( m );
-        setupTissue( m );
-        setColors( m );
+        super.init();
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        createCellTypes();
+        setupTissue();
+        setColors();
     }
 
-    static void createCellTypes(Model m) throws Exception
+    void createCellTypes() throws Exception
     {
-        SignalBehavior.setupDictionaries( m.getMicroenvironment() );
+        SignalBehavior.setupDictionaries( m );
         CellDefinition pCD = CellDefinition.getCellDefinition( "director cell" );
         pCD.functions.updatePhenotype = new DirectorCellRule();
 
         pCD = CellDefinition.getCellDefinition( "cargo cell" );
-        pCD.functions.updatePhenotype = new CargoCellRule( m );
+        pCD.functions.updatePhenotype = new CargoCellRule( this );
         pCD.functions.contact = new StandardElasticContact();
 
         pCD = CellDefinition.getCellDefinition( "worker cell" );
-        pCD.functions.updatePhenotype = new WorkerCellRule( m );
+        pCD.functions.updatePhenotype = new WorkerCellRule( this );
         pCD.functions.contact = new StandardElasticContact();
     }
 
-    static void setupTissue(Model model) throws Exception
+    void setupTissue() throws Exception
     {
-        Microenvironment m = model.getMicroenvironment();
         double Xmin = m.mesh.boundingBox[0];
         double Ymin = m.mesh.boundingBox[1];
-        double Zmin = m.mesh.boundingBox[2];
         double Xmax = m.mesh.boundingBox[3];
         double Ymax = m.mesh.boundingBox[4];
-        double Zmax = m.mesh.boundingBox[5];
-        if( m.options.simulate2D )
-        {
-            Zmin = 0.0;
-            Zmax = 0.0;
-        }
+
         double Xrange = Xmax - Xmin;
         double Yrange = Ymax - Ymin;
 
-        // create some of each type of cell 
-        for( int k = 0; k < CellDefinition.getDefinitionsCount(); k++ )
-        {
-            CellDefinition pCD = CellDefinition.getCellDefinitionByIndex( k );
-            System.out.println( "Placing cells of type " + pCD.name + " ... " );
-            int numberCells = model.getParameterInt( "number_of_cells" );
-            for( int n = 0; n < numberCells; n++ )
-            {
-                double[] position = new double[] {PhysiCellUtilities.UniformRandom( Xmin, Xmax ),
-                        PhysiCellUtilities.UniformRandom( Ymin, Ymax ), PhysiCellUtilities.UniformRandom( Zmin, Zmax )};
-                Cell.createCell( pCD, m, position );
-            }
-        }
-        /* custom loading here */
-        int directorsNumber = model.getParameterInt( "number_of_directors" ); // 15;  
-        int cargoClustersNumber = model.getParameterInt( "number_of_cargo_clusters" ); // 100;  
-        int workersNumber = model.getParameterInt( "number_of_workers" ); // 50;  
+        int directorsNumber = getParameterInt( "number_of_directors" ); // 15;  
+        int cargoClustersNumber = getParameterInt( "number_of_cargo_clusters" ); // 100;  
+        int workersNumber = getParameterInt( "number_of_workers" ); // 50;  
         CellDefinition pCargoDef = CellDefinition.getCellDefinition( "cargo cell" );
         CellDefinition pDirectorDef = CellDefinition.getCellDefinition( "director cell" );
         CellDefinition pWorkerDef = CellDefinition.getCellDefinition( "worker cell" );

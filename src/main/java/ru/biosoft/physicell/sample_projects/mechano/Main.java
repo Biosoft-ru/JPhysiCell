@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.mechano;
 
-import java.io.File;
 import java.io.InputStream;
 
 import ru.biosoft.physicell.core.CellCSVReader;
@@ -80,31 +79,23 @@ public class Main
     private static String SHELL_PATH = "config/cells-shell.csv";
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/mechano/shell";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/mechano/shell2";
 
     public static void main(String ... strings) throws Exception
     {
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        if( !new File( resultPath ).exists() )
-            new File( resultPath ).mkdirs();
-
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
-
-        Model model = new ModelReader().read( settings );
+        Model model = new ModelReader().read( settings, Mechano.class );
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
         model.addVisualizer( 0, "substrate" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
 
-        /* Users typically start modifying here. START USERMODS */
-        Mechano.init( model );
-        //        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( model.getInitialPath() ), model.getMicroenvironment() );
+        model.init();
         CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( SHELL_PATH ), model.getMicroenvironment() );
-        /* Users typically stop modifying here. END USERMODS */
-
         System.out.println( model.display() );
         model.simulate();
     }

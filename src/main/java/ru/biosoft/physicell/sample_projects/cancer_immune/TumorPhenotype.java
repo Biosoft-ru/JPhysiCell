@@ -22,7 +22,7 @@ public class TumorPhenotype extends O2based
         Microenvironment m = pCell.getMicroenvironment();
         int cycle_start_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
         int cycle_end_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
-        int oncoprotein_i = pCell.custom_data.findVariableIndex( "oncoprotein" );
+        int oncoprotein_i = pCell.customData.findVariableIndex( "oncoprotein" );
 
         // update secretion rates based on hypoxia 
         int immune_factor_index = m.findDensityIndex( "immunostimulatory factor" );
@@ -38,7 +38,7 @@ public class TumorPhenotype extends O2based
 
         // multiply proliferation rate by the oncoprotein 
         double rate = phenotype.cycle.data.getTransitionRate( cycle_start_index, cycle_end_index );
-        double factor = pCell.custom_data.get( oncoprotein_i );
+        double factor = pCell.customData.get( oncoprotein_i );
         //        System.out.println( pCell.toString() + " " + rate + " " + factor + " " + rate * factor );
         phenotype.cycle.data.setTransitionRate( cycle_start_index, cycle_end_index, rate * factor );
         //            phenotype.cycle.data.modifyTransitionRate( cycle_start_index, cycle_end_index, pCell.custom_data.get( oncoprotein_i ) );

@@ -17,7 +17,7 @@ public class CancerImmunityVisualizer extends AgentVisualizer
     @Override
     public Color findColor(Cell cell)
     {
-        int oncoprotein_i = cell.custom_data.findVariableIndex( "oncoprotein" );
+        int oncoprotein_i = cell.customData.findVariableIndex( "oncoprotein" );
         Color result = Color.black; // immune are black
 
         if( cell.type == 1 )
@@ -34,7 +34,7 @@ public class CancerImmunityVisualizer extends AgentVisualizer
 
         if( cell.phenotype.death.dead == false )
         {
-            int oncoprotein = (int)Math.round( 0.5 * cell.custom_data.get( oncoprotein_i ) * 255.0 );
+            int oncoprotein = (int)Math.round( 0.5 * cell.customData.get( oncoprotein_i ) * 255.0 );
             return new Color( oncoprotein, oncoprotein, 255 - oncoprotein );
             //                        char szTempString [128];
             //                        sprintf( szTempString , "rgb(%u,%u,%u)", oncoprotein, oncoprotein, 255-oncoprotein );

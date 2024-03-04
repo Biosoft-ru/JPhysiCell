@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.celltypes3;
 
-import java.io.File;
 import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
@@ -76,19 +75,15 @@ public class Main
 {
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/celltypes3/result6";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/celltypes3/result7";
 
     public static void main(String ... strings) throws Exception
     {
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        if( !new File( resultPath ).exists() )
-            new File( resultPath ).mkdirs();
-
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
-
-        Model model = new ModelReader().read( settings );
+        Model model = new ModelReader().read( settings, Celltype3.class );
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
@@ -98,10 +93,8 @@ public class Main
         model.addVisualizer( 0, "figureB" ).setStubstrateIndex( 2 ).setMaxDensity( 0.5 );
         model.addVisualizer( 0, "figureC" ).setStubstrateIndex( 3 ).setMaxDensity( 0.5 );
 
-        /* Users typically start modifying here. START USERMODS */
-        Celltype3.init( model );
-        /* Users typically stop modifying here. END USERMODS */
-
+        model.init();
+        System.out.println( model.display() );
         model.simulate();
     }
 }

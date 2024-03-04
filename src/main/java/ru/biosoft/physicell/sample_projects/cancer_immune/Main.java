@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.cancer_immune;
 
-import java.io.File;
 import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
@@ -76,19 +75,14 @@ public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings2D.xml";
     private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_immune/result2D";
-    private static boolean use2D = true;
 
     public static void main(String ... strings) throws Exception
     {
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        if( !new File( resultPath ).exists() )
-            new File( resultPath ).mkdirs();
-
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
-
-        Model model = new ModelReader().read( settings );
+        Model model = new ModelReader().read( settings, CancerImmune.class );
 
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
@@ -96,9 +90,7 @@ public class Main
         model.setWriteDensity( true );
         model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
 
-        /* Users typically start modifying here. START USERMODS */
-        CancerImmune.init( model, use2D );
-        /* Users typically stop modifying here. END USERMODS */
+        model.init();
         System.out.println( model.display() );
         model.simulate();
     }

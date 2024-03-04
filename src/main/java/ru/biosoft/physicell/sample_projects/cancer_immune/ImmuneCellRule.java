@@ -10,7 +10,7 @@ public class ImmuneCellRule extends CustomCellRule
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        int attach_lifetime_i = pCell.custom_data.findVariableIndex( "attachment_lifetime" );
+        int attach_lifetime_i = pCell.customData.findVariableIndex( "attachment_lifetime" );
 
         if( phenotype.death.dead == true )
         {
@@ -34,7 +34,7 @@ public class ImmuneCellRule extends CustomCellRule
             }
 
             // decide whether to detach 
-            if( PhysiCellUtilities.UniformRandom() < dt / ( pCell.custom_data.get( attach_lifetime_i ) + 1e-15 ) )
+            if( PhysiCellUtilities.UniformRandom() < dt / ( pCell.customData.get( attach_lifetime_i ) + 1e-15 ) )
                 detach_me = true;
 
             // if I dettach, resume motile behavior 
@@ -65,21 +65,21 @@ public class ImmuneCellRule extends CustomCellRule
 
     static boolean attemptApoptosis(Cell pAttacker, Cell pTarget, double dt)
     {
-        int oncoproteinIndex = pTarget.custom_data.findVariableIndex( "oncoprotein" );
-        int killRateIndex = pAttacker.custom_data.findVariableIndex( "kill_rate" );
+        int oncoproteinIndex = pTarget.customData.findVariableIndex( "oncoprotein" );
+        int killRateIndex = pAttacker.customData.findVariableIndex( "kill_rate" );
 
-        double oncoproteinSaturation = pAttacker.custom_data.get( "oncoprotein_saturation" ); // 2.0; 
-        double oncoproteinThreshold = pAttacker.custom_data.get( "oncoprotein_threshold" ); // 0.5; // 0.1; 
+        double oncoproteinSaturation = pAttacker.customData.get( "oncoprotein_saturation" ); // 2.0; 
+        double oncoproteinThreshold = pAttacker.customData.get( "oncoprotein_threshold" ); // 0.5; // 0.1; 
         double oncoproteinDifference = oncoproteinSaturation - oncoproteinThreshold;
 
-        double targetOconoprotein = pTarget.custom_data.get( oncoproteinIndex );
+        double targetOconoprotein = pTarget.customData.get( oncoproteinIndex );
         if( targetOconoprotein < oncoproteinThreshold )
             return false;
 
         double scale = ( targetOconoprotein - oncoproteinThreshold ) / oncoproteinDifference;
         scale = Math.min( scale, 1.0 );
 
-        if( PhysiCellUtilities.UniformRandom() < pAttacker.custom_data.get( killRateIndex ) * scale * dt )
+        if( PhysiCellUtilities.UniformRandom() < pAttacker.customData.get( killRateIndex ) * scale * dt )
             return true;
         return false;
     }
@@ -99,18 +99,18 @@ public class ImmuneCellRule extends CustomCellRule
 
     static boolean attemptAttachment(Cell pAttacker, Cell pTarget, double dt)
     {
-        double oncoprotein_saturation = pAttacker.custom_data.get( "oncoprotein_saturation" );
-        double oncoprotein_threshold = pAttacker.custom_data.get( "oncoprotein_threshold" );
-        double maxAttachmentDistance = pAttacker.custom_data.get( "max_attachment_distance" );
-        double minAttachmentDistance = pAttacker.custom_data.get( "min_attachment_distance" );
-        double targetOncoprotein = pTarget.custom_data.get( "oncoprotein" );
+        double oncoprotein_saturation = pAttacker.customData.get( "oncoprotein_saturation" );
+        double oncoprotein_threshold = pAttacker.customData.get( "oncoprotein_threshold" );
+        double maxAttachmentDistance = pAttacker.customData.get( "max_attachment_distance" );
+        double minAttachmentDistance = pAttacker.customData.get( "min_attachment_distance" );
+        double targetOncoprotein = pTarget.customData.get( "oncoprotein" );
         if( targetOncoprotein > oncoprotein_threshold && !pTarget.phenotype.death.dead )
         {
             double distance = VectorUtil.dist( pTarget.position, pAttacker.position );
             if( distance > maxAttachmentDistance )
                 return false;
 
-            double attachRate = pAttacker.custom_data.get( "attachment_rate" );
+            double attachRate = pAttacker.customData.get( "attachment_rate" );
             double scale = ( targetOncoprotein - oncoprotein_threshold ) / ( oncoprotein_saturation - oncoprotein_threshold );
             double distanceScale = ( maxAttachmentDistance - distance ) / ( maxAttachmentDistance - minAttachmentDistance );
             attachRate *= Math.min( scale, 1.0 ) * Math.min( distanceScale, 1.0 );

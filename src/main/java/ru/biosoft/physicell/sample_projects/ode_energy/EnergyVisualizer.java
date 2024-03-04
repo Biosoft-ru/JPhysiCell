@@ -11,14 +11,14 @@ public class EnergyVisualizer extends FalseCellCytometryVisualizer
     public Color findColor(Cell pCell)
     {
         // Get Energy index
-        int energy_vi = pCell.custom_data.findVariableIndex( "intra_energy" );
+        int energy_vi = pCell.customData.findVariableIndex( "intra_energy" );
 
         // start with flow cytometry coloring 
         //	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
 
         // color
         // proliferative cell
-        if( pCell.phenotype.death.dead == false && pCell.type == 0 && pCell.custom_data.get( energy_vi ) > 445 )
+        if( pCell.phenotype.death.dead == false && pCell.type == 0 && pCell.customData.get( energy_vi ) > 445 )
         {
             return new Color( 125, 125, 0 );
             //		output[0] = "rgb(255,255,0)";
@@ -26,7 +26,7 @@ public class EnergyVisualizer extends FalseCellCytometryVisualizer
         }
 
         // arrested cell
-        if( pCell.phenotype.death.dead == false && pCell.type == 0 && pCell.custom_data.get( energy_vi ) <= 445 )
+        if( pCell.phenotype.death.dead == false && pCell.type == 0 && pCell.customData.get( energy_vi ) <= 445 )
         {
             return new Color( 125, 0, 0 );
             //		output[0] = "rgb(255,0,0)";

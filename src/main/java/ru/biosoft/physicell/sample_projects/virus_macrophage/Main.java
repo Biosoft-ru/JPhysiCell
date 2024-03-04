@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.virus_macrophage;
 
-import java.io.File;
 import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
@@ -76,31 +75,22 @@ public class Main
 {
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/virus_macrophage/result2";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/virus_macrophage/result3";
 
     public static void main(String ... strings) throws Exception
     {
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        if( !new File( resultPath ).exists() )
-            new File( resultPath ).mkdirs();
-
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
-
-        Model model = new ModelReader().read( settings );
+        Model model = new ModelReader().read( settings, VirusMacrophage.class );
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
         model.addVisualizer( 0, "virus" ).setStubstrateIndex( 0 ).setMaxDensity( 1E-4 );
         model.addVisualizer( 0, "interferon" ).setStubstrateIndex( 1 ).setMaxDensity( 1E-4 );
-
-
-        /* Users typically start modifying here. START USERMODS */
-        VirusMacrophage.init( model );
-        /* Users typically stop modifying here. END USERMODS */
-
+        model.init();
         System.out.println( model.display() );
         model.simulate();
     }

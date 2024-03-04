@@ -20,9 +20,9 @@ public class WeightedMotility extends UpdateMigrationBias
     {
         double[] direction = phenotype.motility.migrationBiasDirection;
         VectorUtil.zero( direction );
-        VectorUtil.axpy( direction, pCell.custom_data.get( "prey_weight" ), pCell.nearestGradient( "prey signal" ) );
-        VectorUtil.axpy( direction, pCell.custom_data.get( "predator_weight" ), pCell.nearestGradient( "predator signal" ) );
-        VectorUtil.axpy( direction, pCell.custom_data.get( "food_weight" ), pCell.nearestGradient( "food" ) );
+        VectorUtil.axpy( direction, pCell.customData.get( "prey_weight" ), pCell.nearestGradient( "prey signal" ) );
+        VectorUtil.axpy( direction, pCell.customData.get( "predator_weight" ), pCell.nearestGradient( "predator signal" ) );
+        VectorUtil.axpy( direction, pCell.customData.get( "food_weight" ), pCell.nearestGradient( "food" ) );
         VectorUtil.normalize( direction );
     }
 

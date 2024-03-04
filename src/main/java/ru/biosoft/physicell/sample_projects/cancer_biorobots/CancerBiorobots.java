@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.cancer_biorobots;
 
-import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
@@ -76,24 +75,26 @@ import ru.biosoft.physicell.ui.Visualizer;
 ###############################################################################
 */
 
-public class CancerBiorobots
+public class CancerBiorobots extends Model
 {
 
-    public static void init(Model model) throws Exception
+    @Override
+    public void init() throws Exception
     {
-        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
-        create_cell_types( model );
-        setup_tissue( model );
-        model.addEvent( new TherapyEvent( model.getParameterDouble( "therapy_activation_time" ) ) );
-        for( Visualizer visualizer : model.getVisualizers() )
+        super.init();
+        SignalBehavior.setupDictionaries( m );
+        createCellTypes();
+        setup_tissue();
+        addEvent( new TherapyEvent( getParameterDouble( "therapy_activation_time" ) ) );
+        for( Visualizer visualizer : getVisualizers() )
         {
             visualizer.setAgentVisualizer( new CancerBiorobotsVisualizer() );
         }
     }
 
-    private static void create_cell_types(Model m)
+    private void createCellTypes()
     {
-        PhysiCellUtilities.setSeed( m.getParameterInt( "random_seed" ) );
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
 
         //cancer cell
         CellDefinition pCD = CellDefinition.getCellDefinition( "cancer cell" );
@@ -127,51 +128,28 @@ public class CancerBiorobots
         pCD.functions.updatePhenotype = null; // worker_cell_rule;
         pCD.functions.customCellRule = new WorkerCellRule();
         pCD.functions.contact = new BiorobotsContact();
-
-        /*
-         * This builds the map of cell definitions and summarizes the setup.
-         */
-
-        //	display_CellDefinitions(std::cout);
     }
 
-    private static void setup_tissue(Model model) throws Exception
+    private void setupTissue() throws Exception
     {
-        Microenvironment microenvironment = model.getMicroenvironment();
-        double Xmin = microenvironment.mesh.boundingBox[0];
-        double Ymin = microenvironment.mesh.boundingBox[1];
-        double Zmin = microenvironment.mesh.boundingBox[2];
-        double Xmax = microenvironment.mesh.boundingBox[3];
-        double Ymax = microenvironment.mesh.boundingBox[4];
-        double Zmax = microenvironment.mesh.boundingBox[5];
+        double Xmin = m.mesh.boundingBox[0];
+        double Ymin = m.mesh.boundingBox[1];
+        double Zmin = m.mesh.boundingBox[2];
+        double Xmax = m.mesh.boundingBox[3];
+        double Ymax = m.mesh.boundingBox[4];
+        double Zmax = m.mesh.boundingBox[5];
 
-        if( microenvironment.options.simulate2D == true )
+        if( m.options.simulate2D )
         {
             Zmin = 0.0;
             Zmax = 0.0;
         }
-        // create some of each type of cell
-
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
-        {
-            System.out.println( "Placing cells of type " + cd.name + " ... " );
-            for( int n = 0; n < model.getParameterInt( "number_of_cells" ); n++ )
-            {
-                double[] position = {0, 0, 0};
-                position[0] = PhysiCellUtilities.UniformRandom( Xmin, Xmax );// * Xrange;
-                position[1] = PhysiCellUtilities.UniformRandom( Ymin, Ymax );// + PhysiCellUtilities.UniformRandom() * Yrange;
-                position[2] = PhysiCellUtilities.UniformRandom( Zmin, Zmax );// + PhysiCellUtilities.UniformRandom() * Zrange;
-                Cell.createCell( cd, microenvironment, position );
-            }
-        }
-        //	std::cout << std::endl; 
-
         // custom placement, place a cluster of tumor cells at the center
         CellDefinition defaults = StandardModels.getDefaultCellDefinition();
         double cell_radius = defaults.phenotype.geometry.radius;
         double cell_spacing = 0.95 * 2.0 * cell_radius;
 
-        double tumor_radius = model.getParameterDouble( "tumor_radius" ); // 200.0;
+        double tumor_radius = getParameterDouble( "tumor_radius" ); // 200.0;
 
         Cell pCell = null;
         CellDefinition pCD_cancer = CellDefinition.getCellDefinition( "cancer cell" );
@@ -192,20 +170,20 @@ public class CancerBiorobots
 
             while( x < x_outer )
             {
-                pCell = Cell.createCell( pCD_cancer, microenvironment, new double[] {x, y, 0.0} ); // tumor cell
+                pCell = Cell.createCell( pCD_cancer, m, new double[] {x, y, 0.0} ); // tumor cell
 
                 if( Math.abs( y ) > 0.01 )
                 {
-                    pCell = Cell.createCell( pCD_cancer, microenvironment, new double[] {x, -y, 0.0} ); // tumor cell			
+                    pCell = Cell.createCell( pCD_cancer, m, new double[] {x, -y, 0.0} ); // tumor cell			
                 }
 
                 if( Math.abs( x ) > 0.01 )
                 {
-                    Cell.createCell( pCD_cancer, microenvironment, new double[] { -x, y, 0.0} );
+                    Cell.createCell( pCD_cancer, m, new double[] { -x, y, 0.0} );
 
                     if( Math.abs( y ) > 0.01 )
                     {
-                        Cell.createCell( pCD_cancer, microenvironment, new double[] { -x, -y, 0.0} );
+                        Cell.createCell( pCD_cancer, m, new double[] { -x, -y, 0.0} );
                     }
                 }
                 x += cell_spacing;
@@ -213,40 +191,6 @@ public class CancerBiorobots
 
             y += cell_spacing * Math.sqrt( 3.0 ) / 2.0;
             n++;
-        }
-    }
-
-    public static void introduce_biorobots(Model model) throws Exception
-    {
-        Microenvironment m = model.getMicroenvironment();
-        // idea: we'll "inject" them in a little column
-        double worker_fraction = model.getParameterDouble( "worker_fraction" ); // 0.10; /* param */
-        int number_of_injected_cells = model.getParameterInt( "number_of_injected_cells" ); // 500; /* param */
-
-        // make these vary with domain size
-        double left_coordinate = m.options.X_range[1] - 150.0; // 600.0;
-        double right_cooridnate = m.options.X_range[1] - 50.0; // 700.0;
-
-        double bottom_coordinate = m.options.Y_range[0] + 50.0; // -700;
-        double top_coordinate = m.options.Y_range[1] - 50.0; // 700;
-
-        CellDefinition pCD_worker = CellDefinition.getCellDefinition( "worker cell" );
-        CellDefinition pCD_cargo = CellDefinition.getCellDefinition( "cargo cell" );
-
-        for( int i = 0; i < number_of_injected_cells; i++ )
-        {
-            double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( left_coordinate, right_cooridnate );//left_coordinate + ( right_cooridnate - left_coordinate ) * PhysiCellUtilities.UniformRandom();
-            position[1] = PhysiCellUtilities.UniformRandom( bottom_coordinate, top_coordinate );//bottom_coordinate + ( top_coordinate - bottom_coordinate ) * PhysiCellUtilities.UniformRandom();
-
-            if( PhysiCellUtilities.UniformRandom() <= worker_fraction )
-            {
-                Cell.createCell( pCD_worker, m, position );
-            }
-            else
-            {
-                Cell.createCell( pCD_cargo, m, position );
-            }
         }
     }
 }

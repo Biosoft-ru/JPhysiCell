@@ -75,24 +75,24 @@ import ru.biosoft.physicell.ui.Visualizer;
 ###############################################################################
 */
 
-public class Heterogeneity
+public class Heterogeneity extends Model
 {
     private static final String CUSTOM_ONCOPROTEIN = "custom:oncoprotein";
 
-    public static void init(Model model) throws Exception
+    @Override
+    public void init() throws Exception
     {
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
-        createCellTypes( model );
-        setupTissue( model );
-        printSummary( model.getMicroenvironment(), CUSTOM_ONCOPROTEIN );
-        for( Visualizer visualizer : model.getVisualizers() )
-        {
-            visualizer.setAgentVisualizer( new HeterogeneityVisualizer( model ) );
-        }
+        super.init();
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        SignalBehavior.setupDictionaries( getMicroenvironment() );
+        createCellTypes();
+        setupTissue();
+        printSummary( m, CUSTOM_ONCOPROTEIN );
+        for( Visualizer visualizer : getVisualizers() )
+            visualizer.setAgentVisualizer( new HeterogeneityVisualizer( this ) );
     }
 
-    static void createCellTypes(Model model)
+    void createCellTypes()
     {
         CellDefinition pCD = CellDefinition.getCellDefinition( "cancer cell" );
         pCD.functions.updatePhenotype = new TumorPhenotype();
@@ -100,47 +100,19 @@ public class Heterogeneity
         pCD.parameters.o2_reference = 38;
     }
 
-    static void setupTissue(Model model) throws Exception
+    void setupTissue() throws Exception
     {
-        Microenvironment m = model.getMicroenvironment();
-        double xMin = m.mesh.boundingBox[0];
-        double yMin = m.mesh.boundingBox[1];
-        double zMin = m.mesh.boundingBox[2];
-        double xMax = m.mesh.boundingBox[3];
-        double yMax = m.mesh.boundingBox[4];
-        double zMax = m.mesh.boundingBox[5];
-
-        if( m.options.simulate2D == true )
-        {
-            zMin = 0.0;
-            zMax = 0.0;
-        }
-
-        // create some of each type of cell 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
-        {
-            System.out.println( "Placing cells of type " + cd.name + " ... " );
-            for( int n = 0; n < model.getParameterInt( "number_of_cells" ); n++ )
-            {
-                double[] position = new double[3];
-                position[0] = PhysiCellUtilities.UniformRandom( xMin, xMax );
-                position[1] = PhysiCellUtilities.UniformRandom( yMin, yMax );
-                position[2] = PhysiCellUtilities.UniformRandom( zMin, zMax );
-                Cell.createCell( cd, m, position );
-            }
-        }
-
         CellDefinition pCD = CellDefinition.getCellDefinition( "cancer cell" );
         double cellRadius = pCD.phenotype.geometry.radius;
         double cellSpacing = 0.95 * 2.0 * cellRadius;
-        double tumorRadius = model.getParameterDouble( "tumor_radius" ); // 250.0; 
+        double tumorRadius = getParameterDouble( "tumor_radius" ); // 250.0; 
         double x = 0.0;
         double xOuter = tumorRadius;
         double y = 0.0;
-        double pMean = model.getParameterDouble( "oncoprotein_mean" );
-        double pSD = model.getParameterDouble( "oncoprotein_sd" );
-        double pMin = model.getParameterDouble( "oncoprotein_min" );
-        double pMax = model.getParameterDouble( "oncoprotein_max" );
+        double pMean = getParameterDouble( "oncoprotein_mean" );
+        double pSD = getParameterDouble( "oncoprotein_sd" );
+        double pMin = getParameterDouble( "oncoprotein_min" );
+        double pMax = getParameterDouble( "oncoprotein_max" );
 
         int n = 0;
         while( y < tumorRadius )
@@ -188,7 +160,7 @@ public class Heterogeneity
         }
     }
 
-    static void printSummary(Microenvironment m, String parameter)
+    void printSummary(Microenvironment m, String parameter)
     {
         double sum = 0.0;
         double min = 9e9;

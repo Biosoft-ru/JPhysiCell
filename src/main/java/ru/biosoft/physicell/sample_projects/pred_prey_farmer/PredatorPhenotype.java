@@ -33,15 +33,15 @@ public class PredatorPhenotype extends UpdatePhenotype
                 if( distance <= pCell.phenotype.geometry.radius + prey.phenotype.geometry.radius + maxDetectionDistance )
                 {
                     pCell.ingestCell( prey );
-                    pCell.custom_data.set( "energy", pCell.custom_data.get( "energy" ) + 100 );
+                    pCell.customData.set( "energy", pCell.customData.get( "energy" ) + 100 );
                 }
             }
         }
 
-        pCell.custom_data.set( "energy", pCell.custom_data.get( "energy" ) / ( 1.0 + dt * decayRate ) );
+        pCell.customData.set( "energy", pCell.customData.get( "energy" ) / ( 1.0 + dt * decayRate ) );
 
         int nNecrosis = phenotype.death.findDeathModelIndex( "necrosis" );
-        if( pCell.custom_data.get( "energy" ) < 0.1 )
+        if( pCell.customData.get( "energy" ) < 0.1 )
         {
             pCell.startDeath( nNecrosis );
             pCell.functions.updatePhenotype = null;

@@ -84,7 +84,7 @@ public class Cell extends BasicAgent
     public String typeName;
 
     CellDefinition definition;
-    public CustomCellData custom_data;// = new CustomCellData();
+    public CustomCellData customData;// = new CustomCellData();
     public CellParameters parameters;// = new CellParameters();
     public CellFunctions functions;// = new CellFunctions();
 
@@ -99,7 +99,7 @@ public class Cell extends BasicAgent
         super( m );
         type = cd.type;
         typeName = cd.name;
-        custom_data = cd.custom_data.clone();
+        customData = cd.custom_data.clone();
         parameters = cd.parameters.clone();
         functions = cd.functions.clone();
         phenotype = cd.phenotype.clone();
@@ -128,12 +128,12 @@ public class Cell extends BasicAgent
 
     void flagForDivision()
     {
-        get_container().flag_cell_for_division( this );
+        get_container().flagDivision( this );
     }
 
     void flagForRemoval()
     {
-        get_container().flag_cell_for_removal( this );
+        get_container().flagRemoval( this );
     }
 
     @Override
@@ -237,7 +237,7 @@ public class Cell extends BasicAgent
 
         // new AUgust 2017
         //        if( MicroenvironmentOptions.default_microenvironment_options.simulate_2D == true )
-        if( microenvironment.options.simulate2D )
+        if( m.options.simulate2D )
         {
             velocity[2] = 0.0;
         }
@@ -320,18 +320,18 @@ public class Cell extends BasicAgent
         // version 1.10.3: 
         // conserved quantitites in custom data aer divided in half
         // so that each daughter cell gets half of the original ;
-        for( int nn = 0; nn < custom_data.variables.size(); nn++ )
+        for( int nn = 0; nn < customData.variables.size(); nn++ )
         {
-            if( custom_data.variables.get( nn ).conserved_quantity )
+            if( customData.variables.get( nn ).conserved_quantity )
             {
-                custom_data.variables.get( nn ).value *= 0.5;
+                customData.variables.get( nn ).value *= 0.5;
             }
         }
-        for( int nn = 0; nn < custom_data.vectorVariables.size(); nn++ )
+        for( int nn = 0; nn < customData.vectorVariables.size(); nn++ )
         {
-            if( custom_data.vectorVariables.get( nn ).conserved_quantity )
+            if( customData.vectorVariables.get( nn ).conserved_quantity )
             {
-                VectorUtil.prod( custom_data.vectorVariables.get( nn ).value, 0.5 );
+                VectorUtil.prod( customData.vectorVariables.get( nn ).value, 0.5 );
             }
         }
 
@@ -380,7 +380,7 @@ public class Cell extends BasicAgent
         double[] pos = VectorUtil.newSum( position, rand_vec );
         //        System.out.println( type_name + "\tdivided\t" + position[0] + "\t" + position[1] + "\t" + position[2] + "\t->\t" + pos[0] + "\t"
         //                + pos[1] + "\t" + pos[2] );
-        Cell child = createCell( functions.instantiate_cell, definition, microenvironment, pos );
+        Cell child = createCell( functions.instantiate_cell, definition, m, pos );
         child.copyData( this );
         child.copyFunctionPointers( this );
         child.parameters = parameters;
@@ -441,28 +441,28 @@ public class Cell extends BasicAgent
         state.springAttachments.clear();
     }
 
-    public static void attachcCells(Cell pCell_1, Cell pCell_2)
+    public static void attachcCells(Cell cell1, Cell cell2)
     {
-        pCell_1.attachCell( pCell_2 );
-        pCell_2.attachCell( pCell_1 );
+        cell1.attachCell( cell2 );
+        cell2.attachCell( cell1 );
     }
 
-    public static void attachCellsAsSpring(Cell pCell_1, Cell pCell_2)
+    public static void attachCellsAsSpring(Cell cell1, Cell cell2)
     {
-        pCell_1.attachCellAsSpring( pCell_2 );
-        pCell_2.attachCellAsSpring( pCell_1 );
+        cell1.attachCellAsSpring( cell2 );
+        cell2.attachCellAsSpring( cell1 );
     }
 
-    public static void detachCells(Cell pCell_1, Cell pCell_2)
+    public static void detachCells(Cell cell1, Cell cell2)
     {
-        pCell_1.detachCell( pCell_2 );
-        pCell_2.detachCell( pCell_1 );
+        cell1.detachCell( cell2 );
+        cell2.detachCell( cell1 );
     }
 
-    public static void detachCellsAsSpring(Cell pCell_1, Cell pCell_2)
+    public static void detachCellsAsSpring(Cell cell1, Cell cell2)
     {
-        pCell_1.detachCellAsSpring( pCell_2 );
-        pCell_2.detachCellAsSpring( pCell_1 );
+        cell1.detachCellAsSpring( cell2 );
+        cell2.detachCellAsSpring( cell1 );
     }
 
     void attachCell(Cell pAddMe)
@@ -486,24 +486,24 @@ public class Cell extends BasicAgent
         state.springAttachments.remove( pRemoveMe );
     }
 
-    public void copyData(Cell copy_me)
+    public void copyData(Cell copyMe)
     {
         // phenotype=copyMe->phenotype; //it is taken care in set_phenotype
-        type = copy_me.type;
-        typeName = copy_me.typeName;
+        type = copyMe.type;
+        typeName = copyMe.typeName;
 
-        custom_data = copy_me.custom_data.clone();
-        parameters = copy_me.parameters.clone();
+        customData = copyMe.customData.clone();
+        parameters = copyMe.parameters.clone();
 
-        velocity = copy_me.velocity.clone();
+        velocity = copyMe.velocity.clone();
         // expected_phenotype = copy_me. expected_phenotype; //it is taken care in set_phenotype
-        sourceSinkTemp1 = copy_me.sourceSinkTemp1.clone();
-        sourceSinkTemp2 = copy_me.sourceSinkTemp2.clone();
+        sourceSinkTemp1 = copyMe.sourceSinkTemp1.clone();
+        sourceSinkTemp2 = copyMe.sourceSinkTemp2.clone();
     }
 
-    void copyFunctionPointers(Cell copy_me)
+    void copyFunctionPointers(Cell copyMe)
     {
-        functions = copy_me.functions.clone();
+        functions = copyMe.functions.clone();
     }
 
     void updateVoxelInContainer()
@@ -548,9 +548,9 @@ public class Cell extends BasicAgent
     }
 
     @Override
-    public boolean assignPosition(double[] new_position)
+    public boolean assignPosition(double[] position)
     {
-        return assignPosition( new_position[0], new_position[1], new_position[2] );
+        return assignPosition( position[0], position[1], position[2] );
     }
 
     public void setPreviousVelocity(double xV, double yV, double zV)
@@ -704,7 +704,7 @@ public class Cell extends BasicAgent
         VectorUtil.axpy( velocity, temp_r, displacement );
     }
 
-    public void updateMotilityVector(double dt_) throws Exception
+    public void updateMotilityVector(double dt) throws Exception
     {
         if( phenotype.motility.isMotile == false )
         {
@@ -712,7 +712,7 @@ public class Cell extends BasicAgent
             return;
         }
 
-        if( PhysiCellUtilities.UniformRandom() < dt_ / phenotype.motility.persistenceTime || phenotype.motility.persistenceTime < dt_ )
+        if( PhysiCellUtilities.UniformRandom() < dt / phenotype.motility.persistenceTime || phenotype.motility.persistenceTime < dt )
         {
             /*
             // choose a uniformly random unit vector 
@@ -737,7 +737,7 @@ public class Cell extends BasicAgent
             */
             //            std::vector<double> randvec(3,0.0);
             double[] randvec;
-            if( phenotype.motility.restrictTo2D == true )
+            if( phenotype.motility.restrictTo2D )
             {
                 randvec = PhysiCellUtilities.UniformOnUnitCircle();
             }
@@ -749,7 +749,7 @@ public class Cell extends BasicAgent
             // if the update_bias_vector function is set, use it  
             if( functions.updateMigration != null )
             {
-                functions.updateMigration.execute( this, phenotype, dt_ );
+                functions.updateMigration.execute( this, phenotype, dt );
             }
 
             //            phenotype.motility.motility_vector = phenotype.motility.migration_bias_direction; // motiltiy = bias_vector
@@ -758,11 +758,8 @@ public class Cell extends BasicAgent
                     phenotype.motility.migrationBias );
 
             double one_minus_bias = 1.0 - phenotype.motility.migrationBias;
-
             VectorUtil.axpy( ( phenotype.motility.motilityVector ), one_minus_bias, randvec ); // motility = (1-bias)*randvec + bias*bias_vector
-
             VectorUtil.normalize( ( phenotype.motility.motilityVector ) );
-
             VectorUtil.prod( phenotype.motility.motilityVector, phenotype.motility.migrationSpeed );
             //            phenotype.motility.motility_vector *= phenotype.motility.migration_speed; 
         }
@@ -824,11 +821,11 @@ public class Cell extends BasicAgent
             return true;
         }
         //        double[] corner_point= 0.5*(my_voxel_center+other_voxel_center);
-        double[] corner_point = VectorUtil.newSum( my_voxel_center, other_voxel_center );
-        VectorUtil.prod( corner_point, 0.5 );
-        double distance_squared = ( corner_point[0] - pCell.position[0] ) * ( corner_point[0] - pCell.position[0] )
-                + ( corner_point[1] - pCell.position[1] ) * ( corner_point[1] - pCell.position[1] )
-                + ( corner_point[2] - pCell.position[2] ) * ( corner_point[2] - pCell.position[2] );
+        double[] cornerPoint = VectorUtil.newSum( my_voxel_center, other_voxel_center );
+        VectorUtil.prod( cornerPoint, 0.5 );
+        double distance_squared = ( cornerPoint[0] - pCell.position[0] ) * ( cornerPoint[0] - pCell.position[0] )
+                + ( cornerPoint[1] - pCell.position[1] ) * ( cornerPoint[1] - pCell.position[1] )
+                + ( cornerPoint[2] - pCell.position[2] ) * ( cornerPoint[2] - pCell.position[2] );
         if( distance_squared > max_interactive_distance * max_interactive_distance )
             return false;
         return true;
@@ -841,14 +838,14 @@ public class Cell extends BasicAgent
         return getMicroenvironment().nearestDensity( this.currentVoxelIndex );//current_voxel_index );
     }
 
-    public void ingestCell(Cell pCell_to_eat)
+    public void ingestCell(Cell cellToEat)
     {
         // don't ingest self 
-        if( pCell_to_eat == this )
+        if( cellToEat == this )
             return;
 
         // don't ingest a cell that's already ingested 
-        if( pCell_to_eat.phenotype.volume.total < 1e-15 )
+        if( cellToEat.phenotype.volume.total < 1e-15 )
             return;
 
         // make this thread safe 
@@ -864,74 +861,74 @@ public class Cell extends BasicAgent
             */
 
             // mark it as dead 
-            pCell_to_eat.phenotype.death.dead = true;
+            cellToEat.phenotype.death.dead = true;
             // set secretion and uptake to zero 
-            pCell_to_eat.phenotype.secretion.setSecretionToZero();
-            pCell_to_eat.phenotype.secretion.setUptakeToZero();
+            cellToEat.phenotype.secretion.setSecretionToZero();
+            cellToEat.phenotype.secretion.setUptakeToZero();
 
             // deactivate all custom function 
-            pCell_to_eat.functions.customCellRule = null;
-            pCell_to_eat.functions.updatePhenotype = null;
-            pCell_to_eat.functions.contact = null;
+            cellToEat.functions.customCellRule = null;
+            cellToEat.functions.updatePhenotype = null;
+            cellToEat.functions.contact = null;
 
             // should set volume fuction to NULL too! 
-            pCell_to_eat.functions.updateVolume = null;
+            cellToEat.functions.updateVolume = null;
 
             // set cell as unmovable and non-secreting 
-            pCell_to_eat.isMovable = false;
-            pCell_to_eat.isActive = false;
+            cellToEat.isMovable = false;
+            cellToEat.isActive = false;
 
             // absorb all the volume(s)
 
             // absorb fluid volume (all into the cytoplasm) 
-            phenotype.volume.cytoplasmic_fluid += pCell_to_eat.phenotype.volume.fluid;
-            pCell_to_eat.phenotype.volume.cytoplasmic_fluid = 0.0;
+            phenotype.volume.cytoplasmic_fluid += cellToEat.phenotype.volume.fluid;
+            cellToEat.phenotype.volume.cytoplasmic_fluid = 0.0;
 
             // absorb nuclear and cyto solid volume (into the cytoplasm) 
-            phenotype.volume.cytoplasmic_solid += pCell_to_eat.phenotype.volume.cytoplasmic_solid;
-            pCell_to_eat.phenotype.volume.cytoplasmic_solid = 0.0;
+            phenotype.volume.cytoplasmic_solid += cellToEat.phenotype.volume.cytoplasmic_solid;
+            cellToEat.phenotype.volume.cytoplasmic_solid = 0.0;
 
-            phenotype.volume.cytoplasmic_solid += pCell_to_eat.phenotype.volume.nuclear_solid;
-            pCell_to_eat.phenotype.volume.nuclear_solid = 0.0;
+            phenotype.volume.cytoplasmic_solid += cellToEat.phenotype.volume.nuclear_solid;
+            cellToEat.phenotype.volume.nuclear_solid = 0.0;
 
             // consistency calculations 
 
             phenotype.volume.fluid = phenotype.volume.nuclear_fluid + phenotype.volume.cytoplasmic_fluid;
-            pCell_to_eat.phenotype.volume.fluid = 0.0;
+            cellToEat.phenotype.volume.fluid = 0.0;
 
             phenotype.volume.solid = phenotype.volume.cytoplasmic_solid + phenotype.volume.nuclear_solid;
-            pCell_to_eat.phenotype.volume.solid = 0.0;
+            cellToEat.phenotype.volume.solid = 0.0;
 
             // no change to nuclear volume (initially) 
-            pCell_to_eat.phenotype.volume.nuclear = 0.0;
-            pCell_to_eat.phenotype.volume.nuclear_fluid = 0.0;
+            cellToEat.phenotype.volume.nuclear = 0.0;
+            cellToEat.phenotype.volume.nuclear_fluid = 0.0;
 
             phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + phenotype.volume.cytoplasmic_fluid;
-            pCell_to_eat.phenotype.volume.cytoplasmic = 0.0;
+            cellToEat.phenotype.volume.cytoplasmic = 0.0;
 
             phenotype.volume.total = phenotype.volume.nuclear + phenotype.volume.cytoplasmic;
-            pCell_to_eat.phenotype.volume.total = 0.0;
+            cellToEat.phenotype.volume.total = 0.0;
 
             phenotype.volume.fluid_fraction = phenotype.volume.fluid / ( phenotype.volume.total + 1e-16 );
-            pCell_to_eat.phenotype.volume.fluid_fraction = 0.0;
+            cellToEat.phenotype.volume.fluid_fraction = 0.0;
 
             phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / ( phenotype.volume.nuclear_solid + 1e-16 );
 
             // update corresponding BioFVM parameters (self-consistency) 
             setTotalVolume( phenotype.volume.total );
-            pCell_to_eat.setTotalVolume( 0.0 );
+            cellToEat.setTotalVolume( 0.0 );
 
             // absorb the internalized substrates 
 
             // multiply by the fraction that is supposed to be ingested (for each substrate) 
             //            *(pCell_to_eat.internalized_substrates) *= 
             //                *(pCell_to_eat.fraction_transferred_when_ingested); // 
-            VectorUtil.prod( pCell_to_eat.internalizedSubstrates, pCell_to_eat.fractionTransferredIngested );
+            VectorUtil.prod( cellToEat.internalizedSubstrates, cellToEat.fractionTransferredIngested );
 
             //            *internalized_substrates += *(pCell_to_eat.internalized_substrates);
-            VectorUtil.sum( internalizedSubstrates, pCell_to_eat.internalizedSubstrates );
+            VectorUtil.sum( internalizedSubstrates, cellToEat.internalizedSubstrates );
             //            int n_substrates = internalizedSubstrates.length;
-            pCell_to_eat.internalizedSubstrates = new double[internalizedSubstrates.length];//assign( n_substrates , 0.0 );    
+            cellToEat.internalizedSubstrates = new double[internalizedSubstrates.length];//assign( n_substrates , 0.0 );    
 
             // trigger removal from the simulation 
             // pCell_to_eat.die(); // I don't think this is safe if it's in an OpenMP loop 
@@ -945,9 +942,9 @@ public class Cell extends BasicAgent
         }
 
         // things that have their own thread safety 
-        pCell_to_eat.flagForRemoval();
-        pCell_to_eat.removeAllAttachedCells();
-        pCell_to_eat.removeAllSpringAttachments();
+        cellToEat.flagForRemoval();
+        cellToEat.removeAllAttachedCells();
+        cellToEat.removeAllSpringAttachments();
     }
 
     public void attackCell(Cell pCellToAttack, double dt)
@@ -982,32 +979,32 @@ public class Cell extends BasicAgent
 
             //            std::vector<double> new_position = position; // x_B
             //            new_position *= phenotype.volume.total; // vol_B * x_B 
-            double[] new_position = VectorUtil.newProd( position, phenotype.volume.total );
+            double[] newPosition = VectorUtil.newProd( position, phenotype.volume.total );
             double total_volume = phenotype.volume.total;
             total_volume += pCellToFuse.phenotype.volume.total;
 
-            VectorUtil.axpy( new_position, pCellToFuse.phenotype.volume.total, pCellToFuse.position ); // vol_B*x_B + vol_S*x_S
+            VectorUtil.axpy( newPosition, pCellToFuse.phenotype.volume.total, pCellToFuse.position ); // vol_B*x_B + vol_S*x_S
             //            new_position /= total_volume; // (vol_B*x_B+vol_S*x_S)/(vol_B+vol_S);
-            VectorUtil.div( new_position, total_volume );
+            VectorUtil.div( newPosition, total_volume );
 
-            double xL = microenvironment.mesh.boundingBox[0];
-            double xU = microenvironment.mesh.boundingBox[3];
+            double xL = m.mesh.boundingBox[0];
+            double xU = m.mesh.boundingBox[3];
 
-            double yL = microenvironment.mesh.boundingBox[1];
-            double yU = microenvironment.mesh.boundingBox[4];
+            double yL = m.mesh.boundingBox[1];
+            double yU = m.mesh.boundingBox[4];
 
-            double zL = microenvironment.mesh.boundingBox[2];
-            double zU = microenvironment.mesh.boundingBox[5];
+            double zL = m.mesh.boundingBox[2];
+            double zU = m.mesh.boundingBox[5];
 
-            if( new_position[0] < xL || new_position[0] > xU || new_position[1] < yL || new_position[1] > yU || new_position[2] < zL
-                    || new_position[2] > zU )
+            if( newPosition[0] < xL || newPosition[0] > xU || newPosition[1] < yL || newPosition[1] > yU || newPosition[2] < zL
+                    || newPosition[2] > zU )
             {
-                System.out.println( "cell fusion at " + new_position + " violates domain bounds" );
-                System.out.println( microenvironment.mesh.boundingBox );
+                System.out.println( "cell fusion at " + newPosition + " violates domain bounds" );
+                System.out.println( m.mesh.boundingBox );
                 //                std::cout << "cell fusion at " << new_position << " violates domain bounds" << std::endl; 
                 //                std::cout << get_default_microenvironment().mesh.bounding_box << std::endl << std::endl; 
             }
-            position = new_position;
+            position = newPosition;
             updateVoxelInContainer();
 
             // set number of nuclei 
@@ -1140,7 +1137,7 @@ public class Cell extends BasicAgent
         // use the cell defaults; 
         type = cd.type;
         typeName = cd.name;
-        custom_data = cd.custom_data.clone();
+        customData = cd.custom_data.clone();
         parameters = cd.parameters.clone();
         functions = cd.functions.clone();
         phenotype = cd.phenotype.clone();

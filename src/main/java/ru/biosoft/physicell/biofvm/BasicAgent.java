@@ -55,7 +55,7 @@ public class BasicAgent
 
     static int maxBasicAgentId = 0;
 
-    protected Microenvironment microenvironment;
+    protected Microenvironment m;
     int selected_microenvironment;
 
     int current_microenvironment_voxel_index;
@@ -171,12 +171,12 @@ public class BasicAgent
             isActive = false;
             return;
         }
-        currentVoxelIndex = microenvironment.nearestVoxelIndex( position );
+        currentVoxelIndex = m.nearestVoxelIndex( position );
     }
 
     public void registerMicroenvironment(Microenvironment microenvironment)
     {
-        this.microenvironment = microenvironment;
+        this.m = microenvironment;
         microenvironment.addAgent( this );
         double[] density = microenvironment.getDensity( 0 );
         int length = density.length;
@@ -202,7 +202,7 @@ public class BasicAgent
 
     public Microenvironment getMicroenvironment()
     {
-        return microenvironment;
+        return m;
     }
 
     public static BasicAgent createBasicAgent(Microenvironment m)
@@ -229,7 +229,7 @@ public class BasicAgent
         //   p(n+1)*temp2 =  p(n) + temp1
         //   p(n+1) = (  p(n) + temp1 )/temp2
 
-        double v = microenvironment.voxels( currentVoxelIndex ).volume; //voxel volume
+        double v = m.voxels( currentVoxelIndex ).volume; //voxel volume
         double discretizeConstant = dt * volume / v; // needs a fix  (?)
 
         // temp1 = dt*(V_cell/V_voxel)*S*T, where: S - secretion rate, T- saturation density
@@ -309,13 +309,13 @@ public class BasicAgent
 
         if( currentVoxelIndex == -1 )
             return;
-        VectorUtil.div( internalizedSubstrates, microenvironment.voxels( currentVoxelIndex ).volume );// turn to density 
+        VectorUtil.div( internalizedSubstrates, m.voxels( currentVoxelIndex ).volume );// turn to density 
         VectorUtil.prod( internalizedSubstrates, fractionReleasedDeath );// what fraction is released? 
         // release this amount into the environment 
 
         //        pS.get( currentVoxelIndex ) += internalized_substrates;
         //        (*pS)(current_voxel_index) += *internalized_substrates; 
-        VectorUtil.sum( microenvironment.get( currentVoxelIndex ), internalizedSubstrates );
+        VectorUtil.sum( m.get( currentVoxelIndex ), internalizedSubstrates );
         // zero out the now-removed substrates 
         internalizedSubstrates = new double[internalizedSubstrates.length];
         //        internalized_substrates->assign( internalized_substrates->size() , 0.0 ); 

@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.mechano;
 
-import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
@@ -74,19 +73,21 @@ import ru.biosoft.physicell.core.SignalBehavior;
 ###############################################################################
 */
 
-public class Mechano
+public class Mechano extends Model
 {
-    public static void init(Model model) throws Exception
+    @Override
+    public void init() throws Exception
     {
-        createCellTypes( model );
-        setupTissue( model );
-        model.getVisualizers().forEach( v -> v.setAgentVisualizer( new MechanoVisualizer() ) );
+        super.init();
+        createCellTypes();
+        setupTissue();
+        getVisualizers().forEach( v -> v.setAgentVisualizer( new MechanoVisualizer() ) );
     }
 
-    static void createCellTypes(Model model)
+    void createCellTypes()
     {
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( model.getMicroenvironment() );
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        SignalBehavior.setupDictionaries( m );
         //        Rules.setup_cell_rules( model );
         CellDefinition pCD = CellDefinition.getCellDefinition( "cancer" );
         pCD.phenotype.mechanics.maxAttachments = 6;
@@ -103,9 +104,8 @@ public class Mechano
         pCD.functions.updatePhenotype = null;
     }
 
-    static void setupTissue(Model model) throws Exception
+    void setupTissue() throws Exception
     {
-        Microenvironment m = model.getMicroenvironment();
         for( Cell cell : m.getAgents( Cell.class ) )
         {
             if( Math.abs( cell.position[0] ) > 450 )

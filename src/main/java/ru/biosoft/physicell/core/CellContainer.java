@@ -411,12 +411,12 @@ public class CellContainer extends AgentContainer
         return -1;
     }
 
-    void flag_cell_for_division(Cell pCell)
+    void flagDivision(Cell pCell)
     {
         cellsReadyToDivide.add( pCell );
     }
 
-    void flag_cell_for_removal(Cell pCell)
+    void flagRemoval(Cell pCell)
     {
         cellsReadyToDie.add( pCell );
     }

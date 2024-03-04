@@ -13,13 +13,13 @@ public class TumorPhenotype extends UpdatePhenotype
     {
         double damage = SignalBehavior.getSingleSignal( pCell, "damage" );
 
-        double damage_rate = SignalBehavior.getSingleSignal( pCell, "custom:damage_rate" );
-        double repair_rate = SignalBehavior.getSingleSignal( pCell, "custom:repair_rate" );
-        double drug_death_rate = SignalBehavior.getSingleSignal( pCell, "custom:drug_death_rate" );
+        double damageRate = SignalBehavior.getSingleSignal( pCell, "custom:damage_rate" );
+        double repairRate = SignalBehavior.getSingleSignal( pCell, "custom:repair_rate" );
+        double drugDeathRate = SignalBehavior.getSingleSignal( pCell, "custom:drug_death_rate" );
 
         double drug = SignalBehavior.getSingleSignal( pCell, "therapeutic" );
 
-        double max_damage = 1.0 * damage_rate / ( 1e-16 + repair_rate );
+        double maxDamage = 1.0 * damageRate / ( 1e-16 + repairRate );
 
         // if I'm dead, don't bother. disable my phenotype rule
         if( SignalBehavior.getSingleSignal( pCell, "dead" ) > 0.5 )
@@ -38,31 +38,28 @@ public class TumorPhenotype extends UpdatePhenotype
 
         // dD/dt = alpha*c - beta-D by implicit scheme
 
-        double temp = drug;
+        //        double temp = drug;
 
         // reuse temp as much as possible to reduce memory allocations etc.
-        temp *= dt;
-        temp *= damage_rate;
+        //        temp *= dt;
+        //        temp *= damageRate;
 
-        damage += temp; // d_prev + dt*chemo*damage_rate
+        damage += ( drug * dt * damageRate ) / ( repairRate * dt + 1 );//temp; // d_prev + dt*chemo*damage_rate
 
-        temp = repair_rate;
-        temp *= dt;
-        temp += 1.0;
-        damage /= temp; // (d_prev + dt*chemo*damage_rate)/(1 + dt*repair_rate)
+        //        temp = repairRate;
+        //        temp *= dt;
+        //        temp += 1.0;
+        damage /= ( repairRate * dt + 1 );//temp; // (d_prev + dt*chemo*damage_rate)/(1 + dt*repair_rate)
 
         // then, see if the cell undergoes death from the therapy
-        temp = dt;
-        temp *= damage;
-        temp *= drug_death_rate;
-        temp /= max_damage; // dt*(damage/max_damage)*death_rate
+        double temp = dt * damage * drugDeathRate / maxDamage;
+//        temp = dt;
+//        temp *= damage;
+//        temp *= drugDeathRate;
+//        temp /= maxDamage; // dt*(damage/max_damage)*death_rate
 
         // make sure we write the damage (not current a behavior)
         pCell.state.damage = damage;
-        if( damage > 0 )
-        {
-            System.out.println( damage );
-        }
         if( PhysiCellUtilities.UniformRandom() <= temp )
         {
             // pCell.start_death( apoptosis_model_index );

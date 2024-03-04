@@ -74,39 +74,39 @@ import ru.biosoft.physicell.core.PhysiCellUtilities;
 ###############################################################################
 */
 
-public class VirusMacrophage
+public class VirusMacrophage extends Model
 {
 
-
-    public static void init(Model model) throws Exception
+    @Override
+    public void init() throws Exception
     {
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        createCellTypes( model );
-        setupTissue( model );
-        model.getVisualizers().forEach( v -> v.setAgentVisualizer( new VirusVisualizer( model ) ) );
+        super.init();
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        createCellTypes();
+        setupTissue();
+        getVisualizers().forEach( v -> v.setAgentVisualizer( new VirusVisualizer( this ) ) );
     }
 
-    static void createCellTypes(Model model) throws Exception
+    void createCellTypes() throws Exception
     {
-        Microenvironment microenvironment = model.getMicroenvironment();
 
         // first find index for a few key variables. 
-        int virus_index = microenvironment.findDensityIndex( "virus" );
-        int nInterferon = microenvironment.findDensityIndex( "interferon" );
+        int virus_index = m.findDensityIndex( "virus" );
+        int nInterferon = m.findDensityIndex( "interferon" );
 
         CellDefinition pEpithelial = CellDefinition.getCellDefinition( "epithelial cell" );
         CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
 
         pEpithelial.functions.updatePhenotype = new Epithelial();
 
-        pEpithelial.phenotype.molecular.fractionReleasedDeath[virus_index] = model.getParameterDouble( "fraction_released_at_death" );
-        pEpithelial.phenotype.molecular.fractionTransferredIngested[virus_index] = model
-                .getParameterDouble( "fraction_transferred_when_ingested" );
+        pEpithelial.phenotype.molecular.fractionReleasedDeath[virus_index] = getParameterDouble( "fraction_released_at_death" );
+        pEpithelial.phenotype.molecular.fractionTransferredIngested[virus_index] = getParameterDouble(
+                "fraction_transferred_when_ingested" );
         /*		
         	pEpithelial.phenotype.molecular.fraction_released_at_death[ nInterferon ] = 0;
         	pEpithelial.phenotype.molecular.fraction_transferred_when_ingested[ nInterferon ] = 0; 		
         */
-        pMacrophage.phenotype.mechanics.cellCellAdhesionStrength *= model.getParameterDouble( "macrophage_relative_adhesion" );
+        pMacrophage.phenotype.mechanics.cellCellAdhesionStrength *= getParameterDouble( "macrophage_relative_adhesion" );
         pMacrophage.phenotype.molecular.fractionReleasedDeath[virus_index] = 0.0;
         pMacrophage.phenotype.molecular.fractionTransferredIngested[virus_index] = 0.0;
 
@@ -114,66 +114,56 @@ public class VirusMacrophage
         pMacrophage.functions.customCellRule = new AvoidBoundaries();
     }
 
-    static void setupTissue(Model model)
+    void setupTissue()
     {
-        Microenvironment microenvironment = model.getMicroenvironment();
-        int nVirus = microenvironment.findDensityIndex( "virus" );
+        int nVirus = m.findDensityIndex( "virus" );
+        PhysiCellUtilities.place2D( m, "epithelial cell", getParameterInt( "number_of_infected_cells" ) );
+        for( Cell cell : m.getAgents( Cell.class ) )
+            cell.phenotype.molecular.internSubstrates[nVirus] = 1;
+
+        PhysiCellUtilities.place2D( m, "epithelial cell", getParameterInt( "number_of_uninfected_cells" ) );
+        PhysiCellUtilities.place2D( m, "macrophage", getParameterInt( "number_of_macrophages" ) );
+
+        //        for (Cell cell)
         // create some cells near the origin
-
-        double length_x = microenvironment.mesh.boundingBox[3] - microenvironment.mesh.boundingBox[0];
-
-        double length_y = microenvironment.mesh.boundingBox[4] - microenvironment.mesh.boundingBox[1];
-
-        int number_of_infected_cells = model.getParameterInt( "number_of_infected_cells" );
-
-        CellDefinition pCD = CellDefinition.getCellDefinition( "epithelial cell" );
-
-        for( int n = 0; n < number_of_infected_cells; n++ )
-        {
-            double x = microenvironment.mesh.boundingBox[0] + PhysiCellUtilities.UniformRandom() * length_x;
-            double y = microenvironment.mesh.boundingBox[1] + PhysiCellUtilities.UniformRandom() * length_y;
-            Cell pC = Cell.createCell( pCD, microenvironment, new double[] {x, y, 0.0} );
-            pC.phenotype.molecular.internSubstrates[nVirus] = 1;
-        }
-
-        int number_of_uninfected_cells = model.getParameterInt( "number_of_uninfected_cells" );
-
-        for( int n = 0; n < number_of_uninfected_cells; n++ )
-        {
-            double x = microenvironment.mesh.boundingBox[0] + PhysiCellUtilities.UniformRandom() * length_x;
-            double y = microenvironment.mesh.boundingBox[1] + PhysiCellUtilities.UniformRandom() * length_y;
-            Cell.createCell( pCD, microenvironment, new double[] {x, y, 0.0} );
-        }
-
-        pCD = CellDefinition.getCellDefinition( "macrophage" );
-
-        for( int n = 0; n < model.getParameterInt( "number_of_macrophages" ); n++ )
-        {
-            double x = microenvironment.mesh.boundingBox[0] + PhysiCellUtilities.UniformRandom() * length_x;
-            double y = microenvironment.mesh.boundingBox[1] + PhysiCellUtilities.UniformRandom() * length_y;
-            Cell.createCell( pCD, microenvironment, new double[] {x, y, 0.0} );
-        }
+        //        CellDefinition pCD = CellDefinition.getCellDefinition( "epithelial cell" );
+        //        for( int n = 0; n < getParameterInt( "number_of_infected_cells" ); n++ )
+        //        {
+        //            PhysiCellUtilities.place( m, getInitialPath(), n );
+        //            double x = PhysiCellUtilities.UniformRandom( m.mesh.boundingBox[0], m.mesh.boundingBox[3] );
+        //            double y = PhysiCellUtilities.UniformRandom( m.mesh.boundingBox[1], m.mesh.boundingBox[4] );
+        //            Cell pC = Cell.createCell( pCD, m, new double[] {x, y, 0.0} );
+        //            pC.phenotype.molecular.internSubstrates[nVirus] = 1;
+        //        }
+        //
+        //        for( int n = 0; n < getParameterInt( "number_of_uninfected_cells" ); n++ )
+        //        {
+        //            double x = PhysiCellUtilities.UniformRandom( m.mesh.boundingBox[0], m.mesh.boundingBox[3] );
+        //            double y = PhysiCellUtilities.UniformRandom( m.mesh.boundingBox[1], m.mesh.boundingBox[4] );
+        //            Cell.createCell( pCD, m, new double[] {x, y, 0.0} );
+        //        }
+        //
+        //        pCD = CellDefinition.getCellDefinition( "macrophage" );
+        //        for( int n = 0; n < getParameterInt( "number_of_macrophages" ); n++ )
+        //        {
+        //            double x = PhysiCellUtilities.UniformRandom( m.mesh.boundingBox[0], m.mesh.boundingBox[3] );
+        //            double y = PhysiCellUtilities.UniformRandom( m.mesh.boundingBox[1], m.mesh.boundingBox[4] );
+        //            Cell.createCell( pCD, m, new double[] {x, y, 0.0} );
+        //        }
     }
 
-    public static double[] integrate_total_substrates(Microenvironment microenvironment)
+    public static double[] integrateTotalSubstrates(Microenvironment microenvironment)
     {
-        // start with 0 vector 
-        //	std::vector<double> out( microenvironment.number_of_densities() , 0.0 ); 
-        //        List<Double> out = new ArrayList<>();
         double[] out = new double[microenvironment.numberDensities()];
-        // integrate extracellular substrates 
         for( int n = 0; n < microenvironment.numberVoxels(); n++ )
         {
-            // out = out + microenvironment(n) * dV(n) 
             VectorUtil.axpy( out, microenvironment.mesh.voxels[n].volume, microenvironment.get( n ) );
         }
 
-        // inte
-        for( Cell cell : microenvironment.getAgents( Cell.class ) )//int n = 0; n < ( all_cells ).size(); n++ )
+        for( Cell cell : microenvironment.getAgents( Cell.class ) )
         {
             VectorUtil.sum( out, cell.phenotype.molecular.internSubstrates );
         }
-
         return out;
     }
 

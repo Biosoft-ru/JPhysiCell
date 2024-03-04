@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.heterogeneity;
 
-import java.io.File;
 import java.io.InputStream;
 
 import ru.biosoft.physicell.core.Model;
@@ -82,22 +81,15 @@ public class Main
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        if( !new File( resultPath ).exists() )
-            new File( resultPath ).mkdirs();
-
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
-
-        Model model = new ModelReader().read( settings );
+        Model model = new ModelReader().read( settings, Heterogeneity.class );
 
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
         model.addVisualizer( 0, "figure1_no_apop" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
-
-        /* Users typically start modifying here. START USERMODS */
-        Heterogeneity.init( model );
-        /* Users typically stop modifying here. END USERMODS */
+        model.init();
         model.simulate();
     }
 }

@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.pred_prey_farmer;
 
-import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
@@ -73,20 +72,21 @@ import ru.biosoft.physicell.core.PhysiCellUtilities;
 */
 public class PredPreyFarmer extends Model
 {
-    public static void init(Model model)
+    public void init() throws Exception
     {
-        PhysiCellUtilities.setSeed( model.getParameterInt( "random_seed" ) );
-        createCellTypes( model );
-        setupTissue( model );
-        model.getVisualizers().forEach( v -> v.setAgentVisualizer( new PPFVisualizer() ) );
+        super.init();
+        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        createCellTypes();
+        setupTissue();
+        getVisualizers().forEach( v -> v.setAgentVisualizer( new PPFVisualizer() ) );
     }
 
-    static void createCellTypes(Model model)
+    void createCellTypes()
     {
         CellDefinition pFarmerDef = CellDefinition.getCellDefinition( "farmer" );
-        pFarmerDef.functions.customCellRule = null;
+        pFarmerDef.functions.customCellRule = new AvoidBoundariesRule();
         pFarmerDef.functions.updatePhenotype = null;
-        pFarmerDef.functions.updateMigration = null;
+        pFarmerDef.functions.updateMigration = new WeightedMotility();
 
         CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
         pPreyDef.functions.customCellRule = new AvoidBoundariesRule();
@@ -99,11 +99,10 @@ public class PredPreyFarmer extends Model
         pPredDef.functions.updateMigration = new WeightedMotility();
     }
 
-    static void setupTissue(Model model)
+    void setupTissue()
     {
-        Microenvironment m = model.getMicroenvironment();
-        PhysiCellUtilities.place( m, "farmer", model.getParameterInt( "number_of_farmers" ) );
-        PhysiCellUtilities.place( m, "prey", model.getParameterInt( "number_of_prey" ) );
-        PhysiCellUtilities.place( m, "predator", model.getParameterInt( "number_of_predators" ) );
+        PhysiCellUtilities.place( m, "farmer", getParameterInt( "number_of_farmers" ) );
+        PhysiCellUtilities.place( m, "prey", getParameterInt( "number_of_prey" ) );
+        PhysiCellUtilities.place( m, "predator", getParameterInt( "number_of_predators" ) );
     }
 }

@@ -145,6 +145,14 @@ public class PhysiCellUtilities
         }
     }
 
+    public static void place2D(Microenvironment m, String type, int number)
+    {
+        double[] box = m.mesh.boundingBox.clone();
+        box[2] = 0.0;
+        box[5] = 0.0;
+        placeInBox( box, type, number, m );
+    }
+
     public static void place(Microenvironment m, String type, int number)
     {
         double[] box = m.mesh.boundingBox.clone();

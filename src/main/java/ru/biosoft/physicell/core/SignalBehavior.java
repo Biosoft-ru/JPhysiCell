@@ -170,10 +170,10 @@ public class SignalBehavior
 
         // custom signals 
         int first_custom_ind = findSignalIndex( "custom 0" );
-        int max_custom_ind = first_custom_ind + pCell.custom_data.variables.size();
+        int max_custom_ind = first_custom_ind + pCell.customData.variables.size();
         if( first_custom_ind > -1 && index >= first_custom_ind && index < max_custom_ind )
         {
-            out = pCell.custom_data.variables.get( index - first_custom_ind ).value;
+            out = pCell.customData.variables.get( index - first_custom_ind ).value;
             out /= signalScales[index];
             return out;
         }
@@ -819,10 +819,10 @@ public class SignalBehavior
 
         // custom behavior
         int first_custom_ind = findBehaviorIndex( "custom 0" );
-        int max_custom_ind = first_custom_ind + pCell.custom_data.variables.size();
+        int max_custom_ind = first_custom_ind + pCell.customData.variables.size();
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
         {
-            pCell.custom_data.variables.get( index - first_custom_ind ).value = parameter;
+            pCell.customData.variables.get( index - first_custom_ind ).value = parameter;
         }
 
         // set cell to movable / not movable 
@@ -1086,10 +1086,10 @@ public class SignalBehavior
 
         // custom behavior
         int first_custom_ind = findBehaviorIndex( "custom 0" );
-        int max_custom_ind = first_custom_ind + pCell.custom_data.variables.size();
+        int max_custom_ind = first_custom_ind + pCell.customData.variables.size();
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
         {
-            return pCell.custom_data.variables.get( index - first_custom_ind ).value;
+            return pCell.customData.variables.get( index - first_custom_ind ).value;
         }
 
         // is the cell movable / not movable 
@@ -1305,10 +1305,10 @@ public class SignalBehavior
 
         // custom behavior
         int first_custom_ind = findBehaviorIndex( "custom 0" );
-        int max_custom_ind = first_custom_ind + pCell.custom_data.variables.size();
+        int max_custom_ind = first_custom_ind + pCell.customData.variables.size();
         if( first_custom_ind >= 0 )
         {
-            for( int nc = 0; nc < pCell.custom_data.variables.size(); nc++ )
+            for( int nc = 0; nc < pCell.customData.variables.size(); nc++ )
             {
                 parameters[first_custom_ind + nc] = pCD.custom_data.variables.get( nc ).value;
             }
@@ -1549,7 +1549,7 @@ public class SignalBehavior
 
         // custom behavior
         int first_custom_ind = findBehaviorIndex( "custom 0" );
-        int max_custom_ind = first_custom_ind + pCell.custom_data.variables.size();
+        int max_custom_ind = first_custom_ind + pCell.customData.variables.size();
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
         {
             return pCD.custom_data.variables.get( index - first_custom_ind ).value;

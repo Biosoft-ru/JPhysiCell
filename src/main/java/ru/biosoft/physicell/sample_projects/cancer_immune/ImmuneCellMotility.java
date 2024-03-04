@@ -14,8 +14,8 @@ public class ImmuneCellMotility extends UpdateMigrationBias
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        Microenvironment microenvironment = pCell.getMicroenvironment();
-        int immuneFactorIndex = microenvironment.findDensityIndex( "immunostimulatory factor" );
+        Microenvironment m = pCell.getMicroenvironment();
+        int immuneFactorIndex = m.findDensityIndex( "immunostimulatory factor" );
         if( pCell.state.attachedCells.size() == 0 )
         {
             phenotype.motility.isMotile = true;
