@@ -11,8 +11,9 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 
 public class PhysiCellUtilities
 {
-    private static double seed = 0;
-    private static Random r = new Random();
+    private static long seed = (long) -4.5786084958200968E16;//new Random().nextLong();//3.33256335198003E18
+    private static Random r = new Random( seed );
+
     public static void setSeed(long val)
     {
         seed = val;
@@ -151,6 +152,17 @@ public class PhysiCellUtilities
         box[2] = 0.0;
         box[5] = 0.0;
         placeInBox( box, type, number, m );
+    }
+
+    public static void place(Microenvironment m, CellDefinition cd, int number)
+    {
+        double[] box = m.mesh.boundingBox.clone();
+        if( m.options.simulate2D )
+        {
+            box[2] = 0.0;
+            box[5] = 0.0;
+        }
+        placeInBox( box, cd, number, m );
     }
 
     public static void place(Microenvironment m, String type, int number)

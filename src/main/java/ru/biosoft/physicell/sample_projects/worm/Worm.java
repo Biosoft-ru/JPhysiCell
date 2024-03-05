@@ -1,10 +1,4 @@
-package ru.biosoft.physicell.sample_projects.pred_prey_farmer;
-
-import java.io.InputStream;
-
-import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.xml.ModelReader;
-
+package ru.biosoft.physicell.sample_projects.worm;
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -40,7 +34,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -71,27 +65,45 @@ import ru.biosoft.physicell.xml.ModelReader;
 #                                                                             #
 ###############################################################################
 */
-public class Main
+
+import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.core.PhysiCellUtilities;
+
+public class Worm extends Model
 {
-    private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/perd_prey_farmer/r3";
 
-    public static void main(String ... strings) throws Exception
+    @Override
+    public void init() throws Exception
     {
-        if( strings != null && strings.length > 0 )
-            resultPath = strings[0];
-
-        InputStream settings = Main.class.getResourceAsStream( settingsPath );
-        Model model = new ModelReader().read( settings, PredPreyFarmer.class );
-        double mechanics_voxel_size = 30;
-        model.createContainer( mechanics_voxel_size );
-        model.setResultFolder( resultPath );
-        model.setWriteDensity( true );
-        model.addVisualizer( 0, "food" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
-        model.addVisualizer( 0, "prey signal" ).setStubstrateIndex( 1 ).setMaxDensity( 10 );
-        model.addVisualizer( 0, "predator signal" ).setStubstrateIndex( 2 ).setMaxDensity( 10 );
-        model.init();
-        System.out.println( model.display() );
-        model.simulate();
+        super.init();
+        //        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        createCellTypes();
+        setupTissue();
     }
+
+    void createCellTypes()
+    {
+        CellDefinition cd = CellDefinition.getCellDefinition( "worm" );
+        cd.phenotype.mechanics.attachmentElasticConstant = getParameterDouble( "attachment_elastic_constant" );
+        cd.functions.contact = new Contact();
+        cd.functions.customCellRule = new WormRule( this );
+        cd.functions.updatePhenotype = null;
+        cd.functions.membraneInteraction = null;
+        cd.functions.membraneDistanceCalculator = null;
+        getVisualizers().forEach( v -> v.setAgentVisualizer( new WormVisualizer() ) );
+    }
+
+    void setupTissue()
+    {
+        PhysiCellUtilities.place( m, "worm", getParameterInt( "number_of_cells" ) );
+
+        for( Cell cell : m.getAgents( Cell.class ) )
+        {
+            cell.customData.set( "head", PhysiCellUtilities.UniformRandom() );
+            cell.customData.set( "head_initial", cell.customData.get( "head" ) );
+        }
+    }
+
 }

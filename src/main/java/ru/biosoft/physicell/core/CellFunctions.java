@@ -68,6 +68,7 @@ package ru.biosoft.physicell.core;
 */
 public class CellFunctions
 {
+    Model model;
     public instantiate_cell instantiate_cell;
     public VolumeUpdate updateVolume;
     public UpdateMigrationBias updateMigration;
@@ -87,21 +88,20 @@ public class CellFunctions
         CellFunctions result = new CellFunctions();
         try
         {
-            result.instantiate_cell = instantiate_cell == null ? null : instantiate_cell.getClass().newInstance();
-            result.updateVolume = updateVolume == null ? null : updateVolume.getClass().newInstance();
-            result.updateMigration = updateMigration == null ? null : updateMigration.getClass().newInstance();
-            result.updatePhenotype = updatePhenotype == null ? null : updatePhenotype.clone();
-            result.pre_update_intracellular = pre_update_intracellular == null ? null : pre_update_intracellular.getClass().newInstance();
-            result.post_update_intracellular = post_update_intracellular == null ? null
-                    : post_update_intracellular.getClass().newInstance();
-            result.updateVelocity = updateVelocity == null ? null : updateVelocity.getClass().newInstance();
-            result.membraneInteraction = membraneInteraction == null ? null
-                    : membraneInteraction.getClass().newInstance();
-            result.membraneDistanceCalculator = membraneDistanceCalculator == null ? null
-                    : membraneDistanceCalculator.getClass().newInstance();
-            result.set_orientation = set_orientation == null ? null : set_orientation.getClass().newInstance();
-            result.contact = contact == null ? null : contact.getClass().newInstance();
-            result.customCellRule = customCellRule == null ? null : customCellRule.getClass().newInstance();
+            result.instantiate_cell = instantiate_cell;// == null ? null : instantiate_cell.getClass().newInstance();
+            result.updateVolume = updateVolume;// == null ? null : updateVolume.getClass().newInstance();
+            result.updateMigration = updateMigration;// == null ? null : updateMigration.getClass().newInstance();
+            result.updatePhenotype = updatePhenotype;// == null ? null : updatePhenotype.clone();
+            result.pre_update_intracellular = pre_update_intracellular;// == null ? null : pre_update_intracellular.getClass().newInstance();
+            result.post_update_intracellular = post_update_intracellular;// == null ? null;
+            //                    : post_update_intracellular.getClass().newInstance();
+            result.updateVelocity = updateVelocity;// == null ? null : updateVelocity.getClass().newInstance();
+            result.membraneInteraction = membraneInteraction;// == null ? null : membraneInteraction.getClass().newInstance();
+            result.membraneDistanceCalculator = membraneDistanceCalculator;// == null ? null
+            //                    : membraneDistanceCalculator.getClass().newInstance();
+            result.set_orientation = set_orientation;// == null ? null : set_orientation.getClass().newInstance();
+            result.contact = contact;// == null ? null : contact.getClass().newInstance();
+            result.customCellRule = customCellRule;
         }
         catch( Exception ex )
         {
@@ -138,7 +138,7 @@ public class CellFunctions
     public static abstract class VolumeUpdate extends OneCellFunction
     {
     }
-    
+
     public static abstract class UpdateMigrationBias extends OneCellFunction
     {
     }
@@ -153,6 +153,7 @@ public class CellFunctions
 
     public static abstract class CustomCellRule extends OneCellFunction
     {
+
     }
 
     public static abstract class pre_update_intracellular extends OneCellFunction

@@ -1,5 +1,6 @@
 package ru.biosoft.physicell.core;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.BasicAgent;
@@ -1267,6 +1268,83 @@ public class Cell extends BasicAgent
         return getMicroenvironment().getGradient( currentVoxelIndex )[index];
     }
 
+    public Set<Cell> nearby_interacting_cells()
+    {
+        return find_nearby_interacting_cells( this );
+    }
+
+
+    Set<Cell> find_nearby_interacting_cells(Cell pCell)
+    {
+        Set<Cell> neighbors = new HashSet<>();
+
+        for( Cell neighbor : pCell.get_container().agentGrid.get( pCell.get_current_mechanics_voxel_index() ) )
+        {
+            double distance = VectorUtil.dist( neighbor.position, pCell.position );
+            if( distance <= pCell.phenotype.mechanics.relMaxAdhesionDistance * pCell.phenotype.geometry.radius
+                    + ( neighbor ).phenotype.mechanics.relMaxAdhesionDistance * ( neighbor ).phenotype.geometry.radius
+                    && ( neighbor ) != pCell )
+            {
+                neighbors.add( neighbor );
+            }
+        }
+        // First check the neighbors in my current voxel
+        //        std::vector<Cell*>::iterator neighbor;
+        //        std::vector<Cell*>::iterator end = pCell.get_container().agent_grid[pCell.get_current_mechanics_voxel_index()].end();
+        //        for( neighbor = pCell.get_container().agent_grid[pCell.get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
+        //        {
+        //            std::vector<double> displacement = (neighbor).position - pCell.position; 
+        //            double distance = norm( displacement ); 
+        //            if( distance <= pCell.phenotype.mechanics.relative_maximum_adhesion_distance * pCell.phenotype.geometry.radius 
+        //                + (neighbor).phenotype.mechanics.relative_maximum_adhesion_distance * (neighbor).phenotype.geometry.radius 
+        //                && (neighbor) != pCell )
+        //            { neighbors.push_back( neighbor ); }
+        //        }
+
+        for( int neighbor_voxel_index : pCell.get_container().mesh.moore_connected_voxel_indices[pCell
+                .get_current_mechanics_voxel_index()] )
+        {
+            if( !Cell.isNeighborVoxel( pCell, pCell.get_container().mesh.voxels[pCell.get_current_mechanics_voxel_index()].center,
+                    pCell.get_container().mesh.voxels[neighbor_voxel_index].center, neighbor_voxel_index ) )
+                continue;
+
+            for( Cell neighbor : pCell.get_container().agentGrid.get( neighbor_voxel_index ) )
+            {
+                double distance = VectorUtil.dist( neighbor.position, pCell.position );
+                //                double distance = norm( displacement ); 
+                if( distance <= pCell.phenotype.mechanics.relMaxAdhesionDistance * pCell.phenotype.geometry.radius
+                        + ( neighbor ).phenotype.mechanics.relMaxAdhesionDistance * ( neighbor ).phenotype.geometry.radius
+                        && ( neighbor ) != pCell )
+                {
+                    neighbors.add( neighbor );
+                }
+            }
+        }
+        //        std::vector<int>::iterator neighbor_voxel_index;
+        //        std::vector<int>::iterator neighbor_voxel_index_end = 
+        //            pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()].end();
+
+        //        for( neighbor_voxel_index = 
+        //            pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()].begin();
+        //            neighbor_voxel_index != neighbor_voxel_index_end; 
+        //            ++neighbor_voxel_index )
+        //        {
+        //            if(!is_neighbor_voxel(pCell, pCell.get_container().underlying_mesh.voxels[pCell.get_current_mechanics_voxel_index()].center, pCell.get_container().underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+        //                continue;
+        //            end = pCell.get_container().agent_grid[neighbor_voxel_index].end();
+        //            for(neighbor = pCell.get_container().agent_grid[neighbor_voxel_index].begin();neighbor != end; ++neighbor)
+        //            {
+        //                double[] displacement = (neighbor).position - pCell.position; 
+        //                double distance = norm( displacement ); 
+        //                if( distance <= pCell.phenotype.mechanics.relative_maximum_adhesion_distance * pCell.phenotype.geometry.radius 
+        //                    + (neighbor).phenotype.mechanics.relative_maximum_adhesion_distance * (neighbor).phenotype.geometry.radius
+        //                    && (neighbor) != pCell )
+        //                { neighbors.add( neighbor ); }
+        //            }
+        //        }
+
+        return neighbors;
+    }
 
     @Override
     public String toString()

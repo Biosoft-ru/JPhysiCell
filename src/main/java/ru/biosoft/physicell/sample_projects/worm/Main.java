@@ -1,7 +1,8 @@
-package ru.biosoft.physicell.sample_projects.pred_prey_farmer;
+package ru.biosoft.physicell.sample_projects.worm;
 
 import java.io.InputStream;
 
+import ru.biosoft.physicell.core.CellCSVReader;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
 
@@ -73,8 +74,10 @@ import ru.biosoft.physicell.xml.ModelReader;
 */
 public class Main
 {
+    private static String CELLS_PATH = "config/cells.csv";
+
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/perd_prey_farmer/r3";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/worm/result_repeat";
 
     public static void main(String ... strings) throws Exception
     {
@@ -82,15 +85,14 @@ public class Main
             resultPath = strings[0];
 
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
-        Model model = new ModelReader().read( settings, PredPreyFarmer.class );
+        Model model = new ModelReader().read( settings, Worm.class );
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addVisualizer( 0, "food" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
-        model.addVisualizer( 0, "prey signal" ).setStubstrateIndex( 1 ).setMaxDensity( 10 );
-        model.addVisualizer( 0, "predator signal" ).setStubstrateIndex( 2 ).setMaxDensity( 10 );
+        model.addVisualizer( 0, "signal" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
         model.init();
+        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( CELLS_PATH ), model.getMicroenvironment() );
         System.out.println( model.display() );
         model.simulate();
     }
