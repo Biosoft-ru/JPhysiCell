@@ -23,58 +23,37 @@ public class RegularAgentVisualizer extends AgentVisualizer
         bColor = ModelReader.readColor( model.getParameter( "B_color" ) );
         cColor = ModelReader.readColor( model.getParameter( "C_color" ) );
     }
+
     @Override
-    public Color findColor(Cell pCell)
+    public Color[] findColors(Cell cell)
     {
-        CellDefinition aCD = CellDefinition.getCellDefinition( "A" );
-        CellDefinition bCD = CellDefinition.getCellDefinition( "B" );
-        CellDefinition cCD = CellDefinition.getCellDefinition( "C" );
+        Color[] output = new Color[] {Color.black, Color.black, Color.black, Color.black};
 
-        int A_type = aCD.type;
-        int B_type = bCD.type;
-        int C_type = cCD.type;
-
-        // start with flow cytometry coloring 
-        Color output = Color.black;
-        //            String[] output = {"black", "black", "black", "black"};
-
-        // color live C 
-        if( pCell.type == A_type )
+        if( cell.type == CellDefinition.getCellDefinition( "A" ).type )
         {
-            output = aColor;//ModelReader.readColor( model.getParameter( "A_color" ) );
-            //                output[0] = parameters.strings( "A_color" );
-            //                output[2] = parameters.strings( "A_color" );
+            output[0] = aColor;
+            output[2] = aColor;
+        }
+        else if( cell.type == CellDefinition.getCellDefinition( "B" ).type )
+        {
+            output[0] = bColor;
+            output[2] = bColor;
+        }
+        else if( cell.type == CellDefinition.getCellDefinition( "C" ).type )
+        {
+            output[0] = cColor;
+            output[2] = cColor;
         }
 
-        // color live B
-        if( pCell.type == B_type )
-        {
-            output = bColor;//ModelReader.readColor( model.getParameter( "B_color" ) );
-            //                output[0] = parameters.strings( "B_color" );
-            //                output[2] = parameters.strings( "B_color" );
-        }
-
-        // color live C
-        if( pCell.type == C_type )
-        {
-            output = cColor;//ModelReader.readColor( model.getParameter( "C_color" ) );
-            //                output[0] = parameters.strings( "C_color" );
-            //                output[2] = parameters.strings( "C_color" );
-        }
-
-        if( pCell.phenotype.death.dead == true )
+        if( cell.phenotype.death.dead )
         {
             // Necrotic - Brown
-            if( pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_swelling
-                    || pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_lysed
-                    || pCell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic )
-            {
-                output = new Color( 123, 63, 0 );//  "chocolate";
-            }
+            if( cell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_swelling
+                    || cell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_lysed
+                    || cell.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic )
+                output[2] = new Color( 123, 63, 0 );//  "chocolate";
             else
-            {
-                output = Color.black;//"black";
-            }
+                output[2] = Color.black;
         }
         return output;
     }

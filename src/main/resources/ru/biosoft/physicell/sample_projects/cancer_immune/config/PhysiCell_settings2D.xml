@@ -331,7 +331,7 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 
 		<!-- main --> 
-		<immune_activation_time type="double" units="min">20160</immune_activation_time> <!--20160 -->
+		<immune_activation_time type="double" units="min">60</immune_activation_time> <!--20160 -->
 			<!-- activate in 7 days --> 
 		<save_interval_after_therapy_start type="double" units="min">15.0</save_interval_after_therapy_start>
 		<SVG_interval_after_therapy_start type="double" units="min">3.0</SVG_interval_after_therapy_start>

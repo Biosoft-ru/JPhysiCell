@@ -62,6 +62,11 @@ public class PhysiCellUtilities
         return m + var * r.nextGaussian();
     }
 
+    public static double NormalRestricted(double m, double var, double min, double max)
+    {
+        return restrict( m + var * r.nextGaussian(), min, max );
+    }
+
     public static double restrict(double val, double min, double max)
     {
         if( val < min )

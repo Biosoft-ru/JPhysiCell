@@ -1,7 +1,5 @@
 package ru.biosoft.physicell.sample_projects.biorobots;
 
-import java.awt.Color;
-
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
@@ -9,24 +7,9 @@ import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
 import ru.biosoft.physicell.core.SignalBehavior;
 import ru.biosoft.physicell.core.standard.StandardElasticContact;
-import ru.biosoft.physicell.ui.Visualizer;
-import ru.biosoft.physicell.xml.ModelReader;
 
 public class Biorobots extends Model
 {
-    public void setColors() throws Exception
-    {
-        Color cargoColor = ModelReader.readColor( getParameter( "cargo_color" ) );
-        Color workerColor = ModelReader.readColor( getParameter( "worker_color" ) );
-        Color directorColor = ModelReader.readColor( getParameter( "director_color" ) );
-        for( Visualizer visualizer : getVisualizers() )
-        {
-            visualizer.setColorType( CellDefinition.getCellDefinition( "cargo cell" ).type, cargoColor );
-            visualizer.setColorType( CellDefinition.getCellDefinition( "worker cell" ).type, workerColor );
-            visualizer.setColorType( CellDefinition.getCellDefinition( "director cell" ).type, directorColor );
-        }
-    }
-
     @Override
     public void init() throws Exception
     {
@@ -34,7 +17,7 @@ public class Biorobots extends Model
         PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
         createCellTypes();
         setupTissue();
-        setColors();
+        getVisualizers().forEach( v -> v.setAgentVisualizer( new BiorobotsVisualizer( this ) ) );
     }
 
     void createCellTypes() throws Exception

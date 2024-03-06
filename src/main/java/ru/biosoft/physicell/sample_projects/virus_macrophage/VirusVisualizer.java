@@ -17,13 +17,9 @@ public class VirusVisualizer extends AgentVisualizer
     }
 
     @Override
-    public Color findColor(Cell pCell)
+    public Color[] findColors(Cell pCell)
     {
-        //	start with flow cytometry coloring 
-        //    	std::vector<std::string> output = { "magenta" , "black" , "magenta", "black" }; 
-
-        Color output = Color.magenta;
-        //            int nVirus = microenvironment.find_density_index( "virus" );
+        Color[] output = new Color[] {Color.magenta, Color.black, Color.magenta, Color.black};
 
         double min_virus = pCell.customData.get( "min_virion_count" );
         double max_virus = pCell.customData.get( "burst_virion_count" );
@@ -31,35 +27,30 @@ public class VirusVisualizer extends AgentVisualizer
 
         CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
 
-        // dead cells 
         if( pCell.phenotype.death.dead == true )
         {
-            return Color.red.darker();
-            //		 output[0] = "red"; 
-            //		 output[2] = "darkred"; 
-            //		 return output; 
+            output[0] = Color.red;
+            output[2] = Color.red.darker();
+            return output;
         }
 
         if( pCell.type != pMacrophage.type )
         {
-            output = Color.blue.darker();
-            //		output[0] = "blue"; 
-            //		output[2] = "darkblue"; 
-            //		
+            output[0] = Color.blue;
+            output[2] = Color.blue.darker();
+
             double virus = pCell.phenotype.molecular.internSubstrates[nVirus];
 
             if( pCell.phenotype.molecular.internSubstrates[nVirus] >= min_virus )
             {
-                //                return Color.yellow;
                 double interp = ( virus - min_virus ) / denominator;
-                if( interp > 1.0 )
-                {
-                    interp = 1.0;
-                }
+                interp = Math.min( 1.0, interp );
                 int Red = (int)Math.floor( 255.0 * interp );
                 int Green = (int)Math.floor( 255.0 * interp );
                 int Blue = (int)Math.floor( 255.0 * ( 1 - interp ) );
-                return new Color( Red, Green, Blue );
+                Color c = new Color( Red, Green, Blue );
+                output[0] = c;
+                output[2] = c;
             }
 
         }

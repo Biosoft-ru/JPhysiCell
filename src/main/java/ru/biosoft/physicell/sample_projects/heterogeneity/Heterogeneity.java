@@ -113,44 +113,38 @@ public class Heterogeneity extends Model
         double pSD = getParameterDouble( "oncoprotein_sd" );
         double pMin = getParameterDouble( "oncoprotein_min" );
         double pMax = getParameterDouble( "oncoprotein_max" );
-
+        Cell cell;
         int n = 0;
         while( y < tumorRadius )
         {
             x = 0.0;
             if( n % 2 == 1 )
-            {
                 x = 0.5 * cellSpacing;
-            }
             xOuter = Math.sqrt( tumorRadius * tumorRadius - y * y );
 
             while( x < xOuter )
             {
-                Cell pCell = Cell.createCell( pCD, m, new double[] {x, y, 0.0} ); // tumor cell 
-                double p = PhysiCellUtilities.NormalRandom( pMean, pSD );
-                p = PhysiCellUtilities.restrict( p, pMin, pMax );
-                SignalBehavior.setSingleBehavior( pCell, CUSTOM_ONCOPROTEIN, p );
+                cell = Cell.createCell( pCD, m, new double[] {x, y, 0.0} ); // tumor cell 
+                double p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
+                SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
 
                 if( Math.abs( y ) > 0.01 )
                 {
-                    Cell pCell2 = Cell.createCell( pCD, m, new double[] {x, -y, 0.0} ); // tumor cell 
-                    p = PhysiCellUtilities.NormalRandom( pMean, pSD );
-                    p = PhysiCellUtilities.restrict( p, pMin, pMax );
-                    SignalBehavior.setSingleBehavior( pCell2, CUSTOM_ONCOPROTEIN, p );
+                    cell = Cell.createCell( pCD, m, new double[] {x, -y, 0.0} ); // tumor cell 
+                    p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
+                    SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
                 }
                 if( Math.abs( x ) > 0.01 )
                 {
-                    Cell pCell3 = Cell.createCell( pCD, m, new double[] { -x, y, 0} ); // tumor cell 
-                    p = PhysiCellUtilities.NormalRandom( pMean, pSD );
-                    p = PhysiCellUtilities.restrict( p, pMin, pMax );
-                    SignalBehavior.setSingleBehavior( pCell3, CUSTOM_ONCOPROTEIN, p );
+                    cell = Cell.createCell( pCD, m, new double[] { -x, y, 0} ); // tumor cell 
+                    p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
+                    SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
 
                     if( Math.abs( y ) > 0.01 )
                     {
-                        Cell pCell4 = Cell.createCell( pCD, m, new double[] { -x, -y, 0} ); // tumor cell
-                        p = PhysiCellUtilities.NormalRandom( pMean, pSD );
-                        p = PhysiCellUtilities.restrict( p, pMin, pMax );
-                        SignalBehavior.setSingleBehavior( pCell4, CUSTOM_ONCOPROTEIN, p );
+                        cell = Cell.createCell( pCD, m, new double[] { -x, -y, 0} ); // tumor cell
+                        p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
+                        SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
                     }
                 }
                 x += cellSpacing;

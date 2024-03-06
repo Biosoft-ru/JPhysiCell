@@ -28,12 +28,12 @@ public class NeutrophilPhenotype extends UpdatePhenotype
 
         // migration bias increases with pro-inflammatory
         int nPIF = m.findDensityIndex( "pro-inflammatory" );
-        double PIF = pCell.nearest_density_vector()[nPIF];
-        double base_val = pCD.phenotype.motility.migrationBias;
-        double max_val = 0.75;
-        double half_max = pCD.custom_data.get( "migration_bias_halfmax" ); // 0.25 
-        double hill = BasicSignaling.Hill_response_function( PIF, half_max, 1.5 );
-        phenotype.motility.migrationBias = base_val + ( max_val - base_val ) * hill;
+        double pif = pCell.nearest_density_vector()[nPIF];
+        double base = pCD.phenotype.motility.migrationBias;
+        double max = 0.75;
+        double half = pCD.custom_data.get( "migration_bias_halfmax" ); // 0.25 
+        double hill = BasicSignaling.Hill_response_function( pif, half, 1.5 );
+        phenotype.motility.migrationBias = base + ( max - base ) * hill;
     }
 
     @Override

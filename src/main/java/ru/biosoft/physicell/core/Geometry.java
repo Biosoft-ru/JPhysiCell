@@ -69,7 +69,7 @@ package ru.biosoft.physicell.core;
 public class Geometry implements Cloneable
 {
     public double radius;
-    double nuclearRadius;
+    private double nuclearRadius;
     double surfaceArea;
     double polarity;
     static double four_thirds_pi = 4.188790204786391;
@@ -89,6 +89,16 @@ public class Geometry implements Cloneable
         radius = phenotype.volume.total;
         radius /= four_thirds_pi;
         radius = Math.pow( radius, 0.333333333333333333333333333333333333333 );
+    }
+
+    public double getNuclearRadius()
+    {
+        return nuclearRadius;
+    }
+
+    public double getRadius()
+    {
+        return radius;
     }
 
     void updateNuclearRadius(Cell pCell, Phenotype phenotype, double dt)

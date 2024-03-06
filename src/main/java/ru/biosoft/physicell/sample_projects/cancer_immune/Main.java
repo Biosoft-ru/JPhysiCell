@@ -83,13 +83,10 @@ public class Main
 
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
         Model model = new ModelReader().read( settings, CancerImmune.class );
-
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
-        model.setWriteDensity( true );
         model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
-
         model.init();
         System.out.println( model.display() );
         model.simulate();

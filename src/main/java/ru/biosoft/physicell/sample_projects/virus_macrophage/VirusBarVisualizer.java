@@ -17,69 +17,51 @@ public class VirusBarVisualizer extends AgentVisualizer
     }
 
     @Override
-    public Color findColor(Cell pCell)
+    public Color[] findColors(Cell pCell)
     {
-        Color output = Color.magenta;
-
-        double min_virus = pCell.customData.get( "min_virion_count" );
-        double max_virus = pCell.customData.get( "burst_virion_count" );
-        double denominator = max_virus - min_virus + 1e-15;
-
+        Color[] output = new Color[] {Color.magenta, Color.black, Color.magenta, Color.black};
+        double minVirus = pCell.customData.get( "min_virion_count" );
+        double maxVirus = pCell.customData.get( "burst_virion_count" );
+        double denominator = maxVirus - minVirus + 1e-15;
         CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
-
-        // dead cells 
         if( pCell.phenotype.death.dead )
         {
-            //            		 output[0] = "red"; 
-            //            		 output[2] = "darkred"; 
-            return Color.red.darker();
+            output[0] = Color.red;
+            output[2] = Color.red.darker();
         }
 
         if( pCell.type != pMacrophage.type )
         {
-            output = Color.blue.darker();
-            //            		output[0] = "blue"; 
-            //            		output[2] = "darkblue"; 
-
+            output[0] = Color.blue;
+            output[2] = Color.blue.darker();
             double virus = pCell.phenotype.molecular.internSubstrates[nVirus];
 
-            if( pCell.phenotype.molecular.internSubstrates[nVirus] >= min_virus )
+            if( pCell.phenotype.molecular.internSubstrates[nVirus] >= minVirus )
             {
-                double interp = ( virus - min_virus ) / denominator;
+                double interp = ( virus - minVirus ) / denominator;
                 if( interp > 1.0 )
-                {
                     interp = 1.0;
-                }
 
                 if( interp > 0.75 )
-                {
                     interp = 1;
-                }
+
                 if( interp > 0.5 && interp <= 0.75 )
-                {
                     interp = 0.75;
-                }
+
                 if( interp > 0.25 && interp <= 0.5 )
-                {
                     interp = 0.5;
-                }
+
                 if( interp > 0.01 && interp <= 0.25 )
-                {
                     interp = 0.25;
-                }
 
                 int Red = (int)Math.floor( 255.0 * interp );
                 int Green = (int)Math.floor( 255.0 * interp );
                 int Blue = (int)Math.floor( 255.0 * ( 1 - interp ) );
-                return new Color( Red, Green, Blue );
-                //            			char szTempString [128];
-                //            			sprintf( szTempString , "rgb(%u,%u,%u)", Red, Green, Blue );
-                //            			output[0].assign( szTempString );
-                //            			output[2].assign( szTempString );
+                Color c = new Color( Red, Green, Blue );
+                output[0] = c;
+                output[2] = c;
             }
-
         }
-
         return output;
     }
 }

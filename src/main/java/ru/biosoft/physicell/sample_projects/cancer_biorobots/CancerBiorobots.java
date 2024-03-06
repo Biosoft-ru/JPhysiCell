@@ -84,7 +84,7 @@ public class CancerBiorobots extends Model
         super.init();
         SignalBehavior.setupDictionaries( m );
         createCellTypes();
-        setup_tissue();
+        setupTissue();
         addEvent( new TherapyEvent( getParameterDouble( "therapy_activation_time" ) ) );
         for( Visualizer visualizer : getVisualizers() )
         {
@@ -97,99 +97,74 @@ public class CancerBiorobots extends Model
         PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
 
         //cancer cell
-        CellDefinition pCD = CellDefinition.getCellDefinition( "cancer cell" );
-        pCD.functions.updatePhenotype = new TumorPhenotype();
-        pCD.parameters.o2_proliferation_saturation = 38.0;
-        pCD.parameters.o2_reference = 38.0;
+        CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
+        cd.functions.updatePhenotype = new TumorPhenotype();
+        cd.parameters.o2_proliferation_saturation = 38.0;
+        cd.parameters.o2_reference = 38.0;
 
         // cargo cells
-        pCD = CellDefinition.getCellDefinition( "cargo cell" );
+        cd = CellDefinition.getCellDefinition( "cargo cell" );
         // figure out mechanics parameters
-        pCD.phenotype.mechanics.relMaxAttachmentDistance = pCD.custom_data.get( "max_attachment_distance" )
-                / pCD.phenotype.geometry.radius;
-        pCD.phenotype.mechanics.relDetachmentDistance = pCD.custom_data.get( "max_elastic_displacement" )
-                / pCD.phenotype.geometry.radius;
-        pCD.phenotype.mechanics.attachmentElasticConstant = pCD.custom_data.get( "elastic_coefficient" );
+        cd.phenotype.mechanics.relMaxAttachmentDistance = cd.custom_data.get( "max_attachment_distance" ) / cd.phenotype.geometry.radius;
+        cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_elastic_displacement" ) / cd.phenotype.geometry.radius;
+        cd.phenotype.mechanics.attachmentElasticConstant = cd.custom_data.get( "elastic_coefficient" );
 
         // set functions
-        pCD.functions.updatePhenotype = new CargoPhenotype();
-        pCD.functions.customCellRule = new CargoCellRule();
-        pCD.functions.contact = new BiorobotsContact();
-        pCD.functions.updateMigration = null;
+        cd.functions.updatePhenotype = new CargoPhenotype();
+        cd.functions.customCellRule = new CargoCellRule();
+        cd.functions.contact = new BiorobotsContact();
+        cd.functions.updateMigration = null;
 
         // worker cells
-        pCD = CellDefinition.getCellDefinition( "worker cell" );
-        pCD.phenotype.mechanics.relMaxAttachmentDistance = pCD.custom_data.get( "max_attachment_distance" )
-                / pCD.phenotype.geometry.radius;
-
-        pCD.phenotype.mechanics.relDetachmentDistance = pCD.custom_data.get( "max_elastic_displacement" )
-                / pCD.phenotype.geometry.radius;
-        pCD.phenotype.mechanics.attachmentElasticConstant = pCD.custom_data.get( "elastic_coefficient" );
-        pCD.functions.updatePhenotype = null; // worker_cell_rule;
-        pCD.functions.customCellRule = new WorkerCellRule();
-        pCD.functions.contact = new BiorobotsContact();
+        cd = CellDefinition.getCellDefinition( "worker cell" );
+        cd.phenotype.mechanics.relMaxAttachmentDistance = cd.custom_data.get( "max_attachment_distance" ) / cd.phenotype.geometry.radius;
+        cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_elastic_displacement" ) / cd.phenotype.geometry.radius;
+        cd.phenotype.mechanics.attachmentElasticConstant = cd.custom_data.get( "elastic_coefficient" );
+        cd.functions.updatePhenotype = null; // worker_cell_rule;
+        cd.functions.customCellRule = new WorkerCellRule();
+        cd.functions.contact = new BiorobotsContact();
     }
 
     private void setupTissue() throws Exception
     {
-        double Xmin = m.mesh.boundingBox[0];
-        double Ymin = m.mesh.boundingBox[1];
-        double Zmin = m.mesh.boundingBox[2];
-        double Xmax = m.mesh.boundingBox[3];
-        double Ymax = m.mesh.boundingBox[4];
-        double Zmax = m.mesh.boundingBox[5];
-
-        if( m.options.simulate2D )
-        {
-            Zmin = 0.0;
-            Zmax = 0.0;
-        }
-        // custom placement, place a cluster of tumor cells at the center
         CellDefinition defaults = StandardModels.getDefaultCellDefinition();
-        double cell_radius = defaults.phenotype.geometry.radius;
-        double cell_spacing = 0.95 * 2.0 * cell_radius;
+        double cellRadius = defaults.phenotype.geometry.radius;
+        double cellSpacing = 0.95 * 2.0 * cellRadius;
+        double tumorRadius = getParameterDouble( "tumor_radius" ); // 200.0;
 
-        double tumor_radius = getParameterDouble( "tumor_radius" ); // 200.0;
-
-        Cell pCell = null;
-        CellDefinition pCD_cancer = CellDefinition.getCellDefinition( "cancer cell" );
-
+        CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
         double x = 0.0;
-        double x_outer = tumor_radius;
+        double xOuter = tumorRadius;
         double y = 0.0;
 
         int n = 0;
-        while( y < tumor_radius )
+        while( y < tumorRadius )
         {
             x = 0.0;
             if( n % 2 == 1 )
             {
-                x = 0.5 * cell_spacing;
+                x = 0.5 * cellSpacing;
             }
-            x_outer = Math.sqrt( tumor_radius * tumor_radius - y * y );
+            xOuter = Math.sqrt( tumorRadius * tumorRadius - y * y );
 
-            while( x < x_outer )
+            while( x < xOuter )
             {
-                pCell = Cell.createCell( pCD_cancer, m, new double[] {x, y, 0.0} ); // tumor cell
+                Cell.createCell( cd, m, new double[] {x, y, 0.0} ); // tumor cell
 
                 if( Math.abs( y ) > 0.01 )
-                {
-                    pCell = Cell.createCell( pCD_cancer, m, new double[] {x, -y, 0.0} ); // tumor cell			
-                }
+                    Cell.createCell( cd, m, new double[] {x, -y, 0.0} ); // tumor cell			
 
                 if( Math.abs( x ) > 0.01 )
                 {
-                    Cell.createCell( pCD_cancer, m, new double[] { -x, y, 0.0} );
+                    Cell.createCell( cd, m, new double[] { -x, y, 0.0} );
 
                     if( Math.abs( y ) > 0.01 )
-                    {
-                        Cell.createCell( pCD_cancer, m, new double[] { -x, -y, 0.0} );
-                    }
+                        Cell.createCell( cd, m, new double[] { -x, -y, 0.0} );
                 }
-                x += cell_spacing;
+                x += cellSpacing;
             }
 
-            y += cell_spacing * Math.sqrt( 3.0 ) / 2.0;
+            y += cellSpacing * Math.sqrt( 3.0 ) / 2.0;
             n++;
         }
     }

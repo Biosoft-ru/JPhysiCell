@@ -9,29 +9,20 @@ import ru.biosoft.physicell.ui.AgentVisualizer2;
 public class PPFVisualizer extends AgentVisualizer2
 {
     @Override
-    public Color findColor(Cell pCell)
+    public Color[] findColors(Cell pCell)
     {
         CellDefinition pFarmerDef = CellDefinition.getCellDefinition( "farmer" );
         CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
         CellDefinition pPredDef = CellDefinition.getCellDefinition( "predator" );
 
         if( pCell.type == pFarmerDef.type )
-        {
-            return Color.gray;
-            //{ "grey", "black", "grey", "grey" }; }
-        }
+            return new Color[] {Color.gray};
 
         if( pCell.type == pPreyDef.type )
-        {
-            return Color.blue;
-        }//{ "blue", "black", "blue", "blue" }; }
+            return new Color[] {Color.blue};
 
         if( pCell.type == pPredDef.type )
-        {
-            return Color.orange;
-        }
-        //            { "orange", "black", "orange", "orange" }; };};
-
-        return super.findBorderColor( pCell );//paint_by_number_cell_coloring( pCell );
+            return new Color[] {Color.orange};
+        return super.findColors( pCell );
     }
 }

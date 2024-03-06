@@ -87,6 +87,7 @@ public class CancerImmune extends Model
     @Override
     public void init() throws Exception
     {
+        super.init();
         // use the same random seed so that future experiments have the 
         // same initial histogram of oncoprotein, even if threading means 
         // that future division and other events are still not identical 

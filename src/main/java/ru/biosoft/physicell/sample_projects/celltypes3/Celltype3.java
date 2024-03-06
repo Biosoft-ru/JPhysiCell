@@ -87,7 +87,7 @@ public class Celltype3 extends Model
         setupTissue();
         for( Visualizer visualizer : getVisualizers() )
         {
-            visualizer.setAgentVisualizer( new RegularAgentVisualizer( this ) );
+            visualizer.setAgentVisualizer( new FluorescenceAgentVisualizer() );
         }
     }
 
@@ -96,9 +96,9 @@ public class Celltype3 extends Model
      */
     void createCellTypes() throws Exception
     {
-        CellDefinition.getCellDefinition( "A" ).functions.updatePhenotype = new A_phenotype( this );
-        CellDefinition.getCellDefinition( "B" ).functions.updatePhenotype = new B_phenotype( this );
-        CellDefinition.getCellDefinition( "C" ).functions.updatePhenotype = new C_phenotype( this );
+        CellDefinition.getCellDefinition( "A" ).functions.updatePhenotype = new PhenotypeA( this );
+        CellDefinition.getCellDefinition( "B" ).functions.updatePhenotype = new PhenotypeB( this );
+        CellDefinition.getCellDefinition( "C" ).functions.updatePhenotype = new PhenotypeC( this );
     }
 
     /**

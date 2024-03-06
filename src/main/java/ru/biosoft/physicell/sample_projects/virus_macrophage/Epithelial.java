@@ -17,26 +17,18 @@ class Epithelial extends UpdatePhenotype
         int apoptosis_model_index = pCell.phenotype.death.findDeathModelIndex( "Apoptosis" );
 
         // compare against viral load. Should I commit apoptosis? 
-        //        if( pCell.internalizedSubstrates[0] > 0 || pCell.internalizedSubstrates[1] > 0 )
-        //        {
-        //            double b = 5;
-        //        }
-
         double virus = phenotype.molecular.internSubstrates[nVirus];
         if( virus >= pCell.customData.get( "burst_virion_count" ) )
         {
-            System.out.println( "\t\tburst!" );
             pCell.lyseCell(); // start_death( apoptosis_model_index );
             pCell.functions.updatePhenotype = null;
             return;
         }
 
         // replicate virus particles inside me 
-
         if( virus >= pCell.customData.get( "min_virion_count" ) )
         {
-            double new_virus = pCell.customData.get( "viral_replication_rate" );
-            new_virus *= dt;
+            double new_virus = pCell.customData.get( "viral_replication_rate" ) * dt;
             phenotype.molecular.internSubstrates[nVirus] += new_virus;
         }
 
@@ -48,10 +40,5 @@ class Epithelial extends UpdatePhenotype
         //	 double implicit_Euler_constant = 
         //		(1.0 + dt * pCell.custom_data.get"virus_digestion_rate"] );
         //	phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
-
-
-        // if I have too many 
-        // if I have too many 
-
     }
 }

@@ -33,7 +33,7 @@ public class AgentVisualizer2 extends AgentVisualizer
     }
 
     @Override
-    public Color findColor(Cell cell)
+    public Color[] findColors(Cell cell)
     {
         if( !isInit )
             init();
@@ -71,6 +71,6 @@ public class AgentVisualizer2 extends AgentVisualizer
 
         //        output[1] = "black";
 
-        return output;
+        return new Color[] {output};
     }
 }

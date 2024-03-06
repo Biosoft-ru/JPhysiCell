@@ -25,20 +25,20 @@ public class ImmuneCellRule extends CustomCellRule
         {
             // attempt to kill my attached cell
             Cell attached = pCell.state.attachedCells.iterator().next();///[0];
-            boolean detach_me = false;
+            boolean detachMe = false;
 
             if( attemptApoptosis( pCell, attached, dt ) )
             {
                 triggerApoptosis( pCell, attached );
-                detach_me = true;
+                detachMe = true;
             }
 
             // decide whether to detach 
             if( PhysiCellUtilities.UniformRandom() < dt / ( pCell.customData.get( attach_lifetime_i ) + 1e-15 ) )
-                detach_me = true;
+                detachMe = true;
 
             // if I dettach, resume motile behavior 
-            if( detach_me )
+            if( detachMe )
             {
                 Cell.detachCells( pCell, attached );
                 phenotype.motility.isMotile = true;

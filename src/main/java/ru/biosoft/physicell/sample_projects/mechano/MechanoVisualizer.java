@@ -8,44 +8,29 @@ import ru.biosoft.physicell.ui.AgentVisualizer;
 public class MechanoVisualizer extends AgentVisualizer
 {
     @Override
-    public Color findColor(Cell cell)
+    public Color[] findColors(Cell cell)
     {
-        int n_springs = cell.state.springAttachments.size();
+        int springs = cell.state.springAttachments.size();
+        Color[] result = new Color[] {Color.black};
         if( !cell.typeName.equals( "BM" ) )
         {
-            if( n_springs == 0 )
-            {
-                return Color.gray;
-            }
-            if( n_springs == 1 )
-            {
-                return new Color( 75, 0, 130 ); //indigo
-            }
-            if( n_springs == 2 )
-            {
-                return Color.blue;
-            }
-            if( n_springs == 3 )
-            {
-                return Color.green;
-            }
-            if( n_springs == 4 )
-            {
-                return Color.yellow;
-            }
-            if( n_springs == 5 )
-            {
-                return Color.orange.darker();
-            }
-            if( n_springs == 6 )
-            {
-                return Color.red;
-            }
-            if( n_springs > 6 )
-            {
-                return Color.magenta;
-            }
+            if( springs == 0 )
+                result[0] = Color.gray;
+            else if( springs == 1 )
+                result[0] = new Color( 75, 0, 130 ); //indigo
+            else if( springs == 2 )
+                result[0] = Color.blue;
+            else if( springs == 3 )
+                result[0] = Color.green;
+            else if( springs == 4 )
+                result[0] = Color.yellow;
+            else if( springs == 5 )
+                result[0] = Color.orange.darker();
+            else if( springs == 6 )
+                result[0] = Color.red;
+            else if( springs > 6 )
+                result[0] = Color.magenta;
         }
-        return Color.black;
+        return result;
     }
 }

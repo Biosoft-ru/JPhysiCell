@@ -238,24 +238,15 @@ public class Visualizer
             int r = (int)Math.sqrt( radius * radius - d * d );
             if( agent instanceof Cell )
             {
-                //                Cell cell = (Cell)agent;
-                agentVisualizer.drawAgent( (Cell)agent, c1, c2, r, g );
-                //                String phase = cell.phenotype.cycle.currentPhase().name;
-                //                Color color = phaseColor.get( phase );
-                //                if( cell.isOutOfDomain )
-                //                    continue;
-                //
-                //                if( color != null )
-                //                {
-                //                    g.setColor( color );
-                //                    g.fillOval( c1 - r, c2 - r, 2 * r, 2 * r );
-                //                }
-                //                else
-                //                {
-                //                    System.out.println( "Unknown phase " + phase );
-                //                }
-                //                g.setColor( Color.black );
-                //                g.drawOval( c1 - r, c2 - r, 2 * r, 2 * r );
+                Cell cell = (Cell)agent;
+                double nuclearRadius = cell.phenotype.geometry.getNuclearRadius();
+                if( d > nuclearRadius )
+                    agentVisualizer.drawAgent( cell, c1, c2, r, g );
+                else
+                {
+                    int nr = (int)Math.sqrt( nuclearRadius * nuclearRadius - d * d );
+                    agentVisualizer.drawAgent( cell, c1, c2, r, nr, g );
+                }
             }
             else
             {

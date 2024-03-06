@@ -27,28 +27,18 @@ public class Macrophage extends UpdatePhenotype
         phenotype.molecular.internSubstrates[nVirus] /= implicitEulerConstant;
 
         // check for contact with a cell
-        //        Cell pTestCell = null;
         List<Cell> neighbors = get_possible_neighbors( pCell );
-
-        //	for( int n=0; n < pCell.cells_in_my_container().size() ; n++ )
         for( Cell neighbor : neighbors )
         {
-            //            pTestCell = neighbors.get( n );
-            // if it is not me and not a macrophage 
             if( neighbor != pCell && neighbor.type != pMacrophage.type )
             {
-                // calculate distance to the cell 
-                //                double[] displacement = VectorUtil.newDiff( neighbor.position, pCell.position );
-                //                double distance = VectorUtil.norm( displacement );
                 double dist = VectorUtil.dist( neighbor.position, pCell.position );
                 double maxDistance = 1.1 * ( pCell.phenotype.geometry.radius + neighbor.phenotype.geometry.radius );
-                //                max_distance *= 1.1;
 
                 // if it is not a macrophage, test for viral load if high viral load, eat it. 
                 if( neighbor.phenotype.molecular.internSubstrates[nVirus] > pCell.customData.get( "min_virion_detection_threshold" )
                         && dist < maxDistance )
                 {
-                    //                    System.out.println( "\t\tnom nom nom" );
                     pCell.ingestCell( neighbor );
                 }
             }
@@ -57,7 +47,7 @@ public class Macrophage extends UpdatePhenotype
 
     public String display()
     {
-        return "";
+        return "Ingests infected cells.";
     }
 
     public static List<Cell> get_possible_neighbors(Cell pCell)
@@ -66,22 +56,13 @@ public class Macrophage extends UpdatePhenotype
         CellContainer container = pCell.get_container();
         CartesianMesh mesh = container.mesh;
         List<Cell> neighbors = new ArrayList<>( container.agentGrid.get( mechanicsVoxelIndex ) );
-        //        for( Cell neighbor : container.agent_grid.get( mechanicsVoxelIndex ) )
-        //        {
-        //            neighbors.add( neighbor );
-        //        }
 
         for( int neighborVoxel : mesh.moore_connected_voxel_indices[mechanicsVoxelIndex] )
         {
             if( !Cell.isNeighborVoxel( pCell,
                     mesh.voxels[mechanicsVoxelIndex].center, mesh.voxels[neighborVoxel].center, neighborVoxel ) )
                 continue;
-
             neighbors.addAll( container.agentGrid.get( neighborVoxel ) );
-            //            for( Cell neighbor : container.agent_grid.get( neighborVoxel ) )
-            //            {
-            //                neighbors.add( neighbor );
-            //            }
         }
         return neighbors;
     }

@@ -7,45 +7,45 @@ import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 
-public class A_phenotype extends UpdatePhenotype
+public class PhenotypeA extends UpdatePhenotype
 {
     private Model model;
 
-    public A_phenotype(Model model)
+    public PhenotypeA(Model model)
     {
         this.model = model;
     }
 
-    public void execute(Cell pCell, Phenotype phenotype, double dt)
+    public void execute(Cell cell, Phenotype phenotype, double dt)
     {
-        Microenvironment microenvironment = pCell.getMicroenvironment();
-        CellDefinition pCD = CellDefinition.getCellDefinition( "A" );
-        int nApoptosis = pCD.phenotype.death.findDeathModelIndex( "Apoptosis" );
-        int nNecrosis = pCD.phenotype.death.findDeathModelIndex( "Necrosis" );
+        Microenvironment m = cell.getMicroenvironment();
+        CellDefinition cd = CellDefinition.getCellDefinition( "A" );
+        int nApoptosis = cd.phenotype.death.findDeathModelIndex( "Apoptosis" );
+        int nNecrosis = cd.phenotype.death.findDeathModelIndex( "Necrosis" );
 
         if( phenotype.death.dead == true )
         {
             phenotype.secretion.setSecretionToZero();
             phenotype.secretion.setUptakeToZero();
             phenotype.motility.isMotile = false;
-            pCell.functions.updatePhenotype = null;
+            cell.functions.updatePhenotype = null;
             return;
         }
 
         // sample A, B, C, resource, and pressure 
-        int nA = microenvironment.findDensityIndex( "signal A" );
-        int nB = microenvironment.findDensityIndex( "signal B" );
-        int nC = microenvironment.findDensityIndex( "signal C" );
-        int nR = microenvironment.findDensityIndex( "resource" );
+        int nA = m.findDensityIndex( "signal A" );
+        int nB = m.findDensityIndex( "signal B" );
+        int nC = m.findDensityIndex( "signal C" );
+        int nR = m.findDensityIndex( "resource" );
 
-        double A = pCell.nearest_density_vector()[nA];
-        double B = pCell.nearest_density_vector()[nB];
-        double C = pCell.nearest_density_vector()[nC];
-        double R = pCell.nearest_density_vector()[nR];
-        double p = pCell.state.simplePressure;
+        double A = cell.nearest_density_vector()[nA];
+        double B = cell.nearest_density_vector()[nB];
+        double C = cell.nearest_density_vector()[nC];
+        double R = cell.nearest_density_vector()[nR];
+        double p = cell.state.simplePressure;
 
         // necrotic death rate 
-        double base_necrosis_rate = pCD.phenotype.death.rates.get( nNecrosis );
+        double base_necrosis_rate = cd.phenotype.death.rates.get( nNecrosis );
         double necrosis_threshold = model.getParameterDouble( "A_necrosis_threshold" );
         phenotype.death.rates.set( nNecrosis, 0.0 );
 
@@ -108,8 +108,8 @@ public class A_phenotype extends UpdatePhenotype
     }
 
     @Override
-    public A_phenotype clone()
+    public PhenotypeA clone()
     {
-        return new A_phenotype( model );
+        return new PhenotypeA( model );
     }
 }

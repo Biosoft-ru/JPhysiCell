@@ -118,7 +118,7 @@ public class OdeEnergy extends Model
         double initialTumorRadius = 100;
 
         List<double[]> positions = createCirclePositions( cellRadius, initialTumorRadius );
-        for( int i = 0; i < 1; i++ )//positions.size(); i++ )
+        for( int i = 0; i < positions.size(); i++ )
         {
             Cell pCell = Cell.createCell( cd, m, positions.get( i ) );
             SignalBehavior.setSingleBehavior( pCell, "custom:intra_oxy", getParameterDouble( "initial_internal_oxygen" ) );

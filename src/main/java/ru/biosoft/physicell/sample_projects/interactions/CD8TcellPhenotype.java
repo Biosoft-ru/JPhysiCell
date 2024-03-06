@@ -13,12 +13,9 @@ public class CD8TcellPhenotype extends UpdatePhenotype
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
         CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
-        Microenvironment microenvironment = pCell.getMicroenvironment();
-        //        int nR = microenvironment.findDensityIndex( "resource" );
-        //        int nTox = microenvironment.findDensityIndex( "toxin" );
-        int nDebris = microenvironment.findDensityIndex( "debris" );
-        int nPIF = microenvironment.findDensityIndex( "pro-inflammatory" );
-
+        Microenvironment m = pCell.getMicroenvironment();
+        int nDebris = m.findDensityIndex( "debris" );
+        int nPIF = m.findDensityIndex( "pro-inflammatory" );
         double[] samples = pCell.nearest_density_vector();
         double PIF = samples[nPIF];
 
@@ -31,12 +28,11 @@ public class CD8TcellPhenotype extends UpdatePhenotype
         }
 
         // migration bias increases with pro-inflammatory 
-        //        double signal = PIF;
-        double base_val = pCD.phenotype.motility.migrationBias;
-        double max_val = 0.75;
-        double half_max = pCD.custom_data.get( "migration_bias_halfmax" ); // 0.05 // 0.25 
-        double hill = BasicSignaling.Hill_response_function( PIF, half_max, 1.5 );
-        phenotype.motility.migrationBias = base_val + ( max_val - base_val ) * hill;
+        double base = pCD.phenotype.motility.migrationBias;
+        double max = 0.75;
+        double half = pCD.custom_data.get( "migration_bias_halfmax" ); // 0.05 // 0.25 
+        double hill = BasicSignaling.Hill_response_function( PIF, half, 1.5 );
+        phenotype.motility.migrationBias = base + ( max - base ) * hill;
     }
 
     @Override

@@ -36,7 +36,7 @@ public class Model
     private boolean saveFull = true;
     private double saveFullInterval;
     private double saveFullNext = 0;
-    private boolean saveDensity = false;
+    private boolean saveDensity = true;
     private boolean saveReport = true;
     private boolean saveImg = true;
     private double saveImgNext = 0;
@@ -66,6 +66,7 @@ public class Model
     public void addEvent(Event event)
     {
         this.events.add( event );
+        this.hasEvents = true;
     }
 
 
