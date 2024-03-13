@@ -321,7 +321,6 @@ public class Visualizer
                 if( density > actualMaxDensity )
                     actualMaxDensity = density;
 
-
                 double ratio = ( density / maxDensity );
                 ratio = Math.min( 1, ratio );
                 red = (int) ( ( 1 - ratio ) * 255 );

@@ -1149,7 +1149,7 @@ public class Cell extends BasicAgent
         setTotalVolume( phenotype.volume.total );
     }
 
-    public void advanceBundledPhenotype(double dt) throws Exception
+    public void advanceBundledPhenotype(double dt, boolean rulesEnabled) throws Exception
     {
         // New March 2022
         // perform transformations 
@@ -1158,10 +1158,8 @@ public class Cell extends BasicAgent
 
         // New March 2023 in Version 1.12.0 
         // call the rules-based code to update the phenotype 
-        if( PhysiCellSettings.rules_enabled )
-        {
-            Rules.apply_ruleset( this );
-        }
+        if( rulesEnabled )
+            Rules.applyRuleset( this );
         //        if( SignalBehavior.getSingleSignal( this, "necrotic" ) > 0.5 )
         //        {
         //            double rupture = this.phenotype.volume.rupture_volume;

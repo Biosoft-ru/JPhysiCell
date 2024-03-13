@@ -1,6 +1,11 @@
-package ru.biosoft.physicell.core;
+package ru.biosoft.physicell.sample_projects.rules_sample;
 
-import java.util.List;
+import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.core.Rules;
+import ru.biosoft.physicell.core.SignalBehavior;
+import ru.biosoft.physicell.ui.AgentVisualizer2;
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -36,7 +41,7 @@ import java.util.List;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -68,105 +73,37 @@ import java.util.List;
 ###############################################################################
 */
 
-public class IntegratedSignal
+public class RulesSample extends Model
 {
-    double base_activity;
-    double max_activity;
-
-    List<Double> promoters;
-    List<Double> promoterWeights;
-    double promotersHill;
-    double promotersHalfMax;
-
-    List<Double> inhibitors;
-    List<Double> inhibitorWeights;
-    double inhibitorsHill;
-    double inhibitorsHalfMax;
-
-    public IntegratedSignal()
+    public void init() throws Exception
     {
-        base_activity = 0.0;
-        max_activity = 1.0;
-
-        promoters.clear();
-        promoterWeights.clear();
-
-        promotersHalfMax = 0.1;
-        promotersHill = 4;
-
-        inhibitors.clear();
-        inhibitorWeights.clear();
-
-        inhibitorsHalfMax = 0.1;
-        inhibitorsHill = 4;
+        super.init();
+        createCellTypes();
+        SignalBehavior.setupDictionaries( m );
+        Rules.setupRules( this );
+        setupTissue();
+        getVisualizers().forEach( v -> v.setAgentVisualizer( new AgentVisualizer2() ) );
     }
 
-    void reset()
+    void createCellTypes()
     {
-        promoters.clear();
-        promoterWeights.clear();
-
-        inhibitors.clear();
-        inhibitorWeights.clear();
-    }
-
-    double computeSignal()
-    {
-        double pr = 0.0;
-        double w = 0.0;
-        for( int k = 0; k < promoters.size(); k++ )
+        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
         {
-            pr += promoters.get( k );
-            w += promoterWeights.get( k );
-        }
-        w += 1e-16;
-        pr /= w;
-
-        double inhib = 0.0;
-        w = 0.0;
-        for( int k = 0; k < inhibitors.size(); k++ )
-        {
-            inhib += inhibitors.get( k );
-            w += inhibitorWeights.get( k );
-        }
-        w += 1e-16;
-        inhib /= w;
-
-        double pn = Math.pow( pr, promotersHill );
-        double phalf = Math.pow( promotersHalfMax, promotersHill );
-
-        double in = Math.pow( inhib, inhibitorsHill );
-        double ihalf = Math.pow( inhibitorsHalfMax, inhibitorsHill );
-
-        double p = pn / ( pn + phalf );
-        double i = 1.0 / ( in + ihalf );
-
-        double output = ( ( max_activity - base_activity ) * p + base_activity ) * i;
-        //        output -= base_activity; //(max-base)
-        //        output *= P; // (max-base)*P 
-        //        output += base_activity; // base + (max-base)*P 
-        //        output *= I; // (base + (max-base)*P)*I; 
-        return output;
-    };
-
-    void addSignal(char signalType, double signal, double weight)
-    {
-        if( signalType == 'P' || signalType == 'p' )
-        {
-            promoters.add( signal );
-            promoterWeights.add( weight );
-            return;
-        }
-        if( signalType == 'I' || signalType == 'i' )
-        {
-            inhibitors.add( signal );
-            inhibitorWeights.add( weight );
-            return;
+            cd.functions.updatePhenotype = null;
+            cd.functions.customCellRule = null;
+            cd.functions.contact = null;
         }
     }
 
-    void add_signal(char signal_type, double signal)
+    void setupTissue()
     {
-        addSignal( signal_type, signal, 1.0 );
+        //        CellDefinition cd = CellDefinition.getCellDefinition( 0 );
+        //        PhysiCellUtilities.place( m, cd, 100 );
+        //    for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        //        PhysiCellUtilities.place( m, cd, getParameterInt( "number_of_cells" ) );
     }
+
+    //std::vector<std::string> my_coloring_function( Cell* pCell )
+    //{ return paint_by_number_cell_coloring(pCell); }
+    //
 }

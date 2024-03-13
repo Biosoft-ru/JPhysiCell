@@ -1,6 +1,10 @@
-package ru.biosoft.physicell.core;
+package ru.biosoft.physicell.sample_projects.rules_sample;
 
-import java.util.List;
+import ru.biosoft.physicell.core.CellCSVReader;
+import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.core.Rules;
+import ru.biosoft.physicell.xml.ModelReader;
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -36,7 +40,7 @@ import java.util.List;
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -67,106 +71,36 @@ import java.util.List;
 #                                                                             #
 ###############################################################################
 */
-
-public class IntegratedSignal
+public class Main
 {
-    double base_activity;
-    double max_activity;
+    private static String CELL_RULES_PATH = "config/cell_rules.csv";
+    private static String CELLS_PATH = "config/cells.csv";
+    private static String settingsPath = "config/PhysiCell_settings.xml";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/rules_sample/result";
 
-    List<Double> promoters;
-    List<Double> promoterWeights;
-    double promotersHill;
-    double promotersHalfMax;
-
-    List<Double> inhibitors;
-    List<Double> inhibitorWeights;
-    double inhibitorsHill;
-    double inhibitorsHalfMax;
-
-    public IntegratedSignal()
+    public static void main(String ... strings) throws Exception
     {
-        base_activity = 0.0;
-        max_activity = 1.0;
+        if( strings != null && strings.length > 0 )
+            resultPath = strings[0];
 
-        promoters.clear();
-        promoterWeights.clear();
+        Model model = new ModelReader().read( Main.class.getResourceAsStream( settingsPath ), RulesSample.class );
+        double mechanics_voxel_size = 30;
+        model.createContainer( mechanics_voxel_size );
+        model.setResultFolder( resultPath );
+        model.setWriteDensity( true );
 
-        promotersHalfMax = 0.1;
-        promotersHill = 4;
+        model.addVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
+        model.addVisualizer( 0, "apoptotic debris" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "necrotic debris" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "pro-inflammatory factor" ).setStubstrateIndex( 3 ).setMaxDensity( 1 );
+        model.addVisualizer( 0, "anti-inflammatory factor" ).setStubstrateIndex( 4 ).setMaxDensity( 1 );
 
-        inhibitors.clear();
-        inhibitorWeights.clear();
+        model.init();
+        Rules.parseCSVRules2( Main.class.getResourceAsStream( CELL_RULES_PATH ) );
+        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( CELLS_PATH ), model.getMicroenvironment() );
 
-        inhibitorsHalfMax = 0.1;
-        inhibitorsHill = 4;
-    }
-
-    void reset()
-    {
-        promoters.clear();
-        promoterWeights.clear();
-
-        inhibitors.clear();
-        inhibitorWeights.clear();
-    }
-
-    double computeSignal()
-    {
-        double pr = 0.0;
-        double w = 0.0;
-        for( int k = 0; k < promoters.size(); k++ )
-        {
-            pr += promoters.get( k );
-            w += promoterWeights.get( k );
-        }
-        w += 1e-16;
-        pr /= w;
-
-        double inhib = 0.0;
-        w = 0.0;
-        for( int k = 0; k < inhibitors.size(); k++ )
-        {
-            inhib += inhibitors.get( k );
-            w += inhibitorWeights.get( k );
-        }
-        w += 1e-16;
-        inhib /= w;
-
-        double pn = Math.pow( pr, promotersHill );
-        double phalf = Math.pow( promotersHalfMax, promotersHill );
-
-        double in = Math.pow( inhib, inhibitorsHill );
-        double ihalf = Math.pow( inhibitorsHalfMax, inhibitorsHill );
-
-        double p = pn / ( pn + phalf );
-        double i = 1.0 / ( in + ihalf );
-
-        double output = ( ( max_activity - base_activity ) * p + base_activity ) * i;
-        //        output -= base_activity; //(max-base)
-        //        output *= P; // (max-base)*P 
-        //        output += base_activity; // base + (max-base)*P 
-        //        output *= I; // (base + (max-base)*P)*I; 
-        return output;
-    };
-
-    void addSignal(char signalType, double signal, double weight)
-    {
-        if( signalType == 'P' || signalType == 'p' )
-        {
-            promoters.add( signal );
-            promoterWeights.add( weight );
-            return;
-        }
-        if( signalType == 'I' || signalType == 'i' )
-        {
-            inhibitors.add( signal );
-            inhibitorWeights.add( weight );
-            return;
-        }
-    }
-
-    void add_signal(char signal_type, double signal)
-    {
-        addSignal( signal_type, signal, 1.0 );
+        System.out.println( model.display() );
+        System.out.println( Rules.display_hypothesis_rulesets() );
+        model.simulate();
     }
 }

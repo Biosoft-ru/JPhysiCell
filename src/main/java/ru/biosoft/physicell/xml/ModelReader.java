@@ -83,11 +83,30 @@ public class ModelReader extends Constants
         readPhenotypes( physicell, m );
         readInitialConditions( physicell, model );
         readUserParameters( physicell, model );
-
+        readRules( physicell, model );
         return model;
     }
 
-
+    private void readRules(Element physicell, Model model)
+    {
+        Element rulesElement = findElement( physicell, "cell_rules" );
+        Element rulesetsElement = findElement( rulesElement, "rulesets" );
+        for( Element rulesetElement : findAllElements( rulesetsElement, "ruleset" ) )
+        {
+            boolean enabled = getBoolAttr( rulesetElement, "enabled" );
+            if( !enabled )
+                continue;
+            //            PhysiCellSettings.rules_enabled = true;
+            String format = getAttr( rulesetElement, "format" );
+            String version = getAttr( rulesetElement, "version" );
+            String protocol = getAttr( rulesetElement, "CBHG" );
+            Element folderElement = findElement( rulesetElement, "folder" );
+            String folder = getVal( folderElement );
+            Element filenameElement = findElement( rulesetElement, "filename" );
+            String filename = getVal( filenameElement );
+            model.setRulesPath( folder + "/" + filename );
+        }
+    }
 
     private void readDomain(Element physicell, Microenvironment m)
     {

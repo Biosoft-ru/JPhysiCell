@@ -79,6 +79,7 @@ import ru.biosoft.physicell.core.standard.StandardModels;
 */
 public class CellContainer extends AgentContainer
 {
+    private boolean rulesEnabled = false;
     Set<Cell> cellsReadyToDivide; // the index of agents ready to divide
     Set<Cell> cellsReadyToDie;
     int boundary_condition_for_pushed_out_agents; // what to do with pushed out cells
@@ -103,9 +104,14 @@ public class CellContainer extends AgentContainer
         cellsReadyToDie = new HashSet<>();
     }
 
-    void initialize(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end, double voxel_size)
+    public void setRulesEnabled(boolean enabled)
     {
-        initialize( x_start, x_end, y_start, y_end, z_start, z_end, voxel_size, voxel_size, voxel_size );
+        this.rulesEnabled = enabled;
+    }
+
+    void initialize(double xStart, double xEnd, double yStart, double yEnd, double zStart, double zEnd, double voxelSize)
+    {
+        initialize( xStart, xEnd, yStart, yEnd, zStart, zEnd, voxelSize, voxelSize, voxelSize );
     }
 
     void initialize(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end, double dx, double dy,
@@ -144,7 +150,6 @@ public class CellContainer extends AgentContainer
         Set<Cell> cells = m.getAgents( Cell.class );
         for( Cell cell : cells )
         {
-
             if( !cell.isOutOfDomain )
             {
                 cell.phenotype.secretion.advance( cell, cell.phenotype, diffusionDT );
@@ -179,11 +184,8 @@ public class CellContainer extends AgentContainer
             // Reset the max_radius in each voxel. It will be filled in set_total_volume
             // It might be better if we calculate it before mechanics each time 
             // std::fill(max_cell_interactive_distance_in_voxel.begin(), max_cell_interactive_distance_in_voxel.end(), 0.0);
-
             if( !initialzed )
-            {
                 timeSinceLastCycle = phenotypeDT;
-            }
 
             // new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
             // checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
@@ -191,9 +193,7 @@ public class CellContainer extends AgentContainer
             for( Cell cell : cells )
             {
                 if( !cell.isOutOfDomain )
-                {
-                    cell.advanceBundledPhenotype( timeSinceLastCycle );
-                }
+                    cell.advanceBundledPhenotype( timeSinceLastCycle, rulesEnabled );
             }
 
             // process divides / removes 
@@ -424,6 +424,7 @@ public class CellContainer extends AgentContainer
     public static CellContainer createCellContainer(Microenvironment m, double mechanicsVoxelSize)
     {
         CellContainer cellContainer = new CellContainer();
+
         cellContainer.initialize( m.mesh.boundingBox[0], m.mesh.boundingBox[3], m.mesh.boundingBox[1], m.mesh.boundingBox[4],
                 m.mesh.boundingBox[2], m.mesh.boundingBox[5], mechanicsVoxelSize );
         m.agentContainer = (AgentContainer)cellContainer;

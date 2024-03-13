@@ -48,6 +48,8 @@ public class Model
     private String modelFile = null;
 
     private String initialPath = null;
+    private boolean rulesEnabled = false;
+    private String rulesPath = null;
 
     public Iterable<Visualizer> getVisualizers()
     {
@@ -61,6 +63,12 @@ public class Model
         this.cellDataFolder = folder + "/cells";
         this.logFile = folder + "/log.txt";
         this.modelFile = folder + "/model.txt";
+    }
+
+    public void setRulesPath(String path)
+    {
+        rulesEnabled = true;
+        rulesPath = path;
     }
 
     public void addEvent(Event event)
@@ -98,9 +106,16 @@ public class Model
         return m;
     }
 
+    public void createContainer()
+    {
+        createContainer( 30 );
+
+    }
+
     public void createContainer(double voxelSize)
     {
-        CellContainer.createCellContainer( m, voxelSize );
+        CellContainer container = CellContainer.createCellContainer( m, voxelSize );
+        container.setRulesEnabled( this.rulesEnabled );
     }
 
     public void setWriteDensity(boolean writeDensity)
@@ -389,24 +404,6 @@ public class Model
     {
         return initialPath;
     }
-
-    //                    writeReport( resultFolder + "/step_" + curTime + ".txt", "name\ti1\ti2\tp\tpressure\tphase\telapsed\n" );
-    //                    for( Cell cell : m.getAgents( Cell.class ) )
-    //                    {
-    //                        String report = cell.typeName + "\t" + cell.get_current_mechanics_voxel_index() + "\t" + cell.currentVoxelIndex
-    //                                + "\t" + cell.nearest_density_vector()[0] + "\t" + cell.state.simplePressure + "\t"
-    //                                + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase + "\t"
-    //                                + cell.isOutOfDomain + "\n";
-
-    //                        if( cell.phenotype.cycle.code == 5 )
-    //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t"
-    //                                    + cell.phenotype.cycle.transition_rate( 0, 0 ) + "\t" + cell.state.simplePressure + "\n";
-    //                        else
-    //                            report = cell.typeName + "\t" + cell.phenotype.cycle.currentPhase().name + "\t0.0\t"
-    //                                    + cell.state.simplePressure + "\n";
-    //
-    //                        writeReport( resultFolder + "/step_" + curTime + ".txt", report );
-    //                    }
 
     public String getReport(Cell cell) throws Exception
     {

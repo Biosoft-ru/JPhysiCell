@@ -1,6 +1,7 @@
 package ru.biosoft.physicell.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,137 +73,94 @@ import java.util.Map;
 */
 public class HypothesisRule
 {
-    Map<String, Integer> signals_map;
+    Map<String, Integer> signalsMap = new HashMap<>();
 
-    String cell_type;
-    CellDefinition pCell_Definition;
+    String cellType;
+    CellDefinition cd;
 
     String behavior;
-    double base_value;
-    double max_value;
-    double min_value;
+    double baseValue;
+    double maxValue;
+    double minValue;
 
     List<String> signals;
     List<Boolean> responses;
-    List<Double> half_maxes;
-    List<Double> hill_powers;
-    List<Boolean> applies_to_dead_cells;
+    List<Double> halfMaxes;
+    List<Double> hillPowers;
+    List<Boolean> appliesToDead;
 
-    List<String> up_signals;
-    List<Double> up_half_maxes;
-    List<Double> up_hill_powers;
-    List<Boolean> up_applies_to_dead_cells;
+    List<String> upSignals;
+    List<Double> upHalfMaxes;
+    List<Double> upHillPowers;
+    List<Boolean> upAppliesToDead;
 
-    List<String> down_signals;
-    List<Double> down_half_maxes;
-    List<Double> down_hill_powers;
-    List<Boolean> down_applies_to_dead_cells;
+    List<String> downSignals;
+    List<Double> downHalfMaxes;
+    List<Double> downHillPowers;
+    List<Boolean> downAppliesToDead;
 
     HypothesisRule()
     {
-        signals_map.clear();
+        signalsMap.clear();
 
         behavior = "none";
-        base_value = 1.0;
-        max_value = 10.0;
-        min_value = 0.1;
+        baseValue = 1.0;
+        maxValue = 10.0;
+        minValue = 0.1;
 
-        signals = new ArrayList<>();//String[0];//.resize( 0 );
-        responses = new ArrayList<>();//boolean[0];
-        half_maxes = new ArrayList<>();//new double[0];
-        hill_powers = new ArrayList<>();//new double[0];
-        applies_to_dead_cells = new ArrayList<>();//new boolean[0];
+        signals = new ArrayList<>();
+        responses = new ArrayList<>();
+        halfMaxes = new ArrayList<>();
+        hillPowers = new ArrayList<>();
+        appliesToDead = new ArrayList<>();
 
-        up_signals = new ArrayList<>();//= new String[0];
-        up_half_maxes = new ArrayList<>();//= new double[0];
-        up_hill_powers = new ArrayList<>();//= new double[0];
-        up_applies_to_dead_cells = new ArrayList<>();//= new boolean[0];
+        upSignals = new ArrayList<>();
+        upHalfMaxes = new ArrayList<>();
+        upHillPowers = new ArrayList<>();
+        upAppliesToDead = new ArrayList<>();
 
-        down_signals = new ArrayList<>();//= new String[0];
-        down_half_maxes = new ArrayList<>();//= new double[0];
-        down_hill_powers = new ArrayList<>();//= new double[0];
-        down_applies_to_dead_cells = new ArrayList<>();//= new boolean[0];
+        downSignals = new ArrayList<>();
+        downHalfMaxes = new ArrayList<>();
+        downHillPowers = new ArrayList<>();
+        downAppliesToDead = new ArrayList<>();
 
-        cell_type = "none";
-        pCell_Definition = null;
+        cellType = "none";
+        cd = null;
     }
 
-    String convert_bool_to_response(boolean input)
+    String convert(boolean input)
     {
-        if( input )
-        {
-            return "increases";
-        }
-        return "decreases";
+        return ( input ) ? "increases" : "decreases";
     }
-
-    /*
-    double multivariate_Hill_response_function( double[] signals, double[] half_maxes , double[] hill_powers )
-    {
-        double temp1 = 0.0; 
-        double temp2 = 0.0; 
-        double temp3 = 0.0; 
-        // create the generalized (s^h), stored in temp1; 
-        for( int j=0 ; j < signals.size(); j++ )
-        {
-            temp2 = signals[j];     // s
-            temp2 /= half_maxes[j]; // s/s_half 
-            temp3 = pow( temp2 , hill_powers[j] ); // (s/s_half)^h 
-            temp1 += temp3; 
-        }
-        temp2 = temp1;   // numerator (S^h)
-        temp1 += 1.0;    // denominator (1+S^h)
-        temp2 /= temp1;  // numerator/denominator = S^h / (1+S^h)
-        return temp2; 
-    }
-    
-    double multivariate_linear_response_function( double[] signals, double[] min_thresholds , double[] max_thresholds ) 
-    {
-        double output = 0.0; 
-    
-        for( int j=0 ; j < signals.length; j++ )
-        { output += linear_response_function( signals[j] , min_thresholds[j], max_thresholds[j] ); }
-    
-        if( output > 1.0 )
-        { return 1.0; }
-    
-        return output; 
-    }
-    */
 
     String display()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( "For cell type " + cell_type + ": \n" );
+        sb.append( "For cell type " + cellType + ": \n" );
         for( int j = 0; j < signals.size(); j++ )
-        {
-            sb.append( signals.get( j ) + " " + convert_bool_to_response( responses.get( j ) ) + " " + behavior + "\n" );
-        }
+            sb.append( "\n" + signals.get( j ) + " " + convert( responses.get( j ) ) + " " + behavior );
         return sb.toString();
     }
 
-    String reduced_display()
+    String reducedDisplay()
     {
         StringBuilder sb = new StringBuilder();
         for( int j = 0; j < signals.size(); j++ )
-        {
-            sb.append( signals.get( j ) + " " + convert_bool_to_response( responses.get( j ) ) + " " + behavior + "\n" );
-        }
-
+            sb.append( "\n" + signals.get( j ) + " " + convert( responses.get( j ) ) + " " + behavior );
         return sb.toString();
     }
 
-    String detailed_display()
+    String detailedDisplay()
     {
         StringBuilder sb = new StringBuilder();
         // sb.append( "For cell type " + cell_type + ": " + std::endl; 
-        sb.append( behavior + " is modulated from " + min_value + " to " + max_value + " with a base value of " + base_value + "\n" );
+        sb.append( behavior + " is modulated from " + minValue + " to " + maxValue + " with a base value of " + baseValue + "\n" );
         sb.append( "--------------------------------------------------------\n" );
         for( int j = 0; j < signals.size(); j++ )
         {
-            sb.append( "\t" + signals.get( j ) + " " + convert_bool_to_response( responses.get( j ) ) + " " + behavior + " with half-max "
-                    + half_maxes.get( j ) + " and Hill power " + hill_powers.get( j ) + "." );
-            if( applies_to_dead_cells.get( j ) == true )
+            sb.append( "\t" + signals.get( j ) + " " + convert( responses.get( j ) ) + " " + behavior + " with half-max "
+                    + halfMaxes.get( j ) + " and Hill power " + hillPowers.get( j ) + "." );
+            if( appliesToDead.get( j ) )
             {
                 sb.append( " Rule applies to dead cells." );
             }
@@ -216,30 +174,16 @@ public class HypothesisRule
         StringBuilder sb = new StringBuilder();
         for( int j = 0; j < signals.size(); j++ )
         {
-            sb.append( signals.get( j ) + " " );
-            if( responses.get( j ) == true )
-            {
-                sb.append( "increases " );
-            }
+            sb.append( signals.get( j ) + " " + convert(responses.get( j )) );
+            sb.append( behavior + " from " + baseValue + " towards " );
+            if( responses.get( j ) )
+                sb.append( maxValue );
             else
-            {
-                sb.append( "decreases " );
-            }
-            sb.append( behavior + " from " + base_value + " towards " );
-            if( responses.get( j ) == true )
-            {
-                sb.append( max_value );
-            }
-            else
-            {
-                sb.append( min_value );
-            }
-            sb.append( " with a Hill response, with half-max " + half_maxes.get( j ) );
-            sb.append( " and Hill power " + hill_powers.get( j ) + "." );
-            if( applies_to_dead_cells.get( j ) == true )
-            {
+                sb.append( minValue );
+            sb.append( " with a Hill response, with half-max " + halfMaxes.get( j ) );
+            sb.append( " and Hill power " + hillPowers.get( j ) + "." );
+            if( appliesToDead.get( j ) )
                 sb.append( " Rule applies to dead cells." );
-            }
             sb.append( "\n" );
         }
         return sb.toString();
@@ -250,30 +194,16 @@ public class HypothesisRule
         StringBuilder sb = new StringBuilder();
         for( int j = 0; j < signals.size(); j++ )
         {
-            sb.append( "<li>" + signals.get( j ) + " " );
-            if( responses.get( j ) == true )
-            {
-                sb.append( "increases " );
-            }
+            sb.append( "<li>" + signals.get( j ) + " " + convert( responses.get( j ) ) );
+            sb.append( behavior + " from " + baseValue + " towards " );
+            if( responses.get( j ) )
+                sb.append( maxValue );
             else
-            {
-                sb.append( "decreases " );
-            }
-            sb.append( behavior + " from " + base_value + " towards " );
-            if( responses.get( j ) == true )
-            {
-                sb.append( max_value );
-            }
-            else
-            {
-                sb.append( min_value );
-            }
-            sb.append( " with a Hill response, with half-max " + half_maxes.get( j ) );
-            sb.append( " and Hill power " + hill_powers.get( j ) + "." );
-            if( applies_to_dead_cells.get( j ) == true )
-            {
+                sb.append( minValue );
+            sb.append( " with a Hill response, with half-max " + halfMaxes.get( j ) );
+            sb.append( " and Hill power " + hillPowers.get( j ) + "." );
+            if( appliesToDead.get( j ) )
                 sb.append( " Rule applies to dead cells." );
-            }
             sb.append( "</li>\n" );
         }
         return sb.toString();
@@ -284,15 +214,7 @@ public class HypothesisRule
         StringBuilder sb = new StringBuilder();
         for( int j = 0; j < signals.size(); j++ )
         {
-            sb.append( signals.get( j ) + " " );
-            if( responses.get( j ) == true )
-            {
-                sb.append( "increases " );
-            }
-            else
-            {
-                sb.append( "decreases " );
-            }
+            sb.append( signals.get( j ) + " " + convert( responses.get( j ) ) );
             sb.append( behavior + "\n" );
         }
         return sb.toString();
@@ -303,21 +225,13 @@ public class HypothesisRule
         StringBuilder sb = new StringBuilder();
         for( int j = 0; j < signals.size(); j++ )
         {
-            sb.append( "<li>" + signals.get( j ) + " " );
-            if( responses.get( j ) == true )
-            {
-                sb.append( "increases " );
-            }
-            else
-            {
-                sb.append( "decreases " );
-            }
+            sb.append( "<li>" + signals.get( j ) + " " + convert( responses.get( j ) ) );
             sb.append( behavior + "</li>\n" );
         }
         return sb.toString();
     }
 
-    void add_signal(String signal, double half_max, double hill_power, String response) throws Exception
+    void addSignal(String signal, double half_max, double hill_power, String response) throws Exception
     {
         // check: is this a valid signal? (is it in the dictionary?)
         if( SignalBehavior.findSignalIndex( signal ) < 0 )
@@ -327,7 +241,7 @@ public class HypothesisRule
         }
 
         // check to see if it's already there 
-        int n = find_signal( signal );
+        int n = findSignal( signal );
 
         // if so, then just warn and exit.  
         if( n > -1 )
@@ -337,329 +251,268 @@ public class HypothesisRule
         }
 
         // add the signal; 
-        signals_map.put( signal, signals_map.size() );
+        signalsMap.put( signal, signalsMap.size() );
 
         boolean bResponse = false; // true if up-regulate, false if down
-        if( response == "increase" || response == "increases" || response == "promotes" )
-        {
+        if( response.equals( "increase" ) || response.equals( "increases" ) || response.equals( "promotes" ) )
             bResponse = true;
-        }
 
         signals.add( signal );
-        half_maxes.add( half_max );
-        hill_powers.add( hill_power );
+        halfMaxes.add( half_max );
+        hillPowers.add( hill_power );
         responses.add( bResponse );
-        applies_to_dead_cells.add( false );
+        appliesToDead.add( false );
 
         // separate into up and down for our convenience 
-        if( bResponse == true )
+        if( bResponse )
         {
-            up_signals.add( signal );
-            up_half_maxes.add( half_max );
-            up_hill_powers.add( hill_power );
-            up_applies_to_dead_cells.add( false );
+            upSignals.add( signal );
+            upHalfMaxes.add( half_max );
+            upHillPowers.add( hill_power );
+            upAppliesToDead.add( false );
         }
         else
         {
-            down_signals.add( signal );
-            down_half_maxes.add( half_max );
-            down_hill_powers.add( hill_power );
-            down_applies_to_dead_cells.add( false );
+            downSignals.add( signal );
+            downHalfMaxes.add( half_max );
+            downHillPowers.add( hill_power );
+            downAppliesToDead.add( false );
         }
     }
 
-    void add_signal(String signal, String response) throws Exception
+    void addSignal(String signal, String response) throws Exception
     {
-        add_signal( signal, 0.5, 3.0, response );
+        addSignal( signal, 0.5, 3.0, response );
     }
 
-    double evaluate( double[] signal_values , boolean dead )
+    double evaluate(double[] signalValues, boolean dead)
     {
-    // create signals 
-    List<Double> up_signal = new ArrayList<>();//(0,0); //  up_signals.size() , 0.0 ); 
-    List<Double> down_signal = new ArrayList<>();//(0,0); //  down_signals.size() , 0.0 ); 
-
-        boolean apply_rule = false; 
+        List<Double> upSignal = new ArrayList<>();
+        List<Double> downSignal = new ArrayList<>();
+        boolean applyRule = false;
 
         // need to modify to evaluate if cell is live or if the rule is allowed for dead cells 
-
-        for( int j = 0; j < signal_values.length; j++ )
-        { 
-            if( applies_to_dead_cells.get(j) == true || dead == false )
+        for( int j = 0; j < signalValues.length; j++ )
+        {
+            if( appliesToDead.get( j ) || !dead )
             {
-                if( responses.get(j) )
-                {
-                    up_signal.add( signal_values[j] );
-                }
+                if( responses.get( j ) )
+                    upSignal.add( signalValues[j] );
                 else
-                {
-                    down_signal.add( signal_values[j] );
-                }
-
-                apply_rule = true; 
+                    downSignal.add( signalValues[j] );
+                applyRule = true;
             }
             else
             {
                 // new oin sep 7 , 2022
-                if( responses.get(j) )
-                {
-                    up_signal.add( 0.0 );
-                }
+                if( responses.get( j ) )
+                    upSignal.add( 0.0 );
                 else
-                {
-                    down_signal.add( 0.0 );
-                }
+                    downSignal.add( 0.0 );
             }
         }
 
         // March 27, 2023
         // if none of the rules apply, the return an absurdly low value 
         // to signal that the parameter value shoudl not be written 
-        if( apply_rule == false )
-        { return -9e99; }
+        if( !applyRule )
+            return -9e99;
 
         // up-regulation part 
-        double HU = BasicSignaling.multivariate_Hill_response_function( up_signal, up_half_maxes, up_hill_powers );
-        double U = base_value + (max_value-base_value)*HU; 
+        double hu = BasicSignaling.multivariate_Hill_response_function( upSignal, upHalfMaxes, upHillPowers );
+        double u = baseValue + ( maxValue - baseValue ) * hu;
 
         // then the down-regulation part 
-        double DU = BasicSignaling.multivariate_Hill_response_function( down_signal, down_half_maxes, down_hill_powers );
-        double output = U + (min_value-U)*DU; 
+        double du = BasicSignaling.multivariate_Hill_response_function( downSignal, downHalfMaxes, downHillPowers );
+        double output = u + ( minValue - u ) * du;
 
-        return output; 
+        return output;
     }
 
-    double evaluate(double[] signal_values)
+    double evaluate(double[] values)
     {
-        return evaluate( signal_values, true );
+        return evaluate( values, true );
     }
 
-    double evaluate(Cell pCell) throws Exception
+    double evaluate(Cell cell) throws Exception
     {
-    // construct signal vector 
-    double[] signal_values = new double[signals.size()];//( signals.length , 0.0 ); 
-    for( int i = 0; i < signals.size(); i++ )
-    {
-        signal_values[i] = SignalBehavior.getSingleSignal( pCell, signals.get(i) );
-    }
+        if( !cell.phenotype.cycle.name.equals( "Flow cytometry model (separated)" ) )
+        {
+            double a = 5;
+        }
+        double[] signalValues = new double[signals.size()];
+        for( int i = 0; i < signals.size(); i++ )
+            signalValues[i] = SignalBehavior.getSingleSignal( cell, signals.get( i ) );
 
         // now, get live/dead value 
-        boolean dead = SignalBehavior.getSingleSignal( pCell, "dead" ) != 0;
-
-        double out = evaluate( signal_values , dead ); 
+        boolean dead = SignalBehavior.getSingleSignal( cell, "dead" ) != 0;
+        double out = evaluate( signalValues, dead );
 
         // new March 27, 2023 
         // if the rule was found to not apply, then just get the prior value 
         if( out < -9e90 )
-        {
-            out = SignalBehavior.getSinglBehavior( pCell, this.behavior );
-        }
-
-        return out; 
+            out = SignalBehavior.getSinglBehavior( cell, this.behavior );
+        return out;
     }
 
-    void apply(Cell pCell) throws Exception
+    void apply(Cell cell) throws Exception
     {
-        // evaluate the rule 
-        double param = evaluate( pCell );
-
-        // apply it ot the appropriate behavior 
-        SignalBehavior.setSingleBehavior( pCell, behavior, param );
+        double param = evaluate( cell );
+        SignalBehavior.setSingleBehavior( cell, behavior, param );
     }
 
-    void sync_to_CellDefinition(CellDefinition pCD)
+    void sync(CellDefinition pCD)
     {
         if( pCD == null )
             return;
-        cell_type = pCD.name;
-        //        pCellDefinition = pCD;
-
-        // sync base behavior 
-        base_value = SignalBehavior.getSingleBaseBehavior( pCD, behavior );
+        cellType = pCD.name;
+        SignalBehavior.getSingleBaseBehavior( pCD, behavior );
     }
 
-    void sync_to_CellDefinition(String cell_name)
+    void sync(String cellName)
     {
-        sync_to_CellDefinition( CellDefinition.getCellDefinition( cell_name ) );
+        sync( CellDefinition.getCellDefinition( cellName ) );
     }
 
-    int find_signal(String name)
+    int findSignal(String name)
     {
-        if( signals_map.containsKey( name ) )
-            signals_map.get( name );
+        if( signalsMap.containsKey( name ) )
+            return signalsMap.get( name );
         return -1;
-        //        auto search = signals_map.find( name );
-        //
-        //        if( search == signals_map.end() )
-        //        {
-        //            return -1;
-        //        }
-        //
-        //        return search.second;
     }
 
-    void set_half_max(String name, double hm)
+    void setHalfMax(String name, double hm)
     {
-        int n = find_signal( name );
+        int n = findSignal( name );
         if( n < 0 )
-        {
             return;
-        }
 
-        half_maxes.set( n, hm );//[n] = hm;
+        halfMaxes.set( n, hm );
 
-        if( responses.get( n ) == true )
+        if( responses.get( n ) )
         {
-            for( int m = 0; m < up_signals.size(); m++ )
+            for( int m = 0; m < upSignals.size(); m++ )
             {
-                if( up_signals.get( m ).equals( name ) )
+                if( upSignals.get( m ).equals( name ) )
                 {
-                    up_half_maxes.set( m, hm );//[m] = hm;
+                    upHalfMaxes.set( m, hm );
                 }
             }
         }
         else
         {
-            for( int m = 0; m < down_signals.size(); m++ )
+            for( int m = 0; m < downSignals.size(); m++ )
             {
-                if( down_signals.get( m ).equals( name ) )
+                if( downSignals.get( m ).equals( name ) )
                 {
-                    down_half_maxes.set( m, hm );//[m] = hm;
+                    downHalfMaxes.set( m, hm );
                 }
             }
         }
-        return;
     }
 
-    void set_hill_power(String name, double hp)
+    void setHillPower(String name, double hp)
     {
-        int n = find_signal( name );
+        int n = findSignal( name );
         if( n < 0 )
-        {
             return;
-        }
 
-        hill_powers.set( n, hp );//[n] = hp;
-        if( responses.get( n ) == true )
+        hillPowers.set( n, hp );
+        if( responses.get( n ) )
         {
-            for( int m = 0; m < up_signals.size(); m++ )
+            for( int m = 0; m < upSignals.size(); m++ )
             {
-                if( up_signals.get( m ).equals( name ) )//[m] == name )
+                if( upSignals.get( m ).equals( name ) )
                 {
-                    up_hill_powers.set( m, hp );//[m] = hp;
+                    upHillPowers.set( m, hp );
                 }
             }
         }
         else
         {
-            for( int m = 0; m < down_signals.size(); m++ )
+            for( int m = 0; m < downSignals.size(); m++ )
             {
-                if( down_signals.get( m ).equals( name ) )//[m] == name )
+                if( downSignals.get( m ).equals( name ) )
                 {
-                    down_hill_powers.set( m, hp );//[m] = hp;
+                    downHillPowers.set( m, hp );
                 }
             }
         }
-        return;
     }
 
-    void set_response(String name, String response)
+    void setResponse(String name, String response)
     {
-        int n = find_signal( name );
+        int n = findSignal( name );
         if( n < 0 )
-        {
             return;
-        }
 
         boolean bResponse = false; // true if up-regulate, false if down
-        if( response == "increase" || response == "increases" || response == "promotes" )
-        {
+        if( response.equals( "increase" ) || response.equals( "increases" ) || response.equals( "promotes" ) )
             bResponse = true;
-        }
 
         // this is already my response? if so exit 
         if( bResponse == responses.get( n ) )
-        {
             return;
-        }
 
         if( responses.get( n ) )//[n] == true )
         {
             // need to switch from up to down 
             // find current index 
             int ci = -1;
-            for( int m = 0; m < up_signals.size(); m++ )
+            for( int m = 0; m < upSignals.size(); m++ )
             {
-                if( up_signals.get( m ).equals( name ) )//[m] == name )
+                if( upSignals.get( m ).equals( name ) )//[m] == name )
                 {
                     ci = m;
                 }
             }
             // swap last inot that position 
-            up_half_maxes.set( ci, up_half_maxes.get( up_half_maxes.size() - 1 ) );//.back() );
-            up_hill_powers.set( ci, up_hill_powers.get( up_hill_powers.size() - 1 ) );
-            up_signals.set( ci, up_signals.get( up_signals.size() - 1 ) );
-            up_applies_to_dead_cells.set( ci, up_applies_to_dead_cells.get( up_applies_to_dead_cells.size() - 1 ) );
-
-            //                        up_half_maxes[ci] = up_half_maxes.back();
-            //            up_hill_powers[ci] = up_hill_powers.back();
-            //            up_signals[ci] = up_signals.back();
-            //            up_applies_to_dead_cells[ci] = up_applies_to_dead_cells.back();
+            upHalfMaxes.set( ci, upHalfMaxes.get( upHalfMaxes.size() - 1 ) );
+            upHillPowers.set( ci, upHillPowers.get( upHillPowers.size() - 1 ) );
+            upSignals.set( ci, upSignals.get( upSignals.size() - 1 ) );
+            upAppliesToDead.set( ci, upAppliesToDead.get( upAppliesToDead.size() - 1 ) );
 
             // reduce size by one
-
-            up_half_maxes.remove( up_half_maxes.size() - 1 );//.pop_back();
-            up_hill_powers.remove( up_hill_powers.size() - 1 );//pop_back();
-            up_signals.remove( up_signals.size() - 1 );//pop_back();
-            up_applies_to_dead_cells.remove( up_applies_to_dead_cells.size() - 1 );//pop_back();
+            upHalfMaxes.remove( upHalfMaxes.size() - 1 );
+            upHillPowers.remove( upHillPowers.size() - 1 );
+            upSignals.remove( upSignals.size() - 1 );
+            upAppliesToDead.remove( upAppliesToDead.size() - 1 );
 
             // move to the other side 
-
-            down_half_maxes.add( half_maxes.get( n ) );//[n] );
-            down_hill_powers.add( hill_powers.get( n ) );
-            down_signals.add( signals.get( n ) );
-            down_applies_to_dead_cells.add( applies_to_dead_cells.get( n ) );
+            downHalfMaxes.add( halfMaxes.get( n ) );
+            downHillPowers.add( hillPowers.get( n ) );
+            downSignals.add( signals.get( n ) );
+            downAppliesToDead.add( appliesToDead.get( n ) );
         }
         else
         {
-            // need to switch from down to up 
-            // find current index 
+            // need to switch from down to up find current index 
             int ci = -1;
-            for( int m = 0; m < down_signals.size(); m++ )
+            for( int m = 0; m < downSignals.size(); m++ )
             {
-                if( down_signals.get( m ).equals( name ) )//[m] == name )
+                if( downSignals.get( m ).equals( name ) )
                 {
                     ci = m;
                 }
             }
             // swap last inot that position 
-            down_half_maxes.set( ci, down_half_maxes.get( down_half_maxes.size() - 1 ) );//.back() );
-            down_hill_powers.set( ci, down_hill_powers.get( down_hill_powers.size() - 1 ) );
-            down_signals.set( ci, down_signals.get( down_signals.size() - 1 ) );
-            down_applies_to_dead_cells.set( ci, down_applies_to_dead_cells.get( down_applies_to_dead_cells.size() - 1 ) );
-            //            down_half_maxes[ci] = down_half_maxes.back();
-            //            down_hill_powers[ci] = down_hill_powers.back();
-            //            down_signals[ci] = down_signals.back();
-            //            down_applies_to_dead_cells[ci] = up_applies_to_dead_cells.back();
+            downHalfMaxes.set( ci, downHalfMaxes.get( downHalfMaxes.size() - 1 ) );
+            downHillPowers.set( ci, downHillPowers.get( downHillPowers.size() - 1 ) );
+            downSignals.set( ci, downSignals.get( downSignals.size() - 1 ) );
+            downAppliesToDead.set( ci, downAppliesToDead.get( downAppliesToDead.size() - 1 ) );
 
             // reduce size by one
-            down_half_maxes.remove( down_half_maxes.size() - 1 );//.pop_back();
-            down_hill_powers.remove( down_hill_powers.size() - 1 );//pop_back();
-            down_signals.remove( down_signals.size() - 1 );//pop_back();
-            down_applies_to_dead_cells.remove( down_applies_to_dead_cells.size() - 1 );//pop_back();
-            //            down_half_maxes.pop_back();
-            //            down_hill_powers.pop_back();
-            //            down_signals.pop_back();
-            //            down_applies_to_dead_cells.pop_back();
+            downHalfMaxes.remove( downHalfMaxes.size() - 1 );
+            downHillPowers.remove( downHillPowers.size() - 1 );
+            downSignals.remove( downSignals.size() - 1 );
+            downAppliesToDead.remove( downAppliesToDead.size() - 1 );
 
             // move to the other side 
-
-            up_half_maxes.add( half_maxes.get( n ) );
-            up_hill_powers.add( hill_powers.get( n ) );
-            up_signals.add( signals.get( n ) );
-            up_applies_to_dead_cells.add( applies_to_dead_cells.get( n ) );
+            upHalfMaxes.add( halfMaxes.get( n ) );
+            upHillPowers.add( hillPowers.get( n ) );
+            upSignals.add( signals.get( n ) );
+            upAppliesToDead.add( appliesToDead.get( n ) );
         }
-
-        responses.set( n, bResponse );// [n] = bResponse;
+        responses.set( n, bResponse );
     }
 }

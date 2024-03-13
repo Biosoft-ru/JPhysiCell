@@ -113,7 +113,7 @@ public class IntracellularEuler extends Intracellular
 
                 //transport types
                 //uptake rate
-                if( first.substring( 0, 3 ) == "sur" )
+                if( first.substring( 0, 3 ).equals( "sur" ) )
                 {
                     //std::cout + sub_index + \n;
                     //std::cout + "Before sur1 : " + phenotype.secretion.uptake_rates[sub_index] + \n;
@@ -285,16 +285,16 @@ public class IntracellularEuler extends Intracellular
                     return -1;
                 }
 
-                if( first.substring( 0, 3 ) == "sur" )
+                if( first.substring( 0, 3 ).equals( "sur" ) )
                 {
                 }
-                else if( first.substring( 0, 3 ) == "ssr" )
+                else if( first.substring( 0, 3 ).equals( "ssr" ) )
                 {
                 }
-                else if( first.substring( 0, 3 ) == "ssd" )
+                else if( first.substring( 0, 3 ).equals( "ssd" ) )
                 {
                 }
-                else if( first.substring( 0, 3 ) == "ser" )
+                else if( first.substring( 0, 3 ).equals( "ser" ) )
                 {
                 }
                 else
@@ -310,7 +310,7 @@ public class IntracellularEuler extends Intracellular
             }
             else if( first.startsWith( "c" ) )
             {
-                if( first.substring( 0, 3 ) == "ctr" )
+                if( first.substring( 0, 3 ).equals( "ctr" ) )
                 {
                     // getting num of phases
                     int num_of_phases = ( ( phenotype.cycle ) ).phases.size();

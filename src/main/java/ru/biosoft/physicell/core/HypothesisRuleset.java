@@ -1,98 +1,80 @@
 package ru.biosoft.physicell.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class HypothesisRuleset
 {
-
-    Map<String, HypothesisRule> rules_map;
-    String cell_type;
-    CellDefinition pCellDefinition;
-    List<HypothesisRule> rules;
+    Map<String, HypothesisRule> rulesMap = new HashMap<>();
+    String type;
+    CellDefinition cd;
+    List<HypothesisRule> rules = new ArrayList<>();
 
     HypothesisRuleset()
     {
-        cell_type = "none";
-        pCellDefinition = null;
+        type = "none";
+        cd = null;
         rules = new ArrayList<>();
-        rules_map.clear();
+        rulesMap.clear();
     }
 
-    String display()
+    public String display()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( "Behavioral rules for cell type " + cell_type + ":" );
-        sb.append( "===================================================" );
-        for( HypothesisRule rule : rules )// int i = 0; i < rules.size(); i++ )
-        {
-            sb.append( rule.reduced_display() );
-        }
+        sb.append( "\nBehavioral rules for cell type " + type + ":" );
+        sb.append( "\n===================================================" );
+        for( HypothesisRule rule : rules )
+            sb.append( rule.reducedDisplay() );
         sb.append( "\n" );
         return sb.toString();
     }
 
-    String detailed_display()
+    String detailedDisplay()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( "Behavioral rules for cell type " + cell_type + ":" );
-        sb.append( "===================================================" );
-        for( HypothesisRule rule : rules )// int i = 0; i < rules.size(); i++ )
-        {
-            sb.append( rule.detailed_display() );
-        }
+        sb.append( "\nBehavioral rules for cell type " + type + ":" );
+        sb.append( "\n===================================================" );
+        for( HypothesisRule rule : rules )
+            sb.append( rule.detailedDisplay() );
         sb.append( "\n" );
         return sb.toString();
     }
 
-
-    void sync_to_CellDefinition(CellDefinition pCD)
+    void sync(CellDefinition cd)
     {
-        pCellDefinition = pCD;
-        cell_type = pCD.name;
-
-        for( HypothesisRule rule : rules )// int i = 0; i < rules.size(); i++ )
-        {
-            rule.sync_to_CellDefinition( pCD );
-        }
+        this.cd = cd;
+        type = cd.name;
+        for( HypothesisRule rule : rules )
+            rule.sync( cd );
     }
 
-    HypothesisRule add_behavior( String behavior , double min_behavior, double max_behavior ) throws Exception
+    HypothesisRule addBehavior(String behavior, double minBehavior, double maxBehavior) throws Exception
     {
         // check: is this a valid signal? (is it in the dictionary?)
         if( SignalBehavior.findBehaviorIndex( behavior ) < 0 )
-        {
-            throw new Exception( "Warning! Attempted to add behavior " + behavior + " which is not in the dictionary. " + "Either fix your model or add the missing behavior to the simulation."); 
-
-        }
+            throw new Exception( "Warning! Attempted to add behavior " + behavior + " which is not in the dictionary. "
+                    + "Either fix your model or add the missing behavior to the simulation." );
 
         // first, check. Is there already a ruleset? 
-        HypothesisRule rule = rules_map.get( behavior );
+        HypothesisRule rule = rulesMap.get( behavior );
 
-            // if not, add it 
-//        if( search == rules_map.end() )
-//        {
-        if (rule == null)
+        // if not, add it 
+        if( rule == null )
         {
-            HypothesisRule hr = new HypothesisRule(); 
-
-            hr.behavior = behavior; 
-
-            hr.sync_to_CellDefinition( pCellDefinition ); 
-
-            hr.min_value = min_behavior; 
-            hr.max_value = max_behavior; 
-
+            HypothesisRule hr = new HypothesisRule();
+            hr.behavior = behavior;
+            hr.sync( cd );
+            hr.minValue = minBehavior;
+            hr.maxValue = maxBehavior;
             rules.add( hr );
-            //            HypothesisRule pHR = ( rules.back() );
-            rules_map.put( behavior, hr );
-
+            rulesMap.put( behavior, hr );
             return hr;
         }
 
-            // otherwise, edit it 
-            //        HypothesisRule pHR = search.second; 
+        // otherwise, edit it 
+        //        HypothesisRule pHR = search.second; 
 
         /*
             // March 28 2023 fix  : let's not overwrite eixsting values
@@ -100,45 +82,34 @@ public class HypothesisRuleset
         pHR.max_value = max_behavior; 
         */
 
-            return rule;
+        return rule;
     }
 
-    HypothesisRule add_behavior(String behavior) throws Exception
-    { 
-        double min_behavior = 0.1; 
-        double max_behavior = 1.0; 
-        return add_behavior( behavior, min_behavior, max_behavior );
-    }
-
-    void sync_to_CellDefinition(String cell_name)
+    HypothesisRule addBehavior(String behavior) throws Exception
     {
-        sync_to_CellDefinition( CellDefinition.getCellDefinition( cell_name ) );
+        double minBehavior = 0.1;
+        double maxBehavior = 1.0;
+        return addBehavior( behavior, minBehavior, maxBehavior );
     }
 
-    HypothesisRule find_behavior(String name)
+    void sync(String name)
     {
-        return rules_map.get( name );
-        //        auto search = rules_map.find( name );
-        //        if( search == rules_map.end() )
-        //        {
-        //            // System.out.println( "Warning! Ruleset does not contain " + name + std::endl; 
-        //            // System.out.println( "         Returning NULL." + std::endl; 
-        //            return null;
-        //        }
-        //
-        //        return search.second;
+        sync( CellDefinition.getCellDefinition( name ) );
+    }
+
+    HypothesisRule findBehavior(String name)
+    {
+        return rulesMap.get( name );
     }
 
     HypothesisRule get(String name)
     {
-        return find_behavior( name );
+        return findBehavior( name );
     }
 
-    void apply(Cell pCell) throws Exception
+    void apply(Cell cell) throws Exception
     {
         for( HypothesisRule rule : rules )
-        {
-            rule.apply( pCell );
-        }
+            rule.apply( cell );
     }
 }
