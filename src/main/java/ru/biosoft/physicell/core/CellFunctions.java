@@ -173,10 +173,8 @@ public class CellFunctions
         public abstract double execute(Cell pCell, Phenotype phenotype, double dt) throws Exception;
     }
 
-    @FunctionalInterface
-    public static interface set_orientation
+    public static abstract class set_orientation extends OneCellFunction
     {
-        public void execute(Cell pCell, Phenotype phenotype, double dt);
     }
 
     public static abstract class Contact extends Function

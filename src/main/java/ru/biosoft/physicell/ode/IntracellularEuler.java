@@ -37,7 +37,7 @@ public class IntracellularEuler extends Intracellular
     }
 
     @Override
-    public void update() throws Exception
+    public void step() throws Exception
     {
         euler.doStep();
     }

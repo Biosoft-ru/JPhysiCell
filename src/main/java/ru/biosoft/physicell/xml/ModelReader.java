@@ -90,6 +90,8 @@ public class ModelReader extends Constants
     private void readRules(Element physicell, Model model)
     {
         Element rulesElement = findElement( physicell, "cell_rules" );
+        if( rulesElement == null )
+            return;
         Element rulesetsElement = findElement( rulesElement, "rulesets" );
         for( Element rulesetElement : findAllElements( rulesetsElement, "ruleset" ) )
         {
@@ -474,6 +476,8 @@ public class ModelReader extends Constants
     public void readCellDefinitions(Element physicell, Microenvironment m) throws Exception
     {
         Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
+        if( cellDefinitionsElement == null )
+            return;
         for( Element cdElement : findAllElements( cellDefinitionsElement, "cell_definition" ) )
         {
             CellDefinition cd;
@@ -511,6 +515,8 @@ public class ModelReader extends Constants
     public void readPhenotypes(Element physicell, Microenvironment m) throws Exception
     {
         Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
+        if( cellDefinitionsElement == null )
+            return;
         for( Element cdElement : findAllElements( cellDefinitionsElement, "cell_definition" ) )
         {
             String name = getAttr( cdElement, "name" );

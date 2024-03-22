@@ -162,7 +162,7 @@ public class OdeEnergy extends Model
                 intra.setParameterValue( "Lactate", cellLactate );
 
                 // SBML Simulation
-                intra.update();
+                intra.step();
 
                 // Phenotype Simulation
                 intra.updatePhenotypeParameters( m, cell.phenotype );

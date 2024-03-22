@@ -24,11 +24,11 @@ public class Model
     private double tMax;
     protected double startTime;
     protected double curTime = 0;
-    private double diffusion_dt;
-    private double mechanics_dt = 0.1;
-    private double phenotype_dt = 6.0;
-    private double intracellular_dt = 0.01;
-    private double next_intracellular_update = intracellular_dt;
+    protected double diffusion_dt;
+    protected double mechanics_dt = 0.1;
+    protected double phenotype_dt = 6.0;
+    protected double intracellular_dt = 0.01;
+    protected double next_intracellular_update = intracellular_dt;
 
     private boolean hasEvents = false;
     private List<Event> events = new ArrayList<>();
@@ -181,7 +181,7 @@ public class Model
             listener.finish();
     }
 
-    private void doStep() throws Exception
+    protected void doStep() throws Exception
     {
         m.simulateDiffusionDecay( diffusion_dt );
         ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );

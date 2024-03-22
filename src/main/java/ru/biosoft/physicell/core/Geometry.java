@@ -71,7 +71,7 @@ public class Geometry implements Cloneable
     public double radius;
     private double nuclearRadius;
     double surfaceArea;
-    double polarity;
+    public double polarity;
     static double four_thirds_pi = 4.188790204786391;
     static double the_constant = 4.835975862049409; // 4pi / (4pi/3)^(2/3)
 
