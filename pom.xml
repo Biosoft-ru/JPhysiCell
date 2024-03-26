@@ -25,6 +25,31 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+    <groupId>com.sample</groupId>
+    <artifactId>sample</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/biouml.plugins.sbml_0.9.10.jar</systemPath>
+    </dependency>
+
+    <dependency>
+    <groupId>com.sample</groupId>
+    <artifactId>sample</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/biouml.plugins.simulation_0.9.10.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>com.sample</groupId>
+    <artifactId>sample</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/src.jar</systemPath>
+    </dependency>
+    
   </dependencies>
 
   <build>
