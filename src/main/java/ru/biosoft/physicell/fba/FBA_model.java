@@ -130,96 +130,7 @@ public class FBA_model
         result.setApacheModel( (ApacheModel)fbcModel.clone() );
         return result;
     }
-    //    boolean hasReaction(String rId)
-    //    {
-    //        return reactionsIndexer.containsKey( rId );
-    //    }
-    //
-    //    public FBA_reaction getReaction(String rId)
-    //    {
-    //        if( this.hasReaction( rId ) )
-    //        {
-    //            int idx = this.reactionsIndexer.get( rId );
-    //            FBA_reaction rxn = this.reactions.get( idx );
-    //            return rxn;
-    //        }
-    //        return null;
-    //    }
-    //
 
-    //
-    //    double getReactionUpperBound(String rId)
-    //    {
-    //        FBA_reaction rxn = this.getReaction( rId );
-    //        return rxn.getUpperBound();
-    //    }
-    //
-    //    void setReactionUpperBound(String rId, double upperBound)
-    //    {
-    //        FBA_reaction rxn = this.getReaction( rId );
-    //        if( rxn != null )
-    //        {
-    //            rxn.setUpperBound( upperBound );
-    //            int colIdx = this.reactionsIndexer.get( rId );
-    //            //            this.lp_model.setColumnUpper( colIdx, upperBound );
-    //        }
-    //    }
-    //
-    //    double getReactionLowerBound(String rId)
-    //    {
-    //        FBA_reaction rxn = this.getReaction( rId );
-    //        return rxn.getLowerBound();
-    //    }
-    //
-    //    
-    //
-    //
-    //    void addReaction(FBA_reaction rxn)
-    //    {
-    //        if( !this.hasReaction( rxn.getId() ) )
-    //        {
-    //            this.reactions.add( rxn );
-    //            this.reactionsIndexer.put( rxn.getId(), this.reactions.size() - 1 );
-    //            //            this.reactionsIndexer[rxn.getId()] = this.reactions.size() - 1;
-    //        }
-    //    }
-    //
-    //    int getReactionIndex(String rId)
-    //    {
-    //        if( this.hasReaction( rId ) )
-    //            return this.reactionsIndexer.get( rId );
-    //        else
-    //            return -1;
-    //    }
-    //
-    //
-    //    List<FBA_reaction> getListOfBoundaryReactions()
-    //    {
-    //        List<FBA_reaction> listOfBoundarys = new ArrayList<>();
-    //        for( FBA_reaction reaction : this.reactions )
-    //        {
-    //            if( reaction.getNumberOfMetabolites() == 1 )
-    //            {
-    //                listOfBoundarys.add( reaction );
-    //            }
-    //        }
-    //        return listOfBoundarys;
-    //    }
-    //
-    //
-    //    List<String> getListOfBoundaryReactionIds()
-    //    {
-    //        List<String> listOfBoundaryIds = new ArrayList<>();
-    //        for( FBA_reaction reaction : this.reactions )
-    //        {
-    //            if( reaction.getNumberOfMetabolites() == 1 )
-    //            {
-    //                listOfBoundaryIds.add( reaction.getId() );
-    //            }
-    //        }
-    //        return listOfBoundaryIds;
-    //    }
-    //
     //
     //    void initLpModel()
     //    {
@@ -280,33 +191,5 @@ public class FBA_model
     //        //        //        delete objective;
     //        //
     //        //        this.is_initialized = true;
-    //    }
-    //
-    //
-    //    void runFBA()
-    //    {
-    //        //@TODO
-    //        //        std::cout << "Running FBA... ";
-    //        //        this.lp_model.primal();
-    //        //        if( lp_model.isProvenOptimal() )
-    //        //        {
-    //        //            double[] columnPrimal = this.lp_model.primalColumnSolution();
-    //        //            //            std::cout << "Optimal solution found!" << std::endl;
-    //        //            for( FBA_reaction reaction : this.reactions )
-    //        //            {
-    //        //                int idx = this.reactionsIndexer.get( reaction.getId() );
-    //        //                double v = columnPrimal[idx];
-    //        //                reaction.setFluxValue( v );
-    //        //            }
-    //        //        }
-    //        //        else
-    //        //        {
-    //        //            for( FBA_reaction reaction : this.reactions )
-    //        //            {
-    //        //                reaction.setFluxValue( 0.0 );
-    //        //            }
-    //        //            //            std::cout << "Primal infeasible" << std::endl;
-    //        //        }
-    //
     //    }
 }

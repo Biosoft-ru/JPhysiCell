@@ -8,8 +8,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 
 import biouml.model.Diagram;
-import biouml.plugins.fbc.ApacheModel;
-import biouml.plugins.fbc.ApacheModelCreator;
+import biouml.plugins.fbc.GLPKModel;
+import biouml.plugins.fbc.GLPKModelCreator;
 import biouml.plugins.fbc.SbmlModelFBCReader2;
 import biouml.plugins.sbml.SbmlModelFactory;
 import biouml.plugins.sbml.SbmlModelReader_31;
@@ -17,6 +17,7 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.CellFunctions.VolumeUpdate;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
@@ -104,7 +105,7 @@ public class EcoliAceticSwitch extends Model
 
         // set the default cell type to no phenotype updates
         bacteria_cell.functions.updatePhenotype = null;
-        bacteria_cell.functions.updateVolume = null;// = new update_cell( this );
+        bacteria_cell.functions.updateVolume = null;// new anuclear_volume_model();// = new update_cell( this );
     }
 
     void createCellTypes() throws Exception
@@ -156,7 +157,7 @@ public class EcoliAceticSwitch extends Model
         // place a bacterial colony at the center 
         double cell_radius = cd.phenotype.geometry.radius;
         double cell_spacing = 0.95 * 2.0 * cell_radius;
-        double colony_radius = 4;//getParameterDouble( "colony_radius" );
+        double colony_radius = getParameterDouble( "colony_radius" );
 
         Cell pCell = null;
 
@@ -164,11 +165,11 @@ public class EcoliAceticSwitch extends Model
         double x_outer = colony_radius;
         double y = 0.0;
 
-        //        pCell = Cell.createCell( bacteria_cell, m, new double[] {0, 0, 0.0} );
-        //        pCell.phenotype.intracellular = fba.clone();
+        pCell = Cell.createCell( bacteria_cell, m, new double[] {0, 0, 0.0} );
+        pCell.phenotype.intracellular = fba.clone();
 
         int n = 0;
-        while( y < colony_radius )
+        while( y < 0 )//colony_radius )
         {
             x = 0.0;
             if( n % 2 == 1 )
@@ -216,8 +217,8 @@ public class EcoliAceticSwitch extends Model
         SbmlModelReader_31 reader = (SbmlModelReader_31)SbmlModelFactory.getReader( document );
         SbmlModelFBCReader2 packageReader = new SbmlModelFBCReader2();
         Diagram diagram = reader.read( document, "EcoliAceticSwitch", null, packageReader );
-        ApacheModelCreator creator = new ApacheModelCreator();
-        fba.model.fbcModel = (ApacheModel)creator.createModel( diagram );
+        GLPKModelCreator creator = new GLPKModelCreator( "" ); //usr/local/lib64/jni" );
+        fba.model.fbcModel = (GLPKModel)creator.createModel( diagram );
         fba.parameterMapping = new HashMap<>();
         fba.parameterMapping.put( "glucose", "R_EX_glc__D_e" );
         fba.parameterMapping.put( "acetate", "R_EX_ac_e" );
@@ -225,37 +226,40 @@ public class EcoliAceticSwitch extends Model
         fba.parameterMapping.put( "growth_rate", "R_BIOMASS_Ecoli_core_w_GAM" );
     }
 
-    void anuclear_volume_model(Cell pCell, Phenotype phenotype, double dt)
+    public class anuclear_volume_model extends VolumeUpdate
     {
-        phenotype.volume.fluid += dt * phenotype.volume.fluid_change_rate
-                * ( phenotype.volume.target_fluid_fraction * phenotype.volume.total - phenotype.volume.fluid );
-
-        // if the fluid volume is negative, set to zero
-        if( phenotype.volume.fluid < 0.0 )
+        @Override
+        public void execute(Cell pCell, Phenotype phenotype, double dt)
         {
-            phenotype.volume.fluid = 0.0;
+            phenotype.volume.fluid += dt * phenotype.volume.fluid_change_rate
+                    * ( phenotype.volume.target_fluid_fraction * phenotype.volume.total - phenotype.volume.fluid );
+
+            // if the fluid volume is negative, set to zero
+            if( phenotype.volume.fluid < 0.0 )
+            {
+                phenotype.volume.fluid = 0.0;
+            }
+
+
+            phenotype.volume.cytoplasmic_solid += dt * phenotype.volume.cytoplasmic_biomass_change_rate
+                    * ( phenotype.volume.target_solid_cytoplasmic - phenotype.volume.cytoplasmic_solid );
+
+            if( phenotype.volume.cytoplasmic_solid < 0.0 )
+            {
+                phenotype.volume.cytoplasmic_solid = 0.0;
+            }
+
+            phenotype.volume.solid = phenotype.volume.cytoplasmic_solid;
+            phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + phenotype.volume.cytoplasmic_fluid;
+
+            phenotype.volume.total = phenotype.volume.cytoplasmic;
+
+
+            phenotype.volume.fluid_fraction = phenotype.volume.fluid / ( 1e-16 + phenotype.volume.total );
+
+            phenotype.geometry.update( pCell, phenotype, dt );
         }
-
-
-        phenotype.volume.cytoplasmic_solid += dt * phenotype.volume.cytoplasmic_biomass_change_rate
-                * ( phenotype.volume.target_solid_cytoplasmic - phenotype.volume.cytoplasmic_solid );
-
-        if( phenotype.volume.cytoplasmic_solid < 0.0 )
-        {
-            phenotype.volume.cytoplasmic_solid = 0.0;
-        }
-
-        phenotype.volume.solid = phenotype.volume.cytoplasmic_solid;
-        phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + phenotype.volume.cytoplasmic_fluid;
-
-        phenotype.volume.total = phenotype.volume.cytoplasmic;
-
-
-        phenotype.volume.fluid_fraction = phenotype.volume.fluid / ( 1e-16 + phenotype.volume.total );
-
-        phenotype.geometry.update( pCell, phenotype, dt );
     }
-
     //    void metabolic_cell_phenotype(Cell pCell, Phenotype phenotype, double dt)
     //    {
     //        // if cell is dead, don't bother with future phenotype changes.
@@ -305,7 +309,7 @@ public class EcoliAceticSwitch extends Model
     @Override
     public String getReportHeader()
     {
-        return "ID\tX\tY\tZ\toxygen\tglucose\tacetate";
+        return "ID\tX\tY\tZ\tvoxel\toxygen\tglucose\tacetate\toxygen_conc\tglucose_conc\tacetate_conc";
     }
 
     @Override
@@ -321,7 +325,11 @@ public class EcoliAceticSwitch extends Model
         double uptakeGlucose = secretion.uptakeRates[glucose_idx];
         double uptakeAcetate = secretion.uptakeRates[acetate_idx];
 
-        return "\n" + cell.ID + "\t" + cell.position[0] + "\t" + cell.position[1] + "\t" + cell.position[2] + "\t" + uptakeOxygen + "\t"
-                + uptakeGlucose + "\t" + uptakeAcetate;
+        int voxelIndex = cell.currentVoxelIndex;
+        double[] density = m.nearestDensity( voxelIndex );
+
+        return "\n" + cell.ID + "\t" + cell.position[0] + "\t" + cell.position[1] + "\t" + cell.position[2] + "\t" + voxelIndex + "\t"
+                + uptakeOxygen + "\t" + uptakeGlucose + "\t" + uptakeAcetate + "\t" + density[oxygen_idx] + "\t" + density[glucose_idx]
+                + "\t" + density[acetate_idx];
     }
 }

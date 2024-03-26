@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,6 +37,9 @@ import ru.biosoft.physicell.core.standard.AdvancedChemotaxisNormalized;
 import ru.biosoft.physicell.core.standard.Chemotaxis;
 import ru.biosoft.physicell.core.standard.DomainEdgeAvoidance;
 import ru.biosoft.physicell.core.standard.StandardModels;
+import ru.biosoft.physicell.fba.IntracellularFBA;
+import ru.biosoft.physicell.fba.IntracellularFBA.exchange_data;
+import ru.biosoft.physicell.fba.IntracellularFBA.kinetic_parm;
 import ru.biosoft.physicell.ode.IntracellularEuler;
 
 
@@ -573,7 +577,7 @@ public class ModelReader extends Constants
                         readCellTransformations( el, cd );
                         break;
                     case "intracellular":
-                        readIntracellular( el, cd );
+                        readIntracellular( el, m, cd );
                         break;
                 }
             }
@@ -582,9 +586,15 @@ public class ModelReader extends Constants
         }
     }
 
-    private void readIntracellular(Element el, CellDefinition cd) throws Exception
+    private void readIntracellular(Element el, Microenvironment m, CellDefinition cd) throws Exception
     {
         Phenotype p = cd.phenotype;
+        String type = getAttr( el, "type" );
+        if( type.equals( "dfba" ) )
+        {
+            readIntracellularFBA( el, m, cd );
+            return;
+        }
         p.intracellular = new IntracellularEuler();
         for( Element child : getAllElements( el ) )
         {
@@ -1356,6 +1366,41 @@ public class ModelReader extends Constants
             String inputFilename = folder + "/" + fileName;
             m.setInitialPath( inputFilename );
             //            CellCSVReader.load_cells_csv( input_filename, m.getMicroenvironment() );
+        }
+    }
+
+    void readIntracellularFBA(Element element, Microenvironment m, CellDefinition cd)
+    {
+        cd.phenotype.intracellular = new IntracellularFBA();
+        ( (IntracellularFBA)cd.phenotype.intracellular ).substrate_exchanges = new HashMap<>();
+        Element sbml = findElement( element, "sbml_filename" );
+        //        String sbmlName = getVal( sbml );
+
+        List<Element> exchangeElements = findAllElements( element, "exchange" );
+
+        for( Element exchangeElement : exchangeElements )
+        {
+            String substrate = getAttr( exchangeElement, "substrate" );
+            int index = m.findDensityIndex( substrate );
+            String actualName = m.densityNames[index];
+            Element fluxElement = findElement( exchangeElement, "fba_flux" );
+            String fluxName = getVal( fluxElement );
+            Element kmElement = findElement( exchangeElement, "Km" );
+            double km = getDoubleVal( kmElement );
+            Element vmaxElement = findElement( exchangeElement, "Vmax" );
+            double vmax = getDoubleVal( vmaxElement );
+
+            exchange_data ed = new exchange_data();
+            ed.density_index = index;
+            ed.density_name = actualName;
+            ed.fba_flux_id = fluxName;
+            ed.Km = new kinetic_parm();
+            ed.Km.name = "Km";
+            ed.Km.value = km;
+            ed.Vmax = new kinetic_parm();
+            ed.Vmax.name = "Vmax";
+            ed.Vmax.value = vmax;
+            ( (IntracellularFBA)cd.phenotype.intracellular ).substrate_exchanges.put( substrate, ed );
         }
     }
 
