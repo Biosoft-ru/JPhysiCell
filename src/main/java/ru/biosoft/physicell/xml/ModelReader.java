@@ -15,6 +15,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import biouml.model.Diagram;
+import biouml.plugins.fbc.GLPKModel;
+import biouml.plugins.fbc.GLPKModelCreator;
+import biouml.plugins.fbc.SbmlModelFBCReader2;
+import biouml.plugins.sbml.SbmlModelFactory;
+import biouml.plugins.sbml.SbmlModelReader_31;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.MicroenvironmentOptions;
 import ru.biosoft.physicell.biofvm.VectorUtil;
@@ -46,7 +52,7 @@ import ru.biosoft.physicell.ode.IntracellularEuler;
 public class ModelReader extends Constants
 {
     private static final String OPTIONS = "options";
-
+    private File f;
     public Model read(InputStream is) throws Exception
     {
         return this.read( is, null );
@@ -62,6 +68,7 @@ public class ModelReader extends Constants
 
     public Model read(File f, Class clazz) throws Exception
     {
+        this.f = f;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse( f );
@@ -84,7 +91,7 @@ public class ModelReader extends Constants
         readSave( physicell, model );
         readMicroenvironmentSetup( physicell, m );
         readCellDefinitions( physicell, m );
-        readPhenotypes( physicell, m );
+        readPhenotypes( physicell, model );
         readInitialConditions( physicell, model );
         readUserParameters( physicell, model );
         readRules( physicell, model );
@@ -516,8 +523,9 @@ public class ModelReader extends Constants
         }
     }
 
-    public void readPhenotypes(Element physicell, Microenvironment m) throws Exception
+    public void readPhenotypes(Element physicell, Model model) throws Exception
     {
+        Microenvironment m = model.getMicroenvironment();
         Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
         if( cellDefinitionsElement == null )
             return;
@@ -577,7 +585,7 @@ public class ModelReader extends Constants
                         readCellTransformations( el, cd );
                         break;
                     case "intracellular":
-                        readIntracellular( el, m, cd );
+                        readIntracellular( el, model, cd );
                         break;
                 }
             }
@@ -586,13 +594,13 @@ public class ModelReader extends Constants
         }
     }
 
-    private void readIntracellular(Element el, Microenvironment m, CellDefinition cd) throws Exception
+    private void readIntracellular(Element el, Model model, CellDefinition cd) throws Exception
     {
         Phenotype p = cd.phenotype;
         String type = getAttr( el, "type" );
         if( type.equals( "dfba" ) )
         {
-            readIntracellularFBA( el, m, cd );
+            readIntracellularFBA( el, model, cd );
             return;
         }
         p.intracellular = new IntracellularEuler();
@@ -1369,12 +1377,13 @@ public class ModelReader extends Constants
         }
     }
 
-    void readIntracellularFBA(Element element, Microenvironment m, CellDefinition cd)
+    void readIntracellularFBA(Element element, Model model, CellDefinition cd) throws Exception
     {
+        Microenvironment m = model.getMicroenvironment();
         cd.phenotype.intracellular = new IntracellularFBA();
         ( (IntracellularFBA)cd.phenotype.intracellular ).substrate_exchanges = new HashMap<>();
         Element sbml = findElement( element, "sbml_filename" );
-        //        String sbmlName = getVal( sbml );
+        this.readSBML( getVal( sbml ), cd );
 
         List<Element> exchangeElements = findAllElements( element, "exchange" );
 
@@ -1402,6 +1411,18 @@ public class ModelReader extends Constants
             ed.Vmax.value = vmax;
             ( (IntracellularFBA)cd.phenotype.intracellular ).substrate_exchanges.put( substrate, ed );
         }
+    }
+
+    public void readSBML(String name, CellDefinition cd) throws Exception
+    {
+        String path = f.toPath().resolve( name ).toAbsolutePath().toString();
+        //        String path = clazz.getResource( path ).getFile();
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( new File( path ) );
+        SbmlModelReader_31 reader = (SbmlModelReader_31)SbmlModelFactory.getReader( document );
+        SbmlModelFBCReader2 packageReader = new SbmlModelFBCReader2();
+        Diagram diagram = reader.read( document, "CancerMetabolism", null, packageReader );
+        GLPKModelCreator creator = new GLPKModelCreator( "" ); //usr/local/lib64/jni" );
+        ( (IntracellularFBA)cd.phenotype.intracellular ).model.fbcModel = (GLPKModel)creator.createModel( diagram );
     }
 
     private Element findElement(Element parent, String tag)

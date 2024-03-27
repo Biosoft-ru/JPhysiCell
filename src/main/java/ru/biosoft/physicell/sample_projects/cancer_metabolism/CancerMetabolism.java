@@ -1,19 +1,8 @@
 package ru.biosoft.physicell.sample_projects.cancer_metabolism;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-
-import biouml.model.Diagram;
-import biouml.plugins.fbc.GLPKModel;
-import biouml.plugins.fbc.GLPKModelCreator;
-import biouml.plugins.fbc.SbmlModelFBCReader2;
-import biouml.plugins.sbml.SbmlModelFactory;
-import biouml.plugins.sbml.SbmlModelReader_31;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
@@ -24,7 +13,6 @@ import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.Secretion;
 import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.core.standard.StandardVolumeUpdate;
-import ru.biosoft.physicell.fba.IntracellularFBA;
 import ru.biosoft.physicell.ui.Visualizer;
 
 /*
@@ -100,7 +88,6 @@ public class CancerMetabolism extends Model
     {
         super.init();
         createCellTypes();
-        setMetabolicModel( CellDefinition.getCellDefinition( "metabolic cell" ) );
         setupTissue();
         for( Visualizer visualizer : getVisualizers() )
             visualizer.setAgentVisualizer( new CancerMetabolismVisualizer() );
@@ -119,18 +106,6 @@ public class CancerMetabolism extends Model
         cellDefaults.functions.customCellRule = null;
     }
 
-    protected void setMetabolicModel(CellDefinition cd) throws Exception
-    {
-        String path = "C:/Users/Damag/git/JPhysiCell/src/main/resources/ru/biosoft/physicell/sample_projects/cancer_metabolism/config/iSIM.xml";
-        //        SbmlModelReader reader = SbmlModelFactory.readDiagram( path, false );
-        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( new File( path ) );
-        SbmlModelReader_31 reader = (SbmlModelReader_31)SbmlModelFactory.getReader( document );
-        SbmlModelFBCReader2 packageReader = new SbmlModelFBCReader2();
-        Diagram diagram = reader.read( document, "CancerMetabolism", null, packageReader );
-        GLPKModelCreator creator = new GLPKModelCreator( "" ); //usr/local/lib64/jni" );
-        ( (IntracellularFBA)cd.phenotype.intracellular ).model.fbcModel = (GLPKModel)creator.createModel( diagram );
-    }
-
     List<double[]> createSpherePositions(double cell_radius, double sphere_radius)
     {
         List<double[]> cells = new ArrayList<>();
@@ -139,8 +114,8 @@ public class CancerMetabolism extends Model
         double y_spacing = cell_radius * 2;
         double z_spacing = cell_radius * Math.sqrt( 3 );
 
-        for( double z = -sphere_radius; z < sphere_radius; z += z_spacing, zc++ )
-        {
+        //        for( double z = -sphere_radius; z < sphere_radius; z += z_spacing, zc++ )
+        //        {
             for( double x = -sphere_radius; x < sphere_radius; x += x_spacing, xc++ )
             {
                 for( double y = -sphere_radius; y < sphere_radius; y += y_spacing, yc++ )
@@ -148,13 +123,13 @@ public class CancerMetabolism extends Model
                     double[] position = new double[3];
                     position[0] = x + ( zc % 2 ) * 0.5 * cell_radius;
                     position[1] = y + ( xc % 2 ) * cell_radius;
-                    position[2] = z;
+                    position[2] = 0;
 
                     if( Math.sqrt( VectorUtil.norm_squared( position ) ) < sphere_radius )
                         cells.add( position );
                 }
             }
-        }
+            //        }
         return cells;
 
     }
@@ -167,9 +142,9 @@ public class CancerMetabolism extends Model
         List<double[]> positions = createSpherePositions( cellRadius, tumorRadius );
 
         CellDefinition cd = CellDefinition.getCellDefinition( "metabolic cell" );
-        Cell.createCell( cd, m, positions.get( 0 ) );
-        //        for( int i = 0; i < positions.size(); i++ )
-        //            Cell.createCell( cd, m, positions.get( i ) );
+        //        Cell.createCell( cd, m, new double[] {0, 0, 0} );
+        for( int i = 0; i < positions.size(); i++ )
+            Cell.createCell( cd, m, positions.get( i ) );
     }
 
     public void updateIntracellular() throws Exception

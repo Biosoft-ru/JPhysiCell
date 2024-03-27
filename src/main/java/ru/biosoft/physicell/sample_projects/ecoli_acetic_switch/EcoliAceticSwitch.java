@@ -31,20 +31,22 @@ public class EcoliAceticSwitch extends Model
 {
     CellDefinition bacteria_cell;
     IntracellularFBA fba;
+    private update_cell updater;
 
     @Override
     public void init() throws Exception
     {
         super.init();
-        setup_default_metabolic_model();
+        readFBA();
         createCellTypes();
         this.setupTissue();
         updater = new update_cell( this );
+        m.options.calculate_gradients = true;
+        m.options.track_internalized_substrates_in_each_agent = false;
     }
 
     protected void doStep() throws Exception
     {
-        //        m.simulateDiffusionDecay( diffusion_dt );
         ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
         updateIntracellular();
         curTime += diffusion_dt;
@@ -105,7 +107,7 @@ public class EcoliAceticSwitch extends Model
 
         // set the default cell type to no phenotype updates
         bacteria_cell.functions.updatePhenotype = null;
-        bacteria_cell.functions.updateVolume = null;// new anuclear_volume_model();// = new update_cell( this );
+        bacteria_cell.functions.updateVolume = new anuclear_volume_model();// = new update_cell( this );
     }
 
     void createCellTypes() throws Exception
@@ -132,24 +134,6 @@ public class EcoliAceticSwitch extends Model
 
         createBacteriaDefinition();
     }
-
-    //void setup_microenvironment( )
-    //{
-    //
-    //	if( default_microenvironment_options.simulate_2D == false )
-    //	{
-    ////		std::cout << "WARNING: overriding from 3-D to 2-D" << std::endl;
-    //		default_microenvironment_options.simulate_2D = true;
-    //	}
-
-    //	default_microenvironment_options.calculate_gradients = true;
-    //	default_microenvironment_options.track_internalized_substrates_in_each_agent = false;
-
-    //	initialize_microenvironment();
-    //
-    //	return;
-    //}
-
 
     void setupTissue()
     {
@@ -208,7 +192,7 @@ public class EcoliAceticSwitch extends Model
         }
     }
 
-    void setup_default_metabolic_model() throws Exception
+    void readFBA() throws Exception
     {
         fba = new IntracellularFBA();
         String path = "C:/Users/Damag/git/JPhysiCell/src/main/resources/ru/biosoft/physicell/sample_projects/ecoli_acetic_switch/config/Ecoli_core.xml";
@@ -260,44 +244,6 @@ public class EcoliAceticSwitch extends Model
             phenotype.geometry.update( pCell, phenotype, dt );
         }
     }
-    //    void metabolic_cell_phenotype(Cell pCell, Phenotype phenotype, double dt)
-    //    {
-    //        // if cell is dead, don't bother with future phenotype changes.
-    //        if( phenotype.death.dead == true )
-    //        {
-    //            pCell.functions.updatePhenotype = null;
-    //            return;
-    //        }
-    //
-    //        // update the transition rate according to growth rate?
-    //        int cycle_start_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
-    //        int cycle_end_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
-    //
-    //        //static int oncoprotein_i = pCell.custom_data.find_variable_index( "oncoprotein" );
-    //        //phenotype.cycle.data.transition_rate( cycle_start_index ,cycle_end_index ) *= pCell.custom_data[oncoprotein_i] ;
-    //    }
-
-
-
-    //    Color[] my_coloring_function(Cell pCell)
-    //    {
-    //        // start with flow cytometry coloring
-    //
-    //        List<String> output = false_cell_coloring_cytometry( pCell );
-    //        output[0] = "red";
-    //        output[1] = "red";
-    //        output[2] = "red";
-    //
-    //        if( !pCell.phenotype.death.dead && pCell.type == 1 )
-    //        {
-    //            output[0] = "black";
-    //            output[2] = "black";
-    //        }
-    //
-    //        return output;
-    //    }
-
-    private update_cell updater;
 
     @Override
     public void updateIntracellular() throws Exception
@@ -309,7 +255,7 @@ public class EcoliAceticSwitch extends Model
     @Override
     public String getReportHeader()
     {
-        return "ID\tX\tY\tZ\tvoxel\toxygen\tglucose\tacetate\toxygen_conc\tglucose_conc\tacetate_conc";
+        return "ID\tX\tY\tZ\tvoxel\toxygen\tglucose\tacetate\toxygen_conc\tglucose_conc\tacetate_conc\tcycle";
     }
 
     @Override
@@ -330,6 +276,6 @@ public class EcoliAceticSwitch extends Model
 
         return "\n" + cell.ID + "\t" + cell.position[0] + "\t" + cell.position[1] + "\t" + cell.position[2] + "\t" + voxelIndex + "\t"
                 + uptakeOxygen + "\t" + uptakeGlucose + "\t" + uptakeAcetate + "\t" + density[oxygen_idx] + "\t" + density[glucose_idx]
-                + "\t" + density[acetate_idx];
+                + "\t" + density[acetate_idx] + "\t" + cell.phenotype.cycle.name;
     }
 }

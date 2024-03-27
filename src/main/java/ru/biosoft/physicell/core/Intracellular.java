@@ -71,22 +71,8 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 public abstract class Intracellular implements Cloneable
 {
 
+
     protected String intracellular_type; // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
-    // bool enabled; 
-
-    // ==========  specific to SBML ==============
-    // std::string sbml_filename;
-
-
-    // ================  generic  ================
-    // This function parse the xml cell definition
-    //        virtual void initialize_intracellular_from_pugixml(pugi::xml_node& node) = 0;
-    //        
-    //        // This function initialize the model, needs to be called on each cell once created
-    //        virtual void start() = 0;
-    //        
-    //        // This function checks if it's time to update the model
-    //        virtual bool need_update() = 0;
 
     public void start()
     {
@@ -104,38 +90,14 @@ public abstract class Intracellular implements Cloneable
     public abstract void update(Cell cell, Phenotype phenotype, double dt);
     public abstract void inherit(Cell cell);
 
-    //        // Get value for model parameter
     public abstract double getParameterValue(String name) throws Exception;
-    //        
-    //        // Set value for model parameter
+
     public abstract void setParameterValue(String name, double value) throws Exception;
 
     public abstract void setDT(double dt);
 
-    //        virtual std::string get_state() = 0;  
-    //        
-    //        virtual void display(std::ostream& os) = 0;
-    //
-    //        virtual Intracellular* clone() = 0;
-    //        
-    //        virtual ~Intracellular(){};
-    //        
-    //
-    //        // ================  specific to "maboss" ================
-    //        virtual bool has_variable(std::string name) = 0; 
-    //        virtual bool get_boolean_variable_value(std::string name) = 0;
-    //        virtual void set_boolean_variable_value(std::string name, bool value) = 0;
-    //        // virtual bool get_double_variable_value(std::string name) = 0;
-    //        // virtual void set_double_variable_value(std::string name, bool value) = 0;
-    //        virtual void print_current_nodes() = 0;
-    //        
-    //
-    //        // ================  specific to "roadrunner" ================
     public abstract int updatePhenotypeParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception;
 
-    public abstract int validate_PhysiCell_tokens(Microenvironment microenvirionment, Phenotype phenotype) throws Exception;
-    //        virtual int validate_SBML_species() = 0;
-    //        virtual int create_custom_data_for_SBML(PhysiCell::Phenotype& phenotype) = 0;
     @Override
     public Intracellular clone()
     {

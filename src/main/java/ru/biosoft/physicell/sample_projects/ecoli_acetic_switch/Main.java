@@ -1,5 +1,6 @@
 package ru.biosoft.physicell.sample_projects.ecoli_acetic_switch;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import biouml.plugins.fbc.ApacheModel;
@@ -17,7 +18,7 @@ public class Main
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        Model model = new ModelReader().read( Main.class.getResourceAsStream( settingsPath ), EcoliAceticSwitch.class );
+        Model model = new ModelReader().read( new File( Main.class.getResource( settingsPath ).getFile() ), EcoliAceticSwitch.class );
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );

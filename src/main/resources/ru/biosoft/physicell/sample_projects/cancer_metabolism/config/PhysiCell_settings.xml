@@ -78,12 +78,12 @@
 		<x_max>750</x_max>
 		<y_min>-750</y_min>
 		<y_max>750</y_max>
-		<z_min>-750</z_min>
-		<z_max>750</z_max>
+		<z_min>-10</z_min>
+		<z_max>10</z_max>
 		<dx>20</dx>
 		<dy>20</dy>
 		<dz>20</dz>
-		<use_2D>false</use_2D>
+		<use_2D>true</use_2D>
 	</domain>
 		
 	<overall>

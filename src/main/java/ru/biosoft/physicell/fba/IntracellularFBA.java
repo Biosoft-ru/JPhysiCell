@@ -18,8 +18,6 @@ public class IntracellularFBA extends Intracellular
     Map<String, Double> parameters = new HashMap<>();;
     public Map<String, exchange_data> substrate_exchanges = new HashMap<>();
 
-    //    Map<String, String> nameMapping = new HashMap<>();
-
     double next_model_run = 0;
 
 
@@ -150,20 +148,11 @@ public class IntracellularFBA extends Intracellular
     }
 
 
-
-    void save_dFBA(String path, String index)
-    {
-
-    }
-
-
     @Override
     public void addPhenotypeSpecies(String code, String species)
     {
         // TODO Auto-generated method stub
-
     }
-
 
     @Override
     public void step() throws Exception
@@ -180,14 +169,12 @@ public class IntracellularFBA extends Intracellular
 
     }
 
-
     @Override
     public double getParameterValue(String name) throws Exception
     {
         // TODO Auto-generated method stub
         return 0;
     }
-
 
     @Override
     public void setParameterValue(String name, double value) throws Exception
@@ -196,7 +183,6 @@ public class IntracellularFBA extends Intracellular
 
     }
 
-
     @Override
     public void setDT(double dt)
     {
@@ -204,17 +190,8 @@ public class IntracellularFBA extends Intracellular
 
     }
 
-
     @Override
     public int updatePhenotypeParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception
-    {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-
-    @Override
-    public int validate_PhysiCell_tokens(Microenvironment microenvirionment, Phenotype phenotype) throws Exception
     {
         // TODO Auto-generated method stub
         return 0;

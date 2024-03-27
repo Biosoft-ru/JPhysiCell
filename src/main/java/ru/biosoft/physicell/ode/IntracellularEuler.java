@@ -205,7 +205,6 @@ public class IntracellularEuler extends Intracellular
         return 0;
     }
 
-    @Override
     public int validate_PhysiCell_tokens(Microenvironment m, Phenotype phenotype)
     {
         for( Entry<String, String> elm : phenotype_species.entrySet() )

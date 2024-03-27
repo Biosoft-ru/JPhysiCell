@@ -59,30 +59,23 @@ public class update_cell extends VolumeUpdate
         double acetate_flux_bound = -1 * ( lac_Vmax * acetate_density ) / ( acetate_density + lac_Km );
         intra.model.setReactionLowerBound( acetate_flux_id, acetate_flux_bound );
 
-        //    std::cout<<"Running FBA for cell: "<<pCell.ID<<std::endl;pCell.fba_model.runFBA();
-        //        GLPK.get
-        //        intra.model.fbcModel
+        System.out.println( "Oxygen density: " + oxygen_density + " => " + intra.model.fbcModel.getLowerBound( oxygen_flux_id ) );
+        System.out.println( "Glucose density: " + glucose_density + " => " + intra.model.fbcModel.getLowerBound( glucose_flux_id ) );
+        System.out.println( "Acetate density: " + acetate_density + " => " + intra.model.fbcModel.getLowerBound( acetate_flux_id ) );
 
-        System.out.println( "Oxygen Bound_: " + oxygen_flux_bound );
-        System.out.println( "Glucose Bound _: " + glucose_flux_bound );
-        System.out.println( "Acetate Bound:_ " + acetate_flux_bound );
-
-        System.out.println( "Oxygen Bound: " + intra.model.fbcModel.getLowerBound( oxygen_flux_id ) );
-        System.out.println( "Glucose Bound: " + intra.model.fbcModel.getLowerBound( glucose_flux_id ) );
-        System.out.println( "Acetate Bound: " + intra.model.fbcModel.getLowerBound( acetate_flux_id ) );
         intra.model.runFBA();
 
         //                System.out.println( "Optimized R_EX_o2_e " + intra.model.getFlux( "R_EX_o2_e" ) );
         if( intra.model.getSolutionStatus() )
         {
             double oxygen_flux = intra.model.getFlux( oxygen_flux_id );
-            System.out.println( "Oxygen: " + oxygen_flux );
+            //            System.out.println( "Oxygen: " + oxygen_flux );
             //	std::cout << "Oxygen flux: " << oxygen_flux << std::endl;
             double glucose_flux = intra.model.getFlux( glucose_flux_id );
-            System.out.println( "Glucose: " + glucose_flux );
+            //            System.out.println( "Glucose: " + glucose_flux );
             //	std::cout << "glucose flux: " << glucose_flux << std::endl;
             double acetate_flux = intra.model.getFlux( acetate_flux_id );
-            System.out.println( "Acetate: " + acetate_flux );
+            //            System.out.println( "Acetate: " + acetate_flux );
             //	std::cout << "acetate flux: " << acetate_flux << std::endl;
 
             if( oxygen_flux < 0 )
@@ -100,6 +93,7 @@ public class update_cell extends VolumeUpdate
         }
         else
         {
+            System.out.println( "Apoptosis" );
             int nApoptosis = phenotype.death.findDeathModelIndex( "apoptosis" );
             pCell.startDeath( nApoptosis );
             //            System.out.println( "Could not find feasible solution" );
