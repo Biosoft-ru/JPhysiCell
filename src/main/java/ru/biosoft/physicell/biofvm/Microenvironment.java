@@ -204,7 +204,10 @@ public class Microenvironment
         thomasSetup = false;
         solverSetup = false;
 
-        solver = new ConstantCoefficientsLOD3D();
+        //        solver = new TornadoSolverParallel();
+        solver = new TornadoSolverParallel2();
+        //        solver = new TornadoSolver();
+//                solver =new ConstantCoefficientsLOD3D();
 
         mesh = new CartesianMesh();
         mesh.resize( 1, 1, 1 );
@@ -332,6 +335,24 @@ public class Microenvironment
     {
         if( solver != null )
             solver.solve( this, dt );
+    }
+
+    public int[][] initIndices()
+    {
+        for( int i = 0; i < mesh.voxels.length; i++ )
+        {
+            if( mesh.voxels[i].isDirichlet )
+            {
+                for( int j = 0; j < dirichletValue[i].length; j++ )
+                {
+                    if( dirichletActivations[i][j] )
+                    {
+
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     void applyDirichletConditions()
@@ -712,14 +733,14 @@ public class Microenvironment
         MicroenvironmentOptions options = m.options;
         //        Microenvironment microenvironment = new Microenvironment(m.name, m.timeUnits, m.spatialUnits);
         // register the diffusion solver 
-        if( options.simulate2D == true )
-        {
-            //            microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
-        }
-        else
-        {
-            m.solver = new ConstantCoefficientsLOD3D();// diffusion_decay_solver__constant_coefficients_LOD_3D; 
-        }
+        //        if( options.simulate2D == true )
+        //        {
+        //            //            microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
+        //        }
+        //        else
+        //        {
+        //            m.solver = new ConstantCoefficientsLOD3D();// diffusion_decay_solver__constant_coefficients_LOD_3D; 
+        //        }
 
         // resize the microenvironment  
         if( options.simulate2D )
