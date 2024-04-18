@@ -1,6 +1,7 @@
 package ru.biosoft.physicell.ui;
 
-import java.awt.Color;
+import java.awt.*;
+import java.awt.color.*;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;

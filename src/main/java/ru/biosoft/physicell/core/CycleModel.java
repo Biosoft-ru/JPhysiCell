@@ -261,10 +261,10 @@ public class CycleModel implements Cloneable
                 else
                 {
                     double prob = transitionRate * dt;
-                    double r = PhysiCellUtilities.UniformRandom();
+//                    double r = PhysiCellUtilities.UniformRandom();
                     //                    if( pCell.type_name.equals( "A" ) )
                     //                        System.out.println( pCell + " " + prob + " " + r );
-                    if( r < prob )
+                    if( PhysiCellUtilities.checkRandom(prob))// r < prob )
                     {
                         //                        System.out.println( "Random " + r + " , probability " + prob );
                         continueTransition = true;

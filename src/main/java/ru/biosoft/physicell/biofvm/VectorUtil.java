@@ -3,6 +3,8 @@ package ru.biosoft.physicell.biofvm;
 import java.util.Arrays;
 
 import ru.biosoft.physicell.core.PhysiCellUtilities;
+import uk.ac.manchester.tornado.api.annotations.Parallel;
+import uk.ac.manchester.tornado.api.types.arrays.DoubleArray;
 
 /*
 #############################################################################
@@ -459,6 +461,23 @@ public class VectorUtil
         for( int i = 0; i < y.length; i++ )
         {
             y[i] += a[i] * x[i];
+        }
+    }
+
+    public static void axpydiv(double[] y, double[] a, double[] x, double[] denom)
+    {
+        for( int i = 0; i < y.length; i++ )
+        {
+            y[i] = ( y[i] + a[i] * x[i] ) / denom[i];
+        }
+    }
+    
+    public static void axpydiv(DoubleArray y, DoubleArray a, DoubleArray x, DoubleArray denom)
+    {
+        for( @Parallel int i = 0; i < y.getSize(); i++ )
+        {
+            y.set( i, (y.get( i )+a.get( i )*x.get( i )) / denom.get( i ) );
+//            y[i] = ( y[i] + a[i] * x[i] ) / denom[i];
         }
     }
 

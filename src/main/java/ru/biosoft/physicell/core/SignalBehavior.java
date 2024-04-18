@@ -875,16 +875,12 @@ public class SignalBehavior
         setSingleBehavior( cell, index, parameter );
     }
 
-    static int findParameterIndex(String responseName)
+    static int findBehaviorIndex(String responseName)
     {
-        if( behavior_to_int.containsKey( responseName ) )
-            return behavior_to_int.get( responseName );
-        return -1;
-    }
-
-    static int findBehaviorIndex(String response_name)
-    {
-        return findParameterIndex( response_name );
+        Integer result = behavior_to_int.get( responseName );
+        if( result == null )
+            return -1;
+        return result;
     }
 
     public static double getSinglBehavior(Cell pCell, String name) throws Exception

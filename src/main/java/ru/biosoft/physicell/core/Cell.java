@@ -617,11 +617,20 @@ public class Cell extends BasicAgent
             phenotype.cycle.data.currentPhase().entryFunction.execute( this, phenotype, 0.0 );
         }
     }
+    public static int calls = 0;
+    public static int badCalls = 0;
 
-    public void addPotentials(Cell other)
+    
+ 
+    
+    public double addPotentials(Cell other)
     {
         if( this.ID == other.ID )
-            return;
+            return 0;
+
+        calls++;
+        if( other.isOutOfDomain || !other.isActive )
+            badCalls++;
 
         /*
         // new April 2022: don't interact with cells with 0 volume 
@@ -700,9 +709,10 @@ public class Cell extends BasicAgent
             //            state.neighbors.push_back(other_agent); 
         }
         if( Math.abs( temp_r ) < 1e-16 )
-            return;
+            return 0;
         temp_r /= distance;
         VectorUtil.axpy( velocity, temp_r, displacement );
+        return temp_r;
     }
 
     public void updateMotilityVector(double dt) throws Exception
@@ -713,7 +723,7 @@ public class Cell extends BasicAgent
             return;
         }
 
-        if( PhysiCellUtilities.UniformRandom() < dt / phenotype.motility.persistenceTime || phenotype.motility.persistenceTime < dt )
+        if( phenotype.motility.persistenceTime < dt || PhysiCellUtilities.checkRandom( dt / phenotype.motility.persistenceTime)  )
         {
             /*
             // choose a uniformly random unit vector 

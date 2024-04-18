@@ -136,7 +136,7 @@
 				<diffusion_coefficient units="micron^2/min">600.00</diffusion_coefficient> 
 				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="pmol">10</initial_condition><!--0.09-->
+			<initial_condition units="pmol">4.5</initial_condition>
 			<Dirichlet_boundary_condition units="pmol" enabled="false">0.09</Dirichlet_boundary_condition>
 			<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
 			<!-- <Dirichlet_options>
@@ -194,7 +194,7 @@
 		<!-- BNID:103904 -->
 		<dry_weight type="double" units="fg">280</dry_weight> 
 		<doubling_time type="double" units="min">40</doubling_time>
-		<cell_radius type="double" units="micron">6.26</cell_radius>
+		<cell_radius type="double" units="micron">0.26</cell_radius>
 
 	</user_parameters>
 	

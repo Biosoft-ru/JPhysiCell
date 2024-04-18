@@ -103,6 +103,29 @@ public class CellInteractions implements Cloneable
         int n = CellDefinition.getCellDefinition( name ).type;
         return livePhagocytosisRates[n];
     }
+    
+    public double getLivePhagocytosisRate(int type)
+    {
+//        int n = CellDefinition.getCellDefinition( name ).type;
+        return livePhagocytosisRates[type];
+    }
+    public double getAttackRate(int type)
+    {
+//        int n = CellDefinition.getCellDefinition( name ).type;
+        return attackRates[type];
+    }
+    
+    public double getImmunogenicity(int type)
+    {
+//        int n = CellDefinition.getCellDefinition( name ).type;
+        return immunogenicities[type];
+    }
+    
+    public double getFusionRate(int type)
+    {
+//        int n = CellDefinition.getCellDefinition( name ).type;
+        return fusionRates[type];
+    }
 
     public double getAttackRate(String name)
     {

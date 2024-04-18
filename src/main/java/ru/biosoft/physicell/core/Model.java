@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
+import ru.biosoft.physicell.core.standard.StandardUpdateVelocity;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
 
@@ -192,6 +193,9 @@ public class Model
         }
         curTime += diffusion_dt;
         m.time = curTime;
+        
+//        System.out.println( curTime+" | "+ StandardUpdateVelocity.addPTime/1E9+" | "+StandardUpdateVelocity.totalTime/1E9 );
+//        System.out.println( Cell.calls + " ( " + Cell.badCalls + ")" );
     }
 
     private void saveImg() throws Exception

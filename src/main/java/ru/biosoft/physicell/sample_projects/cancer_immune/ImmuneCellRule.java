@@ -34,7 +34,7 @@ public class ImmuneCellRule extends CustomCellRule
             }
 
             // decide whether to detach 
-            if( PhysiCellUtilities.UniformRandom() < dt / ( pCell.customData.get( attach_lifetime_i ) + 1e-15 ) )
+            if( PhysiCellUtilities.checkRandom( dt / ( pCell.customData.get( attach_lifetime_i ) + 1e-15 )) )
                 detachMe = true;
 
             // if I dettach, resume motile behavior 
@@ -79,7 +79,7 @@ public class ImmuneCellRule extends CustomCellRule
         double scale = ( targetOconoprotein - oncoproteinThreshold ) / oncoproteinDifference;
         scale = Math.min( scale, 1.0 );
 
-        if( PhysiCellUtilities.UniformRandom() < pAttacker.customData.get( killRateIndex ) * scale * dt )
+        if( PhysiCellUtilities.checkRandom( pAttacker.customData.get( killRateIndex ) * scale * dt) )
             return true;
         return false;
     }
@@ -114,7 +114,7 @@ public class ImmuneCellRule extends CustomCellRule
             double scale = ( targetOncoprotein - oncoprotein_threshold ) / ( oncoprotein_saturation - oncoprotein_threshold );
             double distanceScale = ( maxAttachmentDistance - distance ) / ( maxAttachmentDistance - minAttachmentDistance );
             attachRate *= Math.min( scale, 1.0 ) * Math.min( distanceScale, 1.0 );
-            if( PhysiCellUtilities.UniformRandom() < attachRate * dt )
+            if( PhysiCellUtilities.checkRandom( attachRate * dt) )
                 Cell.attachcCells( pAttacker, pTarget );
             return true;//TODO: should we return true only if attached successfully?
         }

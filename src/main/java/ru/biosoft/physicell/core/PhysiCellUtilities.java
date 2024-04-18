@@ -92,6 +92,15 @@ public class PhysiCellUtilities
         return sdf.format( cal.getTime() );
     }
 
+    public static boolean checkRandom(double probability)
+    {
+        if (probability <= 0)
+            return false;
+        else if (probability >= 1)
+            return true;
+        return r.nextDouble() < probability;
+    }
+    
     public static double UniformRandom()
     {
         return r.nextDouble();

@@ -138,7 +138,7 @@ public class Death implements Cloneable
         while( !dead && i < rates.size() )
         {
             double rate = rates.get( i );
-            if( rate != 0 && PhysiCellUtilities.UniformRandom() < rate * dt )
+            if( PhysiCellUtilities.checkRandom( rate * dt) )
             {
                 dead = true;
                 currentDeathModelIndex = i;

@@ -76,7 +76,7 @@ public class Main
 {
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/interactions/double";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/interactions/Simple2";
 
     public static void main(String ... strings) throws Exception
     {

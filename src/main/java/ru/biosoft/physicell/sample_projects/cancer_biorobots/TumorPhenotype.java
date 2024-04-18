@@ -60,7 +60,7 @@ public class TumorPhenotype extends UpdatePhenotype
 
         // make sure we write the damage (not current a behavior)
         pCell.state.damage = damage;
-        if( PhysiCellUtilities.UniformRandom() <= temp )
+        if( PhysiCellUtilities.checkRandom( temp )  )
         {
             // pCell.start_death( apoptosis_model_index );
             SignalBehavior.setSingleBehavior( pCell, "apoptosis", 9e99 );

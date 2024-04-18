@@ -73,10 +73,10 @@ import ru.biosoft.physicell.xml.ModelReader;
 */
 public class Main
 {
-    private static String settingsPath = "config/PhysiCell_settings2D.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_immune/result2D";
+    private static String settingsPath = "config/PhysiCell_settings.xml";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_immune/TornadoOpt";
 
-    public static void main(String ... strings) throws Exception
+    public static void main(String... strings) throws Exception
     {
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];

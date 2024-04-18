@@ -82,7 +82,7 @@ import ru.biosoft.physicell.ui.Visualizer;
 
 public class CancerImmune extends Model
 {
-    private boolean use2D = true;
+    private boolean use2D = false;
 
     @Override
     public void init() throws Exception

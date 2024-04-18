@@ -57,11 +57,11 @@ public class update_cell extends VolumeUpdate
         double glucose_flux_bound = -1 * ( glc_Vmax * glucose_density ) / ( glucose_density + glc_Km );
         intra.model.setReactionLowerBound( glucose_flux_id, glucose_flux_bound );
         double acetate_flux_bound = -1 * ( lac_Vmax * acetate_density ) / ( acetate_density + lac_Km );
-        intra.model.setReactionLowerBound( acetate_flux_id, acetate_flux_bound );
+        intra.model.setReactionLowerBound( acetate_flux_id, 1 );//acetate_flux_id, acetate_flux_bound );
 
-        System.out.println( "Oxygen density: " + oxygen_density + " => " + intra.model.fbcModel.getLowerBound( oxygen_flux_id ) );
-        System.out.println( "Glucose density: " + glucose_density + " => " + intra.model.fbcModel.getLowerBound( glucose_flux_id ) );
-        System.out.println( "Acetate density: " + acetate_density + " => " + intra.model.fbcModel.getLowerBound( acetate_flux_id ) );
+        //        System.out.println( "Oxygen density: " + oxygen_density + " => " + intra.model.fbcModel.getLowerBound( oxygen_flux_id ) );
+        //        System.out.println( "Glucose density: " + glucose_density + " => " + intra.model.fbcModel.getLowerBound( glucose_flux_id ) );
+        //        System.out.println( "Acetate density: " + acetate_density + " => " + intra.model.fbcModel.getLowerBound( acetate_flux_id ) );
 
         intra.model.runFBA();
 
@@ -77,7 +77,7 @@ public class update_cell extends VolumeUpdate
             double acetate_flux = intra.model.getFlux( acetate_flux_id );
             //            System.out.println( "Acetate: " + acetate_flux );
             //	std::cout << "acetate flux: " << acetate_flux << std::endl;
-
+            System.out.println( "ACetate " + acetate_flux );
             if( oxygen_flux < 0 )
                 phenotype.secretion.uptakeRates[oxygen_idx] = Math.abs( oxygen_flux / oxygen_density );
 

@@ -419,7 +419,7 @@ public class StandardModels
         List<Cell> toDetach = new ArrayList<>();
         for( Cell pTest : pCell.state.springAttachments )
         {
-            if( PhysiCellUtilities.UniformRandom() <= detachment_probability )
+            if( PhysiCellUtilities.checkRandom( detachment_probability) )
             {
                 toDetach.add( pTest );
 
@@ -455,9 +455,7 @@ public class StandardModels
                 // std::string search_string = "adhesive affinity to " + pTest.type_name; 
                 // double affinity = get_single_behavior( pCell , search_string );
                 double affinity = phenotype.mechanics.cell_adhesion_affinity( pTest.typeName );
-
-                double prob = attachment_probability * affinity;
-                if( PhysiCellUtilities.UniformRandom() <= prob )
+                if( PhysiCellUtilities.checkRandom( attachment_probability * affinity) )
                 {
                     // attempt the attachment. testing for prior connection is already automated 
                     Cell.attachCellsAsSpring( pCell, pTest );
@@ -587,11 +585,11 @@ public class StandardModels
                 break;
             }
 
-            if( pTarget.phenotype.death.dead == true )
+            if( pTarget.phenotype.death.dead )
             {
                 // dead phagocytosis 
                 probability = phenotype.cellInteractions.deadPhagocytosisRate * dt;
-                if( PhysiCellUtilities.UniformRandom() < probability )
+                if( PhysiCellUtilities.checkRandom( probability ) )
                 {
                     pCell.ingestCell( pTarget );
                 }
@@ -600,32 +598,29 @@ public class StandardModels
             {
                 // live phagocytosis
                 // assume you can only phagocytose one at a time for now 
-                probability = phenotype.cellInteractions.getLivePhagocytosisRate( type_name ) * dt; // s[type] * dt;  
-                if( PhysiCellUtilities.UniformRandom() < probability && !phagocytosed )
+                probability = phenotype.cellInteractions.getLivePhagocytosisRate( type ) * dt; // s[type] * dt;  
+                if( !phagocytosed && PhysiCellUtilities.checkRandom( probability )  )
                 {
                     pCell.ingestCell( pTarget );
                     phagocytosed = true;
                 }
 
-                // attack 
-                // assume you can only attack one cell at a time 
+                // attack assume you can only attack one cell at a time 
                 // probability = phenotype.cell_interactions.attack_rate(type_name)*dt; // s[type] * dt;  
 
-                double attack_ij = phenotype.cellInteractions.getAttackRate( type_name );
-                double immunogenicity_ji = pTarget.phenotype.cellInteractions.getImmunogenicity( pCell.typeName );
+                double attack_ij = phenotype.cellInteractions.getAttackRate( type );
+                double immunogenicity_ji = pTarget.phenotype.cellInteractions.getImmunogenicity( type );
 
                 probability = attack_ij * immunogenicity_ji * dt;
-
-                if( PhysiCellUtilities.UniformRandom() < probability && !attacked )
+                if(  !attacked && PhysiCellUtilities.checkRandom( probability ) )
                 {
                     pCell.attackCell( pTarget, dt );
                     attacked = true;
                 }
 
-                // fusion 
-                // assume you can only fuse once cell at a time 
-                probability = phenotype.cellInteractions.getFusionRate( type_name ) * dt; // s[type] * dt;  
-                if( PhysiCellUtilities.UniformRandom() < probability && !fused )
+                // fusion assume you can only fuse once cell at a time 
+                probability = phenotype.cellInteractions.getFusionRate( type ) * dt; // s[type] * dt;  
+                if( !fused && PhysiCellUtilities.checkRandom( probability )  )
                 {
                     pCell.fuseCell( pTarget );
                     fused = true;
@@ -636,7 +631,7 @@ public class StandardModels
 
     public static void standard_cell_transformations(Cell pCell, Phenotype phenotype, double dt)
     {
-        if( phenotype.death.dead == true )
+        if( phenotype.death.dead  )
         {
             return;
         }
@@ -645,7 +640,7 @@ public class StandardModels
         for( int i = 0; i < phenotype.cellTransformations.transformationRates.length; i++ )
         {
             probability = phenotype.cellTransformations.transformationRates[i] * dt;
-            if( PhysiCellUtilities.UniformRandom() <= probability )
+            if( PhysiCellUtilities.checkRandom( probability ) )
             {
                 // std::cout << "Transforming from " << pCell.type_name << " to " << cell_definitions_by_index[i].name << std::endl; 
                 pCell.convert( CellDefinition.getCellDefinition( i ) );

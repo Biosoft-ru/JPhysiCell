@@ -112,11 +112,11 @@ public class CellFunctions
 
     public static abstract class Function implements Cloneable
     {
-        public UpdatePhenotype clone()
+        public Function clone()
         {
             try
             {
-                return (UpdatePhenotype)super.clone();
+                return (Function)super.clone();
             }
             catch( Exception ex )
             {

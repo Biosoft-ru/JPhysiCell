@@ -1,9 +1,14 @@
 package ru.biosoft.physicell.core;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ru.biosoft.physicell.biofvm.AgentContainer;
 import ru.biosoft.physicell.biofvm.BasicAgent;
@@ -142,8 +147,7 @@ public class CellContainer extends AgentContainer
         updateAllCells( m, t, dt, dt, dt );
     }
 
-    public void updateAllCells(Microenvironment m, double t, double phenotypeDT, double mechanicsDT, double diffusionDT)
-            throws Exception
+    public void updateAllCells(Microenvironment m, double t, double phenotypeDT, double mechanicsDT, double diffusionDT) throws Exception
     {
         // secretions and uptakes. Syncing with BioFVM is automated. 
         //            #pragma omp parallel for 
@@ -247,13 +251,48 @@ public class CellContainer extends AgentContainer
             }
             // update velocities 
             //                #pragma omp parallel for 
-            for( Cell cell : cells )
-            {
-                if( cell.functions.updateVelocity != null && !cell.isOutOfDomain && cell.isMovable )
-                {
-                    cell.functions.updateVelocity.execute( cell, cell.phenotype, time_since_last_mechanics );
-                }
-            }
+
+            //            ExecutorService executor = (ExecutorService)Executors.newFixedThreadPool( 4 );
+            //            queue = new ArrayDeque<>();
+            //            for( Cell cell : cells )
+            //            {
+            //                if( cell.functions.updateVelocity != null && !cell.isOutOfDomain && cell.isMovable )
+            //                {
+            //                    queue.add( cell );
+            //                }
+            //            }
+            //            while( !queue.isEmpty() )
+            //            {
+            //                List<UpdateVelocityTask> processors = new ArrayList<UpdateVelocityTask>();
+            //
+            //                for( int i = 0; i < 4; i++ )
+            //                    processors.add( new UpdateVelocityTask(time_since_last_mechanics) );
+            //                executor.invokeAll( processors );
+            //            }
+            
+            
+//            ExecutorService executor = (ExecutorService)Executors.newFixedThreadPool( 4 );
+//            if( tasks == null )
+//                tasks = new ArrayList<UpdateVelocityTask>();
+//            for( int i = 0; i < 4; i++ )
+//                tasks.add( new UpdateVelocityTask( time_since_last_mechanics ) );
+//            queue = new ArrayDeque<>();
+//            for( Cell cell : cells )
+//            {
+//                if( cell.functions.updateVelocity != null && !cell.isOutOfDomain && cell.isMovable )
+//                {
+//                    queue.add( cell );
+//                }
+//            }
+//            executor.invokeAll( tasks );
+
+                        for( Cell cell : cells )
+                        {
+                            if( cell.functions.updateVelocity != null && !cell.isOutOfDomain && cell.isMovable )
+                            {
+                                cell.functions.updateVelocity.execute( cell, cell.phenotype, time_since_last_mechanics );
+                            }
+                        }
             // new March 2023: 
             // dynamic spring attachments, followed by built-in springs
             if( !PhysiCellSettings.disable_automated_spring_adhesions )
@@ -429,5 +468,30 @@ public class CellContainer extends AgentContainer
                 m.mesh.boundingBox[2], m.mesh.boundingBox[5], mechanicsVoxelSize );
         m.agentContainer = (AgentContainer)cellContainer;
         return cellContainer;
+    }
+
+
+    Queue<Cell> queue;
+    List<UpdateVelocityTask> tasks = null;//new UpdateVelocityTask[4];
+
+    private class UpdateVelocityTask implements Callable<Void>
+    {
+        double dt;
+        public UpdateVelocityTask(double dt)
+        {
+            this.dt = dt;
+        }
+        @Override
+        public Void call() throws Exception
+        {
+            while( !queue.isEmpty() )
+            {
+                Cell cell = queue.poll();
+                if( cell != null )
+                    cell.functions.updateVelocity.execute( cell, cell.phenotype, dt );
+            }
+            return null;
+
+        }
     }
 }

@@ -52,7 +52,8 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
     int xLength;
     int yLength;
     int zLength;
-    double[][] density;
+    //    double[][] density;
+    double[][][][] density2;
 
     public void setup(Microenvironment m, double dt)
     {
@@ -61,7 +62,13 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
         xLength = m.mesh.x_coordinates.length;
         yLength = m.mesh.y_coordinates.length;
         zLength = m.mesh.z_coordinates.length;
-        density = m.density;
+        //        density = m.density;
+
+        density2 = new double[xLength][yLength][zLength][m.densityNames.length];
+        for( int i = 0; i < xLength; i++ )
+            for( int j = 0; j < yLength; j++ )
+                for( int k = 0; k < zLength; k++ )
+                    density2[i][j][k] = m.density[m.getVoxelIndex( i, j, k )];
 
         m.thomas_denomx = new double[xLength][];
         m.thomas_cx = new double[xLength][];
@@ -173,19 +180,23 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
             for( int j = 0; j < yLength; j++ )
             {
                 // Thomas solver, x-direction remaining part of forward sweep, using pre-computed quantities 
-                int n = m.getVoxelIndex( 0, j, k );
-                VectorUtil.div( density[n], m.thomas_denomx[0] );
+                //                int n = m.getVoxelIndex( 0, j, k );
+                //                VectorUtil.div( density[n], m.thomas_denomx[0] );
+                VectorUtil.div( density2[0][j][k], m.thomas_denomx[0] );
                 for( int i = 1; i < xLength; i++ )
                 {
-                    n = m.getVoxelIndex( i, j, k );
-                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.iJump] );
-                    VectorUtil.div( density[n], m.thomas_denomx[i] );
+                    //                    n = m.getVoxelIndex( i, j, k );
+                    //                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.iJump] );
+                    //                    VectorUtil.div( density[n], m.thomas_denomx[i] );
+                    VectorUtil.axpydiv( density2[i][j][k], m.thomas_constant1, density2[i - 1][j][k], m.thomas_denomx[i] );//n - m.iJump] );
+                    //                    VectorUtil.div( density2[i][j][k], m.thomas_denomx[i] );
                 }
                 //back substitution
                 for( int i = xLength - 2; i >= 0; i-- )
                 {
-                    n = m.getVoxelIndex( i, j, k );
-                    VectorUtil.naxpy( density[n], m.thomas_cx[i], density[n + m.iJump] );
+                    //                    n = m.getVoxelIndex( i, j, k );
+                    //                    VectorUtil.naxpy( density[n], m.thomas_cx[i], density[n + m.iJump] );
+                    VectorUtil.naxpy( density2[i][j][k], m.thomas_cx[i], density2[i + 1][j][k] );//n + m.iJump] );
                 }
             }
         }
@@ -196,19 +207,23 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
             for( int i = 0; i < xLength; i++ )
             {
                 // Thomas solver, y-direction remaining part of forward sweep, using pre-computed quantities  
-                int n = m.getVoxelIndex( i, 0, k );
-                VectorUtil.div( density[n], m.thomas_denomy[0] );
+                //                int n = m.getVoxelIndex( i, 0, k );
+                //                VectorUtil.div( density[n], m.thomas_denomy[0] );
+                VectorUtil.div( density2[i][0][k], m.thomas_denomy[0] );
                 for( int j = 1; j < yLength; j++ )
                 {
-                    n = m.getVoxelIndex( i, j, k );
-                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.jJump] );
-                    VectorUtil.div( density[n], m.thomas_denomy[j] );
+                    //                    n = m.getVoxelIndex( i, j, k );
+                    //                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.jJump] );
+                    //                    VectorUtil.div( density[n], m.thomas_denomy[j] );
+                    VectorUtil.axpydiv( density2[i][j][k], m.thomas_constant1, density2[i][j - 1][k], m.thomas_denomy[j] );
+                    //                    VectorUtil.div( density2[i][j][k], m.thomas_denomy[j] );
                 }
                 // back substitution 
                 for( int j = yLength - 2; j >= 0; j-- )
                 {
-                    n = m.getVoxelIndex( i, j, k );
-                    VectorUtil.naxpy( density[n], m.thomas_cy[j], density[n + m.jJump] );
+                    //                    n = m.getVoxelIndex( i, j, k );
+                    //                    VectorUtil.naxpy( density[n], m.thomas_cy[j], density[n + m.jJump] );
+                    VectorUtil.naxpy( density2[i][j][k], m.thomas_cy[j], density2[i][j + 1][k] );//n + m.jJump] );
                 }
             }
         }
@@ -219,20 +234,24 @@ public class ConstantCoefficientsLOD3D extends DiffusionDecaySolver
             for( int i = 0; i < xLength; i++ )
             {
                 // Thomas solver, z-direction remaining part of forward sweep, using pre-computed quantities 
-                int n = m.getVoxelIndex( i, j, 0 );
-                VectorUtil.div( density[n], m.thomas_denomz[0] );
+                //                int n = m.getVoxelIndex( i, j, 0 );
+                //                VectorUtil.div( density[n], m.thomas_denomz[0] );
+                VectorUtil.div( density2[i][j][0], m.thomas_denomz[0] );
                 // should be an empty loop if mesh.z_coordinates.length < 2  
                 for( int k = 1; k < zLength; k++ )
                 {
-                    n = m.getVoxelIndex( i, j, k );
-                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.kJump] );
-                    VectorUtil.div( density[n], m.thomas_denomz[k] );
+                    //                    n = m.getVoxelIndex( i, j, k );
+                    //                    VectorUtil.axpy( density[n], m.thomas_constant1, density[n - m.kJump] );
+                    //                    VectorUtil.div( density[n], m.thomas_denomz[k] );
+                    VectorUtil.axpy( density2[i][j][k], m.thomas_constant1, density2[i][j][k - 1] );//n - m.kJump] );
+                    VectorUtil.div( density2[i][j][k], m.thomas_denomz[k] );
                 }
                 // back substitution
                 for( int k = zLength - 2; k >= 0; k-- )
                 {
-                    n = m.getVoxelIndex( i, j, k );
-                    VectorUtil.naxpy( density[n], m.thomas_cz[k], density[n + m.kJump] );
+                    //                    n = m.getVoxelIndex( i, j, k );
+                    //                    VectorUtil.naxpy( density[n], m.thomas_cz[k], density[n + m.kJump] );
+                    VectorUtil.naxpy( density2[i][j][k], m.thomas_cz[k], density2[i][j][k + 1] );// + m.kJump] );
                 }
             }
         }
