@@ -11,7 +11,7 @@ import ru.biosoft.physicell.core.Phenotype;
 
 public class IntracellularFBA extends Intracellular
 {
-    public GLPK_model model = new GLPK_model();
+    public FBAModel model;
 
     public Map<String, String> parameterMapping = new HashMap<>();
 
