@@ -3,7 +3,6 @@ package ru.biosoft.physicell.sample_projects.ecoli_acetic_switch;
 import java.io.File;
 import java.util.logging.Logger;
 
-import biouml.plugins.fbc.ApacheModel;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
 
@@ -11,7 +10,6 @@ public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
     private static String resultPath = "C:/Users/Damag/BIOFVM/projects/ecoli_acetic_switch/result2";
-    protected static Logger log = Logger.getLogger( ApacheModel.class.getName() );
 
     public static void main(String ... strings) throws Exception
     {

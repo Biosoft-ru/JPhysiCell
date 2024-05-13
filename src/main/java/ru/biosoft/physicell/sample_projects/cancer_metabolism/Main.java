@@ -1,17 +1,13 @@
 package ru.biosoft.physicell.sample_projects.cancer_metabolism;
 
 import java.io.File;
-import java.util.logging.Logger;
-
-import biouml.plugins.fbc.ApacheModel;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
 
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_metabolism/result"; //change this folder
-    protected static Logger log = Logger.getLogger( ApacheModel.class.getName() );
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_metabolism/result2"; //change this folder
 
     public static void main(String ... strings) throws Exception
     {
