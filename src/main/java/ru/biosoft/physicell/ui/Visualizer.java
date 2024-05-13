@@ -1,7 +1,6 @@
 package ru.biosoft.physicell.ui;
 
-import java.awt.*;
-import java.awt.color.*;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -42,6 +41,11 @@ public class Visualizer
     private int zShift = 0;
     private int substrateIndex = 0;
 
+    public String getName()
+    {
+        return name;    
+    }
+    
     public Visualizer()
     {
 
@@ -101,6 +105,11 @@ public class Visualizer
             ImageIO.write( image, "PNG", new File( folder + "/" + name + "/Figure_" + (int)t + ".png" ) );
         if( saveGIF )
             writer.writeToSequence( new IIOImage( image, null, null ), writer.getDefaultWriteParam() );
+    }
+
+    public BufferedImage getImage(Microenvironment m, double t) throws Exception
+    {
+        return draw( m, sec, slice, (int)t );
     }
 
     public void finish() throws IOException
