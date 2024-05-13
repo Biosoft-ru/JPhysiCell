@@ -1,9 +1,7 @@
 package ru.biosoft.physicell.xml;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,15 +10,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import biouml.model.Diagram;
-import biouml.plugins.fbc.GLPKModel;
-import biouml.plugins.fbc.GLPKModelCreator;
-import biouml.plugins.fbc.SbmlModelFBCReader2;
-import biouml.plugins.sbml.SbmlModelFactory;
-import biouml.plugins.sbml.SbmlModelReader_31;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.MicroenvironmentOptions;
 import ru.biosoft.physicell.biofvm.VectorUtil;
@@ -43,14 +34,12 @@ import ru.biosoft.physicell.core.standard.AdvancedChemotaxisNormalized;
 import ru.biosoft.physicell.core.standard.Chemotaxis;
 import ru.biosoft.physicell.core.standard.DomainEdgeAvoidance;
 import ru.biosoft.physicell.core.standard.StandardModels;
-import ru.biosoft.physicell.fba.IntracellularFBA;
-import ru.biosoft.physicell.fba.IntracellularFBA.exchange_data;
-import ru.biosoft.physicell.fba.IntracellularFBA.kinetic_parm;
-import ru.biosoft.physicell.ode.IntracellularEuler;
 
 
-public class ModelReader extends Constants
+public class ModelReader extends ModelReaderSupport
 {
+    private IntracellularReader intracellularReader = null;
+
     private static final String OPTIONS = "options";
     private File f;
     public Model read(InputStream is) throws Exception
@@ -594,40 +583,11 @@ public class ModelReader extends Constants
         }
     }
 
-    private void readIntracellular(Element el, Model model, CellDefinition cd) throws Exception
+    public void readIntracellular(Element el, Model model, CellDefinition cd) throws Exception
     {
-        Phenotype p = cd.phenotype;
-        String type = getAttr( el, "type" );
-        if( type.equals( "dfba" ) )
-        {
-            readIntracellularFBA( el, model, cd );
-            return;
-        }
-        p.intracellular = new IntracellularEuler();
-        for( Element child : getAllElements( el ) )
-        {
-            String tag = child.getTagName();
-            if( tag.equals( "intracellular_dt" ) )
-            {
-                double dt = getDoubleVal( child );
-                p.intracellular.setDT( dt );
-            }
-            else if( tag.equals( "map" ) )
-            {
-                String species = getAttr( child, "sbml_species" );
-
-                if( hasAttr( child, "PC_substrate" ) )
-                {
-                    String substrate = getAttr( child, "PC_substrate" );
-                    p.intracellular.addPhenotypeSpecies( substrate, species );
-                }
-                else if( hasAttr( child, "PC_phenotype" ) )
-                {
-                    String code = getAttr( child, "PC_phenotype" );
-                    p.intracellular.addPhenotypeSpecies( code, species );
-                }
-            }
-        }
+        if( intracellularReader == null )
+            throw new Exception( "No intracellular reader set" );
+        intracellularReader.readIntracellular( el, model, cd );
     }
 
     private void readCycle(Element el, CellDefinition cd) throws Exception
@@ -1377,165 +1337,4 @@ public class ModelReader extends Constants
         }
     }
 
-    void readIntracellularFBA(Element element, Model model, CellDefinition cd) throws Exception
-    {
-        Microenvironment m = model.getMicroenvironment();
-        cd.phenotype.intracellular = new IntracellularFBA();
-        ( (IntracellularFBA)cd.phenotype.intracellular ).substrate_exchanges = new HashMap<>();
-        Element sbml = findElement( element, "sbml_filename" );
-        this.readSBML( getVal( sbml ), cd );
-
-        List<Element> exchangeElements = findAllElements( element, "exchange" );
-
-        for( Element exchangeElement : exchangeElements )
-        {
-            String substrate = getAttr( exchangeElement, "substrate" );
-            int index = m.findDensityIndex( substrate );
-            String actualName = m.densityNames[index];
-            Element fluxElement = findElement( exchangeElement, "fba_flux" );
-            String fluxName = getVal( fluxElement );
-            Element kmElement = findElement( exchangeElement, "Km" );
-            double km = getDoubleVal( kmElement );
-            Element vmaxElement = findElement( exchangeElement, "Vmax" );
-            double vmax = getDoubleVal( vmaxElement );
-
-            exchange_data ed = new exchange_data();
-            ed.density_index = index;
-            ed.density_name = actualName;
-            ed.fba_flux_id = fluxName;
-            ed.Km = new kinetic_parm();
-            ed.Km.name = "Km";
-            ed.Km.value = km;
-            ed.Vmax = new kinetic_parm();
-            ed.Vmax.name = "Vmax";
-            ed.Vmax.value = vmax;
-            ( (IntracellularFBA)cd.phenotype.intracellular ).substrate_exchanges.put( substrate, ed );
-        }
-    }
-
-    public void readSBML(String name, CellDefinition cd) throws Exception
-    {
-        String path = f.toPath().resolve( name ).toAbsolutePath().toString();
-        //        String path = clazz.getResource( path ).getFile();
-        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( new File( path ) );
-        SbmlModelReader_31 reader = (SbmlModelReader_31)SbmlModelFactory.getReader( document );
-        SbmlModelFBCReader2 packageReader = new SbmlModelFBCReader2();
-        Diagram diagram = reader.read( document, "CancerMetabolism", null, packageReader );
-        GLPKModelCreator creator = new GLPKModelCreator( "" ); //usr/local/lib64/jni" );
-        ( (IntracellularFBA)cd.phenotype.intracellular ).model.fbcModel = (GLPKModel)creator.createModel( diagram );
-    }
-
-    private Element findElement(Element parent, String tag)
-    {
-        return findElement( parent.getChildNodes(), tag );
-    }
-
-    private Element findElement(NodeList list, String tag)
-    {
-        for( int i = 0; i < list.getLength(); i++ )
-        {
-            Node node = list.item( i );
-            if( node instanceof Element && ( (Element)node ).getTagName().equals( tag ) )
-            {
-                return (Element)node;
-            }
-        }
-        return null;
-    }
-
-    private List<Element> getAllElements(Element parent)
-    {
-        List<Element> result = new ArrayList<>();
-        NodeList list = parent.getChildNodes();
-        for( int i = 0; i < list.getLength(); i++ )
-        {
-            Node node = list.item( i );
-            if( node instanceof Element )
-            {
-                result.add( (Element)node );
-            }
-        }
-        return result;
-    }
-
-    private List<Element> findAllElements(Element parent, String tag)
-    {
-        List<Element> result = new ArrayList<>();
-        for( int i = 0; i < parent.getChildNodes().getLength(); i++ )
-        {
-            Node node = parent.getChildNodes().item( i );
-            if( node instanceof Element && ( (Element)node ).getTagName().equals( tag ) )
-            {
-                result.add( (Element)node );
-            }
-        }
-        return result;
-    }
-
-
-    private boolean getBoolVal(Element el)
-    {
-        return Boolean.parseBoolean( getVal( el ) );
-    }
-
-    private String getVal(Element el)
-    {
-        return el.getChildNodes().item( 0 ).getNodeValue();// el.getNodeValue();
-    }
-
-    private double getDoubleVal(Element el)
-    {
-        return Double.parseDouble( getVal( el ) );
-    }
-
-    private int getIntVal(Element el)
-    {
-        return Integer.parseInt( getVal( el ) );
-    }
-
-    private double getDoubleAttr(Element el, String name)
-    {
-        return Double.parseDouble( el.getAttribute( name ) );
-    }
-
-    private boolean getBoolAttr(Element el, String name)
-    {
-        return Boolean.parseBoolean( el.getAttribute( name ) );
-    }
-
-    private String getAttr(Element el, String name)
-    {
-        return el.getAttribute( name );
-    }
-
-    private boolean hasAttr(Element el, String name)
-    {
-        return el.hasAttribute( name );
-    }
-
-    private Integer getIntAttr(Element el, String name)
-    {
-        return Integer.parseInt( el.getAttribute( name ) );
-    }
-
-    public static Color readColor(String str)
-    {
-        switch( str )
-        {
-            case "green":
-                return Color.green;
-            case "red":
-                return Color.red;
-            case "blue":
-                return Color.blue;
-            case "limegreen":
-                return new Color( 50, 205, 50 );
-            case "magenta":
-                return Color.magenta;
-            case "cyan":
-                return Color.cyan;
-            default:
-                return Color.white;
-        }
-    }
 }
