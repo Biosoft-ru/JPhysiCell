@@ -1,5 +1,6 @@
 package ru.biosoft.physicell.core;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.core.standard.StandardUpdateVelocity;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
 
@@ -124,11 +124,9 @@ public class Model
         this.saveDensity = writeDensity;
     }
 
-    public void init() throws Exception
-    {
-        curTime = 0;
-        saveFullNext = 0;
 
+    public void initFiles() throws Exception
+    {
         File f = new File( resultFolder );
         if( f.exists() )
             deleteDirectory( f );
@@ -139,12 +137,26 @@ public class Model
         f.mkdirs();
 
         writeReport( modelFile, display() );
+    }
+
+    public void init(boolean outputFiles) throws Exception
+    {
+        curTime = 0;
+        saveFullNext = 0;
 
         for( Visualizer listener : visualizers )
             listener.init();
 
         startTime = System.currentTimeMillis();
         hasEvents = !events.isEmpty();
+        
+        if( outputFiles )
+            initFiles();
+    }
+
+    public void init() throws Exception
+    {
+        init(true);
     }
 
     public static void deleteDirectory(File directoryToBeDeleted)
@@ -182,7 +194,12 @@ public class Model
             listener.finish();
     }
 
-    protected void doStep() throws Exception
+    public double getCurrentTime()
+    {
+        return curTime;
+    }
+
+    public void doStep() throws Exception
     {
         m.simulateDiffusionDecay( diffusion_dt );
         ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
@@ -193,9 +210,9 @@ public class Model
         }
         curTime += diffusion_dt;
         m.time = curTime;
-        
-//        System.out.println( curTime+" | "+ StandardUpdateVelocity.addPTime/1E9+" | "+StandardUpdateVelocity.totalTime/1E9 );
-//        System.out.println( Cell.calls + " ( " + Cell.badCalls + ")" );
+
+        //        System.out.println( curTime+" | "+ StandardUpdateVelocity.addPTime/1E9+" | "+StandardUpdateVelocity.totalTime/1E9 );
+        //        System.out.println( Cell.calls + " ( " + Cell.badCalls + ")" );
     }
 
     private void saveImg() throws Exception
@@ -204,7 +221,18 @@ public class Model
             listener.saveResult( m, curTime );
     }
 
-    private void saveFull() throws Exception
+    public Map<String, BufferedImage> getImages() throws Exception
+    {
+        Map<String, BufferedImage> result = new HashMap<>();
+        for( Visualizer vs : getVisualizers() )
+        {
+            BufferedImage image = vs.getImage( m, curTime );
+            result.put( vs.getName(), image );
+        }
+        return result;
+    }
+
+    public void saveFull() throws Exception
     {
         if( logFile != null )
         {
@@ -226,7 +254,7 @@ public class Model
                 writeReport( cellDataFolder + "/Cells " + Math.round( curTime ) + ".txt", this.getReport( cell ) );
             }
         }
-        System.out.println( getLogInfo() );
+        //        System.out.println( getLogInfo() );
     }
 
     private boolean executeEvents(double curTime) throws Exception
@@ -407,6 +435,17 @@ public class Model
     public String getInitialPath()
     {
         return initialPath;
+    }
+
+    public String[] getReportHeaderElements()
+    {
+        return new String[] {"ID", "X", "Y", "Z", "Cycle", "Elapsed"};
+    }
+
+    public Object[] getReportElements(Cell cell) throws Exception
+    {
+        return new Object[] {cell.ID, cell.position[0], cell.position[1], cell.position[2], cell.phenotype.cycle.currentPhase().name,
+                cell.phenotype.cycle.data.elapsedTimePhase};
     }
 
     public String getReport(Cell cell) throws Exception
