@@ -1,18 +1,5 @@
 package ru.biosoft.physicell.sample_projects.ecoli_acetic_switch;
 
-import java.io.File;
-import java.util.HashMap;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-
-import biouml.model.Diagram;
-import biouml.plugins.fbc.GLPKModel;
-import biouml.plugins.fbc.GLPKModelCreator;
-import biouml.plugins.fbc.SbmlModelFBCReader2;
-import biouml.plugins.sbml.SbmlModelFactory;
-import biouml.plugins.sbml.SbmlModelReader_31;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
@@ -37,7 +24,7 @@ public class EcoliAceticSwitch extends Model
     public void init() throws Exception
     {
         super.init();
-        readFBA();
+//        readFBA();/
         createCellTypes();
         this.setupTissue();
         updater = new update_cell( this );
@@ -45,7 +32,7 @@ public class EcoliAceticSwitch extends Model
         m.options.track_internalized_substrates_in_each_agent = false;
     }
 
-    protected void doStep() throws Exception
+    public void doStep() throws Exception
     {
         ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
         updateIntracellular();
@@ -192,23 +179,23 @@ public class EcoliAceticSwitch extends Model
         }
     }
 
-    void readFBA() throws Exception
-    {
-        fba = new IntracellularFBA();
-        String path = "C:/Users/Damag/git/JPhysiCell/src/main/resources/ru/biosoft/physicell/sample_projects/ecoli_acetic_switch/config/Ecoli_core.xml";
-        //        SbmlModelReader reader = SbmlModelFactory.readDiagram( path, false );
-        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( new File( path ) );
-        SbmlModelReader_31 reader = (SbmlModelReader_31)SbmlModelFactory.getReader( document );
-        SbmlModelFBCReader2 packageReader = new SbmlModelFBCReader2();
-        Diagram diagram = reader.read( document, "EcoliAceticSwitch", null, packageReader );
-        GLPKModelCreator creator = new GLPKModelCreator( "" ); //usr/local/lib64/jni" );
-        fba.model.fbcModel = (GLPKModel)creator.createModel( diagram );
-        fba.parameterMapping = new HashMap<>();
-        fba.parameterMapping.put( "glucose", "R_EX_glc__D_e" );
-        fba.parameterMapping.put( "acetate", "R_EX_ac_e" );
-        fba.parameterMapping.put( "oxygen", "R_EX_o2_e" );
-        fba.parameterMapping.put( "growth_rate", "R_BIOMASS_Ecoli_core_w_GAM" );
-    }
+//    void readFBA() throws Exception
+//    {
+//        fba = new IntracellularFBA();
+//        String path = "C:/Users/Damag/git/JPhysiCell/src/main/resources/ru/biosoft/physicell/sample_projects/ecoli_acetic_switch/config/Ecoli_core.xml";
+//        //        SbmlModelReader reader = SbmlModelFactory.readDiagram( path, false );
+//        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( new File( path ) );
+//        SbmlModelReader_31 reader = (SbmlModelReader_31)SbmlModelFactory.getReader( document );
+//        SbmlModelFBCReader2 packageReader = new SbmlModelFBCReader2();
+//        Diagram diagram = reader.read( document, "EcoliAceticSwitch", null, packageReader );
+//        GLPKModelCreator creator = new GLPKModelCreator( "" ); //usr/local/lib64/jni" );
+//        fba.model.fbcModel = (GLPKModel)creator.createModel( diagram );
+//        fba.parameterMapping = new HashMap<>();
+//        fba.parameterMapping.put( "glucose", "R_EX_glc__D_e" );
+//        fba.parameterMapping.put( "acetate", "R_EX_ac_e" );
+//        fba.parameterMapping.put( "oxygen", "R_EX_o2_e" );
+//        fba.parameterMapping.put( "growth_rate", "R_BIOMASS_Ecoli_core_w_GAM" );
+//    }
 
     public class anuclear_volume_model extends VolumeUpdate
     {
