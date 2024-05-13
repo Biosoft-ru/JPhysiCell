@@ -205,9 +205,9 @@ public class Microenvironment
         solverSetup = false;
 
         //        solver = new TornadoSolverParallel();
-        solver = new TornadoSolverParallel2();
+        //        solver = new TornadoSolverParallel2();
         //        solver = new TornadoSolver();
-//                solver =new ConstantCoefficientsLOD3D();
+        solver = new ConstantCoefficientsLOD3D();
 
         mesh = new CartesianMesh();
         mesh.resize( 1, 1, 1 );
