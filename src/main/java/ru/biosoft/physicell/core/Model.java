@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.core;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -144,14 +143,14 @@ public class Model
         curTime = 0;
         saveFullNext = 0;
 
+        if( outputFiles )
+            initFiles();
+
         for( Visualizer listener : visualizers )
             listener.init();
 
         startTime = System.currentTimeMillis();
         hasEvents = !events.isEmpty();
-        
-        if( outputFiles )
-            initFiles();
     }
 
     public void init() throws Exception
@@ -219,17 +218,6 @@ public class Model
     {
         for( Visualizer listener : visualizers )
             listener.saveResult( m, curTime );
-    }
-
-    public Map<String, BufferedImage> getImages() throws Exception
-    {
-        Map<String, BufferedImage> result = new HashMap<>();
-        for( Visualizer vs : getVisualizers() )
-        {
-            BufferedImage image = vs.getImage( m, curTime );
-            result.put( vs.getName(), image );
-        }
-        return result;
     }
 
     public void saveFull() throws Exception

@@ -9,7 +9,11 @@ import java.io.IOException;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOInvalidTreeException;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
 
 import ru.biosoft.physicell.biofvm.BasicAgent;
@@ -40,12 +44,13 @@ public class Visualizer
     private int yShift = 0;
     private int zShift = 0;
     private int substrateIndex = 0;
+    private File fileGIF;
 
     public String getName()
     {
-        return name;    
+        return name;
     }
-    
+
     public Visualizer()
     {
 
@@ -82,29 +87,95 @@ public class Visualizer
         setColorPhase( "Necrotic (lysed)", Color.pink );
     }
 
+    public void setFileGIF(File f)
+    {
+        this.fileGIF = f;
+    }
+
+    public File getFileGIF()
+    {
+        return fileGIF;
+    }
+
     public void init() throws IOException
     {
         if( saveImage || saveGIF )
         {
+            if( fileGIF == null )
+                fileGIF = new File( folder + "/" + name + ".gif" );
             writer = ImageIO.getImageWritersByFormatName( "GIF" ).next();
-            ios = ImageIO.createImageOutputStream( new File( folder + "/" + name + ".gif" ) );
+            ios = ImageIO.createImageOutputStream( fileGIF );
+            //            ios = ImageIO.createImageOutputStream( new File( folder + "/" + name + ".gif" ) );
             if( saveImage )
             {
                 File images = new File( folder + "/" + name );
                 images.mkdir();
             }
+
+
+            ImageTypeSpecifier imageTypeSpecifier = ImageTypeSpecifier.createFromBufferedImageType( BufferedImage.TYPE_INT_ARGB );
+            metadata = writer.getDefaultImageMetadata( imageTypeSpecifier, writer.getDefaultWriteParam() );
+            configureRootMetadata( 100, true );
+
             writer.setOutput( ios );
             writer.prepareWriteSequence( null );
         }
     }
+    protected IIOMetadata metadata;
 
-    public void saveResult(Microenvironment m, double t) throws Exception
+    private void configureRootMetadata(int delay, boolean loop) throws IIOInvalidTreeException
+    {
+        String metaFormatName = metadata.getNativeMetadataFormatName();
+        IIOMetadataNode root = (IIOMetadataNode)metadata.getAsTree( metaFormatName );
+
+        IIOMetadataNode graphicsControlExtensionNode = getNode( root, "GraphicControlExtension" );
+        graphicsControlExtensionNode.setAttribute( "disposalMethod", "none" );
+        graphicsControlExtensionNode.setAttribute( "userInputFlag", "FALSE" );
+        graphicsControlExtensionNode.setAttribute( "transparentColorFlag", "FALSE" );
+        graphicsControlExtensionNode.setAttribute( "delayTime", Integer.toString( delay / 10 ) );
+        graphicsControlExtensionNode.setAttribute( "transparentColorIndex", "0" );
+
+        IIOMetadataNode commentsNode = getNode( root, "CommentExtensions" );
+        commentsNode.setAttribute( "CommentExtension", "Created by BioUML" );
+
+        IIOMetadataNode appExtensionsNode = getNode( root, "ApplicationExtensions" );
+        IIOMetadataNode child = new IIOMetadataNode( "ApplicationExtension" );
+        child.setAttribute( "applicationID", "NETSCAPE" );
+        child.setAttribute( "authenticationCode", "2.0" );
+
+        int loopContinuously = loop ? 0 : 1;
+        child.setUserObject( new byte[] {0x1, (byte) ( loopContinuously & 0xFF ), (byte) ( ( loopContinuously >> 8 ) & 0xFF )} );
+        appExtensionsNode.appendChild( child );
+        metadata.setFromTree( metaFormatName, root );
+    }
+
+    private static IIOMetadataNode getNode(IIOMetadataNode rootNode, String nodeName)
+    {
+        int nNodes = rootNode.getLength();
+        for( int i = 0; i < nNodes; i++ )
+        {
+            if( rootNode.item( i ).getNodeName().equalsIgnoreCase( nodeName ) )
+            {
+                return (IIOMetadataNode)rootNode.item( i );
+            }
+        }
+        IIOMetadataNode node = new IIOMetadataNode( nodeName );
+        rootNode.appendChild( node );
+        return ( node );
+    }
+
+    public void saveResult(Microenvironment m, double t) throws IOException
     {
         BufferedImage image = draw( m, sec, slice, (int)t );
         if( saveImage )
             ImageIO.write( image, "PNG", new File( folder + "/" + name + "/Figure_" + (int)t + ".png" ) );
         if( saveGIF )
-            writer.writeToSequence( new IIOImage( image, null, null ), writer.getDefaultWriteParam() );
+            writer.writeToSequence( new IIOImage( image, null, metadata ), writer.getDefaultWriteParam() );
+    }
+
+    public void updateGIF(BufferedImage image) throws IOException
+    {
+        writer.writeToSequence( new IIOImage( image, null, metadata ), writer.getDefaultWriteParam() );
     }
 
     public BufferedImage getImage(Microenvironment m, double t) throws Exception
@@ -128,18 +199,20 @@ public class Visualizer
         X, Y, Z
     }
 
-    public BufferedImage draw(Microenvironment m, double slice, double time, String fileName) throws Exception
+    public BufferedImage draw(Microenvironment m, double slice, double time, String fileName) throws IOException
     {
         return draw( m, Section.Z, slice, time, fileName );
     }
 
-    public BufferedImage draw(Microenvironment m, Section sec, double slice, double time) throws Exception
+    public BufferedImage draw(Microenvironment m, Section sec, double slice, double time) throws IOException
     {
         return draw( m, sec, slice, time, null );
     }
 
-    public BufferedImage draw(Microenvironment m, Section sec, double slice, double time, String fileName) throws Exception
+    public BufferedImage draw(Microenvironment m, Section sec, double slice, double time, String fileName) throws IOException
     {
+        int extraWidth = 130;
+        int textOffset = 10;
         this.xShift = -(int) ( Math.floor( m.mesh.x_coordinates[0] - m.mesh.dx / 2.0 ) );
         this.yShift = -(int) ( Math.floor( m.mesh.y_coordinates[0] - m.mesh.dy / 2.0 ) );
         this.zShift = -(int) ( Math.floor( m.mesh.z_coordinates[0] - m.mesh.dz / 2.0 ) );
@@ -163,7 +236,8 @@ public class Visualizer
                 break;
         }
 
-        BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_RGB );
+        width += extraWidth;
+        BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
         Graphics g = img.getGraphics();
         g.setColor( Color.white );
         g.fillRect( 0, 0, width, height );
@@ -174,7 +248,7 @@ public class Visualizer
         if( drawAgents )
             drawAgents( m, sec, slice, g );
         if( drawTitle )
-            drawText( m, sec, time, g );
+            drawText( m, sec, time, width - extraWidth + textOffset, g );
         if( fileName != null )
             ImageIO.write( img, "PNG", new File( fileName ) );
         return img;
@@ -195,18 +269,18 @@ public class Visualizer
         }
     }
 
-    private void drawText(Microenvironment m, Section sec, double time, Graphics g)
+    private void drawText(Microenvironment m, Section sec, double time, int x, Graphics g)
     {
         g.setFont( new Font( "TimesRoman", Font.PLAIN, 20 ) );
         g.setColor( Color.BLACK );
-        g.drawString( "Time: " + time, 10, 40 );
-        g.drawString( "Cells: " + m.getAgentsCount(), 10, 70 );
+        g.drawString( "Time: " + time, x, 40 );
+        g.drawString( "Cells: " + m.getAgentsCount(), x, 70 );
         if( sec == Section.X )
-            g.drawString( "X = " + slice, 10, 100 );
+            g.drawString( "X = " + slice, x, 100 );
         else if( sec == Section.Y )
-            g.drawString( "Y = " + slice, 10, 100 );
+            g.drawString( "Y = " + slice, x, 100 );
         else
-            g.drawString( "Z = " + slice, 10, 100 );
+            g.drawString( "Z = " + slice, x, 100 );
     }
 
     private void drawAgents(Microenvironment m, Section sec, double slice, Graphics g)
