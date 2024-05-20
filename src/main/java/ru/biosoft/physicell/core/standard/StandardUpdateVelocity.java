@@ -176,4 +176,10 @@ public class StandardUpdateVelocity extends UpdateVelocity
     {
         return "Standard velocity: cell-cell adhesion + biased motility";
     }
+
+    @Override
+    public String getName()
+    {
+        return "Standard velocity";
+    }
 }

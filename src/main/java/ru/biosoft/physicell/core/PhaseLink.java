@@ -99,4 +99,11 @@ public class PhaseLink
             return startPhase.toString() + " -> " + endPhase.toString();
         return startPhase.toString() + " -> ";
     }
+
+    public String toShortString()
+    {
+        if( endPhase != null )
+            return startPhase.getName() + " -> " + endPhase.getName();
+        return startPhase.getName() + " -> ";
+    }
 }

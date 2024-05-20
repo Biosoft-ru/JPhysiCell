@@ -12,4 +12,11 @@ public class UpOrientation extends set_orientation
         pCell.state.orientation[1] = 0.0;
         pCell.state.orientation[2] = 1.0;
     }
+
+
+    @Override
+    public String getName()
+    {
+        return "Up orientation";
+    }
 }

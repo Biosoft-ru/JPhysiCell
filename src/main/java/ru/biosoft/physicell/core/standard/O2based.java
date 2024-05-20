@@ -124,4 +124,10 @@ public class O2based extends UpdatePhenotype
     {
         return "Default O2-based phenotype: cell division and necrosis are based on oxygen density";
     }
+
+    @Override
+    public String getName()
+    {
+        return "Default O2-based phenotype";
+    }
 }

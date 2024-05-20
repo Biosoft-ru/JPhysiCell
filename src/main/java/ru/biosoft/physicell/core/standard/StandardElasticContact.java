@@ -32,4 +32,10 @@ public class StandardElasticContact extends Contact
         // axpy( &(pC1.velocity) , p1.mechanics.attachment_elastic_constant , displacement ); 
         VectorUtil.axpy( pC1.velocity, effective_attachment_elastic_constant, displacement );
     }
+
+    @Override
+    public String getName()
+    {
+        return "Standard Elastic Contact";
+    }
 }

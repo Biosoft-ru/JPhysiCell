@@ -95,12 +95,46 @@ public class StandardModels
 
     public static CellDefinition defaults;// = new CycleModel();
 
-    static DeathParameters apoptosis_parameters = new DeathParameters();
-    static DeathParameters necrosis_parameters = new DeathParameters();
+    public static DeathParameters apoptosis_parameters = new DeathParameters();
+    public static DeathParameters necrosis_parameters = new DeathParameters();
 
     // new cycle models:
     public static CycleModel flow_cytometry_cycle_model = new CycleModel();
     public static CycleModel flow_cytometry_separated_cycle_model = new CycleModel();
+
+    public static CycleModel[] getBasicModels() throws Exception
+    {
+        if( !PhysiCell_standard_cycle_models_initialized )
+            create_standard_cell_cycle_models();
+        return new CycleModel[] {live, Ki67_basic, Ki67_advanced, flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model};
+    }
+
+    public static CycleModel[] getBasicDeathModels() throws Exception
+    {
+        if( !PhysiCell_standard_death_models_initialized )
+            create_standard_cell_death_models();
+        return new CycleModel[] {apoptosis, necrosis};
+    }
+
+    public static DeathParameters getBasicParameters(String name) throws Exception
+    {
+        if( !PhysiCell_standard_death_models_initialized )
+            create_standard_cell_death_models();
+        if( name.equals( apoptosis.name ) )
+            return apoptosis_parameters;
+        else if( name.equals( necrosis.name ) )
+            return necrosis_parameters;
+        return null;
+    }
+
+    public static double getBasicRate(String name) throws Exception
+    {
+        if( !PhysiCell_standard_death_models_initialized )
+            create_standard_cell_death_models();
+        if( name.equals( apoptosis.name ) )
+            return 5.31667e-05;
+        return 0;
+    }
 
     public static CellDefinition createFromDefault(String name, int type, Microenvironment m) throws Exception
     {
@@ -419,7 +453,7 @@ public class StandardModels
         List<Cell> toDetach = new ArrayList<>();
         for( Cell pTest : pCell.state.springAttachments )
         {
-            if( PhysiCellUtilities.checkRandom( detachment_probability) )
+            if( PhysiCellUtilities.checkRandom( detachment_probability ) )
             {
                 toDetach.add( pTest );
 
@@ -455,7 +489,7 @@ public class StandardModels
                 // std::string search_string = "adhesive affinity to " + pTest.type_name; 
                 // double affinity = get_single_behavior( pCell , search_string );
                 double affinity = phenotype.mechanics.cell_adhesion_affinity( pTest.typeName );
-                if( PhysiCellUtilities.checkRandom( attachment_probability * affinity) )
+                if( PhysiCellUtilities.checkRandom( attachment_probability * affinity ) )
                 {
                     // attempt the attachment. testing for prior connection is already automated 
                     Cell.attachCellsAsSpring( pCell, pTest );
@@ -599,7 +633,7 @@ public class StandardModels
                 // live phagocytosis
                 // assume you can only phagocytose one at a time for now 
                 probability = phenotype.cellInteractions.getLivePhagocytosisRate( type ) * dt; // s[type] * dt;  
-                if( !phagocytosed && PhysiCellUtilities.checkRandom( probability )  )
+                if( !phagocytosed && PhysiCellUtilities.checkRandom( probability ) )
                 {
                     pCell.ingestCell( pTarget );
                     phagocytosed = true;
@@ -612,7 +646,7 @@ public class StandardModels
                 double immunogenicity_ji = pTarget.phenotype.cellInteractions.getImmunogenicity( type );
 
                 probability = attack_ij * immunogenicity_ji * dt;
-                if(  !attacked && PhysiCellUtilities.checkRandom( probability ) )
+                if( !attacked && PhysiCellUtilities.checkRandom( probability ) )
                 {
                     pCell.attackCell( pTarget, dt );
                     attacked = true;
@@ -620,7 +654,7 @@ public class StandardModels
 
                 // fusion assume you can only fuse once cell at a time 
                 probability = phenotype.cellInteractions.getFusionRate( type ) * dt; // s[type] * dt;  
-                if( !fused && PhysiCellUtilities.checkRandom( probability )  )
+                if( !fused && PhysiCellUtilities.checkRandom( probability ) )
                 {
                     pCell.fuseCell( pTarget );
                     fused = true;
@@ -631,7 +665,7 @@ public class StandardModels
 
     public static void standard_cell_transformations(Cell pCell, Phenotype phenotype, double dt)
     {
-        if( phenotype.death.dead  )
+        if( phenotype.death.dead )
         {
             return;
         }

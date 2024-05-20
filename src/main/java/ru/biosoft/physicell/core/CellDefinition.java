@@ -9,6 +9,7 @@ import java.util.Set;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.CustomCellData.Variable;
 import ru.biosoft.physicell.core.CustomCellData.VectorVariable;
+import ru.biosoft.physicell.core.standard.StandardModels;
 
 /*
 ###############################################################################
@@ -115,6 +116,7 @@ public class CellDefinition
         cellDefinitionNames.clear();
         cellDefinitionTypes.clear();
         typeToIndex.clear();
+        StandardModels.defaults = null;
         sync();
     }
 
@@ -201,6 +203,19 @@ public class CellDefinition
         result.phenotype = phenotype.clone();
         result.functions = functions.clone();
         result.phenotype.sync( m );
+        return result;
+    }
+
+    public CellDefinition clone(String name, int type)
+    {
+        CellDefinition result = new CellDefinition( );
+        result.name = name;
+        result.type = type;
+        result.isMovable = this.isMovable;
+        result.parameters = parameters.clone();
+        result.custom_data = custom_data.clone();
+        result.phenotype = phenotype.clone();
+        result.functions = functions.clone();
         return result;
     }
 

@@ -169,4 +169,11 @@ public class DomainEdgeDistance extends DistanceCalculator
         //            pCell.displacement = new double[] {0, 0, 0};
         //            return 9e99;
     }
+
+
+    @Override
+    public String getName()
+    {
+        return "Domain edge distance";
+    }
 }

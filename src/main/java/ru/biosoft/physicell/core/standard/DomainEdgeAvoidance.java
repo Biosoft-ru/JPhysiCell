@@ -32,4 +32,11 @@ public class DomainEdgeAvoidance extends MembraneInteractions
 
         VectorUtil.axpy( ( pCell.velocity ), temp_r, pCell.displacement );
     }
+
+
+    @Override
+    public String getName()
+    {
+        return "Avoid domain edge";
+    }
 }

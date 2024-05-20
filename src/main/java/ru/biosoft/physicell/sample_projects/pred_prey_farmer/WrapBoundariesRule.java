@@ -92,4 +92,10 @@ public class WrapBoundariesRule extends CustomCellRule
             pCell.assignPosition( p );
         }
     }
+
+    @Override
+    public String display()
+    {
+        return "Wrap microenvironment boundaries";
+    }
 }

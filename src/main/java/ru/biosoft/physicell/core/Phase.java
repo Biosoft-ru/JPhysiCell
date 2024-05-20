@@ -86,6 +86,11 @@ public class Phase
         entryFunction = null;
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
     @Override
     public String toString()
     {

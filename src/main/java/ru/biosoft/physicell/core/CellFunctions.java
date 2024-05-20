@@ -128,6 +128,11 @@ public class CellFunctions
         {
             return getClass().getSimpleName();
         }
+
+        public String getName()
+        {
+            return display();
+        }
     }
 
     public static abstract class OneCellFunction extends Function
