@@ -61,12 +61,7 @@ public class Tutorial1
     private static double outputInterval = 0.1; // time delta between images
     private static boolean outputTables = false;
 
-    static Visualizer visualizer = new Visualizer( resultPath, "Z5003", Section.Z, zSlice );
-    static
-    {
-        visualizer.setSaveImage( false );
-        visualizer.setSaveGIF( true );
-    }
+    static Visualizer visualizer = Visualizer.createWithGIF( resultPath, "Z5003", Section.Z, zSlice );
 
     public static void main(String ... args) throws Exception
     {

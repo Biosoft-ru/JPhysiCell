@@ -109,27 +109,24 @@ public class TestMechanics2
 
     static
     {
-        Visualizer visualizer = new Visualizer( resultPath, "Z500", Section.Z, zSlice );
+        Visualizer visualizer = Visualizer.createWithGIF( resultPath, "Z500", Section.Z, zSlice );
         visualizer.setDrawDensity( false );
-        visualizer.setSaveImage( false );
         visualizer.setColorPhase( "Ki67-", Color.lightGray );
         visualizer.setColorPhase( "Ki67+ (premitotic)", Color.green );
         visualizer.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
         visualizer.setColorPhase( "Apoptotic", Color.red );
         resultListeners.add( visualizer );
 
-        Visualizer visualizer2 = new Visualizer( resultPath, "Z590", Section.Z, zSlice - 10 );
+        Visualizer visualizer2 = Visualizer.createWithGIF( resultPath, "Z590", Section.Z, zSlice - 10 );
         visualizer2.setDrawDensity( false );
-        visualizer2.setSaveImage( false );
         visualizer2.setColorPhase( "Ki67-", Color.gray );
         visualizer2.setColorPhase( "Ki67+ (premitotic)", Color.green );
         visualizer2.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
         visualizer2.setColorPhase( "Apoptotic", Color.red );
         resultListeners.add( visualizer2 );
 
-        Visualizer visualizer3 = new Visualizer( resultPath, "Y500", Section.Y, zSlice );
+        Visualizer visualizer3 = Visualizer.createWithGIF( resultPath, "Y500", Section.Y, zSlice );
         visualizer3.setDrawDensity( false );
-        visualizer3.setSaveImage( false );
         visualizer3.setColorPhase( "Ki67-", Color.gray );
         visualizer3.setColorPhase( "Ki67+ (premitotic)", Color.green );
         visualizer3.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );

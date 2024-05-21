@@ -97,7 +97,7 @@ public class TestHDS
 
     private static void addListener(String name, Section sec, int slice)
     {
-        Visualizer visualizer3 = new Visualizer( resultPath, name, sec, slice );
+        Visualizer visualizer3 = Visualizer.createWithGIF( resultPath, name, sec, slice );
         visualizer3.setSaveImage( false );
         //        visualizer3.setDrawDensity( false );
         visualizer3.setMaxDensity( o2_conc * 2 );

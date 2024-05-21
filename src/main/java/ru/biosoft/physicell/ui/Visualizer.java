@@ -6,15 +6,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriter;
-import javax.imageio.metadata.IIOInvalidTreeException;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.metadata.IIOMetadataNode;
-import javax.imageio.stream.ImageOutputStream;
 
 import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.Microenvironment;
@@ -29,12 +24,11 @@ public class Visualizer
     private boolean drawGrid = false;
     private boolean drawDensity = true;
     private boolean saveImage = true;
-    private boolean saveGIF = true;
+
+    private List<ResultGenerator> resultGenerators = new ArrayList<ResultGenerator>();
 
     private double maxDensity = 1E-13;//6.06;
 
-    private ImageWriter writer = null;
-    private ImageOutputStream ios = null;
     private Section sec;
     private double slice;
     private String folder;
@@ -44,7 +38,11 @@ public class Visualizer
     private int yShift = 0;
     private int zShift = 0;
     private int substrateIndex = 0;
-    private File fileGIF;
+
+    public enum Section
+    {
+        X, Y, Z
+    }
 
     public String getName()
     {
@@ -62,7 +60,6 @@ public class Visualizer
         return this;
     }
 
-
     public Visualizer(String folder, String name, Section sec, double slice)
     {
         this.folder = folder;
@@ -70,6 +67,14 @@ public class Visualizer
         this.sec = sec;
         this.slice = slice;
         setDefaultScheme();
+    }
+
+    public static Visualizer createWithGIF(String folder, String name, Section sec, double slice)
+    {
+        Visualizer result = new Visualizer( folder, name, sec, slice );
+        result.setSaveImage( false );
+        result.addResultGenerator( new GIFGenerator( folder, name + ".gif" ) );
+        return result;
     }
 
     public void setAgentVisualizer(AgentVisualizer agentVisualizer)
@@ -87,81 +92,20 @@ public class Visualizer
         setColorPhase( "Necrotic (lysed)", Color.pink );
     }
 
-    public void setFileGIF(File f)
+    public void addResultGenerator(ResultGenerator generator)
     {
-        this.fileGIF = f;
-    }
-
-    public File getFileGIF()
-    {
-        return fileGIF;
+        resultGenerators.add( generator );
     }
 
     public void init() throws IOException
     {
-        if( saveImage || saveGIF )
+        if( saveImage )
         {
-            if( fileGIF == null )
-                fileGIF = new File( folder + "/" + name + ".gif" );
-            writer = ImageIO.getImageWritersByFormatName( "GIF" ).next();
-            ios = ImageIO.createImageOutputStream( fileGIF );
-            //            ios = ImageIO.createImageOutputStream( new File( folder + "/" + name + ".gif" ) );
-            if( saveImage )
-            {
-                File images = new File( folder + "/" + name );
-                images.mkdir();
-            }
-
-
-            ImageTypeSpecifier imageTypeSpecifier = ImageTypeSpecifier.createFromBufferedImageType( BufferedImage.TYPE_INT_ARGB );
-            metadata = writer.getDefaultImageMetadata( imageTypeSpecifier, writer.getDefaultWriteParam() );
-            configureRootMetadata( 100, true );
-
-            writer.setOutput( ios );
-            writer.prepareWriteSequence( null );
+            File images = new File( folder + "/" + name );
+            images.mkdir();
         }
-    }
-    protected IIOMetadata metadata;
-
-    private void configureRootMetadata(int delay, boolean loop) throws IIOInvalidTreeException
-    {
-        String metaFormatName = metadata.getNativeMetadataFormatName();
-        IIOMetadataNode root = (IIOMetadataNode)metadata.getAsTree( metaFormatName );
-
-        IIOMetadataNode graphicsControlExtensionNode = getNode( root, "GraphicControlExtension" );
-        graphicsControlExtensionNode.setAttribute( "disposalMethod", "none" );
-        graphicsControlExtensionNode.setAttribute( "userInputFlag", "FALSE" );
-        graphicsControlExtensionNode.setAttribute( "transparentColorFlag", "FALSE" );
-        graphicsControlExtensionNode.setAttribute( "delayTime", Integer.toString( delay / 10 ) );
-        graphicsControlExtensionNode.setAttribute( "transparentColorIndex", "0" );
-
-        IIOMetadataNode commentsNode = getNode( root, "CommentExtensions" );
-        commentsNode.setAttribute( "CommentExtension", "Created by BioUML" );
-
-        IIOMetadataNode appExtensionsNode = getNode( root, "ApplicationExtensions" );
-        IIOMetadataNode child = new IIOMetadataNode( "ApplicationExtension" );
-        child.setAttribute( "applicationID", "NETSCAPE" );
-        child.setAttribute( "authenticationCode", "2.0" );
-
-        int loopContinuously = loop ? 0 : 1;
-        child.setUserObject( new byte[] {0x1, (byte) ( loopContinuously & 0xFF ), (byte) ( ( loopContinuously >> 8 ) & 0xFF )} );
-        appExtensionsNode.appendChild( child );
-        metadata.setFromTree( metaFormatName, root );
-    }
-
-    private static IIOMetadataNode getNode(IIOMetadataNode rootNode, String nodeName)
-    {
-        int nNodes = rootNode.getLength();
-        for( int i = 0; i < nNodes; i++ )
-        {
-            if( rootNode.item( i ).getNodeName().equalsIgnoreCase( nodeName ) )
-            {
-                return (IIOMetadataNode)rootNode.item( i );
-            }
-        }
-        IIOMetadataNode node = new IIOMetadataNode( nodeName );
-        rootNode.appendChild( node );
-        return ( node );
+        for( ResultGenerator generator : this.resultGenerators )
+            generator.init();
     }
 
     public void saveResult(Microenvironment m, double t) throws IOException
@@ -169,13 +113,19 @@ public class Visualizer
         BufferedImage image = draw( m, sec, slice, (int)t );
         if( saveImage )
             ImageIO.write( image, "PNG", new File( folder + "/" + name + "/Figure_" + (int)t + ".png" ) );
-        if( saveGIF )
-            writer.writeToSequence( new IIOImage( image, null, metadata ), writer.getDefaultWriteParam() );
+        update( image );
     }
 
-    public void updateGIF(BufferedImage image) throws IOException
+    public void update(BufferedImage image) throws IOException
     {
-        writer.writeToSequence( new IIOImage( image, null, metadata ), writer.getDefaultWriteParam() );
+        for( ResultGenerator generator : this.resultGenerators )
+            generator.update( image );
+    }
+
+    public void finish() throws IOException
+    {
+        for( ResultGenerator generator : this.resultGenerators )
+            generator.finish();
     }
 
     public BufferedImage getImage(Microenvironment m, double t) throws Exception
@@ -183,21 +133,6 @@ public class Visualizer
         return draw( m, sec, slice, (int)t );
     }
 
-    public void finish() throws IOException
-    {
-        writer.endWriteSequence();
-        writer.reset();
-        writer.dispose();
-        ios.flush();
-        ios.close();
-    }
-
-
-
-    public enum Section
-    {
-        X, Y, Z
-    }
 
     public BufferedImage draw(Microenvironment m, double slice, double time, String fileName) throws IOException
     {
@@ -252,21 +187,6 @@ public class Visualizer
         if( fileName != null )
             ImageIO.write( img, "PNG", new File( fileName ) );
         return img;
-    }
-
-    private void drawCoords(Microenvironment m, Section sec, Graphics g)
-    {
-        double[] c1 = null;
-        double[] c2 = null;
-
-        for( int i = 0; i < c1.length; i++ )
-        {
-
-        }
-        for( int j = 0; j < c2.length; j++ )
-        {
-
-        }
     }
 
     private void drawText(Microenvironment m, Section sec, double time, int x, Graphics g)
@@ -422,20 +342,6 @@ public class Visualizer
         }
     }
 
-    private void drawDensity(int xNumber, int yNumber, int xSize, int ySize, double[][] p, int zCoord, Graphics g)
-    {
-        for( int i = 0; i < xNumber; i++ )
-        {
-            for( int j = 0; j < yNumber; j++ )
-            {
-                int offset = zCoord * xNumber * yNumber;
-                int red = (int) ( ( maxDensity - p[offset + i + xNumber * j][0] ) * 255 );
-                g.setColor( new Color( 255, red, red ) );
-                g.fillRect( i * xSize, j * ySize, xSize, ySize );
-            }
-        }
-    }
-
     private void drawGrid(int xNumber, int yNumber, int xSize, int ySize, Graphics g)
     {
         for( int i = 0; i < xNumber; i++ )
@@ -471,11 +377,6 @@ public class Visualizer
     public void setSaveImage(boolean saveImage)
     {
         this.saveImage = saveImage;
-    }
-
-    public void setSaveGIF(boolean saveGIF)
-    {
-        this.saveGIF = saveGIF;
     }
 
     public void setColorType(Integer cellType, Color color)

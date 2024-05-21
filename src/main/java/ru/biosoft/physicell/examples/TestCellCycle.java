@@ -93,10 +93,9 @@ public class TestCellCycle
     private static String resultName = "CellCycle4";
     private static int zSlice = 100;
     //visualizer settings
-    private static Visualizer visualizer = new Visualizer( resultPath, resultName, Section.Z, zSlice );
+    private static Visualizer visualizer = Visualizer.createWithGIF( resultPath, resultName, Section.Z, zSlice );
     static
     {
-        visualizer.setSaveImage( false );
         visualizer.setDrawDensity( false );
         visualizer.setColorPhase( "Ki67-", Color.gray );
         visualizer.setColorPhase( "Ki67+ (premitotic)", Color.blue );

@@ -80,9 +80,9 @@ public class Model
 
     public Visualizer addVisualizer(int zSlice, String name)
     {
-        Visualizer visualizer = new Visualizer( resultFolder, name, Section.Z, zSlice );
+        Visualizer visualizer = Visualizer.createWithGIF( resultFolder, name, Section.Z, zSlice );
         //        visualizer.setDrawDensity( false );
-        visualizer.setSaveImage( false );
+        //        visualizer.setSaveImage( false );
         //        visualizer.setColorPhase( "Ki67-", Color.lightGray );
         //        visualizer.setColorPhase( "Ki67+ (premitotic)", Color.green );
         //        visualizer.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );

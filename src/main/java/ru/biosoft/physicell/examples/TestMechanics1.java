@@ -89,10 +89,9 @@ public class TestMechanics1
     private static double[] point2 = new double[] {105.73, 100, 100};
     private static double volume = 4188.790204786391;
 
-    private static Visualizer visualizer = new Visualizer( resultPath, resultName, Section.Z, 100 );
+    private static Visualizer visualizer = Visualizer.createWithGIF( resultPath, resultName, Section.Z, 100 );
     static
     {
-        visualizer.setSaveImage( false );
         visualizer.setDrawDensity( false );
     }
 
