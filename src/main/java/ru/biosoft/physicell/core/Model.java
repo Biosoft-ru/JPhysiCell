@@ -77,16 +77,15 @@ public class Model
         this.hasEvents = true;
     }
 
+    public Visualizer addVisualizer(Visualizer visualizer)
+    {
+        this.visualizers.add( visualizer );
+        return visualizer;
+    }
 
-    public Visualizer addVisualizer(int zSlice, String name)
+    public Visualizer addGIFVisualizer(int zSlice, String name)
     {
         Visualizer visualizer = Visualizer.createWithGIF( resultFolder, name, Section.Z, zSlice );
-        //        visualizer.setDrawDensity( false );
-        //        visualizer.setSaveImage( false );
-        //        visualizer.setColorPhase( "Ki67-", Color.lightGray );
-        //        visualizer.setColorPhase( "Ki67+ (premitotic)", Color.green );
-        //        visualizer.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
-        //        visualizer.setColorPhase( "Apoptotic", Color.red );
         this.visualizers.add( visualizer );
         return visualizer;
     }
@@ -155,7 +154,7 @@ public class Model
 
     public void init() throws Exception
     {
-        init(true);
+        init( true );
     }
 
     public static void deleteDirectory(File directoryToBeDeleted)
@@ -176,9 +175,11 @@ public class Model
         while( curTime < tMax + 0.1 * diffusion_dt )
         {
             boolean eventsFired = executeEvents( curTime );
-            if( saveFull && ( Math.abs( curTime - saveFullNext ) < 0.01 * diffusion_dt || eventsFired ) )
+            if( ( Math.abs( curTime - saveFullNext ) < 0.01 * diffusion_dt || eventsFired ) )
             {
-                saveFull();
+                if( saveFull )
+                    saveFull();
+                System.out.println( getLogInfo() );
                 saveFullNext += saveFullInterval;
             }
             if( saveImg && ( Math.abs( curTime - saveImgNext ) < 0.01 * diffusion_dt || eventsFired ) )
@@ -186,11 +187,14 @@ public class Model
                 saveImg();
                 saveImgNext += saveImgInterval;
             }
+
             doStep();
         }
 
         for( Visualizer listener : visualizers )
             listener.finish();
+
+
     }
 
     public double getCurrentTime()
