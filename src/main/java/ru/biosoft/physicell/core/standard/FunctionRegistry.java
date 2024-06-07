@@ -1,8 +1,12 @@
 package ru.biosoft.physicell.core.standard;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import ru.biosoft.physicell.core.CellFunctions.Contact;
 import ru.biosoft.physicell.core.CellFunctions.CustomCellRule;
 import ru.biosoft.physicell.core.CellFunctions.DistanceCalculator;
+import ru.biosoft.physicell.core.CellFunctions.Function;
 import ru.biosoft.physicell.core.CellFunctions.MembraneInteractions;
 import ru.biosoft.physicell.core.CellFunctions.UpdateMigrationBias;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
@@ -15,6 +19,32 @@ import ru.biosoft.physicell.sample_projects.pred_prey_farmer.WrapBoundariesRule;
 
 public class FunctionRegistry
 {
+    private static Map<String, Function> mapping;
+    private static boolean isInit = false;
+
+    public static Function getFunction(String name)
+    {
+        if( !isInit )
+            initMapping();
+        return mapping.get( name );
+    }
+
+    public static void initMapping()
+    {
+        mapping = new HashMap<>();
+        Function[] allFunctions = getAllFunctions();
+        for( Function f : allFunctions )
+            mapping.put( f.getName(), f );
+        isInit = true;
+    }
+
+    public static Function[] getAllFunctions()
+    {
+        return new Function[] {new StandardVolumeUpdate(), new O2based(), new AvoidBoundariesRule(), new WrapBoundariesRule(),
+                new StandardUpdateVelocity(), new StandardElasticContact(), new StandardElasticContact(), new UpOrientation(),
+                new DomainEdgeAvoidance(), new DomainEdgeDistance()};
+    }
+
     public static VolumeUpdate[] getVolumeFunctions()
     {
         return new VolumeUpdate[] {new StandardVolumeUpdate()};
