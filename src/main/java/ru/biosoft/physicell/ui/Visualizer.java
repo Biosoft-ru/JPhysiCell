@@ -96,6 +96,15 @@ public class Visualizer
     {
         resultGenerators.add( generator );
     }
+    public void clearResultGenerators()
+    {
+        resultGenerators.clear();
+    }
+
+    public Iterable<ResultGenerator> getGenerators()
+    {
+        return resultGenerators;
+    }
 
     public void init() throws IOException
     {
