@@ -42,7 +42,8 @@ public class FunctionRegistry
     {
         return new Function[] {new StandardVolumeUpdate(), new O2based(), new AvoidBoundariesRule(), new WrapBoundariesRule(),
                 new StandardUpdateVelocity(), new StandardElasticContact(), new StandardElasticContact(), new UpOrientation(),
-                new DomainEdgeAvoidance(), new DomainEdgeDistance()};
+                new DomainEdgeAvoidance(), new DomainEdgeDistance(), new Chemotaxis(), new AdvancedChemotaxis(),
+                new AdvancedChemotaxisNormalized()};
     }
 
     public static VolumeUpdate[] getVolumeFunctions()
@@ -62,7 +63,7 @@ public class FunctionRegistry
 
     public static UpdateMigrationBias[] getUpdateMigrationFunctions()
     {
-        return new UpdateMigrationBias[] {};
+        return new UpdateMigrationBias[] {new Chemotaxis(), new AdvancedChemotaxis(), new AdvancedChemotaxisNormalized()};
     }
 
     public static UpdateVelocity[] getVelocityFunctions()
