@@ -87,6 +87,16 @@ public class PhaseLink
         exitFunction = null;
     }
 
+    public Phase getStartPhase()
+    {
+        return startPhase;
+    }
+
+    public Phase getEndPhase()
+    {
+        return endPhase;
+    }
+
     public void setFixedDuration(boolean fixed)
     {
         this.fixedDuration = fixed;
