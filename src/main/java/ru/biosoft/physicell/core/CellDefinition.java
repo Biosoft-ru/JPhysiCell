@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.core.CustomCellData.Variable;
 import ru.biosoft.physicell.core.CustomCellData.VectorVariable;
 import ru.biosoft.physicell.core.standard.StandardModels;
 

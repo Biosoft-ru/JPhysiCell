@@ -5,7 +5,6 @@ import java.util.Map;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
-import ru.biosoft.physicell.core.CustomCellData.Variable;
 
 public class SignalBehavior
 {

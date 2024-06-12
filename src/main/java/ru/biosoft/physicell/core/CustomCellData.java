@@ -190,42 +190,6 @@ public class CustomCellData
         return sb.toString();
     }
 
-    public static class Variable implements Cloneable
-    {
-        String name;
-        public double value;
-        String units;
-        boolean conserved_quantity;
-
-        public Variable()
-        {
-            name = "unnamed";
-            units = "dimensionless";
-            value = 0.0;
-            conserved_quantity = false;
-            return;
-        }
-
-        @Override
-        public String toString()
-        {
-            return name + ": " + value + " " + units;
-        }
-
-        @Override
-        public Variable clone()
-        {
-            try
-            {
-                return (Variable)super.clone();
-            }
-            catch( CloneNotSupportedException ex )
-            {
-                return null;
-            }
-        }
-    }
-
     public class VectorVariable implements Cloneable
     {
         String name;
