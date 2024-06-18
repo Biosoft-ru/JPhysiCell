@@ -218,44 +218,18 @@ public class Cell extends BasicAgent
     @Override
     public void updatePosition(double dt)
     {
-        // BioFVM Basic_Agent::update_position(dt) returns without doing anything. 
-        // So we remove this to avoid any future surprises. 
-        // 
-        // Basic_Agent::update_position(dt);
-
-        // use Adams-Bashforth 
-        double d1 = 1.5 * dt;
-        double d2 = -0.5 * dt;
-        //        boolean constants_defined = false; 
-        //        if( constants_defined == false )
-        //        {
-        //            d1 = dt; 
-        //            d1 *= 1.5; 
-        //            d2 = dt; 
-        //            d2 *= -0.5; 
-        //            constants_defined = true; 
-        //        }
-
-        // new AUgust 2017
-        //        if( MicroenvironmentOptions.default_microenvironment_options.simulate_2D == true )
         if( m.options.simulate2D )
-        {
             velocity[2] = 0.0;
-        }
-
-        //        std::vector<double> old_position(position);
-
-        VectorUtil.axpy( position, d1, velocity );
-        VectorUtil.axpy( position, d2, prevVelocity );
+        // use Adams-Bashforth 
+        VectorUtil.axpy( position, 1.5 * dt, velocity );
+        VectorUtil.axpy( position, -0.5 * dt, prevVelocity );
         // overwrite previous_velocity for future use 
         // if(sqrt(dist(old_position, position))>3* phenotype.geometry.radius)
         // std::cout<<sqrt(dist(old_position, position))<<"old_position: "<<old_position<<", new position: "<< position<<", velocity: "<<velocity<<", previous_velocity: "<< previous_velocity<<std::endl;
 
         prevVelocity = velocity.clone();
+        VectorUtil.zero( velocity );
 
-        velocity[0] = 0;
-        velocity[1] = 0;
-        velocity[2] = 0;
         if( get_container().mesh.isPositionValid( position[0], position[1], position[2] ) )
         {
             updated_current_mechanics_voxel_index = get_container().mesh.nearestVoxelIndex( position );
@@ -263,7 +237,6 @@ public class Cell extends BasicAgent
         else
         {
             updated_current_mechanics_voxel_index = -1;
-
             isOutOfDomain = true;
             isActive = false;
             isMovable = false;
