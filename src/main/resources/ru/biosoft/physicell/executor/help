@@ -1,0 +1,15 @@
+This is a JPhysiCell - ported to java version of the PhysiCell platform
+To run a project              : java -jar [JAR_FILE] -r PROJECT_NAME
+To run a project with options : java -jar [JAR_FILE] -r PROJECT_NAME [-OPTIONS]
+To list available projects    : java -jar [JAR_FILE] -projects
+To see this help              : java -jar [JAR_FILE] -help
+All options:
+        -r --run            Specifies project to run
+		-o --output-dir     specifies output folder.
+		-s --seed           seed for random number generator.
+		-q --quiet          do not log on each step.
+		-p --parallel       update cells in parallel.
+		-d --diff-parallel  simulate diffusion in parallel.
+		-x -experimental    update cells in experimental regime.
+One letter arguments may be joined: -qpd = -q -p -d
+Example: java -jar physicell-1.0-SNAPSHOT.jar --seed 10 -qp --output-dir C:/out

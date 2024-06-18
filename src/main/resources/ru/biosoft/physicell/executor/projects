@@ -1,0 +1,11 @@
+biorobots	ru.biosoft.physicell.sample_projects.biorobots.Biorobots
+pred_prey_farmer	ru.biosoft.physicell.sample_projects.pred_prey_farmer.PredPreyFarmer
+cancer_biorobots	ru.biosoft.physicell.sample_projects.cancer_biorobots.CancerBiorobots
+cancer_immune	ru.biosoft.physicell.sample_projects.cancer_immune.CancerImmune
+celltype3	ru.biosoft.physicell.sample_projects.celltype3.Celltype3
+heterogeneity	ru.biosoft.physicell.sample_projects.heterogeneity.Heterogeneity
+interactions	ru.biosoft.physicell.sample_projects.interactions.Interactions
+mechano	ru.biosoft.physicell.sample_projects.mechano.Mechano
+rules_sample	ru.biosoft.physicell.sample_projects.rules_sample.RulesSample
+virus_macrophage	ru.biosoft.physicell.sample_projects.virus_macrophage.VirusMacrophage
+worm	ru.biosoft.physicell.sample_projects.worm.Worm
