@@ -2,7 +2,6 @@ package ru.biosoft.physicell.xml;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -538,7 +537,6 @@ public class ModelReader extends ModelReaderSupport
             // if we found something to inherit from, then do it! 
             if( parent != null )
             {
-                System.out.println( "\tCopying from type " + parent.name + " ... " );
                 CellDefinition.copy( parent, cd );
                 p = cd.phenotype;
             }
