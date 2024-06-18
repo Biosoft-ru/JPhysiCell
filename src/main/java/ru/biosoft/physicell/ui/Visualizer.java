@@ -398,8 +398,9 @@ public class Visualizer
         agentVisualizer.addPhaseColor( phase, color );
     }
 
-    public void setMaxDensity(double density)
+    public Visualizer setMaxDensity(double density)
     {
         this.maxDensity = density;
+        return this;
     }
 }
