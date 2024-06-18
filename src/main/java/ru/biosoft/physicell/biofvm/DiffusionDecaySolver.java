@@ -1,10 +1,7 @@
 package ru.biosoft.physicell.biofvm;
 
-public class DiffusionDecaySolver
+public abstract class DiffusionDecaySolver
 {
-
-    public void solve(Microenvironment m, double dt) throws Exception
-    {
-
-    }
+    public abstract String getName();
+    public abstract void solve(Microenvironment m, double dt) throws Exception;
 }
