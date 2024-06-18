@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Created-By: Apache Maven 3.6.3
+Built-By: Damag
+Build-Jdk: 21.0.1
+Bundle-ManifestVersion: 2
+Bundle-Localization: plugin
+Bundle-Name: %pluginName
+Bundle-SymbolicName: ru.biosoft.physicell;singleton:=true
+Bundle-Version: 0.9.10
+Bundle-Vendor: %providerName
+Main-Class: ru.biosoft.physicell.executor.Executor
+Export-Package: ru.biosoft.physicell, ru.biosoft.physicell.core, ru.biosoft.physicell.biofvm, ru.biosoft.physicell.ui, ru.biosoft.physicell.core.standard
