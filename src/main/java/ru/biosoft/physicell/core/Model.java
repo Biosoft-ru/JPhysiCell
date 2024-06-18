@@ -33,6 +33,7 @@ public class Model
     private boolean hasEvents = false;
     private List<Event> events = new ArrayList<>();
 
+    private boolean verbose = true;
     private boolean saveFull = true;
     private double saveFullInterval;
     private double saveFullNext = 0;
@@ -117,6 +118,12 @@ public class Model
         container.setRulesEnabled( this.rulesEnabled );
     }
 
+    public void createContainer(double voxelSize, String name) throws Exception
+    {
+        CellContainer container = CellContainer.createCellContainer( m, name, voxelSize );
+        container.setRulesEnabled( this.rulesEnabled );
+    }
+
     public void setWriteDensity(boolean writeDensity)
     {
         this.saveDensity = writeDensity;
@@ -125,6 +132,8 @@ public class Model
 
     public void initFiles() throws Exception
     {
+        if( resultFolder == null )
+            return;
         File f = new File( resultFolder );
         if( f.exists() )
             deleteDirectory( f );
@@ -179,6 +188,7 @@ public class Model
             {
                 if( saveFull )
                     saveFull();
+                if( verbose )
                 System.out.println( getLogInfo() );
                 saveFullNext += saveFullInterval;
             }
@@ -193,18 +203,19 @@ public class Model
 
         for( Visualizer listener : visualizers )
             listener.finish();
-
-
     }
 
     public double getCurrentTime()
     {
         return curTime;
     }
-
+    public static double tDiffusion = 0;
     public void doStep() throws Exception
     {
+        double tDiff = System.nanoTime();
         m.simulateDiffusionDecay( diffusion_dt );
+        tDiff = System.nanoTime() - tDiff;
+        tDiffusion += tDiff;
         ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
         if( curTime >= next_intracellular_update )
         {
@@ -397,6 +408,8 @@ public class Model
         sb.append( "\n\tMaximum Time: " + tMax );
         sb.append( "\tSave interval " + saveFullInterval );
         sb.append( "\tSeed " + PhysiCellUtilities.getSeed() );
+        sb.append( "\tCell update: " + ( (CellContainer)m.agentContainer ).getName() );
+        sb.append( "\tDiffusion: " + m.getSolver().getName() );
         sb.append( "\n\n" + getMicroenvironment().display() );
         sb.append( "\n" );
         sb.append( "\nCell Types: ( " + CellDefinition.getDefinitionsCount() + " total)" );
@@ -460,5 +473,10 @@ public class Model
     {
         return PhysiCellUtilities.getCurrentTime() + "\tElapsed\t" + ( System.currentTimeMillis() - startTime ) / 1000 + "\tTime:\t"
                 + (int)Math.round( curTime ) + "\tCells\t" + m.getAgentsCount();
+    }
+
+    public void setVerbose(boolean verbose)
+    {
+        this.verbose = verbose;
     }
 }
