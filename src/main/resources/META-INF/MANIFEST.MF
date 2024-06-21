@@ -9,4 +9,4 @@ Bundle-SymbolicName: ru.biosoft.physicell;singleton:=true
 Bundle-Version: 0.9.10
 Bundle-Vendor: %providerName
 Main-Class: ru.biosoft.physicell.executor.Executor
-Export-Package: ru.biosoft.physicell, ru.biosoft.physicell.core, ru.biosoft.physicell.biofvm, ru.biosoft.physicell.ui, ru.biosoft.physicell.core.standard
+Export-Package: ru.biosoft.physicell, ru.biosoft.physicell.core, ru.biosoft.physicell.biofvm, ru.biosoft.physicell.ui, ru.biosoft.physicell.core.standard, ru.biosoft.physicell.xml
