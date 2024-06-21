@@ -2,7 +2,7 @@ biorobots	ru.biosoft.physicell.sample_projects.biorobots.Biorobots
 pred_prey_farmer	ru.biosoft.physicell.sample_projects.pred_prey_farmer.PredPreyFarmer
 cancer_biorobots	ru.biosoft.physicell.sample_projects.cancer_biorobots.CancerBiorobots
 cancer_immune	ru.biosoft.physicell.sample_projects.cancer_immune.CancerImmune
-celltype3	ru.biosoft.physicell.sample_projects.celltype3.Celltype3
+celltype3	ru.biosoft.physicell.sample_projects.celltypes3.Celltype3
 heterogeneity	ru.biosoft.physicell.sample_projects.heterogeneity.Heterogeneity
 interactions	ru.biosoft.physicell.sample_projects.interactions.Interactions
 mechano	ru.biosoft.physicell.sample_projects.mechano.Mechano
