@@ -3,8 +3,11 @@ package ru.biosoft.physicell.biofvm;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 /*
 #############################################################################
@@ -92,6 +95,11 @@ public class Microenvironment
     public void setSolver(DiffusionDecaySolver solver)
     {
         this.solver = solver;
+    }
+
+    public DiffusionDecaySolver getSolver()
+    {
+        return solver;
     }
 
     /*! For internal use and accelerations in solvers */
@@ -337,8 +345,14 @@ public class Microenvironment
             solver.solve( this, dt );
     }
 
-    public int[][] initIndices()
+    private List<Integer>[] dirichletIndices;
+
+    void initDirichlet()
     {
+        dirichletIndices = new List[densityNames.length];
+        for (int i=0; i< densityNames.length; i++)
+            dirichletIndices[i] = new ArrayList<>();
+
         for( int i = 0; i < mesh.voxels.length; i++ )
         {
             if( mesh.voxels[i].isDirichlet )
@@ -347,15 +361,24 @@ public class Microenvironment
                 {
                     if( dirichletActivations[i][j] )
                     {
-
+                        dirichletIndices[j].add( i );
                     }
                 }
             }
         }
-        return null;
     }
 
     void applyDirichletConditions()
+    {
+        for( int i = 0; i < dirichletIndices.length; i++ )
+            for( int j = 0; j < dirichletIndices[i].size(); j++ )
+            {
+                int k = dirichletIndices[i].get( j );
+                getDensity( k )[i] = dirichletValue[k][i];
+            }
+    }
+
+    void applyDirichletConditions2()
     {
         /*
         #pragma omp parallel for 
@@ -560,8 +583,9 @@ public class Microenvironment
         int zLength = mesh.z_coordinates.length;
         int numDens = numberDensities();
 
-        //        #pragma omp parallel for 
-        for( int k = 0; k < zLength; k++ )
+        IntStream.range( 0, zLength ).parallel().forEach( k ->
+        //                #pragma omp parallel for 
+        //        for( int k = 0; k < zLength; k++ )
         {
             for( int j = 0; j < yLength; j++ )
             {
@@ -589,9 +613,10 @@ public class Microenvironment
                 }
 
             }
-        }
+        } );
         //        #pragma omp parallel for 
-        for( int k = 0; k < zLength; k++ )
+        IntStream.range( 0, zLength ).parallel().forEach( k ->
+        //        for( int k = 0; k < zLength; k++ )
         {
             for( int i = 0; i < xLength; i++ )
             {
@@ -619,11 +644,12 @@ public class Microenvironment
                 }
 
             }
-        }
+        } );
         if( zLength == 1 ) // don't bother computing z component if there is no z-directoin 
             return;
         //        #pragma omp parallel for 
-        for( int j = 0; j < yLength; j++ )
+        IntStream.range( 0, yLength ).parallel().forEach( j ->
+        //        for( int j = 0; j < yLength; j++ )
         {
             for( int i = 0; i < xLength; i++ )
             {
@@ -653,7 +679,7 @@ public class Microenvironment
                 }
 
             }
-        }
+        } );
     }
 
     public double[] nearestDensity(double[] position)
@@ -986,7 +1012,7 @@ public class Microenvironment
         // {
         //  microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
         // }
-
+        m.initDirichlet();
         m.displayInformation();
     }
 
