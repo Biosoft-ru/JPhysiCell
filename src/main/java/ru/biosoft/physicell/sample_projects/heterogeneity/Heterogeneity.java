@@ -87,7 +87,7 @@ public class Heterogeneity extends Model
         SignalBehavior.setupDictionaries( getMicroenvironment() );
         createCellTypes();
         setupTissue();
-        printSummary( m, CUSTOM_ONCOPROTEIN );
+        //        printSummary( m, CUSTOM_ONCOPROTEIN );
         for( Visualizer visualizer : getVisualizers() )
             visualizer.setAgentVisualizer( new HeterogeneityVisualizer( this ) );
     }
