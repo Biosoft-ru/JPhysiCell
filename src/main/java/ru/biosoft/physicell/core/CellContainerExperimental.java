@@ -62,14 +62,20 @@ public class CellContainerExperimental extends CellContainer
             time_since_last_mechanics = mechanicsDT;
             timeSinceLastCycle = phenotypeDT;
         }
+        final double tslc = timeSinceLastCycle;
 
         if( Math.abs( timeSinceLastCycle - phenotypeDT ) < phenotypeDTtolerance )
         {
-            for( Cell cell : cells )
-            {
-                if( !cell.isOutOfDomain )
-                    cell.advanceBundledPhenotype( timeSinceLastCycle, rulesEnabled );
-            }
+            cells.parallelStream().filter( c -> !c.isOutOfDomain ).forEach( cell -> {
+                try
+                {
+                    cell.advanceBundledPhenotype( tslc, rulesEnabled );
+                }
+                catch( Exception ex )
+                {
+
+                }
+            } );
 
             for( Cell cell : cellsReadyToDivide )
                 cell.divide();

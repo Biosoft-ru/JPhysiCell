@@ -133,16 +133,20 @@ public class CellContainerParallel extends CellContainer
             // std::fill(max_cell_interactive_distance_in_voxel.begin(), max_cell_interactive_distance_in_voxel.end(), 0.0);
             if( !initialized )
                 timeSinceLastCycle = phenotypeDT;
-
+            final double tslc = timeSinceLastCycle;
             // new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
             // checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
-            //                #pragma omp parallel for 
             double tPhen = System.nanoTime();
-            for( Cell cell : cells )
-            {
-                if( !cell.isOutOfDomain )
-                    cell.advanceBundledPhenotype( timeSinceLastCycle, rulesEnabled );
-            }
+            cells.parallelStream().filter( c -> !c.isOutOfDomain ).forEach( cell -> {
+                try
+                {
+                    cell.advanceBundledPhenotype( tslc, rulesEnabled );
+                }
+                catch( Exception ex )
+                {
+
+                }
+            } );
             tPhen = System.nanoTime() - tPhen;
             tPhenotype += tPhen;
 
