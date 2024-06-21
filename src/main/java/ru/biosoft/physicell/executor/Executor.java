@@ -1,6 +1,8 @@
 package ru.biosoft.physicell.executor;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
@@ -15,8 +17,8 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Executor
 {
     private static String PROJECTS_FILE = "projects";
-    public static String PROJECTS_CMD = "-projects";
-    public static String HELP_CMD = "-help";
+    public static String PROJECTS_CMD = "--projects";
+    public static String HELP_CMD = "--help";
     public static String PATH_TO_SETTINGS = "config/PhysiCell_settings.xml";
     private static String HELP_FILE = "help";
     public static String help;
@@ -45,24 +47,30 @@ public class Executor
         String project = parameters.project;
         if( project == null )
         {
-            System.out.println( "Unknown command, please specify project. Use --help for more information." );
+            System.out.println( "Unknown command, please specify project. Use " + HELP_CMD + " for more information." );
             return;
         }
 
         if( !projects.keySet().contains( project ) )
         {
-            System.out.println( "Unknown project " + project + ". Use --projects to see available projects." );
+            System.out.println( "Unknown project " + project + ". Use " + PROJECTS_CMD + " to see available projects." );
             return;
         }
 
         if( projects.keySet().contains( project ) )
         {
-            System.out.println( PhysiCellUtilities.getCurrentTime() + "Running " + project + " project..." );
+            System.out.println( PhysiCellUtilities.getCurrentTime() + "Selected " + project + " project..." );
             String path = projects.get( project );
             try
             {
                 Class c = Class.forName( path );
-                InputStream stream = c.getResourceAsStream( PATH_TO_SETTINGS );
+                InputStream stream = null;
+                if( parameters.settingdPath != null )
+                {
+                    stream = new FileInputStream( new File( parameters.settingdPath ) );
+                }
+                else
+                    stream = c.getResourceAsStream( PATH_TO_SETTINGS );
                 Model model = new ModelReader().read( stream, c );
                 runProject( model, parameters );
             }
@@ -78,7 +86,7 @@ public class Executor
         try
         {
             double startTime = System.nanoTime();
-            PhysiCellUtilities.setSeed( params.seed );
+
             ( (ConstantCoefficientsLOD3D)model.getMicroenvironment().getSolver() ).setPrallel( params.parallelDiffusion );
             model.createContainer( 30, params.cellType );
 
@@ -100,14 +108,24 @@ public class Executor
             if( params.quiet )
                 model.setVerbose( false );
 
+            if( params.finalTime > 0 )
+                model.setTMax( params.finalTime );
+
             model.init();
-            double tStart = System.nanoTime();
-            model.simulate();
-            tStart = System.nanoTime() - tStart;
+            PhysiCellUtilities.setSeed( params.seed );
+            if( params.printInfo )
+            {
+                System.out.println( model.display() );
+            }
+            else
+            {
+                double tStart = System.nanoTime();
+                model.simulate();
+                tStart = System.nanoTime() - tStart;
 
-            System.out.println(
-                    PhysiCellUtilities.getCurrentTime() + "Completed, elapsed time: " + ( System.nanoTime() - startTime ) / 1E9 + " s." );
-
+                System.out.println( PhysiCellUtilities.getCurrentTime() + "Completed, elapsed time: "
+                        + ( System.nanoTime() - startTime ) / 1E9 + " s." );
+            }
             //            System.out.println( "Total " + tStart / 1E9 );
             //            System.out.println( "Diffusion " + Model.tDiffusion / 1E9 );
             //            System.out.println( "Secretion " + CellContainer.tSecretion / 1E9 );

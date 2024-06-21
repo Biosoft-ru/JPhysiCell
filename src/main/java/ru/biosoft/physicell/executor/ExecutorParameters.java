@@ -14,6 +14,10 @@ public class ExecutorParameters
     boolean trackTime = false;
     String project = null;
     long seed = (long) ( Math.random() * 1E12 );
+    String settingdPath;
+    int finalTime = -1;
+    boolean printInfo;
+    boolean simulate;
 
     public ExecutorParameters(String ... args)
     {
@@ -47,12 +51,26 @@ public class ExecutorParameters
             else if( arg.equals( "--run" ) || arg.equals( "-r" ) )
             {
                 project = args[++i];
+                simulate = true;
+            }
+            else if( arg.equals( "--info" ) || arg.equals( "-i" ) )
+            {
+                project = args[++i];
+                printInfo = true;
             }
             else if( arg.equals( "-s" ) || arg.equals( "--seed" ) )
             {
                 seed = Long.parseLong( args[++i] );
             }
-            else if( arg.startsWith( "-" ) )
+            else if( arg.equals( "--settings" ) )
+            {
+                this.settingdPath = args[++i];
+            }
+            else if( arg.equals( "--tf" ) )
+            {
+                this.finalTime = Integer.parseInt( args[++i] );
+            }
+            else if( arg.startsWith( "-" ) && !arg.subSequence( 0, 2 ).equals( "--" ) )
             {
                 if( arg.contains( "p" ) )
                 {
