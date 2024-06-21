@@ -1,6 +1,8 @@
 package ru.biosoft.physicell.sample_projects.rules_sample;
 
-import ru.biosoft.physicell.core.CellCSVReader;
+import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
+import ru.biosoft.physicell.core.CellContainer;
+import ru.biosoft.physicell.core.CellContainerExperimental;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Rules;
 import ru.biosoft.physicell.xml.ModelReader;
@@ -73,10 +75,10 @@ import ru.biosoft.physicell.xml.ModelReader;
 */
 public class Main
 {
-    private static String CELL_RULES_PATH = "config/cell_rules.csv";
-    private static String CELLS_PATH = "config/cells.csv";
+    //    private static String CELL_RULES_PATH = "config/cell_rules.csv";
+    //    private static String CELLS_PATH = "config/cells.csv";
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/rules_sample/result";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/rules_sample/experimental";
 
     public static void main(String ... strings) throws Exception
     {
@@ -84,23 +86,44 @@ public class Main
             resultPath = strings[0];
 
         Model model = new ModelReader().read( Main.class.getResourceAsStream( settingsPath ), RulesSample.class );
+        ( (ConstantCoefficientsLOD3D)model.getMicroenvironment().getSolver() ).setPrallel( true );
         double mechanics_voxel_size = 30;
-        model.createContainer( mechanics_voxel_size );
+        model.createContainer( mechanics_voxel_size, CellContainerExperimental.EXPERIMENTAL_CONTAINER_NAME ); //.CellContainerParallel.PARALLEL_CONTAINER_NAME );
         model.setResultFolder( resultPath );
-        model.setWriteDensity( true );
 
-        model.addVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
-        model.addVisualizer( 0, "apoptotic debris" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "necrotic debris" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "pro-inflammatory factor" ).setStubstrateIndex( 3 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "anti-inflammatory factor" ).setStubstrateIndex( 4 ).setMaxDensity( 1 );
+        model.setWriteDensity( false );
+        model.setSaveFull( false );
+        model.setSaveImg( false );
+        //        model.setWriteDensity( true );
+
+        //        model.addGIFVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
+        //        model.addGIFVisualizer( 0, "apoptotic debris" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        //        model.addGIFVisualizer( 0, "necrotic debris" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );
+        //        model.addGIFVisualizer( 0, "pro-inflammatory factor" ).setStubstrateIndex( 3 ).setMaxDensity( 1 );
+        //        model.addGIFVisualizer( 0, "anti-inflammatory factor" ).setStubstrateIndex( 4 ).setMaxDensity( 1 );
 
         model.init();
-        Rules.parseCSVRules2( Main.class.getResourceAsStream( CELL_RULES_PATH ) );
-        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( CELLS_PATH ), model.getMicroenvironment() );
+        //        Rules.parseCSVRules2( Main.class.getResourceAsStream( CELL_RULES_PATH ) );
+        //        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( CELLS_PATH ), model.getMicroenvironment() );
 
         System.out.println( model.display() );
         System.out.println( Rules.display_hypothesis_rulesets() );
+        double tStart = System.nanoTime();
         model.simulate();
+        tStart = System.nanoTime() - tStart;
+
+        System.out.println( "Total " + tStart / 1E9 );
+        System.out.println( "Diffusion " + Model.tDiffusion / 1E9 );
+        System.out.println( "Secretion " + CellContainer.tSecretion / 1E9 );
+        System.out.println( "Phenotype " + CellContainer.tPhenotype / 1E9 );
+        System.out.println( "Velocity " + CellContainer.tVelocity / 1E9 );
+        System.out.println( "Interaction " + CellContainer.tInteraction / 1E9 );
+        System.out.println( "Contact " + CellContainer.tContact / 1E9 );
+        System.out.println( "Custom " + CellContainer.tCustom / 1E9 );
+        System.out.println( "Attachment " + CellContainer.tAttachment / 1E9 );
+        System.out.println( "Divide " + CellContainer.tDivide / 1E9 );
+        System.out.println( "Rest " + CellContainer.tRestAll / 1E9 );
+        System.out.println( "Gradient " + CellContainer.tGradient / 1E9 );
+        System.out.println( "Total cell " + CellContainer.tTotal / 1E9 );
     }
 }
