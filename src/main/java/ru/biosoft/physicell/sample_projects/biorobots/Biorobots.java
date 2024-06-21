@@ -14,7 +14,8 @@ public class Biorobots extends Model
     public void init() throws Exception
     {
         super.init();
-        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        //        PhysiCellUtilities.setSeed( (int) ( Math.random() * 1000 ) );
+        //        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
         createCellTypes();
         setupTissue();
         getVisualizers().forEach( v -> v.setAgentVisualizer( new BiorobotsVisualizer( this ) ) );
@@ -52,13 +53,11 @@ public class Biorobots extends Model
         CellDefinition pDirectorDef = CellDefinition.getCellDefinition( "director cell" );
         CellDefinition pWorkerDef = CellDefinition.getCellDefinition( "worker cell" );
 
-        System.out.println( "Placing cells ... " );
         // randomly place seed cells 
         double[] position = new double[3];
         double relative_margin = 0.2;
         double relative_outer_margin = 0.02;
 
-        System.out.println( "\tPlacing " + directorsNumber + " director cells ... " );
         for( int i = 0; i < directorsNumber; i++ )
         {
             position[0] = m.options.X_range[0]
@@ -71,7 +70,6 @@ public class Biorobots extends Model
         }
 
         // place cargo clusters on the fringes 
-        System.out.println( "\tPlacing cargo cells ... " );
         for( int i = 0; i < cargoClustersNumber; i++ )
         {
             position[0] = m.options.X_range[0]
@@ -87,8 +85,7 @@ public class Biorobots extends Model
         }
 
         // place workers
-        System.out.println( "\tPlacing worker cells ... " );
-        for( int i = 0; i < workersNumber; i++ )//number_of_workers; i++ )
+        for( int i = 0; i < workersNumber; i++ )
         {
             position[0] = m.options.X_range[0]
                     + Xrange * ( relative_margin + ( 1.0 - 2 * relative_margin ) * PhysiCellUtilities.UniformRandom() );
@@ -97,7 +94,6 @@ public class Biorobots extends Model
                     + Yrange * ( relative_outer_margin + ( 1.0 - 2 * relative_outer_margin ) * PhysiCellUtilities.UniformRandom() );
             Cell.createCell( pWorkerDef, m, position );
         }
-        System.out.println( "Done!" );
     }
 
     /** 

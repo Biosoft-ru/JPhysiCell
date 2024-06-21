@@ -17,7 +17,7 @@ public class TherapyEvent extends Event
     @Override
     public void execute(Model model) throws Exception
     {
-        System.out.println( "Therapy started!" );
+        //        System.out.println( "Therapy started!" );
         model.setSaveFullInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 
         introduceBiorobots( model );
     }

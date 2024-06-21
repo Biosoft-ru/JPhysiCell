@@ -209,7 +209,7 @@ public class CancerImmune extends Model
         double tumorRadius = getParameterDouble( "tumor_radius" );// 250.0;  
 
         List<double[]> positions = createSpherePositions( cellRadius, tumorRadius, use2D );
-        System.out.println( "creating " + positions.size() + " closely-packed tumor cells ... " );
+        //        System.out.println( "creating " + positions.size() + " closely-packed tumor cells ... " );
 
         double imm_mean = getParameterDouble( "tumor_mean_immunogenicity" );
         double imm_sd = getParameterDouble( "tumor_immunogenicity_standard_deviation" );
@@ -220,7 +220,7 @@ public class CancerImmune extends Model
             double oncoprotein = Math.max( 0, PhysiCellUtilities.NormalRandom( imm_mean, imm_sd ) );
             pCell.customData.set( "oncoprotein", oncoprotein );
         }
-        printSummary( m, "oncoprotein" );
+        //        printSummary( m, "oncoprotein" );
     }
 
     private static void printSummary(Microenvironment m, String property)
