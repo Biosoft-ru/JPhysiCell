@@ -7,6 +7,7 @@ import ru.biosoft.physicell.core.CellContainerParallel;
 public class ExecutorParameters
 {
     String resultPath;
+    boolean localResult = false;
     boolean parallelDiffusion;
     String cellType = CellContainer.DEFAULT_NAME;
     boolean experimentalCell;
@@ -18,15 +19,36 @@ public class ExecutorParameters
     int finalTime = -1;
     boolean printInfo;
     boolean simulate;
+    boolean showHelp;
+    boolean listProjects;
+
+    public static String PROJECTS_CMD = "--projects";
+    public static String HELP_CMD = "--help";
+    public static String SHORT_HELP_CMD = "-h";
 
     public ExecutorParameters(String ... args)
     {
         for( int i = 0; i < args.length; i++ )
         {
             String arg = args[i];
-            if( arg.equals( "--output-dir" ) )
+
+            if( arg.equals( PROJECTS_CMD ) )
             {
-                resultPath = args[++i];
+                this.listProjects = true;
+                return;
+            }
+            if( HELP_CMD.equals( arg ) || SHORT_HELP_CMD.equals( arg ) )
+            {
+                this.showHelp = true;
+                return;
+            }
+
+            if( arg.equals( "--output-dir" ) || arg.equals( "-o" ) )
+            {
+                String result = args[++i];
+                if( !result.contains( "/" ) && !result.contains( "\\" ) )
+                    localResult = true;
+                resultPath = result;
             }
             else if( arg.equals( "--quiet" ) )
             {
@@ -48,14 +70,16 @@ public class ExecutorParameters
             {
                 parallelDiffusion = true;
             }
-            else if( arg.equals( "--run" ) || arg.equals( "-r" ) )
+            else if( arg.equals( "--run" ) )
             {
-                project = args[++i];
                 simulate = true;
             }
-            else if( arg.equals( "--info" ) || arg.equals( "-i" ) )
+            else if( arg.equals( "--name" ) || arg.equals( "-n" ) )
             {
                 project = args[++i];
+            }
+            else if( arg.equals( "--info" ) )
+            {
                 printInfo = true;
             }
             else if( arg.equals( "-s" ) || arg.equals( "--seed" ) )
@@ -91,6 +115,14 @@ public class ExecutorParameters
                 if( arg.contains( "t" ) )
                 {
                     trackTime = true;
+                }
+                if( arg.contains( "r" ) )
+                {
+                    this.simulate = true;
+                }
+                if( arg.contains( "i" ) )
+                {
+                    this.printInfo = true;
                 }
             }
         }

@@ -1,22 +1,29 @@
 This is a JPhysiCell - ported to java version of the PhysiCell platform
-To run a project              : java -jar [JAR_FILE] -r PROJECT_NAME
-To run a project with options : java -jar [JAR_FILE] -r PROJECT_NAME [-OPTIONS]
-To print info about project   : java -jar {JAR_FILE] -i PROJECT_NAME
+
+To run a project              : java -jar [JAR_FILE] --name PROJECT_NAME --run 
+To print info about project   : java -jar {JAR_FILE] --name PROJECT_NAME --info
 To list available projects    : java -jar [JAR_FILE] --projects
 To see this help              : java -jar [JAR_FILE] --help
-Project execution options:  
-		-r --run            specifies project to run
-		-i --info           log information about specified project
+
+All options:  
+		-h --help           shows this help.
+		   --projects       lists all available projects.
+		-n --name           specifies project.
+		-r --run            run selected project.
+		-i --info           log information about selected project.
 		-o --output-dir     specifies output folder.
-		   --tf             overrides final time from settings.xml 
-		   --settings       specifies path to custom settings.xml file 
+		   --tf             overrides final time from settings.xml. 
+		   --settings       specifies path to custom settings.xml file. 
 		-s --seed           seed for random number generator.
 		-q --quiet          do not log on each step.
 		-p --parallel       update cells in parallel.
 		-d --diff-parallel  simulate diffusion in parallel.
 		-x -experimental    update cells in experimental regime.
-One letter arguments may be joined: -qpd = -q -p -d
+		
+One letter arguments may be joined: "-rqid" = "-r -q -i -d"
+
 Example: 
-		java -jar physicell-1.0-SNPASHOT.jar -i pred_prey_farmer
-		java -jar physicell-1.0-SNAPSHOT.jar -r pred_prey_farmer --seed 10 -qp
-		java -jar physicell-1.0-SNAPSHOT.jar --help
+		java -jar physicell-1.0-SNPASHOT.jar -n pred_prey_farmer -r
+		java -jar physicell-1.0-SNAPSHOT.jar -n pred_prey_farmer --seed 10 -rqp
+		java -jar physicell-1.0-SNPASHOT.jar -n pred_prey_farmer -r -o result
+		

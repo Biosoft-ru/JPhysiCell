@@ -17,8 +17,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Executor
 {
     private static String PROJECTS_FILE = "projects";
-    public static String PROJECTS_CMD = "--projects";
-    public static String HELP_CMD = "--help";
+
     public static String PATH_TO_SETTINGS = "config/PhysiCell_settings.xml";
     private static String HELP_FILE = "help";
     public static String help;
@@ -26,40 +25,43 @@ public class Executor
 
     public static void main(String ... args)
     {
+        ExecutorParameters parameters = new ExecutorParameters( args );
+
         if( projects == null )
             findProjects();
 
-        if( help == null )
-            findHelp();
-
-        if( PROJECTS_CMD.equals( args[0] ) )
+        if( parameters.listProjects )
         {
-            System.out.println( "There are " + projects.size() + " projects: " + String.join( ", ", projects.keySet() ) );
-            return;
-        }
-        else if( HELP_CMD.equals( args[0] ) )
-        {
-            System.out.println( help );
+            if( projects == null )
+                findProjects();
+            log( "There are " + projects.size() + " projects: " + String.join( ", ", projects.keySet() ) );
             return;
         }
 
-        ExecutorParameters parameters = new ExecutorParameters( args );
+        if( parameters.showHelp )
+        {
+            if( help == null )
+                findHelp();
+            log( help );
+            return;
+        }
+
         String project = parameters.project;
         if( project == null )
         {
-            System.out.println( "Unknown command, please specify project. Use " + HELP_CMD + " for more information." );
+            log( "Unknown command, please specify project. Use --help for more information." );
             return;
         }
 
         if( !projects.keySet().contains( project ) )
         {
-            System.out.println( "Unknown project " + project + ". Use " + PROJECTS_CMD + " to see available projects." );
+            log( "Unknown project " + project + ". Use --projects to see available projects." );
             return;
         }
 
         if( projects.keySet().contains( project ) )
         {
-            System.out.println( PhysiCellUtilities.getCurrentTime() + "Selected " + project + " project..." );
+            log( "Selected " + project + " project..." );
             String path = projects.get( project );
             try
             {
@@ -92,7 +94,14 @@ public class Executor
 
             if( params.resultPath != null )
             {
-                model.setResultFolder( params.resultPath );
+                String path = params.resultPath;
+                if( params.localResult )
+                {
+                    String jarPath = Executor.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+                    String parent = new File( jarPath ).getParent();
+                    path = parent + "/" + path;
+                }
+                model.setResultFolder( path );
                 model.setSaveFull( true );
                 model.setSaveImg( true );
                 model.setWriteDensity( true );
@@ -115,16 +124,20 @@ public class Executor
             PhysiCellUtilities.setSeed( params.seed );
             if( params.printInfo )
             {
-                System.out.println( model.display() );
+                log( model.display() );
             }
-            else
+            else if( params.simulate )
             {
                 double tStart = System.nanoTime();
                 model.simulate();
                 tStart = System.nanoTime() - tStart;
 
-                System.out.println( PhysiCellUtilities.getCurrentTime() + "Completed, elapsed time: "
+                log( "Completed, elapsed time: "
                         + ( System.nanoTime() - startTime ) / 1E9 + " s." );
+            }
+            else
+            {
+                log( "Nothing to do with selected project. Use -r to simulate or -i to print info." );
             }
             //            System.out.println( "Total " + tStart / 1E9 );
             //            System.out.println( "Diffusion " + Model.tDiffusion / 1E9 );
@@ -144,6 +157,11 @@ public class Executor
         {
             ex.printStackTrace();
         }
+    }
+
+    private static void log(String s)
+    {
+        System.out.println( PhysiCellUtilities.getCurrentTime() + s );
     }
 
     public static void findHelp()
