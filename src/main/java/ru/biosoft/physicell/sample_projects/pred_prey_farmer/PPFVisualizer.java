@@ -11,9 +11,9 @@ public class PPFVisualizer extends AgentVisualizer2
     @Override
     public Color[] findColors(Cell pCell)
     {
-        CellDefinition pFarmerDef = CellDefinition.getCellDefinition( "farmer" );
-        CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
-        CellDefinition pPredDef = CellDefinition.getCellDefinition( "predator" );
+        CellDefinition pFarmerDef = pCell.getModel().getCellDefinition( "farmer" );
+        CellDefinition pPreyDef = pCell.getModel().getCellDefinition( "prey" );
+        CellDefinition pPredDef = pCell.getModel().getCellDefinition( "predator" );
 
         if( pCell.type == pFarmerDef.type )
             return new Color[] {Color.gray};

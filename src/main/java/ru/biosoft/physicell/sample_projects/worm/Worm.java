@@ -85,7 +85,7 @@ public class Worm extends Model
 
     void createCellTypes()
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( "worm" );
+        CellDefinition cd = getCellDefinition( "worm" );
         cd.phenotype.mechanics.attachmentElasticConstant = getParameterDouble( "attachment_elastic_constant" );
         cd.functions.contact = new Contact();
         cd.functions.customCellRule = new WormRule( this );
@@ -97,7 +97,7 @@ public class Worm extends Model
 
     void setupTissue()
     {
-        PhysiCellUtilities.place( m, "worm", getParameterInt( "number_of_cells" ) );
+        PhysiCellUtilities.place( this, "worm", getParameterInt( "number_of_cells" ) );
 
         for( Cell cell : m.getAgents( Cell.class ) )
         {

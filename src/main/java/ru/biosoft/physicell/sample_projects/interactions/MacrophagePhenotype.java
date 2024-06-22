@@ -13,7 +13,7 @@ public class MacrophagePhenotype extends UpdatePhenotype
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
+        CellDefinition pCD = pCell.getModel().getCellDefinition( pCell.typeName );
         Microenvironment m = pCell.getMicroenvironment();
         int nPIF = m.findDensityIndex( "pro-inflammatory" );
         int nDebris = m.findDensityIndex( "debris" );
@@ -30,7 +30,7 @@ public class MacrophagePhenotype extends UpdatePhenotype
         double debris = samples[nDebris];
         double q = samples[nQ];
 
-        int bacteriaType = CellDefinition.getCellDefinition( "bacteria" ).type;
+        int bacteriaType = pCell.getModel().getCellDefinition( "bacteria" ).type;
         int numBacteria = 0;
         int numDead = 0;
         for( Cell pC : pCell.state.neighbors )

@@ -95,7 +95,7 @@ public class OdeEnergy extends Model
 
     public void createCellTypes() throws Exception
     {
-        CellDefinition defaults = CellDefinition.getCellDefinition( "default" );
+        CellDefinition defaults = getCellDefinition( "default" );
         defaults.functions.updateVolume = new StandardVolumeUpdate();
         defaults.functions.updateVelocity = new StandardUpdateVelocity();
         defaults.functions.updateMigration = null;
@@ -104,7 +104,7 @@ public class OdeEnergy extends Model
         defaults.functions.membraneInteraction = null;
         defaults.functions.membraneDistanceCalculator = null;
         //        defaults.phenotype.intracellular = new IntracellularEuler( new ToyMetabolicModel() );
-        SignalBehavior.setupDictionaries( m );
+        SignalBehavior.setupDictionaries( this );
     }
 
     void setupTissue() throws Exception
@@ -113,14 +113,14 @@ public class OdeEnergy extends Model
         int glucoseIndex = m.findDensityIndex( "glucose" );
         int lactateIndex = m.findDensityIndex( "lactate" );
 
-        CellDefinition cd = CellDefinition.getCellDefinition( "default" );
+        CellDefinition cd = getCellDefinition( "default" );
         double cellRadius = cd.phenotype.geometry.radius;
         double initialTumorRadius = 100;
 
         List<double[]> positions = createCirclePositions( cellRadius, initialTumorRadius );
         for( int i = 0; i < positions.size(); i++ )
         {
-            Cell pCell = Cell.createCell( cd, m, positions.get( i ) );
+            Cell pCell = Cell.createCell( cd, this, positions.get( i ) );
             SignalBehavior.setSingleBehavior( pCell, "custom:intra_oxy", getParameterDouble( "initial_internal_oxygen" ) );
             SignalBehavior.setSingleBehavior( pCell, "custom:intra_glu", getParameterDouble( "initial_internal_glucose" ) );
             SignalBehavior.setSingleBehavior( pCell, "custom:intra_lac", getParameterDouble( "initial_internal_lactate" ) );

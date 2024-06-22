@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.sample_projects.celltypes3;
 
-import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
@@ -82,7 +81,7 @@ public class Celltype3 extends Model
     {
         super.init();
         PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( m );
+        SignalBehavior.setupDictionaries( this );
         createCellTypes();
         setupTissue();
         for( Visualizer visualizer : getVisualizers() )
@@ -96,9 +95,9 @@ public class Celltype3 extends Model
      */
     void createCellTypes() throws Exception
     {
-        CellDefinition.getCellDefinition( "A" ).functions.updatePhenotype = new PhenotypeA( this );
-        CellDefinition.getCellDefinition( "B" ).functions.updatePhenotype = new PhenotypeB( this );
-        CellDefinition.getCellDefinition( "C" ).functions.updatePhenotype = new PhenotypeC( this );
+        getCellDefinition( "A" ).functions.updatePhenotype = new PhenotypeA( this );
+        getCellDefinition( "B" ).functions.updatePhenotype = new PhenotypeB( this );
+        getCellDefinition( "C" ).functions.updatePhenotype = new PhenotypeC( this );
     }
 
     /**
@@ -129,18 +128,18 @@ public class Celltype3 extends Model
 
         double[] range = new double[] {xMin, yMin, zMin, xMax, yMax, zMin, zMax};
 
-        CellDefinition aCD = CellDefinition.getCellDefinition( "A" );
-        CellDefinition bCD = CellDefinition.getCellDefinition( "B" );
-        CellDefinition cCD = CellDefinition.getCellDefinition( "C" );
+        CellDefinition aCD = getCellDefinition( "A" );
+        CellDefinition bCD = getCellDefinition( "B" );
+        CellDefinition cCD = getCellDefinition( "C" );
 
         int number = getParameterInt( "number_of_A" );
-        placeInRadius( aCD, m, number, range, maxRadius );
+        placeInRadius( aCD, this, number, range, maxRadius );
 
         number = getParameterInt( "number_of_B" );
-        placeInRadius( bCD, m, number, range, maxRadius );
+        placeInRadius( bCD, this, number, range, maxRadius );
 
         number = getParameterInt( "number_of_C" );
-        placeInRadius( cCD, m, number, range, maxRadius );
+        placeInRadius( cCD, this, number, range, maxRadius );
 
         for( Cell cell : m.getAgents( Cell.class ) )
         {
@@ -159,7 +158,7 @@ public class Celltype3 extends Model
      * @param range - bounding box: xMin, yMin, zMin, xMax, yMax, zMax
      * @param maxRadius - maximum radius
      */
-    private static void placeInRadius(CellDefinition cd, Microenvironment m, int number, double[] range, double maxRadius)
+    private static void placeInRadius(CellDefinition cd, Model m, int number, double[] range, double maxRadius)
     {
         for( int n = 0; n < number; n++ )
         {

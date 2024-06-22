@@ -361,17 +361,17 @@ public class HypothesisRule
         SignalBehavior.setSingleBehavior( cell, behavior, param );
     }
 
-    void sync(CellDefinition pCD)
+    void sync(Model model, CellDefinition pCD)
     {
         if( pCD == null )
             return;
         cellType = pCD.name;
-        SignalBehavior.getSingleBaseBehavior( pCD, behavior );
+        SignalBehavior.getSingleBaseBehavior( model, pCD, behavior );
     }
 
-    void sync(String cellName)
+    void sync(Model model, String cellName)
     {
-        sync( CellDefinition.getCellDefinition( cellName ) );
+        sync( model, model.getCellDefinition( cellName ) );
     }
 
     int findSignal(String name)

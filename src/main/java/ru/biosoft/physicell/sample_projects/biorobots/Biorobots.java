@@ -23,15 +23,15 @@ public class Biorobots extends Model
 
     void createCellTypes() throws Exception
     {
-        SignalBehavior.setupDictionaries( m );
-        CellDefinition pCD = CellDefinition.getCellDefinition( "director cell" );
+        SignalBehavior.setupDictionaries( this );
+        CellDefinition pCD = getCellDefinition( "director cell" );
         pCD.functions.updatePhenotype = new DirectorCellRule();
 
-        pCD = CellDefinition.getCellDefinition( "cargo cell" );
+        pCD = getCellDefinition( "cargo cell" );
         pCD.functions.updatePhenotype = new CargoCellRule( this );
         pCD.functions.contact = new StandardElasticContact();
 
-        pCD = CellDefinition.getCellDefinition( "worker cell" );
+        pCD = getCellDefinition( "worker cell" );
         pCD.functions.updatePhenotype = new WorkerCellRule( this );
         pCD.functions.contact = new StandardElasticContact();
     }
@@ -49,9 +49,9 @@ public class Biorobots extends Model
         int directorsNumber = getParameterInt( "number_of_directors" ); // 15;  
         int cargoClustersNumber = getParameterInt( "number_of_cargo_clusters" ); // 100;  
         int workersNumber = getParameterInt( "number_of_workers" ); // 50;  
-        CellDefinition pCargoDef = CellDefinition.getCellDefinition( "cargo cell" );
-        CellDefinition pDirectorDef = CellDefinition.getCellDefinition( "director cell" );
-        CellDefinition pWorkerDef = CellDefinition.getCellDefinition( "worker cell" );
+        CellDefinition pCargoDef = getCellDefinition( "cargo cell" );
+        CellDefinition pDirectorDef = getCellDefinition( "director cell" );
+        CellDefinition pWorkerDef = getCellDefinition( "worker cell" );
 
         // randomly place seed cells 
         double[] position = new double[3];
@@ -65,7 +65,7 @@ public class Biorobots extends Model
 
             position[1] = m.options.Y_range[0]
                     + Yrange * ( relative_outer_margin + ( 1.0 - 2 * relative_outer_margin ) * PhysiCellUtilities.UniformRandom() );
-            Cell cell = Cell.createCell( pDirectorDef, m, position );
+            Cell cell = Cell.createCell( pDirectorDef, this, position );
             SignalBehavior.setSingleBehavior( cell, "movable", 0 );
         }
 
@@ -79,7 +79,7 @@ public class Biorobots extends Model
                     + Yrange * ( relative_outer_margin + ( 1 - 2.0 * relative_outer_margin ) * PhysiCellUtilities.UniformRandom() );
 
             if( PhysiCellUtilities.UniformRandom() < 0.5 )
-                Cell.createCell( pCargoDef, m, position );
+                Cell.createCell( pCargoDef, this, position );
             else
                 createCargoCluster7( position, m );
         }
@@ -92,16 +92,16 @@ public class Biorobots extends Model
 
             position[1] = m.options.Y_range[0]
                     + Yrange * ( relative_outer_margin + ( 1.0 - 2 * relative_outer_margin ) * PhysiCellUtilities.UniformRandom() );
-            Cell.createCell( pWorkerDef, m, position );
+            Cell.createCell( pWorkerDef, this, position );
         }
     }
 
     /** 
      * Create a hollow cluster at position, with random orientation 
      */
-    static void createCargoCluster6(double[] center, Microenvironment m)
+    void createCargoCluster6(double[] center, Microenvironment m)
     {
-        CellDefinition pCargoDef = CellDefinition.getCellDefinition( "cargo cell" );
+        CellDefinition pCargoDef = getCellDefinition( "cargo cell" );
         double spacing = 0.95 * pCargoDef.phenotype.geometry.radius * 2.0;
         double dTheta = 1.047197551196598; // 2*pi / 6.0 
 
@@ -111,7 +111,7 @@ public class Biorobots extends Model
         {
             position[0] = center[0] + spacing * Math.cos( theta );
             position[1] = center[1] + spacing * Math.sin( theta );
-            Cell.createCell( pCargoDef, m, position );
+            Cell.createCell( pCargoDef, this, position );
             theta += dTheta;
         }
     }
@@ -119,19 +119,19 @@ public class Biorobots extends Model
     /**
      * Creates a filled cluster at position, with random orientation 
      */
-    static void createCargoCluster7(double[] center, Microenvironment m)
+    void createCargoCluster7(double[] center, Microenvironment m)
     {
-        CellDefinition pCargoDef = CellDefinition.getCellDefinition( "cargo cell" );
+        CellDefinition pCargoDef = getCellDefinition( "cargo cell" );
         createCargoCluster6( center, m );
-        Cell.createCell( pCargoDef, m, center );
+        Cell.createCell( pCargoDef, this, center );
     }
 
     /**
      *  Creates a small cluster at position, with random orientation 
      */
-    static void createCargoCluster3(double[] center, Microenvironment m)
+    void createCargoCluster3(double[] center, Model model)
     {
-        CellDefinition pCargoDef = CellDefinition.getCellDefinition( "cargo cell" );
+        CellDefinition pCargoDef = getCellDefinition( "cargo cell" );
         double spacing = 0.95 * pCargoDef.phenotype.geometry.radius * 1.0;
         double d_Theta = 2.094395102393195; // 2*pi / 3.0 
         double theta = 6.283185307179586 * PhysiCellUtilities.UniformRandom();
@@ -140,7 +140,7 @@ public class Biorobots extends Model
         {
             position[0] = center[0] + spacing * Math.cos( theta );
             position[1] = center[1] + spacing * Math.sin( theta );
-            Cell.createCell( pCargoDef, m, position );
+            Cell.createCell( pCargoDef, model, position );
             theta += d_Theta;
         }
     }

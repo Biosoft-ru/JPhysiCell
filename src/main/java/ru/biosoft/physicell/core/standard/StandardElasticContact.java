@@ -2,7 +2,6 @@ package ru.biosoft.physicell.core.standard;
 
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CellFunctions.Contact;
 import ru.biosoft.physicell.core.Phenotype;
 
@@ -21,8 +20,8 @@ public class StandardElasticContact extends Contact
         //        displacement -= pC1.position; 
 
         // update May 2022 - effective adhesion 
-        int ii = CellDefinition.getCellDefinitionIndex( pC1.type );
-        int jj = CellDefinition.getCellDefinitionIndex( pC2.type );
+        int ii = pC1.getModel().getCellDefinitionIndex( pC1.type );
+        int jj = pC1.getModel().getCellDefinitionIndex( pC2.type );
 
         double adhesion_ii = pC1.phenotype.mechanics.attachmentElasticConstant * pC1.phenotype.mechanics.cellAdhesionAffinities[jj];
         double adhesion_jj = pC2.phenotype.mechanics.attachmentElasticConstant * pC2.phenotype.mechanics.cellAdhesionAffinities[ii];

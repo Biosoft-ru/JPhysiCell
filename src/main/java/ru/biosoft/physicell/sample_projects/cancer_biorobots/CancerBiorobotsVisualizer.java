@@ -22,8 +22,8 @@ public class CancerBiorobotsVisualizer extends AgentVisualizer
         double maxDamage = 1.0 * SignalBehavior.getSingleSignal( cell, "custom:damage_rate" )
                 / ( 1e-16 + SignalBehavior.getSingleSignal( cell, "custom:repair_rate" ) );
 
-        CellDefinition pCD_cargo = CellDefinition.getCellDefinition( "cargo cell" );
-        CellDefinition pCD_worker = CellDefinition.getCellDefinition( "worker cell" );
+        CellDefinition pCD_cargo = cell.getModel().getCellDefinition( "cargo cell" );
+        CellDefinition pCD_worker = cell.getModel().getCellDefinition( "worker cell" );
 
         if( cell.type == pCD_cargo.type )
             return new Color[] {Color.blue, Color.blue};

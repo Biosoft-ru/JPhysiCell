@@ -94,8 +94,8 @@ public class VirusMacrophage extends Model
         int virus_index = m.findDensityIndex( "virus" );
         int nInterferon = m.findDensityIndex( "interferon" );
 
-        CellDefinition pEpithelial = CellDefinition.getCellDefinition( "epithelial cell" );
-        CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
+        CellDefinition pEpithelial = getCellDefinition( "epithelial cell" );
+        CellDefinition pMacrophage = getCellDefinition( "macrophage" );
 
         pEpithelial.functions.updatePhenotype = new Epithelial();
 
@@ -117,12 +117,12 @@ public class VirusMacrophage extends Model
     void setupTissue()
     {
         int nVirus = m.findDensityIndex( "virus" );
-        PhysiCellUtilities.place2D( m, "epithelial cell", getParameterInt( "number_of_infected_cells" ) );
+        PhysiCellUtilities.place2D( this, "epithelial cell", getParameterInt( "number_of_infected_cells" ) );
         for( Cell cell : m.getAgents( Cell.class ) )
             cell.phenotype.molecular.internSubstrates[nVirus] = 1;
 
-        PhysiCellUtilities.place2D( m, "epithelial cell", getParameterInt( "number_of_uninfected_cells" ) );
-        PhysiCellUtilities.place2D( m, "macrophage", getParameterInt( "number_of_macrophages" ) );
+        PhysiCellUtilities.place2D( this, "epithelial cell", getParameterInt( "number_of_uninfected_cells" ) );
+        PhysiCellUtilities.place2D( this, "macrophage", getParameterInt( "number_of_macrophages" ) );
 
         //        for (Cell cell)
         // create some cells near the origin

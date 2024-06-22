@@ -79,6 +79,7 @@ public class CellInteractions implements Cloneable
     public double[] immunogenicities; // how immnogenic am I to cell type j?  
     public double damageRate;
     public double[] fusionRates; // cell fusion parameters 
+    private String[] names;
 
     public CellInteractions()
     {
@@ -90,60 +91,65 @@ public class CellInteractions implements Cloneable
         fusionRates = new double[] {0.0};
     }
 
-    public void initialize(int cellDefinitionSize)
+    public void initialize(Model model)
     {
-        livePhagocytosisRates = VectorUtil.resize( livePhagocytosisRates, cellDefinitionSize );
-        attackRates = VectorUtil.resize( attackRates, cellDefinitionSize );
-        fusionRates = VectorUtil.resize( fusionRates, cellDefinitionSize );
-        immunogenicities = VectorUtil.resize( immunogenicities, cellDefinitionSize, 1 );
+
+        int size = model.getDefinitionsCount();
+        names = new String[size];
+        for( int i = 0; i < size; i++ )
+            names[i] = model.getCellDefinition( i ).name;
+        livePhagocytosisRates = VectorUtil.resize( livePhagocytosisRates, size );
+        attackRates = VectorUtil.resize( attackRates, size );
+        fusionRates = VectorUtil.resize( fusionRates, size );
+        immunogenicities = VectorUtil.resize( immunogenicities, size, 1 );
     }
 
-    public double getLivePhagocytosisRate(String name)
-    {
-        int n = CellDefinition.getCellDefinition( name ).type;
-        return livePhagocytosisRates[n];
-    }
-    
+    //    public double getLivePhagocytosisRate(String name)
+    //    {
+    //        int n = CellDefinition.getCellDefinition( name ).type;
+    //        return livePhagocytosisRates[n];
+    //    }
+
     public double getLivePhagocytosisRate(int type)
     {
-//        int n = CellDefinition.getCellDefinition( name ).type;
+        //        int n = CellDefinition.getCellDefinition( name ).type;
         return livePhagocytosisRates[type];
     }
     public double getAttackRate(int type)
     {
-//        int n = CellDefinition.getCellDefinition( name ).type;
+        //        int n = CellDefinition.getCellDefinition( name ).type;
         return attackRates[type];
     }
-    
+
     public double getImmunogenicity(int type)
     {
-//        int n = CellDefinition.getCellDefinition( name ).type;
+        //        int n = CellDefinition.getCellDefinition( name ).type;
         return immunogenicities[type];
     }
-    
+
     public double getFusionRate(int type)
     {
-//        int n = CellDefinition.getCellDefinition( name ).type;
+        //        int n = CellDefinition.getCellDefinition( name ).type;
         return fusionRates[type];
     }
 
-    public double getAttackRate(String name)
-    {
-        int n = CellDefinition.getCellDefinition( name ).type;
-        return attackRates[n];
-    }
+    //    public double getAttackRate(String name)
+    //    {
+    //        int n = CellDefinition.getCellDefinition( name ).type;
+    //        return attackRates[n];
+    //    }
 
-    public double getFusionRate(String name)
-    {
-        int n = CellDefinition.getCellDefinition( name ).type;
-        return fusionRates[n];
-    }
+    //    public double getFusionRate(String name)
+    //    {
+    //        int n = CellDefinition.getCellDefinition( name ).type;
+    //        return fusionRates[n];
+    //    }
 
-    public double getImmunogenicity(String name)
-    {
-        int n = CellDefinition.getCellDefinition( name ).type;
-        return immunogenicities[n];
-    }
+    //    public double getImmunogenicity(String name)
+    //    {
+    //        int n = CellDefinition.getCellDefinition( name ).type;
+    //        return immunogenicities[n];
+    //    }
 
     @Override
     public CellInteractions clone()
@@ -172,13 +178,12 @@ public class CellInteractions implements Cloneable
 
         for( int i = 0; i < attackRates.length; i++ )
         {
-            String name = CellDefinition.getCellDefinitionByIndex( i ).name;
             if( attackRates[i] != 0 )
-                attacks.add( name );
+                attacks.add( names[i] );
             if( fusionRates[i] != 0 )
-                fusions.add( name );
+                fusions.add( names[i] );
             if( livePhagocytosisRates[i] != 0 )
-                phogocyte.add( name );
+                phogocyte.add( names[i] );
         }
 
         if( attacks.isEmpty() && fusions.isEmpty() && phogocyte.isEmpty() )

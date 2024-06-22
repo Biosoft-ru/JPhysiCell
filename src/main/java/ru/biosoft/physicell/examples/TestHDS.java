@@ -9,6 +9,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.O2based;
 import ru.biosoft.physicell.core.standard.StandardModels;
@@ -165,6 +166,7 @@ public class TestHDS
 
         // create a microenvironment
         Microenvironment microenvironment = new Microenvironment( "substrate scale", "minutes", "microns" );
+        Model model = new Model( microenvironment );
         microenvironment.setDensity( 0, "oxygen", "mmHg", 1.0e5, 0.1 );
         microenvironment.resizeSpace( bounding_box[0], bounding_box[3], bounding_box[1], bounding_box[4], bounding_box[2], bounding_box[5],
                 dx, dy, dz );
@@ -209,7 +211,7 @@ public class TestHDS
 
         // let's make necrotic cells survive 6 hours in minimal oxygen conditions  
         cd.parameters.max_necrosis_rate = 1.0 / ( 6.0 * 60.0 );
-        CellDefinition.registerCellDefinition( cd );
+        model.registerCellDefinition( cd );
 
         double cell_radius = 10;
         double sphere_radius = 150;
@@ -245,7 +247,7 @@ public class TestHDS
         {
             if( pos[0] > 0 )
                 continue;
-            Cell pCell = Cell.createCell( cd, microenvironment, pos );
+            Cell pCell = Cell.createCell( cd, model, pos );
             pCell.phenotype.cycle.data.currentPhaseIndex = Q_index;
             if( pCell.phenotype.cycle.currentPhase().entryFunction != null )
                 pCell.phenotype.cycle.currentPhase().entryFunction.execute( pCell, pCell.phenotype, dt );

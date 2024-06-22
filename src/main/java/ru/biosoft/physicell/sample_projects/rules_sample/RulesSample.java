@@ -83,19 +83,19 @@ public class RulesSample extends Model
     {
         super.init();
         createCellTypes();
-        SignalBehavior.setupDictionaries( m );
+        SignalBehavior.setupDictionaries( this );
         Rules.setupRules( this );
         setupTissue();
         getVisualizers().forEach( v -> v.setAgentVisualizer( new AgentVisualizer2() ) );
 
-        Rules.parseCSVRules2( Main.class.getResourceAsStream( CELL_RULES_PATH ) );
-        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( CELLS_PATH ), getMicroenvironment() );
+        Rules.parseCSVRules2( this, Main.class.getResourceAsStream( CELL_RULES_PATH ) );
+        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( CELLS_PATH ), this );
 
     }
 
     void createCellTypes()
     {
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : getCellDefinitions() )
         {
             cd.functions.updatePhenotype = null;
             cd.functions.customCellRule = null;

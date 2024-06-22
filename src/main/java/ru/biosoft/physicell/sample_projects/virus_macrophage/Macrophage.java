@@ -20,7 +20,7 @@ public class Macrophage extends UpdatePhenotype
         Microenvironment microenvironment = pCell.getMicroenvironment();
         int nVirus = microenvironment.findDensityIndex( "virus" );
 
-        CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
+        CellDefinition pMacrophage = pCell.getModel().getCellDefinition( "macrophage" );
 
         // digest virus particles inside me 
         double implicitEulerConstant = ( 1.0 + dt * pCell.customData.get( "virus_digestion_rate" ) );

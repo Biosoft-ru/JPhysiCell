@@ -3,7 +3,6 @@ package ru.biosoft.physicell.sample_projects.celltypes3;
 import java.awt.Color;
 
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.ui.AgentVisualizer;
@@ -29,17 +28,17 @@ public class RegularAgentVisualizer extends AgentVisualizer
     {
         Color[] output = new Color[] {Color.black, Color.black, Color.black, Color.black};
 
-        if( cell.type == CellDefinition.getCellDefinition( "A" ).type )
+        if( cell.type == cell.getModel().getCellDefinition( "A" ).type )
         {
             output[0] = aColor;
             output[2] = aColor;
         }
-        else if( cell.type == CellDefinition.getCellDefinition( "B" ).type )
+        else if( cell.type == cell.getModel().getCellDefinition( "B" ).type )
         {
             output[0] = bColor;
             output[2] = bColor;
         }
-        else if( cell.type == CellDefinition.getCellDefinition( "C" ).type )
+        else if( cell.type == cell.getModel().getCellDefinition( "C" ).type )
         {
             output[0] = cColor;
             output[2] = cColor;

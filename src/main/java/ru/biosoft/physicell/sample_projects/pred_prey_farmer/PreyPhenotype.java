@@ -28,7 +28,7 @@ public class PreyPhenotype extends UpdatePhenotype
         }
 
         // division based on food
-        CellDefinition pCD = CellDefinition.getCellDefinition( "prey" );
+        CellDefinition pCD = pCell.getModel().getCellDefinition( "prey" );
         double multiplier = ( food - 0.1 ) / 0.9;
         phenotype.cycle.data.setExitRate( 0, pCD.phenotype.cycle.data.getExitRate( 0 ) * multiplier );
     }

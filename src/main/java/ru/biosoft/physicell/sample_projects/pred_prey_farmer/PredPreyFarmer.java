@@ -83,17 +83,17 @@ public class PredPreyFarmer extends Model
 
     void createCellTypes()
     {
-        CellDefinition pFarmerDef = CellDefinition.getCellDefinition( "farmer" );
+        CellDefinition pFarmerDef = getCellDefinition( "farmer" );
         pFarmerDef.functions.customCellRule = new AvoidBoundariesRule();
         pFarmerDef.functions.updatePhenotype = null;
         pFarmerDef.functions.updateMigration = new WeightedMotility();
 
-        CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
+        CellDefinition pPreyDef = getCellDefinition( "prey" );
         pPreyDef.functions.customCellRule = new AvoidBoundariesRule();
         pPreyDef.functions.updatePhenotype = new PreyPhenotype();
         pPreyDef.functions.updateMigration = new WeightedMotility();
 
-        CellDefinition pPredDef = CellDefinition.getCellDefinition( "predator" );
+        CellDefinition pPredDef = getCellDefinition( "predator" );
         pPredDef.functions.customCellRule = new AvoidBoundariesRule();
         pPredDef.functions.updatePhenotype = new PredatorPhenotype();
         pPredDef.functions.updateMigration = new WeightedMotility();
@@ -101,8 +101,8 @@ public class PredPreyFarmer extends Model
 
     void setupTissue()
     {
-        PhysiCellUtilities.place( m, "farmer", getParameterInt( "number_of_farmers" ) );
-        PhysiCellUtilities.place( m, "prey", getParameterInt( "number_of_prey" ) );
-        PhysiCellUtilities.place( m, "predator", getParameterInt( "number_of_predators" ) );
+        PhysiCellUtilities.place( this, "farmer", getParameterInt( "number_of_farmers" ) );
+        PhysiCellUtilities.place( this, "prey", getParameterInt( "number_of_prey" ) );
+        PhysiCellUtilities.place( this, "predator", getParameterInt( "number_of_predators" ) );
     }
 }

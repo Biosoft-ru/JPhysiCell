@@ -10,6 +10,7 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.O2based;
 import ru.biosoft.physicell.core.standard.StandardModels;
@@ -94,7 +95,7 @@ public class TestVolume
 
     public static void main(String[] argv) throws Exception
     {
-		run(2402, APOPTOSIS, resultPath + "/Apoptosis.txt");
+        run( 2402, APOPTOSIS, resultPath + "/Apoptosis.txt" );
         run( 2402, NECROSIS, resultPath + "/Necrosis.txt" );
         run( 4000, "", resultPath + "/Default.txt" );
     }
@@ -102,15 +103,16 @@ public class TestVolume
     public static void run(double tMax, String type, String name) throws Exception
     {
         Microenvironment m = new Microenvironment( "substrate scale", 2000, 20, "minutes", "microns" );
+        Model model = new Model( m );
         CellContainer.createCellContainer( m, 30 );
 
         m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
         for( int n = 0; n < m.numberVoxels(); n++ )
             m.getDensity( n )[0] = o2Conc;
 
-        CellDefinition.clearCellDefinitions();
+        model.clearCellDefinitions();
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
-        CellDefinition.registerCellDefinition( cd );
+        model.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.createAdvancedKi67();
         cd.functions.updatePhenotype = new O2based();
         //cell_defaults.functions.volume_update_function = standard_volume_update_function;
@@ -125,7 +127,7 @@ public class TestVolume
         //        int A_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.apoptotic );
         //        int N_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.necrotic_swelling );
 
-        Cell cell = Cell.createCell( cd, m, new double[] {500, 500, 500} );
+        Cell cell = Cell.createCell( cd, model, new double[] {500, 500, 500} );
         if( type.equals( APOPTOSIS ) )
         {
             //            cell.phenotype.cycle.data.currentPhaseIndex = A_index;

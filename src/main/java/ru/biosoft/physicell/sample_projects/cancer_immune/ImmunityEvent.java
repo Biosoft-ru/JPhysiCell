@@ -23,14 +23,14 @@ public class ImmunityEvent extends Event
     @Override
     public void execute(Model model) throws Exception
     {
-        System.out.println( "Therapy started!" );
+        //        System.out.println( "Therapy started!" );
         model.setSaveFullInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 
         introduceOmmuneCells( model, use2d );
     }
     
     public static void introduceOmmuneCells(Model model, boolean use2d)
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( "immune cell" );
+        CellDefinition cd = model.getCellDefinition( "immune cell" );
         Microenvironment m = model.getMicroenvironment();
         Set<Cell> cells = m.getAgents( Cell.class );
         double tumor_radius = -9e9; // 250.0; 
@@ -73,7 +73,7 @@ public class ImmunityEvent extends Event
                 double theta = PhysiCellUtilities.UniformRandom() * 6.283185307179586476925286766559;
                 double radius = PhysiCellUtilities.NormalRandom( mean_radius, std_radius );
                 double[] position = new double[] {radius * Math.cos( theta ), radius * Math.sin( theta ), 0};
-                Cell.createCell( cd, m, position );
+                Cell.createCell( cd, model, position );
             }
         }
         else
@@ -85,7 +85,7 @@ public class ImmunityEvent extends Event
                 double radius = PhysiCellUtilities.NormalRandom( mean_radius, std_radius );
                 double[] position = new double[] {radius * Math.cos( theta ) * Math.sin( phi ),
                         radius * Math.sin( theta ) * Math.sin( phi ), radius * Math.cos( phi )};
-                Cell.createCell( cd, m, position );
+                Cell.createCell( cd, model, position );
             }
         }
     }

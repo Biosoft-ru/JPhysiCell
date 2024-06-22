@@ -9,6 +9,7 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CycleModel;
 import ru.biosoft.physicell.core.DeathParameters;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhaseArrest;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
@@ -449,7 +450,7 @@ public class StandardModels
     {
         // check for detachments 
         double detachment_probability = phenotype.mechanics.detachmentRate * dt;
-
+        Model model = pCell.getModel();
         List<Cell> toDetach = new ArrayList<>();
         for( Cell pTest : pCell.state.springAttachments )
         {
@@ -488,7 +489,7 @@ public class StandardModels
             {
                 // std::string search_string = "adhesive affinity to " + pTest.type_name; 
                 // double affinity = get_single_behavior( pCell , search_string );
-                double affinity = phenotype.mechanics.cell_adhesion_affinity( pTest.typeName );
+                double affinity = phenotype.mechanics.cell_adhesion_affinity( pTest.typeName, model );
                 if( PhysiCellUtilities.checkRandom( attachment_probability * affinity ) )
                 {
                     // attempt the attachment. testing for prior connection is already automated 
@@ -532,8 +533,8 @@ public class StandardModels
 
         double[] displacement = VectorUtil.newDiff( pC2.position, pC1.position );
         // update May 2022 - effective adhesion 
-        int ii = CellDefinition.getCellDefinitionIndex( pC1.type );
-        int jj = CellDefinition.getCellDefinitionIndex( pC2.type );
+        int ii = pC1.getModel().getCellDefinitionIndex( pC1.type );
+        int jj = pC1.getModel().getCellDefinitionIndex( pC2.type );
         double adhesion_ii = pC1.phenotype.mechanics.attachmentElasticConstant * pC1.phenotype.mechanics.cellAdhesionAffinities[jj];
         double adhesion_jj = pC2.phenotype.mechanics.attachmentElasticConstant * pC2.phenotype.mechanics.cellAdhesionAffinities[ii];
         double effective_attachment_elastic_constant = Math.sqrt( adhesion_ii * adhesion_jj );
@@ -550,8 +551,8 @@ public class StandardModels
         double[] displacement = VectorUtil.newDiff( pC2.position, pC1.position );
 
         // update May 2022 - effective adhesion 
-        int ii = CellDefinition.getCellDefinitionIndex( pC1.type );
-        int jj = CellDefinition.getCellDefinitionIndex( pC2.type );
+        int ii = pC1.getModel().getCellDefinitionIndex( pC1.type );
+        int jj = pC1.getModel().getCellDefinitionIndex( pC2.type );
 
         double adhesion_ii = pC1.phenotype.mechanics.attachmentElasticConstant * pC1.phenotype.mechanics.cellAdhesionAffinities[jj];
         double adhesion_jj = pC2.phenotype.mechanics.attachmentElasticConstant * pC2.phenotype.mechanics.cellAdhesionAffinities[ii];
@@ -677,7 +678,7 @@ public class StandardModels
             if( PhysiCellUtilities.checkRandom( probability ) )
             {
                 // std::cout << "Transforming from " << pCell.type_name << " to " << cell_definitions_by_index[i].name << std::endl; 
-                pCell.convert( CellDefinition.getCellDefinition( i ) );
+                pCell.convert( pCell.getModel().getCellDefinition( i ) );
                 return;
             }
         }

@@ -44,8 +44,8 @@ public class EcoliAceticSwitch extends Model
     {
         bacteria_cell = StandardModels.getDefaultCellDefinition().clone( "bacteria cell", 1, m );
         bacteria_cell.phenotype.sync( m );
-        bacteria_cell.phenotype.sync();
-        CellDefinition.registerCellDefinition( bacteria_cell );
+        bacteria_cell.phenotype.sync( this );
+        registerCellDefinition( bacteria_cell );
         double four_thirds_pi = 4.188790204786391;
         double cell_radius = getParameterDouble( "cell_radius" );
         double total = Math.pow( four_thirds_pi * cell_radius, 3 );
@@ -100,7 +100,7 @@ public class EcoliAceticSwitch extends Model
     void createCellTypes() throws Exception
     {
         CellDefinition cell_defaults = StandardModels.createDefaultCellDefinition();
-        CellDefinition.registerCellDefinition( cell_defaults );
+        registerCellDefinition( cell_defaults );
         cell_defaults.phenotype.secretion.sync( m );
 
         // turn the default cycle model to live, so it's easier to turn off proliferation
@@ -124,7 +124,7 @@ public class EcoliAceticSwitch extends Model
 
     void setupTissue()
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( "bacteria cell" );
+        CellDefinition cd = getCellDefinition( "bacteria cell" );
         // place a bacterial colony at the center 
         double cell_radius = cd.phenotype.geometry.radius;
         double cell_spacing = 0.95 * 2.0 * cell_radius;
@@ -136,7 +136,7 @@ public class EcoliAceticSwitch extends Model
         double x_outer = colony_radius;
         double y = 0.0;
 
-        pCell = Cell.createCell( bacteria_cell, m, new double[] {0, 0, 0.0} );
+        pCell = Cell.createCell( bacteria_cell, this, new double[] {0, 0, 0.0} );
         pCell.phenotype.intracellular = fba.clone();
 
         int n = 0;
@@ -151,22 +151,22 @@ public class EcoliAceticSwitch extends Model
 
             while( x < x_outer )
             {
-                pCell = Cell.createCell( bacteria_cell, m, new double[] {x, y, 0.0} );
+                pCell = Cell.createCell( bacteria_cell, this, new double[] {x, y, 0.0} );
                 pCell.phenotype.intracellular = fba.clone();
 
                 if( Math.abs( y ) > 0.01 )
                 {
-                    pCell = Cell.createCell( bacteria_cell, m, new double[] {x, -y, 0.0} );
+                    pCell = Cell.createCell( bacteria_cell, this, new double[] {x, -y, 0.0} );
                     pCell.phenotype.intracellular = fba.clone();
                 }
 
                 if( Math.abs( x ) > 0.01 )
                 {
-                    pCell = Cell.createCell( bacteria_cell, m, new double[] { -x, y, 0.0} );
+                    pCell = Cell.createCell( bacteria_cell, this, new double[] { -x, y, 0.0} );
                     pCell.phenotype.intracellular = fba.clone();
                     if( Math.abs( y ) > 0.01 )
                     {
-                        pCell = Cell.createCell( bacteria_cell, m, new double[] { -x, -y, 0.0} );
+                        pCell = Cell.createCell( bacteria_cell, this, new double[] { -x, -y, 0.0} );
                         pCell.phenotype.intracellular = fba.clone();
                     }
                 }

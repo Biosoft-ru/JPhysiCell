@@ -14,7 +14,7 @@ public class BacteriaPhenotype extends UpdatePhenotype
     @Override
     public void execute(Cell cell, Phenotype phenotype, double dt)
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( cell.typeName );
+        CellDefinition cd = cell.getModel().getCellDefinition( cell.typeName );
         CustomCellData data = cd.custom_data;
         Microenvironment m = cell.getMicroenvironment();
         int nR = m.findDensityIndex( "resource" );

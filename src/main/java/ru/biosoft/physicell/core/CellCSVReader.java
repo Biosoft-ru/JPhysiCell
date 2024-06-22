@@ -4,13 +4,12 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 
 public class CellCSVReader
 {
 
-    static void load_cells_csv_v1(BufferedReader br, Microenvironment m) throws Exception
+    static void load_cells_csv_v1(BufferedReader br, Model model) throws Exception
     {
         //        try (BufferedReader br = new BufferedReader( new InputStreamReader( inputStream ) ))
         //        {
@@ -23,11 +22,11 @@ public class CellCSVReader
 
             double[] position = {Double.parseDouble( data[0] ), Double.parseDouble( data[1] ), Double.parseDouble( data[2] )};
             int my_type = (int)Math.round( Double.parseDouble( data[3] ) );
-            CellDefinition pCD = CellDefinition.getCellDefinition( my_type );
+            CellDefinition pCD = model.getCellDefinition( my_type );
             if( pCD != null )
             {
                 //                System.out.println( "Creating " + pCD.name + " (type=" + pCD.type + ") at " + VectorUtil.print( position ) );
-                Cell pCell = Cell.createCell( pCD, m, position );
+                Cell pCell = Cell.createCell( pCD, model, position );
             }
             else
             {
@@ -39,7 +38,7 @@ public class CellCSVReader
         //        }
     }
 
-    static Cell process_csv_v2_line(String line, String[] labels, Microenvironment m)
+    static Cell process_csv_v2_line(String line, String[] labels, Model model)
     {
         String[] tokens = line.split( "," );
         double[] position = new double[3];
@@ -49,7 +48,7 @@ public class CellCSVReader
 
         // the cell type 
         String celltype = tokens[3];
-        CellDefinition pCD = CellDefinition.getCellDefinition( celltype );
+        CellDefinition pCD = model.getCellDefinition( celltype );
         if( pCD == null )
         {
             System.out.println( "Warning! CSV file requests creating cell type " + celltype + "\tat " + position
@@ -58,9 +57,9 @@ public class CellCSVReader
         }
 
         // create the cell IF the definition was found 
-//        System.out.println( "Creating " + pCD.name + " (type=" + pCD.type + ") at " + VectorUtil.print( position ) );
+        //        System.out.println( "Creating " + pCD.name + " (type=" + pCD.type + ") at " + VectorUtil.print( position ) );
 
-        Cell pCell = Cell.createCell( pCD, m, position );
+        Cell pCell = Cell.createCell( pCD, model, position );
         return pCell;
         // now write any extra data 
         //        for( int k=4 ; k < tokens.length; k++ )
@@ -121,7 +120,7 @@ public class CellCSVReader
         //        return pCell;  
     }
 
-    static void load_cells_csv_v2(BufferedReader br, Microenvironment m) throws Exception
+    static void load_cells_csv_v2(BufferedReader br, Model model) throws Exception
     {
         //        File f = new File( filename );
         //        if( !f.exists() )
@@ -134,13 +133,13 @@ public class CellCSVReader
         s = br.readLine();
         while( s != null )
         {
-            process_csv_v2_line( s, labels, m );
+            process_csv_v2_line( s, labels, model );
             s = br.readLine();
         }
         //        }
     }
 
-    public static void load_cells_csv(InputStream inputStream, Microenvironment m) throws Exception
+    public static void load_cells_csv(InputStream inputStream, Model model) throws Exception
     {
         try (BufferedReader br = new BufferedReader( new InputStreamReader( inputStream ) ))
         {
@@ -149,12 +148,12 @@ public class CellCSVReader
             if( c == 'X' || c == 'x' )
             {
                 // v2
-                load_cells_csv_v2( br, m );
+                load_cells_csv_v2( br, model );
             }
             else
             {
                 // v1
-                load_cells_csv_v1( br, m );
+                load_cells_csv_v1( br, model );
             }
         }
     }

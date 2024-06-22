@@ -15,7 +15,7 @@ public class NeutrophilPhenotype extends UpdatePhenotype
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
+        CellDefinition pCD = pCell.getModel().getCellDefinition( pCell.typeName );
         Microenvironment m = pCell.getMicroenvironment();
 
         if( phenotype.death.dead == true )

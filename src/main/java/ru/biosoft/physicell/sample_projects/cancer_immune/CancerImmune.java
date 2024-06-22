@@ -93,7 +93,7 @@ public class CancerImmune extends Model
         // that future division and other events are still not identical 
         // for all runs 
         PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( getMicroenvironment() );
+        SignalBehavior.setupDictionaries( this );
         createCancerCell();
         createImmuneCell();
         setupTissue( use2D );
@@ -106,8 +106,8 @@ public class CancerImmune extends Model
 
     void createImmuneCell()
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( "immune cell" );
-        CellDefinition cancerCellCD = CellDefinition.getCellDefinition( "cancer cell" );
+        CellDefinition cd = getCellDefinition( "immune cell" );
+        CellDefinition cancerCellCD = getCellDefinition( "cancer cell" );
 
         int oxygen_ID = m.findDensityIndex( "oxygen" );
         int immuno_ID = m.findDensityIndex( "immunostimulatory factor" );
@@ -136,7 +136,7 @@ public class CancerImmune extends Model
 
     public void createCancerCell() throws Exception
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
+        CellDefinition cd = getCellDefinition( "cancer cell" );
         cd.parameters.o2_proliferation_saturation = 38.0;
         cd.parameters.o2_reference = 38.0;
         cd.phenotype.mechanics.relMaxAttachmentDistance = cd.custom_data.get( "max_attachment_distance" ) / cd.phenotype.geometry.radius;
@@ -202,7 +202,7 @@ public class CancerImmune extends Model
     void setupTissue(boolean use2D) throws Exception
     {
         // place a cluster of tumor cells at the center 
-        CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
+        CellDefinition cd = getCellDefinition( "cancer cell" );
         double cellRadius = cd.phenotype.geometry.radius;
         //        double cell_spacing = 0.95 * 2.0 * cell_radius;
 
@@ -216,7 +216,7 @@ public class CancerImmune extends Model
 
         for( double[] position : positions )
         {
-            Cell pCell = Cell.createCell( cd, m, position ); // tumor cell 
+            Cell pCell = Cell.createCell( cd, this, position ); // tumor cell 
             double oncoprotein = Math.max( 0, PhysiCellUtilities.NormalRandom( imm_mean, imm_sd ) );
             pCell.customData.set( "oncoprotein", oncoprotein );
         }

@@ -13,7 +13,7 @@ public class DifferentiatedPhenotype extends UpdatePhenotype
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
+        CellDefinition pCD = pCell.getModel().getCellDefinition( pCell.typeName );
         Microenvironment m = pCell.getMicroenvironment();
         int nR = m.findDensityIndex( "resource" );
         int nTox = m.findDensityIndex( "toxin" );

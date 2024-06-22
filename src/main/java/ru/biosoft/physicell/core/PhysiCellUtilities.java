@@ -104,32 +104,6 @@ public class PhysiCellUtilities
     public static double UniformRandom()
     {
         return r.nextDouble();
-        //        thread_local std::uniform_real_distribution<double> distribution(0.0,1.0);
-        //        if( local_pnrg_setup_done == false )
-        //        {
-        //            // get my thread number 
-        //            int i = omp_get_thread_num(); 
-        //            physicell_PRNG_generator.seed( physicell_random_seeds[i] ); 
-        //            local_pnrg_setup_done = true; 
-        //    /*
-        //            #pragma omp critical 
-        //            {
-        //            std::cout << "thread: " << i 
-        //            << " seed: " << physicell_random_seeds[i]  << std::endl; 
-        //            std::cout << "\t first call: " << distribution(physicell_PRNG_generator) << std::endl; 
-        //            }
-        //    */
-        //        }
-        //        return distribution(physicell_PRNG_generator);
-        //
-        //        // helpful info: https://stackoverflow.com/a/29710970
-        //    /*
-        //
-        //        static std::uniform_real_distribution<double> distribution(0.0,1.0); 
-        //        double out;
-        //        out = distribution(physicell_PRNG_generator);
-        //        return out; 
-        //    */  
     }
 
     public static double[] getCenter(GeneralMesh mesh)
@@ -148,7 +122,7 @@ public class PhysiCellUtilities
         return Math.round( v * 2 ) / 2;
     }
 
-    public static void placeInBox(double[] box, CellDefinition cd, int number, Microenvironment m)
+    public static void placeInBox(double[] box, CellDefinition cd, int number, Model model)
     {
         for( int i = 0; i < number; i++ )
         {
@@ -156,50 +130,51 @@ public class PhysiCellUtilities
             position[0] = PhysiCellUtilities.UniformRandom( box[0], box[3] );
             position[1] = PhysiCellUtilities.UniformRandom( box[1], box[4] );
             position[2] = PhysiCellUtilities.UniformRandom( box[2], box[5] );
-            Cell.createCell( cd, m, position );
+            Cell.createCell( cd, model, position );
         }
     }
 
-    public static void place2D(Microenvironment m, String type, int number)
+    public static void place2D(Model model, String type, int number)
     {
-        double[] box = m.mesh.boundingBox.clone();
+        double[] box = model.m.mesh.boundingBox.clone();
         box[2] = 0.0;
         box[5] = 0.0;
-        placeInBox( box, type, number, m );
+        placeInBox( box, type, number, model );
     }
 
-    public static void place(Microenvironment m, CellDefinition cd, int number)
+    public static void place(Model model, CellDefinition cd, int number)
     {
+        Microenvironment m = model.getMicroenvironment();
         double[] box = m.mesh.boundingBox.clone();
         if( m.options.simulate2D )
         {
             box[2] = 0.0;
             box[5] = 0.0;
         }
-        placeInBox( box, cd, number, m );
+        placeInBox( box, cd, number, model );
     }
 
-    public static void place(Microenvironment m, String type, int number)
+    public static void place(Model model, String type, int number)
     {
-        double[] box = m.mesh.boundingBox.clone();
-        if( m.options.simulate2D )
+        double[] box = model.m.mesh.boundingBox.clone();
+        if( model.m.options.simulate2D )
         {
             box[2] = 0.0;
             box[5] = 0.0;
         }
-        placeInBox( box, type, number, m );
+        placeInBox( box, type, number, model );
     }
 
-    public static void placeInBox(double[] box, String type, int number, Microenvironment m)
+    public static void placeInBox(double[] box, String type, int number, Model model)
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
+        CellDefinition cd = model.getCellDefinition( type );
         for( int i = 0; i < number; i++ )
         {
             double[] position = {0, 0, 0};
             position[0] = PhysiCellUtilities.UniformRandom( box[0], box[3] );
             position[1] = PhysiCellUtilities.UniformRandom( box[1], box[4] );
             position[2] = PhysiCellUtilities.UniformRandom( box[2], box[5] );
-            Cell.createCell( cd, m, position );
+            Cell.createCell( cd, model, position );
         }
     }
 

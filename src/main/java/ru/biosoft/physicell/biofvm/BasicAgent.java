@@ -1,6 +1,7 @@
 package ru.biosoft.physicell.biofvm;
 
 import ru.biosoft.physicell.core.CellContainer;
+import ru.biosoft.physicell.core.Model;
 
 /*
 #############################################################################
@@ -55,6 +56,7 @@ public class BasicAgent
 
     static int maxBasicAgentId = 0;
 
+    private Model model;
     protected Microenvironment m;
     int selected_microenvironment;
 
@@ -90,8 +92,9 @@ public class BasicAgent
     public double[] fractionReleasedDeath;
     public double[] fractionTransferredIngested;
 
-    public BasicAgent(Microenvironment m)
+    public BasicAgent(Model model)
     {
+        this.model = model;
         //give the agent a unique ID  
         ID = maxBasicAgentId;
         maxBasicAgentId++;
@@ -111,7 +114,7 @@ public class BasicAgent
         internalizedSubstrates = new double[0];// = new std::vector<double>(0); // 
         fractionReleasedDeath = new double[0];// = new std::vector<double>(0); 
         fractionTransferredIngested = new double[0];// = new std::vector<double>(0); 
-        registerMicroenvironment( m );
+        registerMicroenvironment( model.getMicroenvironment() );
 
         // these are done in register_microenvironment
         // //internalized_substrates.assign( get_default_microenvironment()->number_of_densities() , 0.0 ); 
@@ -205,11 +208,16 @@ public class BasicAgent
         return m;
     }
 
-    public static BasicAgent createBasicAgent(Microenvironment m)
+    public Model getModel()
     {
-        BasicAgent pNew = new BasicAgent( m );
+        return model;
+    }
+
+    public static BasicAgent createBasicAgent(Model model)
+    {
+        BasicAgent pNew = new BasicAgent( model );
         //        allBasicAgents.add( pNew );
-        pNew.index = m.getAgentsCount();
+        pNew.index = model.getMicroenvironment().getAgentsCount();
         return pNew;
     }
 

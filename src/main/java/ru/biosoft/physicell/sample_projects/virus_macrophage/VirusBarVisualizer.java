@@ -23,7 +23,7 @@ public class VirusBarVisualizer extends AgentVisualizer
         double minVirus = pCell.customData.get( "min_virion_count" );
         double maxVirus = pCell.customData.get( "burst_virion_count" );
         double denominator = maxVirus - minVirus + 1e-15;
-        CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
+        CellDefinition pMacrophage = pCell.getModel().getCellDefinition( "macrophage" );
         if( pCell.phenotype.death.dead )
         {
             output[0] = Color.red;

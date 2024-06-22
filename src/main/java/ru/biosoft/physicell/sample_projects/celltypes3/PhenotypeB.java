@@ -21,7 +21,7 @@ public class PhenotypeB extends UpdatePhenotype
     {
         // housekeeping 
         Microenvironment m = pCell.getMicroenvironment();
-        CellDefinition pCD = CellDefinition.getCellDefinition( "B" );
+        CellDefinition pCD = pCell.getModel().getCellDefinition( "B" );
         int nApoptosis = pCD.phenotype.death.findDeathModelIndex( "Apoptosis" );
         int nNecrosis = pCD.phenotype.death.findDeathModelIndex( "Necrosis" );
 

@@ -35,8 +35,8 @@ public class TherapyEvent extends Event
         double bottom = m.options.Y_range[0] + 50.0; // -700;
         double top = m.options.Y_range[1] - 50.0; // 700;
 
-        CellDefinition workerCD = CellDefinition.getCellDefinition( "worker cell" );
-        CellDefinition cargoCD = CellDefinition.getCellDefinition( "cargo cell" );
+        CellDefinition workerCD = model.getCellDefinition( "worker cell" );
+        CellDefinition cargoCD = model.getCellDefinition( "cargo cell" );
 
         for( int i = 0; i < numberInjectedCells; i++ )
         {
@@ -46,11 +46,11 @@ public class TherapyEvent extends Event
 
             if( PhysiCellUtilities.UniformRandom() <= workerFraction )
             {
-                Cell.createCell( workerCD, m, position );
+                Cell.createCell( workerCD, model, position );
             }
             else
             {
-                Cell.createCell( cargoCD, m, position );
+                Cell.createCell( cargoCD, model, position );
             }
         }
     }

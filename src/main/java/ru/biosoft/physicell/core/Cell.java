@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.BasicAgent;
-import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.CellFunctions.instantiate_cell;
 import ru.biosoft.physicell.core.standard.StandardModels;
@@ -95,9 +94,9 @@ public class Cell extends BasicAgent
     boolean isMovable;
     public double[] displacement; // this should be moved to state, or made private
 
-    public Cell(CellDefinition cd, Microenvironment m)
+    public Cell(CellDefinition cd, Model model)
     {
-        super( m );
+        super( model );
         type = cd.type;
         typeName = cd.name;
         customData = cd.custom_data.clone();
@@ -193,15 +192,15 @@ public class Cell extends BasicAgent
         return currentMechanicsVoxelIndex;
     }
 
-    public static Cell createCell(CellDefinition cd, Microenvironment m, double[] position)
+    public static Cell createCell(CellDefinition cd, Model model, double[] position)
     {
-        return createCell( null, cd, m, position );
+        return createCell( null, cd, model, position );
     }
 
-    public static Cell createCell(instantiate_cell custom_instantiate, CellDefinition cd, Microenvironment m, double[] position)
+    public static Cell createCell(instantiate_cell custom_instantiate, CellDefinition cd, Model model, double[] position)
     {
-        Cell pNew = custom_instantiate == null ? new Cell( cd, m ) : custom_instantiate.execute();
-        pNew.index = m.getAgentsCount();
+        Cell pNew = custom_instantiate == null ? new Cell( cd, model ) : custom_instantiate.execute();
+        pNew.index = model.getMicroenvironment().getAgentsCount();
         //        pNew.registerMicroenvironment( m );
         // All the phenotype and other data structures are already set by virtue of the default Cell constructor. 
         pNew.setTotalVolume( pNew.phenotype.volume.total );
@@ -354,7 +353,7 @@ public class Cell extends BasicAgent
         double[] pos = VectorUtil.newSum( position, rand_vec );
         //        System.out.println( type_name + "\tdivided\t" + position[0] + "\t" + position[1] + "\t" + position[2] + "\t->\t" + pos[0] + "\t"
         //                + pos[1] + "\t" + pos[2] );
-        Cell child = createCell( functions.instantiate_cell, definition, m, pos );
+        Cell child = createCell( functions.instantiate_cell, definition, getModel(), pos );
         child.copyData( this );
         child.copyFunctionPointers( this );
         child.parameters = parameters;
@@ -668,8 +667,8 @@ public class Cell extends BasicAgent
 
             // August 2017 - back to the original if both have same coefficient 
             // May 2022 - back to original if both affinities are 1
-            int ii = CellDefinition.getCellDefinitionIndex( type );//CellDefinition.getCellDefinition( type ).;
-            int jj = CellDefinition.getCellDefinitionIndex( other.type );//find_cell_definition_index( other.type );
+            int ii = getModel().getCellDefinitionIndex( type );//CellDefinition.getCellDefinition( type ).;
+            int jj = getModel().getCellDefinitionIndex( other.type );//find_cell_definition_index( other.type );
 
             double adhesion_ii = m1.cellCellAdhesionStrength * m1.cellAdhesionAffinities[jj];
             double adhesion_jj = m2.cellCellAdhesionStrength * m2.cellAdhesionAffinities[ii];

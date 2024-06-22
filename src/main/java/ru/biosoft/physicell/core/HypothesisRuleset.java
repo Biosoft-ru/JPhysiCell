@@ -42,15 +42,15 @@ public class HypothesisRuleset
         return sb.toString();
     }
 
-    void sync(CellDefinition cd)
+    void sync(Model model, CellDefinition cd)
     {
         this.cd = cd;
         type = cd.name;
         for( HypothesisRule rule : rules )
-            rule.sync( cd );
+            rule.sync( model, cd );
     }
 
-    HypothesisRule addBehavior(String behavior, double minBehavior, double maxBehavior) throws Exception
+    HypothesisRule addBehavior(Model model, String behavior, double minBehavior, double maxBehavior) throws Exception
     {
         // check: is this a valid signal? (is it in the dictionary?)
         if( SignalBehavior.findBehaviorIndex( behavior ) < 0 )
@@ -65,7 +65,7 @@ public class HypothesisRuleset
         {
             HypothesisRule hr = new HypothesisRule();
             hr.behavior = behavior;
-            hr.sync( cd );
+            hr.sync( model, cd );
             hr.minValue = minBehavior;
             hr.maxValue = maxBehavior;
             rules.add( hr );
@@ -85,16 +85,16 @@ public class HypothesisRuleset
         return rule;
     }
 
-    HypothesisRule addBehavior(String behavior) throws Exception
+    HypothesisRule addBehavior(Model model, String behavior) throws Exception
     {
         double minBehavior = 0.1;
         double maxBehavior = 1.0;
-        return addBehavior( behavior, minBehavior, maxBehavior );
+        return addBehavior( model, behavior, minBehavior, maxBehavior );
     }
 
-    void sync(String name)
+    void sync(Model model, String name)
     {
-        sync( CellDefinition.getCellDefinition( name ) );
+        sync( model, model.getCellDefinition( name ) );
     }
 
     HypothesisRule findBehavior(String name)

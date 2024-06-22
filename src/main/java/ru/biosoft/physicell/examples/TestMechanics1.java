@@ -5,6 +5,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
@@ -98,24 +99,25 @@ public class TestMechanics1
     public static void main(String ... args) throws Exception
     {
         Microenvironment m = new Microenvironment( "substrate scale", size, 20, "minutes", "microns" );
+        Model model = new Model( m );
         m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
         CellContainer.createCellContainer( m, 30 );
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
-        CellDefinition.registerCellDefinition( cd );
+        model.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         cd.functions.updatePhenotype = null;
         cd.functions.updateVolume = null;
 
         int Q_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_negative );
 
-        Cell pCell1 = Cell.createCell( cd, m, point1 );
+        Cell pCell1 = Cell.createCell( cd, model, point1 );
         pCell1.phenotype.cycle.data.currentPhaseIndex = Q_index;
         /* NOTE: for this experiment, you need to disable volume update function 
          to make sure that volume change are not affecting the distance we measure for the cells.*/
         pCell1.functions.updateVolume = null;
         pCell1.setTotalVolume( volume );
 
-        Cell pCell2 = Cell.createCell( cd, m, point2 );
+        Cell pCell2 = Cell.createCell( cd, model, point2 );
         pCell2.phenotype.cycle.data.currentPhaseIndex = Q_index;
         pCell2.functions.updateVolume = null;
         pCell2.setTotalVolume( volume );

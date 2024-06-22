@@ -87,16 +87,16 @@ public class Mechano extends Model
     void createCellTypes()
     {
         PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( m );
+        SignalBehavior.setupDictionaries( this );
         //        Rules.setup_cell_rules( model );
-        CellDefinition pCD = CellDefinition.getCellDefinition( "cancer" );
+        CellDefinition pCD = getCellDefinition( "cancer" );
         pCD.phenotype.mechanics.maxAttachments = 6;
         pCD.phenotype.mechanics.attachmentElasticConstant = 0.00142; // 0.00142; // 0.1 for confluent version; // 0.002
         pCD.phenotype.mechanics.attachmentRate = 1;
         pCD.phenotype.mechanics.detachmentRate = 0.01; // 0.01
         pCD.functions.updatePhenotype = new CancerPhenotype();
 
-        pCD = CellDefinition.getCellDefinition( "BM" );
+        pCD = getCellDefinition( "BM" );
         pCD.phenotype.mechanics.maxAttachments = 6;
         pCD.phenotype.mechanics.attachmentElasticConstant = 0.05; // 0.0142; // 1;   
         pCD.phenotype.mechanics.attachmentRate = 1;

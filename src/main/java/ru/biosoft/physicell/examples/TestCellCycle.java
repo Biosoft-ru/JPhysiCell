@@ -12,6 +12,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.O2based;
@@ -127,6 +128,7 @@ public class TestCellCycle
     public static void main(String ... argv) throws Exception
     {
         Microenvironment m = new Microenvironment( "substrate scale", size, cellSize, "minutes", "microns" );
+        Model model = new Model( m );
         m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
         for( int n = 0; n < m.numberVoxels(); n++ )
             m.getDensity( n )[0] = o2Сonc;
@@ -134,7 +136,7 @@ public class TestCellCycle
         CellContainer.createCellContainer( m, 30 );
 
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
-        CellDefinition.registerCellDefinition( cd );
+        model.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.Ki67_advanced; // set default cell cycle model 
         cd.functions.updatePhenotype = new O2based(); // set default_cell_functions; 
         cd.functions.updateVelocity = null;
@@ -177,7 +179,7 @@ public class TestCellCycle
             int phaseIndex = 0;
             double[] tempPosition = VectorUtil.random( 3, 0, size );
             tempPosition[2] = zSlice;//keep z at slice
-            Cell cell = Cell.createCell( cd, m, tempPosition );
+            Cell cell = Cell.createCell( cd, model, tempPosition );
             cell.tag = "Source";
             if( i < num_ki67_positive_pre )
             {

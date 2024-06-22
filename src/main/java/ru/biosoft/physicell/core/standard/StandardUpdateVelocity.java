@@ -7,8 +7,9 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.Mechanics;
 import ru.biosoft.physicell.core.CellFunctions.UpdateVelocity;
+import ru.biosoft.physicell.core.Mechanics;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 
 public class StandardUpdateVelocity extends UpdateVelocity
@@ -21,17 +22,18 @@ public class StandardUpdateVelocity extends UpdateVelocity
     public static double addPTime = 0;
     public static double totalTime = 0;
     boolean isInit = false;
-    public void init()
+
+    public void init(Model model)
     {
-        int defs = CellDefinition.getDefinitionsCount();
+        int defs = model.getDefinitionsCount();
         repulsion = new double[defs][defs];
         adhesion = new double[defs][defs];
         for( int i = 0; i < defs; i++ )
         {
             for( int j = 0; j < defs; j++ )
             {
-                CellDefinition cdi = CellDefinition.getCellDefinition( i );
-                CellDefinition cdj = CellDefinition.getCellDefinition( j );
+                CellDefinition cdi = model.getCellDefinition( i );
+                CellDefinition cdj = model.getCellDefinition( j );
 
                 Mechanics mi = cdi.phenotype.mechanics;
                 Mechanics mj = cdj.phenotype.mechanics;
@@ -56,7 +58,7 @@ public class StandardUpdateVelocity extends UpdateVelocity
             pCell.functions.membraneInteraction.execute( pCell, phenotype, dt );
         }
         if( !isInit )
-            init();
+            init( pCell.getModel() );
 
         pCell.state.simplePressure = 0.0;
         pCell.state.neighbors.clear(); // new 1.8.0

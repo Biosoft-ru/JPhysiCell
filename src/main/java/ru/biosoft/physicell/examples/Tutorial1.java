@@ -3,6 +3,7 @@ package ru.biosoft.physicell.examples;
 import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
@@ -67,6 +68,7 @@ public class Tutorial1
     {
         double timeStart = System.currentTimeMillis();
         Microenvironment m = new Microenvironment( "substrate scale", size, cellSize, "minutes", "microns" );
+        Model model = new Model( m );
         //        m.setDensity( 0, "substrate1", "dimensionless" );
         m.setDensity( 0, "substrate1", "dimensionless", diffusionCoefficients, decayRate );
 
@@ -94,7 +96,7 @@ public class Tutorial1
             if( generateAtSlice )
                 pos[2] = zSlice; //keep agents at z slice
 
-            BasicAgent agentSource = BasicAgent.createBasicAgent( m );
+            BasicAgent agentSource = BasicAgent.createBasicAgent( model );
             agentSource.registerMicroenvironment( m );
             agentSource.assignPosition( pos );
             agentSource.setRadius( agentRadius );
@@ -110,7 +112,7 @@ public class Tutorial1
             if( generateAtSlice )
                 pos[2] = zSlice; //keep agents at z slice 
 
-            BasicAgent agentSink = BasicAgent.createBasicAgent( m );
+            BasicAgent agentSink = BasicAgent.createBasicAgent( model );
             agentSink.registerMicroenvironment( m );
             agentSink.assignPosition( pos );
             agentSink.setRadius( agentRadius );

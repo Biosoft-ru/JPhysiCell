@@ -82,27 +82,27 @@ public class Rules
 {
     public static Map<CellDefinition, HypothesisRuleset> hypothesisRulesets = new HashMap<>();
 
-    static void add_hypothesis_ruleset(CellDefinition cd)
+    static void add_hypothesis_ruleset(Model model, CellDefinition cd)
     {
 
         //        auto search = hypothesis_rulesets.find( pCD );
         //        if( search == hypothesis_rulesets.end() )
         //        {
         HypothesisRuleset ruleset = new HypothesisRuleset();
-        ruleset.sync( cd );
+        ruleset.sync( model, cd );
         //            hypothesis_rulesets[pCD] = HRS; 
         //        }
         hypothesisRulesets.put( cd, ruleset );
     }
 
-    static void intialize_hypothesis_rulesets()
+    static void intialize_hypothesis_rulesets(Model model)
     {
         hypothesisRulesets.clear(); // empty(); 
 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             //            CellDefinition pCD = CellDefinitions_by_index[n];
-            add_hypothesis_ruleset( cd );
+            add_hypothesis_ruleset( model, cd );
         }
     }
 
@@ -116,29 +116,29 @@ public class Rules
         return ( hypothesisRulesets.get( cd ) );
     }
 
-    public static String display_hypothesis_rulesets()
+    public static String display_hypothesis_rulesets(Model model)
     {
         StringBuilder sb = new StringBuilder();
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             sb.append( hypothesisRulesets.get( cd ).display() );//CellDefinitions_by_index[n]] );
         }
         return sb.toString();
     }
 
-    String detailed_display_hypothesis_rulesets()
+    String detailed_display_hypothesis_rulesets(Model model)
     {
         StringBuilder sb = new StringBuilder();
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             sb.append( hypothesisRulesets.get( cd ).detailedDisplay() );
         }
         return sb.toString();
     }
 
-    void addRule(String type, String signal, String behavior, String response) throws Exception
+    void addRule(Model model, String type, String signal, String behavior, String response) throws Exception
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
+        CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             System.out.println( "Warning: Attempted to add rule for " + type + ", but no cell definition found for this type." );
 
@@ -154,13 +154,13 @@ public class Rules
                 System.out.println( "wha?" );
             }
         }
-        pHRS.addBehavior( behavior );
+        pHRS.addBehavior( model, behavior );
         pHRS.get( behavior ).addSignal( signal, response );
     }
 
-    static void addRule(String type, String signal, String behavior, String response, boolean useForDead) throws Exception
+    static void addRule(Model model, String type, String signal, String behavior, String response, boolean useForDead) throws Exception
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
+        CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception( "Warning: Attempted to add rule for " + type + ", but no cell definition found for this type." );
 
@@ -176,16 +176,17 @@ public class Rules
                 System.out.println( "wha?" );
             }
         }
-        pHRS.addBehavior( behavior );
+        pHRS.addBehavior( model, behavior );
         pHRS.get( behavior ).addSignal( signal, response );
         // set dead flag
         int n = pHRS.get( behavior ).findSignal( signal );
         pHRS.get( behavior ).appliesToDead.set( n, useForDead );
     }
 
-    static void set_hypothesis_parameters(String type, String signal, String behavior, double max, double hillPower) throws Exception
+    static void set_hypothesis_parameters(Model model, String type, String signal, String behavior, double max, double hillPower)
+            throws Exception
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
+        CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception( "Warning: Attempted to set parameters for " + behavior + " modulated by " + signal + " in " + type
                     + ", but no cell definition found for this type." );
@@ -207,9 +208,9 @@ public class Rules
         hypothesisRulesets.get( cd ).get( behavior ).setHillPower( signal, hillPower );
     }
 
-    void setBehaviorParameters(String type, String behavior, double min, double max) throws Exception
+    void setBehaviorParameters(Model model, String type, String behavior, double min, double max) throws Exception
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
+        CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception(
                     "Warning: Attempted to set parameters for " + behavior + " in " + type + ", but the cell definition is not found." );
@@ -226,9 +227,9 @@ public class Rules
         hypothesisRulesets.get( cd ).get( behavior ).maxValue = max;
     }
 
-    void setBehaviorParameters(String type, String behavior, double min, double base, double max) throws Exception
+    void setBehaviorParameters(Model model, String type, String behavior, double min, double base, double max) throws Exception
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( type );
+        CellDefinition pCD = model.getCellDefinition( type );
         if( pCD == null )
             throw new Exception(
                     "Warning: Attempted to set parameters for " + behavior + " in " + type + ", but the cell definition is not found." );
@@ -247,9 +248,9 @@ public class Rules
     }
 
 
-    static void setBehaviorBaseValue(String type, String behavior, double base) throws Exception
+    static void setBehaviorBaseValue(Model model, String type, String behavior, double base) throws Exception
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
+        CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but the cell definition is not found." );
@@ -265,9 +266,9 @@ public class Rules
         hypothesisRulesets.get( cd ).get( behavior ).baseValue = base;
     }
 
-    static void setBehaviorMinValue(String type, String behavior, double value) throws Exception
+    static void setBehaviorMinValue(Model model, String type, String behavior, double value) throws Exception
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
+        CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but the cell definition is not found." );
@@ -283,9 +284,9 @@ public class Rules
         hypothesisRulesets.get( cd ).get( behavior ).minValue = value;
     }
 
-    static void set_behavior_max_value(String type, String behavior, double max) throws Exception
+    static void set_behavior_max_value(Model model, String type, String behavior, double max) throws Exception
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( type );
+        CellDefinition pCD = model.getCellDefinition( type );
         if( pCD == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but the cell definition is not found." );
@@ -303,7 +304,7 @@ public class Rules
 
     static void applyRuleset(Cell cell) throws Exception
     {
-        CellDefinition cd = CellDefinition.getCellDefinition( cell.typeName );
+        CellDefinition cd = cell.getModel().getCellDefinition( cell.typeName );
         hypothesisRulesets.get( cd ).apply( cell );
     }
 
@@ -569,7 +570,7 @@ public class Rules
      Cell type, behavior, min value, base value, max value, signal, direction, half-max, Hill power, dead
     */
 
-    void parseCSVRule0(String[] input) throws Exception
+    void parseCSVRule0(Model model, String[] input) throws Exception
     {
         boolean skip = input.length != 10;
 
@@ -605,13 +606,13 @@ public class Rules
         //        System.out.println( temp );
 
         // add_rule(cell_type,signal,behavior,response);  
-        addRule( type, signal, behavior, response, useForDead );
+        addRule( model, type, signal, behavior, response, useForDead );
 
-        set_hypothesis_parameters( type, signal, behavior, halfMax, hillPower );
+        set_hypothesis_parameters( model, type, signal, behavior, halfMax, hillPower );
 
         // compare to base behavior value in cell def for discrepancies 
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
-        double refBaseValue = SignalBehavior.getSingleBaseBehavior( cd, behavior );
+        CellDefinition cd = model.getCellDefinition( type );
+        double refBaseValue = SignalBehavior.getSingleBaseBehavior( model, cd, behavior );
         if( Math.abs( refBaseValue - base ) > 1e-15 )
         {
             throw new Exception( "Error: Base value for " + behavior + " in cell type " + type + "\n" + "       has base value " + base
@@ -621,7 +622,7 @@ public class Rules
 
         // get_single_base_behavior
 
-        setBehaviorParameters( type, behavior, min, base, max );
+        setBehaviorParameters( model, type, behavior, min, base, max );
 
         /*
         // set "applies to dead"
@@ -631,15 +632,15 @@ public class Rules
         */
     }
 
-    void parseCSVRule0(String input) throws Exception
+    void parseCSVRule0(Model model, String input) throws Exception
     {
         String[] tokenized = input.split( "," );
         if( tokenized.length != 10 )
             tokenized = input.split( "\t" );
-        parseCSVRule0( tokenized );
+        parseCSVRule0( model, tokenized );
     }
 
-    void parseCSVRules0(InputStream stream) throws Exception
+    void parseCSVRules0(Model model, InputStream stream) throws Exception
     {
         try (BufferedReader br = new BufferedReader( new InputStreamReader( stream ) ))
         {
@@ -647,7 +648,7 @@ public class Rules
             while( line != null )
             {
                 if( line.length() > 0 )
-                    parseCSVRule0( line );
+                    parseCSVRule0( model, line );
             }
             line = br.readLine();
         }
@@ -666,7 +667,7 @@ public class Rules
      Cell type, signal, direction, behavior, base value, max response value, half-max, Hill power, applies to dead? 
     */
 
-    void parseCSVRule1(String[] input) throws Exception
+    void parseCSVRule1(Model model, String[] input) throws Exception
     {
         boolean skip = false;
         if( input.length != 9 )
@@ -710,12 +711,12 @@ public class Rules
         //        System.out.println( temp );
 
         // add_rule(cell_type,signal,behavior,response);  
-        addRule( type, signal, behavior, response, useForDead );
-        set_hypothesis_parameters( type, signal, behavior, halfMax, hillPower );
+        addRule( model, type, signal, behavior, response, useForDead );
+        set_hypothesis_parameters( model, type, signal, behavior, halfMax, hillPower );
 
         // compare to base behavior value in cell def for discrepancies 
-        CellDefinition cd = CellDefinition.getCellDefinition( type );
-        double refBaseValue = SignalBehavior.getSingleBaseBehavior( cd, behavior );
+        CellDefinition cd = model.getCellDefinition( type );
+        double refBaseValue = SignalBehavior.getSingleBaseBehavior( model, cd, behavior );
         if( Math.abs( refBaseValue - base ) > 1e-15 )
         {
             throw new Exception( "Error: Base value for " + behavior + " in cell type " + type + "\n" + "       has base value " + base
@@ -724,19 +725,19 @@ public class Rules
                     + "       Fix this discrepancy to continue the model." );
         }
 
-        setBehaviorBaseValue( type, behavior, base );
+        setBehaviorBaseValue( model, type, behavior, base );
 
         if( response.equals( "increases" ) )
         {
-            set_behavior_max_value( type, behavior, maxResponse );
+            set_behavior_max_value( model, type, behavior, maxResponse );
         }
         else
         {
-            setBehaviorMinValue( type, behavior, maxResponse );
+            setBehaviorMinValue( model, type, behavior, maxResponse );
         }
     }
 
-    void parseCSVRule1(String input) throws Exception
+    void parseCSVRule1(Model model, String input) throws Exception
     {
         String[] tokenized_string = input.split( "," );
         if( tokenized_string.length != 9 )
@@ -748,10 +749,10 @@ public class Rules
             System.out.println( "Skipping commented rule (" + input + ")" );
             return;
         }
-        parseCSVRule1( tokenized_string );
+        parseCSVRule1(model, tokenized_string );
     }
 
-    void parseCSVRules1(String filename) throws Exception
+    void parseCSVRules1(Model model, String filename) throws Exception
     {
         File f = new File( filename );
         if( !f.exists() )
@@ -766,7 +767,7 @@ public class Rules
             while( line != null )
             {
                 if( line.length() > 0 )
-                    parseCSVRule1( line );
+                    parseCSVRule1( model, line );
                 line = br.readLine();
             }
         }
@@ -788,7 +789,7 @@ public class Rules
      Cell type, signal, direction, behavior, max response value, half-max, Hill power, applies to dead?  
     */
 
-    static void parseCSVRule2(String[] input) throws Exception
+    static void parseCSVRule2(Model model, String[] input) throws Exception
     {
         boolean skip = false;
         if( input.length != 8 )
@@ -832,17 +833,17 @@ public class Rules
         //        System.out.println( temp );
 
         // add_rule(cell_type,signal,behavior,response);  
-        addRule( cell_type, signal, behavior, response, use_for_dead );
-        set_hypothesis_parameters( cell_type, signal, behavior, half_max, hill_power );
+        addRule( model, cell_type, signal, behavior, response, use_for_dead );
+        set_hypothesis_parameters( model, cell_type, signal, behavior, half_max, hill_power );
 
         // compare to base behavior value in cell def for discrepancies 
-        CellDefinition pCD = CellDefinition.getCellDefinition( cell_type );
-        double ref_base_value = SignalBehavior.getSingleBaseBehavior( pCD, behavior );
-        setBehaviorBaseValue( cell_type, behavior, ref_base_value );
+        CellDefinition pCD = model.getCellDefinition( cell_type );
+        double ref_base_value = SignalBehavior.getSingleBaseBehavior( model, pCD, behavior );
+        setBehaviorBaseValue( model, cell_type, behavior, ref_base_value );
         if( response.equals( "increases" ) )
-            set_behavior_max_value( cell_type, behavior, max_response );
+            set_behavior_max_value( model, cell_type, behavior, max_response );
         else
-            setBehaviorMinValue( cell_type, behavior, max_response );
+            setBehaviorMinValue( model, cell_type, behavior, max_response );
     }
 
     public static boolean parseBoolean(String val)
@@ -850,7 +851,7 @@ public class Rules
         return Double.parseDouble( val ) > 0;
     }
 
-    static void parseCSVRule2(String input) throws Exception
+    static void parseCSVRule2(Model model, String input) throws Exception
     {
         if( input.startsWith( "//" ) )
             return;
@@ -859,15 +860,15 @@ public class Rules
             tokenized_string = input.split( "\t" );
         //        if( tokenized_string[0].charAt( 0 ) == '/' && tokenized_string[0].charAt( 1 ) == '/' )
         //            throw new Exception( "Skipping commented rule (" + input + ")" );
-        parseCSVRule2( tokenized_string );
+        parseCSVRule2( model, tokenized_string );
     }
 
-    public static void parseCSVRules2(String filePath) throws Exception
+    public static void parseCSVRules2(Model model, String filePath) throws Exception
     {
-        parseCSVRules2( new FileInputStream( new File( filePath ) ) );
+        parseCSVRules2( model, new FileInputStream( new File( filePath ) ) );
     }
 
-    public static void parseCSVRules2(InputStream stream) throws Exception
+    public static void parseCSVRules2(Model model, InputStream stream) throws Exception
     {
         try (BufferedReader br = new BufferedReader( new InputStreamReader( stream ) ))
         {
@@ -875,17 +876,17 @@ public class Rules
             while( line != null )
             {
                 if( line.length() > 0 )
-                    parseCSVRule2( line );
+                    parseCSVRule2( model, line );
                 line = br.readLine();
             }
         }
     }
 
-    public static String stream_annotated_English_rules()
+    public static String stream_annotated_English_rules(Model model)
     {
         StringBuilder sb = new StringBuilder();
         sb.append( "Cell Hypothesis Rules\n\n" );
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             HypothesisRuleset pHRS = findRuleset( cd );
             sb.append( "In " + pHRS.type + " cells:\n" );
@@ -896,11 +897,11 @@ public class Rules
         return sb.toString();
     }
 
-    public static String stream_annotated_English_rules_HTML()
+    public static String stream_annotated_English_rules_HTML(Model model)
     {
         StringBuilder sb = new StringBuilder();
         sb.append( "<html>\n<body><h1>Cell Hypothesis Rules</h1>\n" );
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             sb.append( "<p>" );
             HypothesisRuleset pHRS = findRuleset( cd );
@@ -914,19 +915,19 @@ public class Rules
         return sb.toString();
     }
 
-    static void save_annotated_English_rules(String filename)
+    static void save_annotated_English_rules(Model model, String filename)
     {
         //        String filename = PhysiCellSettings.folder + "/rules.txt";
         //        std::ofstream of( filename , std::ios::out );
-        String text = stream_annotated_English_rules();
+        String text = stream_annotated_English_rules( model );
         //        of.close(); 
     }
 
-    public static String stream_annotated_detailed_English_rules()
+    public static String stream_annotated_detailed_English_rules(Model model)
     {
         StringBuilder sb = new StringBuilder();
         sb.append( "Cell Hypothesis Rules (detailed)\n\n" );
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             HypothesisRuleset pHRS = findRuleset( cd );
             sb.append( "In " + pHRS.type + " cells:\n" );
@@ -939,11 +940,11 @@ public class Rules
         return sb.toString();
     }
 
-    static String stream_annotated_detailed_English_rules_HTML()
+    static String stream_annotated_detailed_English_rules_HTML(Model model)
     {
         StringBuilder sb = new StringBuilder();
         sb.append( "<html>\n<body><h1>Cell Hypothesis Rules (detailed)</h1>\n" );
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             sb.append( "<p>" );
             HypothesisRuleset pHRS = findRuleset( cd );
@@ -959,11 +960,11 @@ public class Rules
         return sb.toString();
     }
 
-    static void save_annotated_detailed_English_rules(String filename) throws Exception
+    static void save_annotated_detailed_English_rules(Model model, String filename) throws Exception
     {
         //        String filename = PhysiCell_settings.folder + "/detailed_rules.txt";
         //        std::ofstream of( filename , std::ios::out );
-        String text = stream_annotated_detailed_English_rules();
+        String text = stream_annotated_detailed_English_rules( model );
         try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( filename ) ) ))
         {
             bw.write( text );
@@ -971,11 +972,11 @@ public class Rules
         //        of.close(); 
     }
 
-    static void save_annotated_detailed_English_rules_HTML(String filename) throws Exception
+    static void save_annotated_detailed_English_rules_HTML(Model model, String filename) throws Exception
     {
         //        String filename = PhysiCell_settings.folder + "/detailed_rules.html";
         //        std::ofstream of( filename , std::ios::out );
-        String text = stream_annotated_detailed_English_rules_HTML();
+        String text = stream_annotated_detailed_English_rules_HTML( model );
         try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( filename ) ) ))
         {
             bw.write( text );
@@ -983,11 +984,11 @@ public class Rules
         //        of.close(); 
     }
 
-    static void save_annotated_English_rules_HTML(String filename) throws Exception
+    static void save_annotated_English_rules_HTML(Model model, String filename) throws Exception
     {
         //        String filename = PhysiCell_settings.folder + "/rules.html";
         //        std::ofstream of( filename , std::ios::out );
-        String text = stream_annotated_English_rules_HTML();
+        String text = stream_annotated_English_rules_HTML( model );
         try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( filename ) ) ))
         {
             bw.write( text );
@@ -997,7 +998,7 @@ public class Rules
 
     // v0 version 
 
-    static void export_rules_csv_v0(String filename) throws Exception
+    static void export_rules_csv_v0(Model model, String filename) throws Exception
     {
         File f = new File( filename );
         if( !f.exists() )
@@ -1008,7 +1009,7 @@ public class Rules
 
         System.out.println( "Exporting rules to file " + filename + " (v0 format) ... " );
 
-        for( CellDefinition pCD : CellDefinition.getCellDefinitions() )// n=0; n < CellDefinitions_by_index.size(); n++ )
+        for( CellDefinition pCD : model.getCellDefinitions() )// n=0; n < CellDefinitions_by_index.size(); n++ )
         {
             //            CellDefinition pCD = CellDefinitions_by_index[n]; 
             HypothesisRuleset pHRS = findRuleset( pCD );
@@ -1062,7 +1063,7 @@ public class Rules
 
     // v1 
 
-    static void export_rules_csv_v1(String filename) throws Exception
+    static void export_rules_csv_v1(Model model, String filename) throws Exception
     {
         File f = new File( filename );
         if( !f.exists() )
@@ -1074,7 +1075,7 @@ public class Rules
         {
             System.out.println( "Exporting rules to file " + filename + " (v1 format) ... " );
 
-            for( CellDefinition pCD : CellDefinition.getCellDefinitions() )//int n=0; n < CellDefinitions_by_index.size(); n++ )
+            for( CellDefinition pCD : model.getCellDefinitions() )//int n=0; n < CellDefinitions_by_index.size(); n++ )
             {
                 //            CellDefinition pCD = CellDefinitions_by_index[n]; 
                 HypothesisRuleset pHRS = findRuleset( pCD );
@@ -1124,7 +1125,7 @@ public class Rules
         System.out.println( "Done!" );
     }
 
-    void export_rules_csv_v2(String filename) throws Exception
+    void export_rules_csv_v2(String filename, Model model) throws Exception
     {
         //        std::fstream fs( filename, std::ios::out );
         File f = new File( filename );
@@ -1137,7 +1138,7 @@ public class Rules
         System.out.println( "Exporting rules to file " + filename + " (v2 format) ... " );
         try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( filename ) ) ))
         {
-            for( CellDefinition pCD : CellDefinition.getCellDefinitions() )//int n=0; n < CellDefinitions_by_index.size(); n++ )
+            for( CellDefinition pCD : model.getCellDefinitions() )//int n=0; n < CellDefinitions_by_index.size(); n++ )
             {
                 //            CellDefinition pCD = CellDefinitions_by_index[n]; 
                 HypothesisRuleset pHRS = findRuleset( pCD );
@@ -1263,7 +1264,7 @@ public class Rules
     public static void setupRules(Model model)
     {
         // setup 
-        intialize_hypothesis_rulesets();
+        intialize_hypothesis_rulesets( model );
 
         // load rules 
         //        parse_rules_from_pugixml(); 

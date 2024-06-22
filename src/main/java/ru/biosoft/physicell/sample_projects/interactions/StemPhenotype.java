@@ -21,7 +21,7 @@ public class StemPhenotype extends UpdatePhenotype
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
+        CellDefinition pCD = pCell.getModel().getCellDefinition( pCell.typeName );
         Microenvironment m = pCell.getMicroenvironment();
 
         int nR = m.findDensityIndex( "resource" );
@@ -40,8 +40,8 @@ public class StemPhenotype extends UpdatePhenotype
         double r = samples[nR];
         double toxin = samples[nTox];
 
-        int stemType = CellDefinition.getCellDefinition( "stem" ).type;
-        int diffType = CellDefinition.getCellDefinition( "differentiated" ).type;
+        int stemType = pCell.getModel().getCellDefinition( "stem" ).type;
+        int diffType = pCell.getModel().getCellDefinition( "differentiated" ).type;
         int numStem = 0;
         int numDifferentiated = 0;
         for( Cell pC : pCell.state.neighbors )

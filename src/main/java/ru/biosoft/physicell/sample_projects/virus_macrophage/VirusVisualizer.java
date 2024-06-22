@@ -25,7 +25,7 @@ public class VirusVisualizer extends AgentVisualizer
         double max_virus = pCell.customData.get( "burst_virion_count" );
         double denominator = max_virus - min_virus + 1e-15;
 
-        CellDefinition pMacrophage = CellDefinition.getCellDefinition( "macrophage" );
+        CellDefinition pMacrophage = pCell.getModel().getCellDefinition( "macrophage" );
 
         if( pCell.phenotype.death.dead == true )
         {

@@ -20,7 +20,7 @@ public class SignalBehavior
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();//Microenvironment.get_default_microenvironment();
         int m = microenvironment.numberDensities();
-        int n = CellDefinition.getDefinitionsCount();
+        int n = pCell.getModel().getDefinitionsCount();
 
         double out = 0.0;
         if( index < 0 )
@@ -77,7 +77,7 @@ public class SignalBehavior
 
         // physical contact with cells (of each type) 
         // individual contact signals are a bit costly 
-        int contact_ind = findSignalIndex( "contact with " + CellDefinition.getCellDefinition( 0 ).name );
+        int contact_ind = findSignalIndex( "contact with " + pCell.getModel().getCellDefinition( 0 ).name );
         if( contact_ind <= index && index < contact_ind + n + 2 )
         {
             int[] counts = new int[n];
@@ -248,7 +248,7 @@ public class SignalBehavior
         int_to_behavior.put( index, name );//] = name; 
     }
 
-    public static void setupDictionaries(Microenvironment microenvironment)
+    public static void setupDictionaries(Model model)
     {
         // set key parameters on number of signals, etc. 
         // make registry of signals 
@@ -256,7 +256,7 @@ public class SignalBehavior
         if( setupDone == true )
             return;
         setupDone = true;
-
+        Microenvironment microenvironment = model.getMicroenvironment();
         int m = microenvironment.numberDensities();
 
         signal_to_int.clear();
@@ -296,7 +296,7 @@ public class SignalBehavior
         register( "volume", map_index );
 
         // contact with each cell type 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             map_index++;
             signal_to_int.put( "contact with " + cd.name, map_index );
@@ -344,7 +344,7 @@ public class SignalBehavior
         //            for( Variable var : cd.custom_data.variables )
         //                customVars.add( var.name );
         //        }
-        CellDefinition def = CellDefinition.getCellDefinition( 0 );
+        CellDefinition def = model.getCellDefinition( 0 );
         // custom signals
         for( Variable var : def.custom_data.variables )
         {
@@ -454,7 +454,7 @@ public class SignalBehavior
 
         // cell adhesion affinities 
         // cell-type specific adhesion 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             map_index++;
             registerBehavior( "adhesive affinity to " + cd.name, map_index );
@@ -486,7 +486,7 @@ public class SignalBehavior
         behavior_to_int.put( "phagocytosis of dead cells", map_index );
 
         // phagocytosis of each live cell type 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             map_index++;
             registerBehavior( "phagocytose " + cd.name, map_index );
@@ -495,7 +495,7 @@ public class SignalBehavior
         }
 
         // attack of each live cell type 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             map_index++;
             registerBehavior( "attack " + cd.name, map_index );
@@ -503,7 +503,7 @@ public class SignalBehavior
         }
 
         // fusion 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             map_index++;
             registerBehavior( "fuse to " + cd.name, map_index );
@@ -511,7 +511,7 @@ public class SignalBehavior
         }
 
         // transformation 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             map_index++;
             registerBehavior( "transform to " + cd.name, map_index );
@@ -536,7 +536,7 @@ public class SignalBehavior
         behavior_to_int.put( "is movable", map_index );
 
         // immunogenicity to each cell type 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : model.getCellDefinitions() )
         {
             map_index++;
             registerBehavior( "immunogenicity to " + cd.name, map_index );
@@ -608,8 +608,9 @@ public class SignalBehavior
     static void setSingleBehavior(Cell pCell, int index, double parameter) throws Exception
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
+        Model model = pCell.getModel();
         int m = microenvironment.numberDensities();
-        int n = CellDefinition.getDefinitionsCount();
+        int n = model.getDefinitionsCount();
 
         if( index < 0 )
         {
@@ -737,7 +738,7 @@ public class SignalBehavior
         }
 
         // cell adhesion affinities 
-        int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + pCell.getModel().getCellDefinition( 0 ).name );
         if( index >= first_affinity_index && index < first_affinity_index + n )
         {
             pCell.phenotype.mechanics.cellAdhesionAffinities[index - first_affinity_index] = parameter;
@@ -785,7 +786,7 @@ public class SignalBehavior
         }
 
         // phagocytosis of each live cell type 
-        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + model.getCellDefinition( 0 ).name );
         if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
         {
             pCell.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index] = parameter;
@@ -793,7 +794,7 @@ public class SignalBehavior
         }
 
         // attack of each live cell type 
-        int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_attack_index = findBehaviorIndex( "attack " + model.getCellDefinition( 0 ).name );
         if( index >= first_attack_index && index < first_attack_index + n )
         {
             pCell.phenotype.cellInteractions.attackRates[index - first_attack_index] = parameter;
@@ -801,7 +802,7 @@ public class SignalBehavior
         }
 
         // fusion 
-        int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_fusion_index = findBehaviorIndex( "fuse to " + model.getCellDefinition( 0 ).name );
         if( index >= first_fusion_index && index < first_fusion_index + n )
         {
             pCell.phenotype.cellInteractions.fusionRates[index - first_fusion_index] = parameter;
@@ -809,7 +810,7 @@ public class SignalBehavior
         }
 
         // transformation 
-        int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_transformation_index = findBehaviorIndex( "transform to " + model.getCellDefinition( 0 ).name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
             pCell.phenotype.cellTransformations.transformationRates[index - first_transformation_index] = parameter;
@@ -832,7 +833,7 @@ public class SignalBehavior
         }
 
         // immunogenicity to each cell type 
-        int first_immunogenicity_index = findBehaviorIndex( "immunogenicity to " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_immunogenicity_index = findBehaviorIndex( "immunogenicity to " + model.getCellDefinition( 0 ).name );
         if( index >= first_immunogenicity_index && index < first_immunogenicity_index + n )
         {
             pCell.phenotype.cellInteractions.immunogenicities[index - first_immunogenicity_index] = parameter;
@@ -889,10 +890,11 @@ public class SignalBehavior
 
     public static double getSingleBehavior(Cell pCell, int index) throws Exception
     {
+        Model model = pCell.getModel();
         Microenvironment microenvironment = pCell.getMicroenvironment();
         int m = microenvironment.numberDensities();
         //        static int m = microenvironment.number_of_densities(); 
-        int n = CellDefinition.getDefinitionsCount();//.size(); 
+        int n = pCell.getModel().getDefinitionsCount();//.size(); 
 
         if( index < 0 )
         {
@@ -1010,7 +1012,7 @@ public class SignalBehavior
         }
 
         // cell adhesion affinities 
-        int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
+        int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + pCell.getModel().getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_affinity_index && index < first_affinity_index + n )
         {
             return pCell.phenotype.mechanics.cellAdhesionAffinities[index - first_affinity_index];
@@ -1052,28 +1054,28 @@ public class SignalBehavior
         }
 
         // phagocytosis of each live cell type 
-        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
+        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + model.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
         {
             return pCell.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index];
         }
 
         // attack of each live cell type 
-        int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
+        int first_attack_index = findBehaviorIndex( "attack " + model.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_attack_index && index < first_attack_index + n )
         {
             return pCell.phenotype.cellInteractions.attackRates[index - first_attack_index];
         }
 
         // fusion 
-        int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
+        int first_fusion_index = findBehaviorIndex( "fuse to " + model.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_fusion_index && index < first_fusion_index + n )
         {
             return pCell.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         }
 
         // transformation 
-        int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
+        int first_transformation_index = findBehaviorIndex( "transform to " + model.getCellDefinition( 0 ).name );//cell_definitions_by_type[0].name ); 
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
             return pCell.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
@@ -1102,7 +1104,7 @@ public class SignalBehavior
         }
 
         // vector of immunogenicity behaviors 
-        int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + CellDefinition.getCellDefinition( 0 ).name );// Dcell_definitions_by_type[0].name ); 
+        int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + model.getCellDefinition( 0 ).name );// Dcell_definitions_by_type[0].name ); 
         int max_immunogenicity_ind = start_immunogenicity_ind + n;
         if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
         {
@@ -1141,11 +1143,11 @@ public class SignalBehavior
 
     public static double[] getBaseBehaviors(Cell pCell)
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
-
+        CellDefinition pCD = pCell.getModel().getCellDefinition( pCell.typeName );
+        Model model = pCell.getModel();
         Microenvironment microenvironment = pCell.getMicroenvironment();
         int m = microenvironment.numberDensities();
-        int n = CellDefinition.getDefinitionsCount();//.size();  
+        int n = model.getDefinitionsCount();//.size();  
 
         double[] parameters = new double[int_to_behavior.size()];//( int_to_behavior.size() , 0.0 ); 
 
@@ -1238,7 +1240,7 @@ public class SignalBehavior
         parameters[cca_spring_index] = pCD.phenotype.mechanics.attachmentElasticConstant;
 
         // cell adhesion affinities 
-        String search_for1 = "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name;//CellDefinitions_by_type[0].name;
+        String search_for1 = "adhesive affinity to " + model.getCellDefinition( 0 ).name;//CellDefinitions_by_type[0].name;
         int first_affinity_index = findBehaviorIndex( search_for1 );
         System.arraycopy( pCD.phenotype.mechanics.cellAdhesionAffinities, 0, parameters, first_affinity_index,
                 pCD.phenotype.mechanics.cellAdhesionAffinities.length );
@@ -1267,7 +1269,7 @@ public class SignalBehavior
         parameters[dead_phag_index] = pCD.phenotype.cellInteractions.deadPhagocytosisRate;
 
         // phagocytosis of each live cell type 
-        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
+        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + model.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         System.arraycopy( pCD.phenotype.cellInteractions.livePhagocytosisRates, 0, parameters, first_phagocytosis_index,
                 pCD.phenotype.cellInteractions.livePhagocytosisRates.length );
         //        std::copy(  pCD.phenotype.cell_interactions.live_phagocytosis_rates.begin(), 
@@ -1275,7 +1277,7 @@ public class SignalBehavior
         //                    parameters.begin()+first_phagocytosis_index );  
 
         // attack of each live cell type 
-        int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
+        int first_attack_index = findBehaviorIndex( "attack " + model.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         System.arraycopy( pCD.phenotype.cellInteractions.attackRates, 0, parameters, first_attack_index,
                 pCD.phenotype.cellInteractions.attackRates.length );
         //        std::copy(  pCD.phenotype.cell_interactions.attack_rates.begin(), 
@@ -1283,7 +1285,7 @@ public class SignalBehavior
         //                    parameters.begin()+first_attack_index );    
 
         // fusion 
-        int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
+        int first_fusion_index = findBehaviorIndex( "fuse to " + model.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         System.arraycopy( pCD.phenotype.cellInteractions.fusionRates, 0, parameters, first_fusion_index,
                 pCD.phenotype.cellInteractions.fusionRates.length );
         //        std::copy(  pCD.phenotype.cell_interactions.fusion_rates.begin(), 
@@ -1291,7 +1293,7 @@ public class SignalBehavior
         //                    parameters.begin()+first_fusion_index );    
 
         // transformation 
-        int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_transformation_index = findBehaviorIndex( "transform to " + model.getCellDefinition( 0 ).name );
         System.arraycopy( pCD.phenotype.cellTransformations.transformationRates, 0, parameters, first_transformation_index,
                 pCD.phenotype.cellTransformations.transformationRates.length );
         //        std::copy(  pCD.phenotype.cell_transformations.transformation_rates.begin(), 
@@ -1321,7 +1323,7 @@ public class SignalBehavior
         }
 
         // vector of immunogenicity behaviors 
-        int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + CellDefinition.getCellDefinition( 0 ).name );//[0].name );
+        int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + model.getCellDefinition( 0 ).name );//[0].name );
         System.arraycopy( pCD.phenotype.cellInteractions.immunogenicities, 0, parameters, start_immunogenicity_ind,
                 pCD.phenotype.cellInteractions.immunogenicities.length );
         //        std::copy( pCD.phenotype.cell_interactions.immunogenicities.begin(),
@@ -1351,10 +1353,11 @@ public class SignalBehavior
     public static double getSingleBaseBehavior(Cell pCell, int index)
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
+        Model model = pCell.getModel();
         int m = microenvironment.numberDensities();
-        int n = CellDefinition.getDefinitionsCount();
+        int n = model.getDefinitionsCount();
 
-        CellDefinition pCD = CellDefinition.getCellDefinition( pCell.typeName );
+        CellDefinition pCD = model.getCellDefinition( pCell.typeName );
 
         if( index < 0 )
         {
@@ -1473,7 +1476,7 @@ public class SignalBehavior
         }
 
         // cell adhesion affinities 
-        int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name );//  CellDefinitions_by_type[0].name );
+        int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + model.getCellDefinition( 0 ).name );//  CellDefinitions_by_type[0].name );
         if( index >= first_affinity_index && index < first_affinity_index + n )
         {
             return pCD.phenotype.mechanics.cellAdhesionAffinities[index - first_affinity_index];
@@ -1515,28 +1518,28 @@ public class SignalBehavior
         }
 
         // phagocytosis of each live cell type 
-        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
+        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + model.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
         {
             return pCD.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index];
         }
 
         // attack of each live cell type 
-        int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
+        int first_attack_index = findBehaviorIndex( "attack " + model.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_attack_index && index < first_attack_index + n )
         {
             return pCD.phenotype.cellInteractions.attackRates[index - first_attack_index];
         }
 
         // fusion 
-        int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
+        int first_fusion_index = findBehaviorIndex( "fuse to " + model.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_fusion_index && index < first_fusion_index + n )
         {
             return pCD.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         }
 
         // transformation 
-        int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
+        int first_transformation_index = findBehaviorIndex( "transform to " + model.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
             return pCD.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
@@ -1565,7 +1568,7 @@ public class SignalBehavior
         }
 
         // vector of immunogenicity behaviors 
-        int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + CellDefinition.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
+        int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + model.getCellDefinition( 0 ).name );//CellDefinitions_by_type[0].name );
         int max_immunogenicity_ind = start_immunogenicity_ind + n;
         if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
         {
@@ -1604,16 +1607,16 @@ public class SignalBehavior
         return -1;
     }
 
-    public static double getSingleBaseBehavior(CellDefinition pCD, String name)
+    public static double getSingleBaseBehavior(Model model, CellDefinition pCD, String name)
     {
-        return getSingleBaseBehavior( pCD, findBehaviorIndex( name ) );
+        return getSingleBaseBehavior( model, pCD, findBehaviorIndex( name ) );
     }
 
-    public static double getSingleBaseBehavior(CellDefinition pCD, int index)
+    public static double getSingleBaseBehavior(Model model, CellDefinition pCD, int index)
     {
         Microenvironment microenvironment = pCD.getMicroenvironment();
         int m = microenvironment.numberDensities();
-        int n = CellDefinition.getDefinitionsCount();
+        int n = model.getDefinitionsCount();
 
         // CellDefinition* pCD = find_CellDefinition( pCell.type_name );     
 
@@ -1734,7 +1737,7 @@ public class SignalBehavior
         }
 
         // cell adhesion affinities 
-        int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_affinity_index = findBehaviorIndex( "adhesive affinity to " + model.getCellDefinition( 0 ).name );
         if( index >= first_affinity_index && index < first_affinity_index + n )
         {
             return pCD.phenotype.mechanics.cellAdhesionAffinities[index - first_affinity_index];
@@ -1776,28 +1779,28 @@ public class SignalBehavior
         }
 
         // phagocytosis of each live cell type 
-        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_phagocytosis_index = findBehaviorIndex( "phagocytose " + model.getCellDefinition( 0 ).name );
         if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
         {
             return pCD.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index];
         }
 
         // attack of each live cell type 
-        int first_attack_index = findBehaviorIndex( "attack " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_attack_index = findBehaviorIndex( "attack " + model.getCellDefinition( 0 ).name );
         if( index >= first_attack_index && index < first_attack_index + n )
         {
             return pCD.phenotype.cellInteractions.attackRates[index - first_attack_index];
         }
 
         // fusion 
-        int first_fusion_index = findBehaviorIndex( "fuse to " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_fusion_index = findBehaviorIndex( "fuse to " + model.getCellDefinition( 0 ).name );
         if( index >= first_fusion_index && index < first_fusion_index + n )
         {
             return pCD.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         }
 
         // transformation 
-        int first_transformation_index = findBehaviorIndex( "transform to " + CellDefinition.getCellDefinition( 0 ).name );
+        int first_transformation_index = findBehaviorIndex( "transform to " + model.getCellDefinition( 0 ).name );
         if( index >= first_transformation_index && index < first_transformation_index + n )
         {
             return pCD.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
@@ -1826,7 +1829,7 @@ public class SignalBehavior
         }
 
         // vector of immunogenicity behaviors 
-        int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + CellDefinition.getCellDefinition( 0 ).name );
+        int start_immunogenicity_ind = findBehaviorIndex( "immunogenicity to " + model.getCellDefinition( 0 ).name );
         int max_immunogenicity_ind = start_immunogenicity_ind + n;
         if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
         {

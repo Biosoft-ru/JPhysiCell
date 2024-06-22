@@ -78,7 +78,7 @@ public class ModelReader extends ModelReaderSupport
         readOptions( physicell );
         readSave( physicell, model );
         readMicroenvironmentSetup( physicell, m );
-        readCellDefinitions( physicell, m );
+        readCellDefinitions( physicell, m, model );
         readPhenotypes( physicell, model );
         readInitialConditions( physicell, model );
         readUserParameters( physicell, model );
@@ -472,7 +472,7 @@ public class ModelReader extends ModelReaderSupport
         Microenvironment.initialize( m );
     }
 
-    public void readCellDefinitions(Element physicell, Microenvironment m) throws Exception
+    public void readCellDefinitions(Element physicell, Microenvironment m, Model model) throws Exception
     {
         Element cellDefinitionsElement = findElement( physicell, "cell_definitions" );
         if( cellDefinitionsElement == null )
@@ -507,7 +507,7 @@ public class ModelReader extends ModelReaderSupport
             //                System.out.println( "\tCopying from type " + parent.name + " ... " );
             //                cd = parent.clone( name, id, m );
             //            }
-            CellDefinition.registerCellDefinition( cd );
+            model.registerCellDefinition( cd );
         }
     }
 
@@ -520,13 +520,13 @@ public class ModelReader extends ModelReaderSupport
         for( Element cdElement : findAllElements( cellDefinitionsElement, "cell_definition" ) )
         {
             String name = getAttr( cdElement, "name" );
-            CellDefinition cd = CellDefinition.getCellDefinition( name );
+            CellDefinition cd = model.getCellDefinition( name );
             Phenotype p = cd.phenotype;
 
             CellDefinition parent = null;
             String parentType = getAttr( cdElement, "parent_type" );
             if( !parentType.isEmpty() )
-                parent = CellDefinition.getCellDefinition( parentType );
+                parent = model.getCellDefinition( parentType );
             //            boolean use_default_as_parent_without_specifying = false;
             //            if( parent == null && !defaultDefinition )
             //            {
@@ -557,7 +557,7 @@ public class ModelReader extends ModelReaderSupport
                         readVolume( el, p );
                         break;
                     case "mechanics":
-                        readMechanics( el, p );
+                        readMechanics( el, p, model );
                         break;
                     case "motility":
                         readMotility( el, cd, m );
@@ -566,10 +566,10 @@ public class ModelReader extends ModelReaderSupport
                         readSecretion( el, p, m );
                         break;
                     case "cell_interactions":
-                        readCellInteractions( el, cd );
+                        readCellInteractions( el, cd, model );
                         break;
                     case "cell_transformations":
-                        readCellTransformations( el, cd );
+                        readCellTransformations( el, cd, model );
                         break;
                     case "intracellular":
                         readIntracellular( el, model, cd );
@@ -864,7 +864,7 @@ public class ModelReader extends ModelReaderSupport
         p.geometry.update( null, p, 0.0 );
     }
 
-    private void readMechanics(Element el, Phenotype p) throws Exception
+    private void readMechanics(Element el, Phenotype p, Model m) throws Exception
     {
         Mechanics mechanics = p.mechanics;
         for( Element paramElement : getAllElements( el ) )
@@ -908,7 +908,7 @@ public class ModelReader extends ModelReaderSupport
                     {
                         String target = getAttr( adhesionElement, "name" );
                         double value = getDoubleVal( adhesionElement );
-                        int ind = CellDefinition.findCellDefinitionIndex( target );
+                        int ind = m.findCellDefinitionIndex( target );
                         if( ind > -1 )
                             mechanics.cellAdhesionAffinities[ind] = value;
                         else
@@ -1135,7 +1135,7 @@ public class ModelReader extends ModelReaderSupport
         }
     }
 
-    private void readCellInteractions(Element el, CellDefinition cd)
+    private void readCellInteractions(Element el, CellDefinition cd, Model m)
     {
         CellInteractions cellInteractions = cd.phenotype.cellInteractions;
         Element dprElement = findElement( el, "dead_phagocytosis_rate" );
@@ -1151,7 +1151,7 @@ public class ModelReader extends ModelReaderSupport
                 // get the name of the target cell type
                 String target_name = getAttr( lprElement, "name" );
                 // now find its index 
-                int index = CellDefinition.findCellDefinitionIndex( target_name );
+                int index = m.findCellDefinitionIndex( target_name );
                 // safety first! 
                 if( index >= 0 )
                 {
@@ -1174,7 +1174,7 @@ public class ModelReader extends ModelReaderSupport
                 // get the name of the target cell type
                 String target_name = getAttr( arElement, "name" );
                 //            // now find its index 
-                int index = CellDefinition.findCellDefinitionIndex( target_name );
+                int index = m.findCellDefinitionIndex( target_name );
                 if( index >= 0 )
                 {
                     cellInteractions.attackRates[index] = getDoubleVal( arElement );
@@ -1194,7 +1194,7 @@ public class ModelReader extends ModelReaderSupport
                 // get the name of the target cell type
                 String target_name = getAttr( drElement, "name" );
                 //            // now find its index 
-                int index = CellDefinition.findCellDefinitionIndex( target_name );
+                int index = m.findCellDefinitionIndex( target_name );
                 if( index >= 0 )
                 {
                     cellInteractions.fusionRates[index] = getDoubleVal( drElement );
@@ -1215,14 +1215,14 @@ public class ModelReader extends ModelReaderSupport
         }
     }
 
-    private void readCellTransformations(Element el, CellDefinition cd)
+    private void readCellTransformations(Element el, CellDefinition cd, Model m)
     {
         CellTransformations transformations = cd.phenotype.cellTransformations;
         Element ratesElement = findElement( el, "transformation_rates" );
         for( Element rateElement : findAllElements( ratesElement, "transformation_rate" ) )
         {
             String name = getAttr( rateElement, "name" );
-            int index = CellDefinition.findCellDefinitionIndex( name );
+            int index = m.findCellDefinitionIndex( name );
             if( index >= 0 )
             {
                 double rate = getDoubleVal( rateElement );

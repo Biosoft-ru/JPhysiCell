@@ -74,20 +74,20 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 public class CellTransformations implements Cloneable
 {
     public double[] transformationRates; // rates of transforming into different cell types 
+    private String[] names;
 
     public CellTransformations()
     {
         transformationRates = new double[] {0.0};
     }
 
-    void sync_to_cell_definitions()
+    public void initialize(Model model)
     {
-        initialize( CellDefinition.getDefinitionsCount() );
-    }
-
-    public void initialize(int cellDefinitionSize)
-    {
-        transformationRates = VectorUtil.resize( transformationRates, cellDefinitionSize );
+        int size = model.getDefinitionsCount();
+        names = new String[size];
+        for( int i = 0; i < size; i++ )
+            names[i] = model.getCellDefinition( i ).name;
+        transformationRates = VectorUtil.resize( transformationRates, size );
     }
 
     @Override
@@ -113,15 +113,15 @@ public class CellTransformations implements Cloneable
     public String display()
     {
         StringBuilder sb = new StringBuilder();
-        List<String> names = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         for( int i = 0; i < transformationRates.length; i++ )
         {
             if( transformationRates[i] != 0 )
             {
-                names.add( CellDefinition.getCellDefinitionByIndex( i ).name );
+                list.add( names[i] );
             }
         }
-        if( names.isEmpty() )
+        if( list.isEmpty() )
         {
             sb.append( "Transformations Disabled." );
             sb.append( "\n--------------------------------" );
@@ -131,11 +131,11 @@ public class CellTransformations implements Cloneable
         sb.append( "Transformations:" );
         sb.append( "\n--------------------------------" );
         sb.append( "\ntTransforms to " );
-        for( int i = 0; i < names.size(); i++ )
+        for( int i = 0; i < list.size(); i++ )
         {
             if( i > 0 )
                 sb.append( "\n\t              " );
-            sb.append( names.get( i ) );
+            sb.append( list.get( i ) );
         }
         return sb.toString();
     }

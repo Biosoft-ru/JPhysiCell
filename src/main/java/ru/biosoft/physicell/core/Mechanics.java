@@ -119,26 +119,26 @@ public class Mechanics implements Cloneable
         maxAttachmentRate = 1.0;
     }
 
-    public void sync_to_cell_definitions()
+    //    public void sync_to_cell_definitions()
+    //    {
+    //        initialize( CellDefinition.getDefinitionsCount() );
+    //    }
+
+    public void initialize(Model model)
     {
-        initialize( CellDefinition.getDefinitionsCount() );
+        cellAdhesionAffinities = VectorUtil.resize( cellAdhesionAffinities, model.getDefinitionsCount(), 1.0 );
     }
 
-    public void initialize(int cellDinitionSize)
+    public double cell_adhesion_affinity(String type_name, Model model)
     {
-        cellAdhesionAffinities = VectorUtil.resize( cellAdhesionAffinities, cellDinitionSize, 1.0 );
-    }
-
-    public double cell_adhesion_affinity(String type_name)
-    {
-        int n = CellDefinition.getCellDefinition( type_name ).type;
+        int n = model.getCellDefinition( type_name ).type;
         return cellAdhesionAffinities[n];
     }
 
-    void setFullyHeterotypic()
+    void setFullyHeterotypic(Model model)
     {
         //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        int number_of_cell_defs = CellDefinition.getDefinitionsCount();
+        int number_of_cell_defs = model.getDefinitionsCount();
         //        cell_adhesion_affinities.assign( number_of_cell_defs, 1.0);
         cellAdhesionAffinities = VectorUtil.assign( number_of_cell_defs, 1.0 );
     }
@@ -146,7 +146,7 @@ public class Mechanics implements Cloneable
     void setFullyHomotypic(Cell pC)
     {
         //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        int number_of_cell_defs = CellDefinition.getDefinitionsCount();
+        int number_of_cell_defs = pC.getModel().getDefinitionsCount();
         //        cell_adhesion_affinities.assign( number_of_cell_defs, 0.0);
         cellAdhesionAffinities = new double[number_of_cell_defs];
         // now find my type and set to 1 

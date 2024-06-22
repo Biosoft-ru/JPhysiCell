@@ -15,6 +15,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
@@ -137,11 +138,12 @@ public class TestMechanics2
     public static void main(String ... argv) throws Exception
     {
         Microenvironment m = new Microenvironment( "substrate scale", size, 20, "minutes", "microns" );
+        Model model = new Model( m );
         CellContainer.createCellContainer( m, 30 );
         m.setDensity( 0, "oxygen", "mmHg", 0, 0 );
 
         CellDefinition cd = StandardModels.createFromDefault( "tumor cell", 0, m );
-        CellDefinition.registerCellDefinition( cd );
+        model.registerCellDefinition( cd );
         cd.phenotype.cycle = StandardModels.Ki67_advanced;
         cd.functions.updatePhenotype = null;
         cd.functions.updateVolume = null;
@@ -150,7 +152,7 @@ public class TestMechanics2
         List<double[]> cellPositions = createSphere( sampleСellRadius / 2, sphereRadius );
         for( int i = 0; i < cellPositions.size(); i++ )
         {
-            Cell pCell = Cell.createCell( cd, m, VectorUtil.newSum( tumorCenter, cellPositions.get( i ) ) );
+            Cell pCell = Cell.createCell( cd, model, VectorUtil.newSum( tumorCenter, cellPositions.get( i ) ) );
             // pCell->functions.volume_update_function=empty_function;
             // pCell->functions.update_phenotype=do_nothing;
             pCell.phenotype.cycle.data.currentPhaseIndex = Qindex;

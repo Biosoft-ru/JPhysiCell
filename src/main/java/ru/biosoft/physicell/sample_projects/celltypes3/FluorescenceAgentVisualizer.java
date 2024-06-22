@@ -14,9 +14,9 @@ public class FluorescenceAgentVisualizer extends AgentVisualizer
     public Color[] findColors(Cell pCell)
     {
         Microenvironment m = pCell.getMicroenvironment();
-        CellDefinition aCD = CellDefinition.getCellDefinition( "A" );
-        CellDefinition bCD = CellDefinition.getCellDefinition( "B" );
-        CellDefinition cCD = CellDefinition.getCellDefinition( "C" );
+        CellDefinition aCD = pCell.getModel().getCellDefinition( "A" );
+        CellDefinition bCD = pCell.getModel().getCellDefinition( "B" );
+        CellDefinition cCD = pCell.getModel().getCellDefinition( "C" );
         int typeA = aCD.type;
         int typeB = bCD.type;
         int typeC = cCD.type;

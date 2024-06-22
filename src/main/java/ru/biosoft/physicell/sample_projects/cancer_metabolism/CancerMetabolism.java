@@ -141,10 +141,10 @@ public class CancerMetabolism extends Model
         double tumorRadius = getParameterDouble( "tumor_radius" ); // 250.0; 
         List<double[]> positions = createSpherePositions( cellRadius, tumorRadius );
 
-        CellDefinition cd = CellDefinition.getCellDefinition( "metabolic cell" );
+        CellDefinition cd = getCellDefinition( "metabolic cell" );
         //        Cell.createCell( cd, m, new double[] {0, 0, 0} );
         for( int i = 0; i < positions.size(); i++ )
-            Cell.createCell( cd, m, positions.get( i ) );
+            Cell.createCell( cd, this, positions.get( i ) );
     }
 
     public void updateIntracellular() throws Exception

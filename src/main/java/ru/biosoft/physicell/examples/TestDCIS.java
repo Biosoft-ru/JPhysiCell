@@ -11,6 +11,7 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CellFunctions.DistanceCalculator;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Output;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
@@ -138,6 +139,7 @@ public class TestDCIS
         bounding_box[PhysiCellConstants.mesh_max_z_index] = 200;
 
         Microenvironment m = new Microenvironment( "substrate scale", "minutes", "microns" );
+        Model model = new Model( m );
         m.setDensity( 0, "oxygen", "mmHg", 1.0e5, 0.1 );
         // microenvironment.add_density( "glucose" , "dimensionless" );
 
@@ -180,7 +182,7 @@ public class TestDCIS
 
 
         cd.functions.membraneDistanceCalculator = new distance_to_membrane_duct();
-        CellDefinition.registerCellDefinition( cd );
+        model.registerCellDefinition( cd );
         double cell_radius = 10;
         double sphere_radius = duct_radius - 10;
 
@@ -207,7 +209,7 @@ public class TestDCIS
         {
             if( pos[0] > 0 )
                 continue;
-            Cell cell = Cell.createCell( cd, m, pos );
+            Cell cell = Cell.createCell( cd, model, pos );
             cell.phenotype.cycle.data.currentPhaseIndex = Q_index;
             if( cell.phenotype.cycle.currentPhase().entryFunction != null )
                 cell.phenotype.cycle.currentPhase().entryFunction.execute( cell, cell.phenotype, dt );

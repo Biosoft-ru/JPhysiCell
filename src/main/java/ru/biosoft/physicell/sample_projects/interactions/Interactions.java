@@ -84,28 +84,28 @@ public class Interactions extends Model
 
     void createCellTypes()
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( "bacteria" );
+        CellDefinition pCD = getCellDefinition( "bacteria" );
         pCD.functions.updatePhenotype = new BacteriaPhenotype();
         // pCD.functions.update_migration_bias = advanced_chemotaxis_function; 
         // pCD.phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
         // pCD.phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
 
         // set up blood vessels 
-        pCD = CellDefinition.getCellDefinition( "blood vessel" );
+        pCD = getCellDefinition( "blood vessel" );
         pCD.functions.updatePhenotype = null;
         pCD.isMovable = false;
 
         // set up stem cells 
-        pCD = CellDefinition.getCellDefinition( "stem" );
+        pCD = getCellDefinition( "stem" );
         pCD.functions.updatePhenotype = new StemPhenotype( this );
         // pCD.phenotype.cell_transformations.transformation_rate("differentiated") = 0.0001; 
 
         // set up differentiated cells 
-        pCD = CellDefinition.getCellDefinition( "differentiated" );
+        pCD = getCellDefinition( "differentiated" );
         pCD.functions.updatePhenotype = new DifferentiatedPhenotype();
 
         // set up macrophages 
-        pCD = CellDefinition.getCellDefinition( "macrophage" );
+        pCD = getCellDefinition( "macrophage" );
         // pCD.phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
         pCD.functions.updatePhenotype = new MacrophagePhenotype();
         // pCD.functions.update_migration_bias = advanced_chemotaxis_function; 
@@ -114,12 +114,12 @@ public class Interactions extends Model
 
 
         // set up CD8+ T cells 
-        pCD = CellDefinition.getCellDefinition( "CD8+ T cell" );
+        pCD = getCellDefinition( "CD8+ T cell" );
         pCD.functions.updatePhenotype = new CD8TcellPhenotype();
         // pCD.phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
 
         // set up neutrophil  
-        pCD = CellDefinition.getCellDefinition( "neutrophil" );
+        pCD = getCellDefinition( "neutrophil" );
         pCD.functions.updatePhenotype = new NeutrophilPhenotype();
         // pCD.phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
 
@@ -127,12 +127,12 @@ public class Interactions extends Model
 
     void setupTissue()
     {
-        PhysiCellUtilities.place( m, "bacteria", getParameterInt( "number_of_bacteria" ) );
-        PhysiCellUtilities.place( m, "blood vessel", getParameterInt( "number_of_blood_vessels" ) );
-        PhysiCellUtilities.place( m, "stem", getParameterInt( "number_of_stem_cells" ) );
-        PhysiCellUtilities.place( m, "differentiated", getParameterInt( "number_of_differentiated_cells" ) );
-        PhysiCellUtilities.place( m, "macrophage", getParameterInt( "number_of_macrophages" ) );
-        PhysiCellUtilities.place( m, "neutrophil", getParameterInt( "number_of_neutrophils" ) );
-        PhysiCellUtilities.place( m, "CD8+ T cell", getParameterInt( "number_of_CD8T_cells" ) );
+        PhysiCellUtilities.place( this, "bacteria", getParameterInt( "number_of_bacteria" ) );
+        PhysiCellUtilities.place( this, "blood vessel", getParameterInt( "number_of_blood_vessels" ) );
+        PhysiCellUtilities.place( this, "stem", getParameterInt( "number_of_stem_cells" ) );
+        PhysiCellUtilities.place( this, "differentiated", getParameterInt( "number_of_differentiated_cells" ) );
+        PhysiCellUtilities.place( this, "macrophage", getParameterInt( "number_of_macrophages" ) );
+        PhysiCellUtilities.place( this, "neutrophil", getParameterInt( "number_of_neutrophils" ) );
+        PhysiCellUtilities.place( this, "CD8+ T cell", getParameterInt( "number_of_CD8T_cells" ) );
     }
 }

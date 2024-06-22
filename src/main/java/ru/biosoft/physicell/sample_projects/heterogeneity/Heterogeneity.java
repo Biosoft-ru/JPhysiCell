@@ -84,7 +84,7 @@ public class Heterogeneity extends Model
     {
         super.init();
         PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( getMicroenvironment() );
+        SignalBehavior.setupDictionaries( this );
         createCellTypes();
         setupTissue();
         //        printSummary( m, CUSTOM_ONCOPROTEIN );
@@ -94,7 +94,7 @@ public class Heterogeneity extends Model
 
     void createCellTypes()
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( "cancer cell" );
+        CellDefinition pCD = getCellDefinition( "cancer cell" );
         pCD.functions.updatePhenotype = new TumorPhenotype();
         pCD.parameters.o2_proliferation_saturation = 38;
         pCD.parameters.o2_reference = 38;
@@ -102,7 +102,7 @@ public class Heterogeneity extends Model
 
     void setupTissue() throws Exception
     {
-        CellDefinition pCD = CellDefinition.getCellDefinition( "cancer cell" );
+        CellDefinition pCD = getCellDefinition( "cancer cell" );
         double cellRadius = pCD.phenotype.geometry.radius;
         double cellSpacing = 0.95 * 2.0 * cellRadius;
         double tumorRadius = getParameterDouble( "tumor_radius" ); // 250.0; 
@@ -124,25 +124,25 @@ public class Heterogeneity extends Model
 
             while( x < xOuter )
             {
-                cell = Cell.createCell( pCD, m, new double[] {x, y, 0.0} ); // tumor cell 
+                cell = Cell.createCell( pCD, this, new double[] {x, y, 0.0} ); // tumor cell 
                 double p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
                 SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
 
                 if( Math.abs( y ) > 0.01 )
                 {
-                    cell = Cell.createCell( pCD, m, new double[] {x, -y, 0.0} ); // tumor cell 
+                    cell = Cell.createCell( pCD, this, new double[] {x, -y, 0.0} ); // tumor cell 
                     p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
                     SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
                 }
                 if( Math.abs( x ) > 0.01 )
                 {
-                    cell = Cell.createCell( pCD, m, new double[] { -x, y, 0} ); // tumor cell 
+                    cell = Cell.createCell( pCD, this, new double[] { -x, y, 0} ); // tumor cell 
                     p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
                     SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
 
                     if( Math.abs( y ) > 0.01 )
                     {
-                        cell = Cell.createCell( pCD, m, new double[] { -x, -y, 0} ); // tumor cell
+                        cell = Cell.createCell( pCD, this, new double[] { -x, -y, 0} ); // tumor cell
                         p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
                         SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
                     }

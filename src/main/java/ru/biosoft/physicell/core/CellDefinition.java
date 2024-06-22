@@ -1,14 +1,7 @@
 package ru.biosoft.physicell.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.CustomCellData.VectorVariable;
-import ru.biosoft.physicell.core.standard.StandardModels;
 
 /*
 ###############################################################################
@@ -78,12 +71,6 @@ import ru.biosoft.physicell.core.standard.StandardModels;
 */
 public class CellDefinition
 {
-    //Static, move to registry of some kind
-    private static List<CellDefinition> cellDefinitions = new ArrayList<>();
-    private static Map<Integer, Integer> typeToIndex = new HashMap<>();
-    private static Map<String, CellDefinition> cellDefinitionNames = new HashMap<>();
-    private static Map<Integer, CellDefinition> cellDefinitionTypes = new HashMap<>();
-
     public int type;
     public String name;
 
@@ -94,68 +81,6 @@ public class CellDefinition
     public CustomCellData custom_data = new CustomCellData();
     public CellFunctions functions = new CellFunctions();
     public Phenotype phenotype = new Phenotype();
-
-    public static int getDefinitionsCount()
-    {
-        return cellDefinitions.size();
-    }
-
-    public static void registerCellDefinition(CellDefinition cd)
-    {
-        cellDefinitionNames.put( cd.name, cd );
-        cellDefinitionTypes.put( cd.type, cd );
-        typeToIndex.put( cd.type, cellDefinitions.size() );
-        cellDefinitions.add( cd );
-        sync();
-    }
-
-    public static void clearCellDefinitions()
-    {
-        cellDefinitions.clear();
-        cellDefinitionNames.clear();
-        cellDefinitionTypes.clear();
-        typeToIndex.clear();
-        StandardModels.defaults = null;
-        sync();
-    }
-
-    public static Iterable<CellDefinition> getCellDefinitions()
-    {
-        return cellDefinitions;
-    }
-
-    public static CellDefinition getCellDefinitionByIndex(int index)
-    {
-        return cellDefinitions.get( index );
-    }
-
-    public static int getCellDefinitionIndex(int type)
-    {
-        return typeToIndex.get( type );
-    }
-
-    public static CellDefinition getCellDefinition(int type)
-    {
-        return cellDefinitionTypes.get( type );
-    }
-
-    public static Set<String> getCellDefinitionNames()
-    {
-        return cellDefinitionNames.keySet();
-    }
-
-    public static CellDefinition getCellDefinition(String name)
-    {
-        return cellDefinitionNames.get( name );
-    }
-
-    private static void sync()
-    {
-        for( CellDefinition cd : cellDefinitions )
-        {
-            cd.phenotype.sync();
-        }
-    }
 
     public CellDefinition()
     {
@@ -183,14 +108,6 @@ public class CellDefinition
         this.type = type;
         this.name = name;
         phenotype.sync( m );
-    }
-
-    public static int findCellDefinitionIndex(String name)
-    {
-        CellDefinition cd = cellDefinitionNames.get( name );
-        if( cd != null )
-            return cd.type;
-        return -1;
     }
 
     public CellDefinition clone(String name, int type, Microenvironment m)

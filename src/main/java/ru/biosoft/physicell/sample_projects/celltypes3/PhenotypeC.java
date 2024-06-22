@@ -20,7 +20,7 @@ public class PhenotypeC extends UpdatePhenotype
     public void execute(Cell cell, Phenotype phenotype, double dt)
     {
         Microenvironment m = cell.getMicroenvironment();
-        CellDefinition cd = CellDefinition.getCellDefinition( "C" );
+        CellDefinition cd = cell.getModel().getCellDefinition( "C" );
         int nApoptosis = cd.phenotype.death.findDeathModelIndex( "Apoptosis" );
         int nNecrosis = cd.phenotype.death.findDeathModelIndex( "Necrosis" );
 

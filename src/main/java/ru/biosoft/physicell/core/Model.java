@@ -11,11 +11,17 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
+import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
 
 public class Model
 {
+    private List<CellDefinition> cellDefinitions = new ArrayList<>();
+    private Map<Integer, Integer> typeToIndex = new HashMap<>();
+    private Map<String, CellDefinition> cellDefinitionNames = new HashMap<>();
+    private Map<Integer, CellDefinition> cellDefinitionTypes = new HashMap<>();
+
     private List<Visualizer> visualizers = new ArrayList<Visualizer>();
     private String logFile;
     protected Microenvironment m;
@@ -412,13 +418,12 @@ public class Model
         sb.append( "\tDiffusion: " + m.getSolver().getName() );
         sb.append( "\n\n" + getMicroenvironment().display() );
         sb.append( "\n" );
-        sb.append( "\nCell Types: ( " + CellDefinition.getDefinitionsCount() + " total)" );
+        sb.append( "\nCell Types: ( " + getDefinitionsCount() + " total)" );
         sb.append( "\n--------------------------------" );
-        for( int i = 0; i < CellDefinition.getDefinitionsCount(); i++ )
-            sb.append( "\n\t" + i + ". " + CellDefinition.getCellDefinitionByIndex( i ).name + " # "
-                    + calcCells( CellDefinition.getCellDefinitionByIndex( i ) ) );
+        for( int i = 0; i < getDefinitionsCount(); i++ )
+            sb.append( "\n\t" + i + ". " + getCellDefinitionByIndex( i ).name + " # " + calcCells( getCellDefinitionByIndex( i ) ) );
 
-        for( CellDefinition cd : CellDefinition.getCellDefinitions() )
+        for( CellDefinition cd : getCellDefinitions() )
             sb.append( "\n\n" + cd.display() );
         return sb.toString();
     }
@@ -478,5 +483,75 @@ public class Model
     public void setVerbose(boolean verbose)
     {
         this.verbose = verbose;
+    }
+
+    public int getDefinitionsCount()
+    {
+        return cellDefinitions.size();
+    }
+
+    public void registerCellDefinition(CellDefinition cd)
+    {
+        cellDefinitionNames.put( cd.name, cd );
+        cellDefinitionTypes.put( cd.type, cd );
+        typeToIndex.put( cd.type, cellDefinitions.size() );
+        cellDefinitions.add( cd );
+        sync();
+    }
+
+    public void clearCellDefinitions()
+    {
+        cellDefinitions.clear();
+        cellDefinitionNames.clear();
+        cellDefinitionTypes.clear();
+        typeToIndex.clear();
+        StandardModels.defaults = null;
+        sync();
+    }
+
+    public Iterable<CellDefinition> getCellDefinitions()
+    {
+        return cellDefinitions;
+    }
+
+    public CellDefinition getCellDefinitionByIndex(int index)
+    {
+        return cellDefinitions.get( index );
+    }
+
+    public int getCellDefinitionIndex(int type)
+    {
+        return typeToIndex.get( type );
+    }
+
+    public CellDefinition getCellDefinition(int type)
+    {
+        return cellDefinitionTypes.get( type );
+    }
+
+    public Set<String> getCellDefinitionNames()
+    {
+        return cellDefinitionNames.keySet();
+    }
+
+    public CellDefinition getCellDefinition(String name)
+    {
+        return cellDefinitionNames.get( name );
+    }
+
+    private void sync()
+    {
+        for( CellDefinition cd : cellDefinitions )
+        {
+            cd.phenotype.sync( this );
+        }
+    }
+
+    public int findCellDefinitionIndex(String name)
+    {
+        CellDefinition cd = cellDefinitionNames.get( name );
+        if( cd != null )
+            return cd.type;
+        return -1;
     }
 }

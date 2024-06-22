@@ -19,11 +19,13 @@ public class PredatorPhenotype extends UpdatePhenotype
 {
     private double maxDetectionDistance = 2;
     private double decayRate = 0.00025;
-    CellDefinition pPreyDef = CellDefinition.getCellDefinition( "prey" );
+    CellDefinition pPreyDef = null;
 
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
+        if( pPreyDef == null )
+            pPreyDef = pCell.getModel().getCellDefinition( "prey" );
         List<Cell> nearby = PhysiCellUtilities.getNeighbors( pCell );
         for( Cell prey : nearby )
         {

@@ -82,7 +82,7 @@ public class CancerBiorobots extends Model
     public void init() throws Exception
     {
         super.init();
-        SignalBehavior.setupDictionaries( m );
+        SignalBehavior.setupDictionaries( this );
         createCellTypes();
         setupTissue();
         addEvent( new TherapyEvent( getParameterDouble( "therapy_activation_time" ) ) );
@@ -97,13 +97,13 @@ public class CancerBiorobots extends Model
         PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
 
         //cancer cell
-        CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
+        CellDefinition cd = getCellDefinition( "cancer cell" );
         cd.functions.updatePhenotype = new TumorPhenotype();
         cd.parameters.o2_proliferation_saturation = 38.0;
         cd.parameters.o2_reference = 38.0;
 
         // cargo cells
-        cd = CellDefinition.getCellDefinition( "cargo cell" );
+        cd = getCellDefinition( "cargo cell" );
         // figure out mechanics parameters
         cd.phenotype.mechanics.relMaxAttachmentDistance = cd.custom_data.get( "max_attachment_distance" ) / cd.phenotype.geometry.radius;
         cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_elastic_displacement" ) / cd.phenotype.geometry.radius;
@@ -116,7 +116,7 @@ public class CancerBiorobots extends Model
         cd.functions.updateMigration = null;
 
         // worker cells
-        cd = CellDefinition.getCellDefinition( "worker cell" );
+        cd = getCellDefinition( "worker cell" );
         cd.phenotype.mechanics.relMaxAttachmentDistance = cd.custom_data.get( "max_attachment_distance" ) / cd.phenotype.geometry.radius;
         cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_elastic_displacement" ) / cd.phenotype.geometry.radius;
         cd.phenotype.mechanics.attachmentElasticConstant = cd.custom_data.get( "elastic_coefficient" );
@@ -132,7 +132,7 @@ public class CancerBiorobots extends Model
         double cellSpacing = 0.95 * 2.0 * cellRadius;
         double tumorRadius = getParameterDouble( "tumor_radius" ); // 200.0;
 
-        CellDefinition cd = CellDefinition.getCellDefinition( "cancer cell" );
+        CellDefinition cd = getCellDefinition( "cancer cell" );
         double x = 0.0;
         double xOuter = tumorRadius;
         double y = 0.0;
@@ -149,17 +149,17 @@ public class CancerBiorobots extends Model
 
             while( x < xOuter )
             {
-                Cell.createCell( cd, m, new double[] {x, y, 0.0} ); // tumor cell
+                Cell.createCell( cd, this, new double[] {x, y, 0.0} ); // tumor cell
 
                 if( Math.abs( y ) > 0.01 )
-                    Cell.createCell( cd, m, new double[] {x, -y, 0.0} ); // tumor cell			
+                    Cell.createCell( cd, this, new double[] {x, -y, 0.0} ); // tumor cell			
 
                 if( Math.abs( x ) > 0.01 )
                 {
-                    Cell.createCell( cd, m, new double[] { -x, y, 0.0} );
+                    Cell.createCell( cd, this, new double[] { -x, y, 0.0} );
 
                     if( Math.abs( y ) > 0.01 )
-                        Cell.createCell( cd, m, new double[] { -x, -y, 0.0} );
+                        Cell.createCell( cd, this, new double[] { -x, -y, 0.0} );
                 }
                 x += cellSpacing;
             }
