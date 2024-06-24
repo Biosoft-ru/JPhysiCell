@@ -9,15 +9,17 @@ import ru.biosoft.physicell.core.SignalBehavior;
 public class CargoCellRule extends UpdatePhenotype
 {
     private double elasticCoefficient;
+    private SignalBehavior signals;
 
     public CargoCellRule(Model model)
     {
+        signals = model.getSignals();
         elasticCoefficient = model.getParameterDouble( "elastic_coefficient" );
     }
 
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        SignalBehavior.setSingleBehavior( pCell, "cell-cell adhesion elastic constant", elasticCoefficient );
+        signals.setSingleBehavior( pCell, "cell-cell adhesion elastic constant", elasticCoefficient );
     }
 }

@@ -5,7 +5,7 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Model.Event;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
+import ru.biosoft.physicell.core.RandomGenerator;
 
 public class TherapyEvent extends Event
 {
@@ -37,14 +37,14 @@ public class TherapyEvent extends Event
 
         CellDefinition workerCD = model.getCellDefinition( "worker cell" );
         CellDefinition cargoCD = model.getCellDefinition( "cargo cell" );
-
+        RandomGenerator rng = model.getRNG();
         for( int i = 0; i < numberInjectedCells; i++ )
         {
             double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( left, right );
-            position[1] = PhysiCellUtilities.UniformRandom( bottom, top );
+            position[0] = rng.UniformRandom( left, right );
+            position[1] = rng.UniformRandom( bottom, top );
 
-            if( PhysiCellUtilities.UniformRandom() <= workerFraction )
+            if( model.getRNG().UniformRandom() <= workerFraction )
             {
                 Cell.createCell( workerCD, model, position );
             }

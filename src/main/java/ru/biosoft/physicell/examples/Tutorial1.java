@@ -92,7 +92,7 @@ public class Tutorial1
         for( int i = 0; i < sourceAgentsNumber; i++ )
         {
             //substrate source agents
-            double[] pos = VectorUtil.random( 3, 0, size );
+            double[] pos = VectorUtil.random( model.getRNG(), 3, 0, size );
             if( generateAtSlice )
                 pos[2] = zSlice; //keep agents at z slice
 
@@ -108,7 +108,7 @@ public class Tutorial1
 
         for( int i = 0; i < sinkAgentsNumber; i++ )
         {
-            double[] pos = VectorUtil.random( 3, 0, size );
+            double[] pos = VectorUtil.random( model.getRNG(), 3, 0, size );
             if( generateAtSlice )
                 pos[2] = zSlice; //keep agents at z slice 
 

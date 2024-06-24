@@ -3,8 +3,6 @@ package ru.biosoft.physicell.sample_projects.cancer_biorobots;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
-import ru.biosoft.physicell.core.SignalBehavior;
 import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
 
@@ -82,23 +80,23 @@ public class CancerBiorobots extends Model
     public void init() throws Exception
     {
         super.init();
-        SignalBehavior.setupDictionaries( this );
+        signals.setupDictionaries( this );
         createCellTypes();
         setupTissue();
         addEvent( new TherapyEvent( getParameterDouble( "therapy_activation_time" ) ) );
         for( Visualizer visualizer : getVisualizers() )
         {
-            visualizer.setAgentVisualizer( new CancerBiorobotsVisualizer() );
+            visualizer.setAgentVisualizer( new CancerBiorobotsVisualizer( this ) );
         }
     }
 
     private void createCellTypes()
     {
-        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        setSeed( getParameterInt( "random_seed" ) );
 
         //cancer cell
         CellDefinition cd = getCellDefinition( "cancer cell" );
-        cd.functions.updatePhenotype = new TumorPhenotype();
+        cd.functions.updatePhenotype = new TumorPhenotype( this );
         cd.parameters.o2_proliferation_saturation = 38.0;
         cd.parameters.o2_reference = 38.0;
 
@@ -110,8 +108,8 @@ public class CancerBiorobots extends Model
         cd.phenotype.mechanics.attachmentElasticConstant = cd.custom_data.get( "elastic_coefficient" );
 
         // set functions
-        cd.functions.updatePhenotype = new CargoPhenotype();
-        cd.functions.customCellRule = new CargoCellRule();
+        cd.functions.updatePhenotype = new CargoPhenotype( this );
+        cd.functions.customCellRule = new CargoCellRule( this );
         cd.functions.contact = new BiorobotsContact();
         cd.functions.updateMigration = null;
 
@@ -121,7 +119,7 @@ public class CancerBiorobots extends Model
         cd.phenotype.mechanics.relDetachmentDistance = cd.custom_data.get( "max_elastic_displacement" ) / cd.phenotype.geometry.radius;
         cd.phenotype.mechanics.attachmentElasticConstant = cd.custom_data.get( "elastic_coefficient" );
         cd.functions.updatePhenotype = null; // worker_cell_rule;
-        cd.functions.customCellRule = new WorkerCellRule();
+        cd.functions.customCellRule = new WorkerCellRule( this );
         cd.functions.contact = new BiorobotsContact();
     }
 

@@ -53,7 +53,7 @@ public class HypothesisRuleset
     HypothesisRule addBehavior(Model model, String behavior, double minBehavior, double maxBehavior) throws Exception
     {
         // check: is this a valid signal? (is it in the dictionary?)
-        if( SignalBehavior.findBehaviorIndex( behavior ) < 0 )
+        if( model.getSignals().findBehaviorIndex( behavior ) < 0 )
             throw new Exception( "Warning! Attempted to add behavior " + behavior + " which is not in the dictionary. "
                     + "Either fix your model or add the missing behavior to the simulation." );
 

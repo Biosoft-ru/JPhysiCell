@@ -74,7 +74,7 @@ import java.util.Map;
 public class HypothesisRule
 {
     Map<String, Integer> signalsMap = new HashMap<>();
-
+    private SignalBehavior signalBehavior;
     String cellType;
     CellDefinition cd;
 
@@ -174,7 +174,7 @@ public class HypothesisRule
         StringBuilder sb = new StringBuilder();
         for( int j = 0; j < signals.size(); j++ )
         {
-            sb.append( signals.get( j ) + " " + convert(responses.get( j )) );
+            sb.append( signals.get( j ) + " " + convert( responses.get( j ) ) );
             sb.append( behavior + " from " + baseValue + " towards " );
             if( responses.get( j ) )
                 sb.append( maxValue );
@@ -234,7 +234,7 @@ public class HypothesisRule
     void addSignal(String signal, double half_max, double hill_power, String response) throws Exception
     {
         // check: is this a valid signal? (is it in the dictionary?)
-        if( SignalBehavior.findSignalIndex( signal ) < 0 )
+        if( signalBehavior.findSignalIndex( signal ) < 0 )
         {
             throw new Exception( "Warning! Attempted to add signal " + signal + " which is not in the dictionary."
                     + "Either fix your model or add the missing signal to the simulation." );
@@ -342,23 +342,23 @@ public class HypothesisRule
         }
         double[] signalValues = new double[signals.size()];
         for( int i = 0; i < signals.size(); i++ )
-            signalValues[i] = SignalBehavior.getSingleSignal( cell, signals.get( i ) );
+            signalValues[i] = signalBehavior.getSingleSignal( cell, signals.get( i ) );
 
         // now, get live/dead value 
-        boolean dead = SignalBehavior.getSingleSignal( cell, "dead" ) != 0;
+        boolean dead = signalBehavior.getSingleSignal( cell, "dead" ) != 0;
         double out = evaluate( signalValues, dead );
 
         // new March 27, 2023 
         // if the rule was found to not apply, then just get the prior value 
         if( out < -9e90 )
-            out = SignalBehavior.getSinglBehavior( cell, this.behavior );
+            out = signalBehavior.getSinglBehavior( cell, this.behavior );
         return out;
     }
 
     void apply(Cell cell) throws Exception
     {
         double param = evaluate( cell );
-        SignalBehavior.setSingleBehavior( cell, behavior, param );
+        signalBehavior.setSingleBehavior( cell, behavior, param );
     }
 
     void sync(Model model, CellDefinition pCD)
@@ -366,7 +366,8 @@ public class HypothesisRule
         if( pCD == null )
             return;
         cellType = pCD.name;
-        SignalBehavior.getSingleBaseBehavior( model, pCD, behavior );
+        this.signalBehavior = model.getSignals();
+        signalBehavior.getSingleBaseBehavior( model, pCD, behavior );
     }
 
     void sync(Model model, String cellName)

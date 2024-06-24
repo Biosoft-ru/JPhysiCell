@@ -177,7 +177,7 @@ public class TestCellCycle
         for( int i = 0; i < total; i++ )
         {
             int phaseIndex = 0;
-            double[] tempPosition = VectorUtil.random( 3, 0, size );
+            double[] tempPosition = VectorUtil.random( model.getRNG(), 3, 0, size );
             tempPosition[2] = zSlice;//keep z at slice
             Cell cell = Cell.createCell( cd, model, tempPosition );
             cell.tag = "Source";

@@ -9,8 +9,6 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
-import ru.biosoft.physicell.core.SignalBehavior;
 import ru.biosoft.physicell.ui.Visualizer;
 
 /**
@@ -92,8 +90,8 @@ public class CancerImmune extends Model
         // same initial histogram of oncoprotein, even if threading means 
         // that future division and other events are still not identical 
         // for all runs 
-        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( this );
+        setSeed( getParameterInt( "random_seed" ) );
+        signals.setupDictionaries( this );
         createCancerCell();
         createImmuneCell();
         setupTissue( use2D );
@@ -129,7 +127,7 @@ public class CancerImmune extends Model
 
         // set functions 
         cd.functions.updatePhenotype = null;
-        cd.functions.customCellRule = new ImmuneCellRule();
+        cd.functions.customCellRule = new ImmuneCellRule( this );
         cd.functions.updateMigration = new ImmuneCellMotility();
         cd.functions.contact = new AdhesionContact();
     }
@@ -217,7 +215,7 @@ public class CancerImmune extends Model
         for( double[] position : positions )
         {
             Cell pCell = Cell.createCell( cd, this, position ); // tumor cell 
-            double oncoprotein = Math.max( 0, PhysiCellUtilities.NormalRandom( imm_mean, imm_sd ) );
+            double oncoprotein = Math.max( 0, rng.NormalRandom( imm_mean, imm_sd ) );
             pCell.customData.set( "oncoprotein", oncoprotein );
         }
         //        printSummary( m, "oncoprotein" );

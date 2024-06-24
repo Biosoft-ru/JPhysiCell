@@ -101,7 +101,7 @@ public class Worm extends Model
 
         for( Cell cell : m.getAgents( Cell.class ) )
         {
-            cell.customData.set( "head", PhysiCellUtilities.UniformRandom() );
+            cell.customData.set( "head", rng.UniformRandom() );
             cell.customData.set( "head_initial", cell.customData.get( "head" ) );
         }
     }

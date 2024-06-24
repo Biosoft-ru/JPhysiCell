@@ -612,7 +612,7 @@ public class Rules
 
         // compare to base behavior value in cell def for discrepancies 
         CellDefinition cd = model.getCellDefinition( type );
-        double refBaseValue = SignalBehavior.getSingleBaseBehavior( model, cd, behavior );
+        double refBaseValue = model.getSignals().getSingleBaseBehavior( model, cd, behavior );
         if( Math.abs( refBaseValue - base ) > 1e-15 )
         {
             throw new Exception( "Error: Base value for " + behavior + " in cell type " + type + "\n" + "       has base value " + base
@@ -716,7 +716,7 @@ public class Rules
 
         // compare to base behavior value in cell def for discrepancies 
         CellDefinition cd = model.getCellDefinition( type );
-        double refBaseValue = SignalBehavior.getSingleBaseBehavior( model, cd, behavior );
+        double refBaseValue = model.getSignals().getSingleBaseBehavior( model, cd, behavior );
         if( Math.abs( refBaseValue - base ) > 1e-15 )
         {
             throw new Exception( "Error: Base value for " + behavior + " in cell type " + type + "\n" + "       has base value " + base
@@ -749,7 +749,7 @@ public class Rules
             System.out.println( "Skipping commented rule (" + input + ")" );
             return;
         }
-        parseCSVRule1(model, tokenized_string );
+        parseCSVRule1( model, tokenized_string );
     }
 
     void parseCSVRules1(Model model, String filename) throws Exception
@@ -838,7 +838,7 @@ public class Rules
 
         // compare to base behavior value in cell def for discrepancies 
         CellDefinition pCD = model.getCellDefinition( cell_type );
-        double ref_base_value = SignalBehavior.getSingleBaseBehavior( model, pCD, behavior );
+        double ref_base_value = model.getSignals().getSingleBaseBehavior( model, pCD, behavior );
         setBehaviorBaseValue( model, cell_type, behavior, ref_base_value );
         if( response.equals( "increases" ) )
             set_behavior_max_value( model, cell_type, behavior, max_response );
@@ -1189,65 +1189,65 @@ public class Rules
     }
 
 
-    double[] UniformInUnitDisc()
+    double[] UniformInUnitDisc(Model model)
     {
         double two_pi = 6.283185307179586;
-        double theta = PhysiCellUtilities.UniformRandom(); // U(0,1)
+        double theta = model.rng.UniformRandom(); // U(0,1)
         theta *= two_pi; // U(0,2*pi)
-        double r = Math.sqrt( PhysiCellUtilities.UniformRandom() ); // sqrt( U(0,1) )
+        double r = Math.sqrt( model.rng.UniformRandom() ); // sqrt( U(0,1) )
         return new double[] {r * Math.cos( theta ), r * Math.sin( theta ), 0.0};
     }
 
-    double[] UniformInUnitSphere()
+    double[] UniformInUnitSphere(Model model)
     {
         // reference: https://doi.org/10.1063/1.168311, adapting equation 13
 
         double two_pi = 6.283185307179586;
 
-        double T = PhysiCellUtilities.UniformRandom();
+        double T = model.rng.UniformRandom();
         double sqrt_T = Math.sqrt( T );
         double sqrt_one_minus_T = 1.0;
         sqrt_one_minus_T -= T;
         sqrt_one_minus_T = Math.sqrt( sqrt_one_minus_T );
 
-        double param1 = Math.pow( PhysiCellUtilities.UniformRandom(), 0.33333333333333333333333333333333333333 ); //  xi^(1/3), 
+        double param1 = Math.pow( model.rng.UniformRandom(), 0.33333333333333333333333333333333333333 ); //  xi^(1/3), 
         double param2 = param1; // xi^(1/3)
         param2 *= 2.0; // 2 * xi^(1/3)
         param2 *= sqrt_T; // 2 * xi(1) * T^(1/2)
         param2 *= sqrt_one_minus_T; //  2 * xi(1) * T^(1/2) * (1-T)^(1/2)
 
-        double theta = PhysiCellUtilities.UniformRandom(); // U(0,1)
+        double theta = model.rng.UniformRandom(); // U(0,1)
         theta *= two_pi; // U(0,2*pi)
 
         return new double[] {param2 * Math.sin( theta ), param2 * Math.cos( theta ), param1 * ( 1 - 2 * T )};
     }
 
-    double[] UniformInAnnulus(double r1, double r2)
+    double[] UniformInAnnulus(Model model, double r1, double r2)
     {
         double two_pi = 6.283185307179586;
 
-        double theta = PhysiCellUtilities.UniformRandom();
+        double theta = model.rng.UniformRandom();
         theta *= two_pi;
         double r1_2 = r1 * r1;
         double r2_2 = r2 * r2;
 
-        double r = Math.sqrt( r1_2 + ( r2_2 - r1_2 ) * PhysiCellUtilities.UniformRandom() );
+        double r = Math.sqrt( r1_2 + ( r2_2 - r1_2 ) * model.rng.UniformRandom() );
         double x = r * Math.cos( theta );
         double y = r * Math.sin( theta );
         return new double[] {x, y, 0.0};
     }
 
-    double[] UniformInShell(double r1, double r2)
+    double[] UniformInShell(Model model, double r1, double r2)
     {
         double two_pi = 6.283185307179586;
 
-        double T = PhysiCellUtilities.UniformRandom();
+        double T = model.rng.UniformRandom();
         double sqrt_T = Math.sqrt( T );
         double sqrt_one_minus_T = 1.0;
         sqrt_one_minus_T -= T;
         sqrt_one_minus_T = Math.sqrt( sqrt_one_minus_T );
 
-        double param1 = Math.pow( PhysiCellUtilities.UniformRandom(), 0.33333333333333333333333333333333333333 ); //  xi^(1/3), 
+        double param1 = Math.pow( model.rng.UniformRandom(), 0.33333333333333333333333333333333333333 ); //  xi^(1/3), 
         // param1 *= (r2-r1); 
         // param1 += r1; 
         double param2 = param1; // xi^(1/3)
@@ -1255,7 +1255,7 @@ public class Rules
         param2 *= sqrt_T; // 2 * xi(1) * T^(1/2)
         param2 *= sqrt_one_minus_T; //  2 * xi(1) * T^(1/2) * (1-T)^(1/2)
 
-        double theta = PhysiCellUtilities.UniformRandom(); // U(0,1)
+        double theta = model.rng.UniformRandom(); // U(0,1)
         theta *= two_pi; // U(0,2*pi)
 
         return new double[] {param2 * Math.sin( theta ), param2 * Math.cos( theta ), param1 * ( 1 - 2 * T )};

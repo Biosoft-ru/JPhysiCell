@@ -77,7 +77,7 @@ public class Interactions extends Model
     public void init() throws Exception
     {
         super.init();
-        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        setSeed( getParameterInt( "random_seed" ) );
         createCellTypes();
         setupTissue();
     }

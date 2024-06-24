@@ -9,7 +9,6 @@ import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Intracellular;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
-import ru.biosoft.physicell.core.SignalBehavior;
 import ru.biosoft.physicell.core.standard.StandardUpdateVelocity;
 import ru.biosoft.physicell.core.standard.StandardVolumeUpdate;
 
@@ -87,7 +86,7 @@ public class OdeEnergy extends Model
     public void init() throws Exception
     {
         super.init();
-        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
+        setSeed( getParameterInt( "random_seed" ) );
         createCellTypes();
         setupTissue();
         getVisualizers().forEach( v -> v.setAgentVisualizer( new EnergyVisualizer() ) );
@@ -104,7 +103,7 @@ public class OdeEnergy extends Model
         defaults.functions.membraneInteraction = null;
         defaults.functions.membraneDistanceCalculator = null;
         //        defaults.phenotype.intracellular = new IntracellularEuler( new ToyMetabolicModel() );
-        SignalBehavior.setupDictionaries( this );
+        signals.setupDictionaries( this );
     }
 
     void setupTissue() throws Exception
@@ -121,17 +120,17 @@ public class OdeEnergy extends Model
         for( int i = 0; i < positions.size(); i++ )
         {
             Cell pCell = Cell.createCell( cd, this, positions.get( i ) );
-            SignalBehavior.setSingleBehavior( pCell, "custom:intra_oxy", getParameterDouble( "initial_internal_oxygen" ) );
-            SignalBehavior.setSingleBehavior( pCell, "custom:intra_glu", getParameterDouble( "initial_internal_glucose" ) );
-            SignalBehavior.setSingleBehavior( pCell, "custom:intra_lac", getParameterDouble( "initial_internal_lactate" ) );
-            SignalBehavior.setSingleBehavior( pCell, "custom:intra_energy", getParameterDouble( "initial_energy" ) );
+            signals.setSingleBehavior( pCell, "custom:intra_oxy", getParameterDouble( "initial_internal_oxygen" ) );
+            signals.setSingleBehavior( pCell, "custom:intra_glu", getParameterDouble( "initial_internal_glucose" ) );
+            signals.setSingleBehavior( pCell, "custom:intra_lac", getParameterDouble( "initial_internal_lactate" ) );
+            signals.setSingleBehavior( pCell, "custom:intra_energy", getParameterDouble( "initial_energy" ) );
             double cellVolume = pCell.phenotype.volume.total;
             double[] substrates = pCell.phenotype.molecular.internSubstrates;
-            substrates[oxygenIndex] = SignalBehavior.getSingleSignal( pCell, "custom:intra_oxy" ) * cellVolume;
-            substrates[glucoseIndex] = SignalBehavior.getSingleSignal( pCell, "custom:intra_glu" ) * cellVolume;
-            substrates[lactateIndex] = SignalBehavior.getSingleSignal( pCell, "custom:intra_lac" ) * cellVolume;
+            substrates[oxygenIndex] = signals.getSingleSignal( pCell, "custom:intra_oxy" ) * cellVolume;
+            substrates[glucoseIndex] = signals.getSingleSignal( pCell, "custom:intra_glu" ) * cellVolume;
+            substrates[lactateIndex] = signals.getSingleSignal( pCell, "custom:intra_lac" ) * cellVolume;
             pCell.phenotype.intracellular.start();
-            pCell.phenotype.intracellular.setParameterValue( "Energy", SignalBehavior.getSingleSignal( pCell, "custom:intra_energy" ) );
+            pCell.phenotype.intracellular.setParameterValue( "Energy", signals.getSingleSignal( pCell, "custom:intra_energy" ) );
         }
     }
 
@@ -151,9 +150,9 @@ public class OdeEnergy extends Model
                 double cellVolume = cell.phenotype.volume.total;
 
                 // Get Intracellular Concentrations
-                double cellOxygen = SignalBehavior.getSingleSignal( cell, "intracellular oxygen" );
-                double cellGlucose = SignalBehavior.getSingleSignal( cell, "intracellular glucose" );
-                double cellLactate = SignalBehavior.getSingleSignal( cell, "intracellular lactate" );
+                double cellOxygen = signals.getSingleSignal( cell, "intracellular oxygen" );
+                double cellGlucose = signals.getSingleSignal( cell, "intracellular glucose" );
+                double cellLactate = signals.getSingleSignal( cell, "intracellular lactate" );
 
                 Intracellular intra = cell.phenotype.intracellular;
                 // Update SBML 
@@ -174,10 +173,10 @@ public class OdeEnergy extends Model
                 substrates[lactateIndex] = intra.getParameterValue( "Lactate" ) * cellVolume;
 
                 //Save custom data
-                SignalBehavior.setSingleBehavior( cell, "custom:intra_oxy", intra.getParameterValue( "Oxygen" ) );
-                SignalBehavior.setSingleBehavior( cell, "custom:intra_glu", intra.getParameterValue( "Glucose" ) );
-                SignalBehavior.setSingleBehavior( cell, "custom:intra_lac", intra.getParameterValue( "Lactate" ) );
-                SignalBehavior.setSingleBehavior( cell, "custom:intra_energy", intra.getParameterValue( "Energy" ) );
+                signals.setSingleBehavior( cell, "custom:intra_oxy", intra.getParameterValue( "Oxygen" ) );
+                signals.setSingleBehavior( cell, "custom:intra_glu", intra.getParameterValue( "Glucose" ) );
+                signals.setSingleBehavior( cell, "custom:intra_lac", intra.getParameterValue( "Lactate" ) );
+                signals.setSingleBehavior( cell, "custom:intra_energy", intra.getParameterValue( "Energy" ) );
             }
         }
     }
@@ -213,9 +212,9 @@ public class OdeEnergy extends Model
     public String getReport(Cell cell) throws Exception
     {
         return "\n" + cell.ID + "\t" + cell.isOutOfDomain + "\t" + VectorUtil.print( cell.position ) + "\t" + cell.phenotype.cycle.name
-                + "\t" + cell.phenotype.cycle.currentPhase().name + "\t" + SignalBehavior.getSingleSignal( cell, "intracellular lactate" )
-                + "\t" + SignalBehavior.getSingleSignal( cell, "intracellular glucose" ) + "\t"
-                + SignalBehavior.getSingleSignal( cell, "intracellular oxygen" ) + "\t"
+                + "\t" + cell.phenotype.cycle.currentPhase().name + "\t" + signals.getSingleSignal( cell, "intracellular lactate" ) + "\t"
+                + signals.getSingleSignal( cell, "intracellular glucose" ) + "\t" + signals.getSingleSignal( cell, "intracellular oxygen" )
+                + "\t"
                 + cell.phenotype.intracellular.getParameterValue( "Energy" );
     }
 
@@ -229,9 +228,9 @@ public class OdeEnergy extends Model
     public String getLogInfo() throws Exception
     {
         Cell cell = m.getAgents( Cell.class ).iterator().next();
-        String addon = SignalBehavior.getSingleSignal( cell, "intracellular lactate" ) + "\t"
-                + SignalBehavior.getSingleSignal( cell, "intracellular glucose" ) + "\t"
-                + SignalBehavior.getSingleSignal( cell, "intracellular oxygen" ) + "\t"
+        String addon = signals.getSingleSignal( cell, "intracellular lactate" ) + "\t"
+                + signals.getSingleSignal( cell, "intracellular glucose" ) + "\t" + signals.getSingleSignal( cell, "intracellular oxygen" )
+                + "\t"
                 + cell.phenotype.intracellular.getParameterValue( "Energy" );
 
         return PhysiCellUtilities.getCurrentTime() + "\tElapsed\t" + ( System.currentTimeMillis() - startTime ) / 1000 + "\tTime:\t"

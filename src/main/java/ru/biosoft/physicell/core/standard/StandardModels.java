@@ -13,7 +13,7 @@ import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhaseArrest;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
+import ru.biosoft.physicell.core.RandomGenerator;
 
 /*
 ###############################################################################
@@ -454,7 +454,7 @@ public class StandardModels
         List<Cell> toDetach = new ArrayList<>();
         for( Cell pTest : pCell.state.springAttachments )
         {
-            if( PhysiCellUtilities.checkRandom( detachment_probability ) )
+            if( model.getRNG().checkRandom( detachment_probability ) )
             {
                 toDetach.add( pTest );
 
@@ -490,7 +490,7 @@ public class StandardModels
                 // std::string search_string = "adhesive affinity to " + pTest.type_name; 
                 // double affinity = get_single_behavior( pCell , search_string );
                 double affinity = phenotype.mechanics.cell_adhesion_affinity( pTest.typeName, model );
-                if( PhysiCellUtilities.checkRandom( attachment_probability * affinity ) )
+                if( model.getRNG().checkRandom( attachment_probability * affinity ) )
                 {
                     // attempt the attachment. testing for prior connection is already automated 
                     Cell.attachCellsAsSpring( pCell, pTest );
@@ -597,7 +597,7 @@ public class StandardModels
         {
             return;
         }
-
+        RandomGenerator rng = pCell.getModel().getRNG();
         //        Cell pTarget = null; 
         int type = -1;
         String type_name = "none";
@@ -624,7 +624,7 @@ public class StandardModels
             {
                 // dead phagocytosis 
                 probability = phenotype.cellInteractions.deadPhagocytosisRate * dt;
-                if( PhysiCellUtilities.checkRandom( probability ) )
+                if( rng.checkRandom( probability ) )
                 {
                     pCell.ingestCell( pTarget );
                 }
@@ -634,7 +634,7 @@ public class StandardModels
                 // live phagocytosis
                 // assume you can only phagocytose one at a time for now 
                 probability = phenotype.cellInteractions.getLivePhagocytosisRate( type ) * dt; // s[type] * dt;  
-                if( !phagocytosed && PhysiCellUtilities.checkRandom( probability ) )
+                if( !phagocytosed && rng.checkRandom( probability ) )
                 {
                     pCell.ingestCell( pTarget );
                     phagocytosed = true;
@@ -647,7 +647,7 @@ public class StandardModels
                 double immunogenicity_ji = pTarget.phenotype.cellInteractions.getImmunogenicity( type );
 
                 probability = attack_ij * immunogenicity_ji * dt;
-                if( !attacked && PhysiCellUtilities.checkRandom( probability ) )
+                if( !attacked && rng.checkRandom( probability ) )
                 {
                     pCell.attackCell( pTarget, dt );
                     attacked = true;
@@ -655,7 +655,7 @@ public class StandardModels
 
                 // fusion assume you can only fuse once cell at a time 
                 probability = phenotype.cellInteractions.getFusionRate( type ) * dt; // s[type] * dt;  
-                if( !fused && PhysiCellUtilities.checkRandom( probability ) )
+                if( !fused && rng.checkRandom( probability ) )
                 {
                     pCell.fuseCell( pTarget );
                     fused = true;
@@ -675,7 +675,7 @@ public class StandardModels
         for( int i = 0; i < phenotype.cellTransformations.transformationRates.length; i++ )
         {
             probability = phenotype.cellTransformations.transformationRates[i] * dt;
-            if( PhysiCellUtilities.checkRandom( probability ) )
+            if( pCell.getModel().getRNG().checkRandom( probability ) )
             {
                 // std::cout << "Transforming from " << pCell.type_name << " to " << cell_definitions_by_index[i].name << std::endl; 
                 pCell.convert( pCell.getModel().getCellDefinition( i ) );

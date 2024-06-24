@@ -14,9 +14,11 @@ public class WorkerCellRule extends UpdatePhenotype
     private double unattachedMigrationBias;
     private double elasticCoefficient;
     private double threshold;
+    private SignalBehavior signals;
 
     public WorkerCellRule(Model m)
     {
+        this.signals = m.getSignals();
         threshold = m.getParameterDouble( "drop_threshold" ); // 0.4; 
         attachedMigrationBias = m.getParameterDouble( "attached_worker_migration_bias" );
         unattachedMigrationBias = m.getParameterDouble( "unattached_worker_migration_bias" );
@@ -26,10 +28,10 @@ public class WorkerCellRule extends UpdatePhenotype
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        double director_signal = SignalBehavior.getSingleSignal( pCell, "director signal" );
-        double cargo_signal = SignalBehavior.getSingleSignal( pCell, "cargo signal" );
+        double director_signal = pCell.getModel().getSignals().getSingleSignal( pCell, "director signal" );
+        double cargo_signal = signals.getSingleSignal( pCell, "cargo signal" );
 
-        SignalBehavior.setSingleBehavior( pCell, "cell-cell adhesion elastic constant", elasticCoefficient );
+        signals.setSingleBehavior( pCell, "cell-cell adhesion elastic constant", elasticCoefficient );
 
         // have I arrived? If so, release my cargo set chemotaxis weights to seek cargo set migration bias 
         if( director_signal > threshold )
@@ -37,14 +39,14 @@ public class WorkerCellRule extends UpdatePhenotype
             // set receptor = 0 for cells we're detaching from and set their cycle rate to zero 
             for( Cell pTemp : pCell.state.attachedCells )
             {
-                SignalBehavior.setSingleBehavior( pTemp, "custom:receptor", 0.0 );
-                SignalBehavior.setSingleBehavior( pTemp, "cycle entry", 0.0 );
+                signals.setSingleBehavior( pTemp, "custom:receptor", 0.0 );
+                signals.setSingleBehavior( pTemp, "cycle entry", 0.0 );
             }
             pCell.removeAllAttachedCells();
 
-            SignalBehavior.setSingleBehavior( pCell, "chemotactic response to director signal", 0.0 );
-            SignalBehavior.setSingleBehavior( pCell, "chemotactic response to cargo signal", 1.0 );
-            SignalBehavior.setSingleBehavior( pCell, "migration bias", unattachedMigrationBias );
+            signals.setSingleBehavior( pCell, "chemotactic response to director signal", 0.0 );
+            signals.setSingleBehavior( pCell, "chemotactic response to cargo signal", 1.0 );
+            signals.setSingleBehavior( pCell, "migration bias", unattachedMigrationBias );
         }
 
         // am I searching for cargo? if so, see if I've found it
@@ -56,18 +58,18 @@ public class WorkerCellRule extends UpdatePhenotype
                 // if it is expressing the receptor, dock with it set chemotaxis weights set migration bias 
                 if( cell == pCell )
                     continue;
-                double receptor = SignalBehavior.getSingleSignal( cell, "custom:receptor" );
+                double receptor = signals.getSingleSignal( cell, "custom:receptor" );
 
                 if( receptor > 0.5 )
                 {
                     Cell.attachcCells( pCell, cell );
-                    SignalBehavior.setSingleBehavior( cell, "custom:receptor", 0.0 );
-                    SignalBehavior.setSingleBehavior( cell, "director signal secretion", 0.0 );
-                    SignalBehavior.setSingleBehavior( cell, "cargo signal secretion", 0.0 );
+                    signals.setSingleBehavior( cell, "custom:receptor", 0.0 );
+                    signals.setSingleBehavior( cell, "director signal secretion", 0.0 );
+                    signals.setSingleBehavior( cell, "cargo signal secretion", 0.0 );
 
-                    SignalBehavior.setSingleBehavior( pCell, "chemotactic response to director signal", 1.0 );
-                    SignalBehavior.setSingleBehavior( pCell, "chemotactic response to cargo signal", 0.0 );
-                    SignalBehavior.setSingleBehavior( pCell, "migration bias", attachedMigrationBias );
+                    signals.setSingleBehavior( pCell, "chemotactic response to director signal", 1.0 );
+                    signals.setSingleBehavior( pCell, "chemotactic response to cargo signal", 0.0 );
+                    signals.setSingleBehavior( pCell, "migration bias", attachedMigrationBias );
                 }
             }
         }

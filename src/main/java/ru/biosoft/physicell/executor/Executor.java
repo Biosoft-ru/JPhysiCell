@@ -61,7 +61,7 @@ public class Executor
 
         if( projects.keySet().contains( project ) )
         {
-            log( "Selected " + project + " project..." );
+            log( "Selected project: " + project + "." );
             String path = projects.get( project );
             try
             {
@@ -121,7 +121,7 @@ public class Executor
                 model.setTMax( params.finalTime );
 
             model.init();
-            PhysiCellUtilities.setSeed( params.seed );
+            model.setSeed( params.seed );
             if( params.printInfo )
             {
                 log( model.display() );

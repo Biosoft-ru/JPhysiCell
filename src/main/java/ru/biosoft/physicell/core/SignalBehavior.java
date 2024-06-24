@@ -8,15 +8,15 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 
 public class SignalBehavior
 {
-    public static Map<String, Integer> behavior_to_int = new HashMap<>();
-    public static Map<Integer, String> int_to_behavior = new HashMap<>();
+    public Map<String, Integer> behavior_to_int = new HashMap<>();
+    public Map<Integer, String> int_to_behavior = new HashMap<>();
     static Map<Integer, String> int_to_signal = new HashMap<>();
-    public static Map<String, Integer> signal_to_int = new HashMap<>();
-    public static double[] signalScales = new double[0];
+    public Map<String, Integer> signal_to_int = new HashMap<>();
+    public double[] signalScales = new double[0];
 
-    private static boolean setupDone = false;
+    private boolean setupDone = false;
 
-    public static double getSingleSignal(Cell pCell, int index)
+    public double getSingleSignal(Cell pCell, int index)
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();//Microenvironment.get_default_microenvironment();
         int m = microenvironment.numberDensities();
@@ -223,7 +223,7 @@ public class SignalBehavior
         return 0.0;
     }
 
-    static int findSignalIndex(String name)
+    int findSignalIndex(String name)
     {
         if( signal_to_int.containsKey( name ) )
             return signal_to_int.get( name );
@@ -231,24 +231,24 @@ public class SignalBehavior
         return -1;
     }
 
-    public static double getSingleSignal(Cell pCell, String name)
+    public double getSingleSignal(Cell pCell, String name)
     {
         return getSingleSignal( pCell, findSignalIndex( name ) );
     }
 
-    private static void register(String name, int index)
+    private void register(String name, int index)
     {
         signal_to_int.put( name, index );// ] = m+i;
         int_to_signal.put( index, name );//] = name; 
     }
 
-    private static void registerBehavior(String name, int index)
+    private void registerBehavior(String name, int index)
     {
         behavior_to_int.put( name, index );// ] = m+i;
         int_to_behavior.put( index, name );//] = name; 
     }
 
-    public static void setupDictionaries(Model model)
+    public void setupDictionaries(Model model)
     {
         // set key parameters on number of signals, etc. 
         // make registry of signals 
@@ -605,7 +605,7 @@ public class SignalBehavior
     //    static int max_attachments_ind;
     //    static int damage_rate_ind;
 
-    static void setSingleBehavior(Cell pCell, int index, double parameter) throws Exception
+    void setSingleBehavior(Cell pCell, int index, double parameter) throws Exception
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
         Model model = pCell.getModel();
@@ -869,13 +869,13 @@ public class SignalBehavior
         }
     }
 
-    public static void setSingleBehavior(Cell cell, String name, double parameter) throws Exception
+    public void setSingleBehavior(Cell cell, String name, double parameter) throws Exception
     {
         int index = findBehaviorIndex( name );
         setSingleBehavior( cell, index, parameter );
     }
 
-    static int findBehaviorIndex(String responseName)
+    int findBehaviorIndex(String responseName)
     {
         Integer result = behavior_to_int.get( responseName );
         if( result == null )
@@ -883,12 +883,12 @@ public class SignalBehavior
         return result;
     }
 
-    public static double getSinglBehavior(Cell pCell, String name) throws Exception
+    public double getSinglBehavior(Cell pCell, String name) throws Exception
     {
         return getSingleBehavior( pCell, findBehaviorIndex( name ) );
     }
 
-    public static double getSingleBehavior(Cell pCell, int index) throws Exception
+    public double getSingleBehavior(Cell pCell, int index) throws Exception
     {
         Model model = pCell.getModel();
         Microenvironment microenvironment = pCell.getMicroenvironment();
@@ -905,7 +905,7 @@ public class SignalBehavior
         // substrate-related behaviors 
 
         // first m entries are secretion 
-        int first_secretion_index = SignalBehavior.findBehaviorIndex( microenvironment.densityNames[0] + " secretion" ); // 0; 
+        int first_secretion_index = findBehaviorIndex( microenvironment.densityNames[0] + " secretion" ); // 0; 
         if( index >= first_secretion_index && index < first_secretion_index + m )
         {
             return pCell.phenotype.secretion.secretionRates[index - first_secretion_index];
@@ -1141,7 +1141,7 @@ public class SignalBehavior
         return -1;
     }
 
-    public static double[] getBaseBehaviors(Cell pCell)
+    public double[] getBaseBehaviors(Cell pCell)
     {
         CellDefinition pCD = pCell.getModel().getCellDefinition( pCell.typeName );
         Model model = pCell.getModel();
@@ -1350,7 +1350,7 @@ public class SignalBehavior
         return parameters;
     }
 
-    public static double getSingleBaseBehavior(Cell pCell, int index)
+    public double getSingleBaseBehavior(Cell pCell, int index)
     {
         Microenvironment microenvironment = pCell.getMicroenvironment();
         Model model = pCell.getModel();
@@ -1607,12 +1607,12 @@ public class SignalBehavior
         return -1;
     }
 
-    public static double getSingleBaseBehavior(Model model, CellDefinition pCD, String name)
+    public double getSingleBaseBehavior(Model model, CellDefinition pCD, String name)
     {
         return getSingleBaseBehavior( model, pCD, findBehaviorIndex( name ) );
     }
 
-    public static double getSingleBaseBehavior(Model model, CellDefinition pCD, int index)
+    public double getSingleBaseBehavior(Model model, CellDefinition pCD, int index)
     {
         Microenvironment microenvironment = pCD.getMicroenvironment();
         int m = microenvironment.numberDensities();
@@ -1868,12 +1868,12 @@ public class SignalBehavior
         return -1;
     }
 
-    public static double get_single_base_behavior(Cell pCell, String name)
+    public double get_single_base_behavior(Cell pCell, String name)
     {
         return getSingleBaseBehavior( pCell, findBehaviorIndex( name ) );
     }
 
-    public static double[] get_base_behaviors(Cell pCell, int[] indices)
+    public double[] get_base_behaviors(Cell pCell, int[] indices)
     {
         double[] parameters = new double[indices.length];//( indices.size() , 0.0 ); 
         for( int n = 0; n < indices.length; n++ )
@@ -1883,7 +1883,7 @@ public class SignalBehavior
         return parameters;
     }
 
-    public static double[] get_base_behaviors(Cell pCell, String[] names)
+    public double[] get_base_behaviors(Cell pCell, String[] names)
     {
         double[] parameters = new double[names.length];//;( names.length , 0.0 ); 
         for( int n = 0; n < names.length; n++ )

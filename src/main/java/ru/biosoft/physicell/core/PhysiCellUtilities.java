@@ -4,32 +4,31 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
 import ru.biosoft.physicell.biofvm.GeneralMesh;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 
 public class PhysiCellUtilities
 {
-    private static long seed = (long) -4.5786084958200968E16;//new Random().nextLong();//3.33256335198003E18
-    private static Random r = new Random( seed );
+    //    private static long seed = (long) -4.5786084958200968E16;//new Random().nextLong();//3.33256335198003E18
+    //    private static Random r = new Random( seed );
+    //
+    //    public static void setSeed(long val)
+    //    {
+    //        seed = val;
+    //        r.setSeed( val );
+    //    }
+    //
+    //    public static double getSeed()
+    //    {
+    //        return seed;
+    //    }
 
-    public static void setSeed(long val)
-    {
-        seed = val;
-        r.setSeed( val );
-    }
-
-    public static double getSeed()
-    {
-        return seed;
-    }
-
-    public static double[] UniformOnUnitSphere()
+    public static double[] UniformOnUnitSphere(Model model)
     {
         double[] output = {0, 0, 0};
-        double z = 2 * UniformRandom() - 1;// Choose z uniformly distributed in [-1,1].
-        double theta = UniformRandom() * 2 * Math.PI;// Choose theta uniformly distributed on [0, 2*pi).
+        double z = 2 * model.getRNG().UniformRandom() - 1;// Choose z uniformly distributed in [-1,1].
+        double theta = model.getRNG().UniformRandom() * 2 * Math.PI;// Choose theta uniformly distributed on [0, 2*pi).
         double r = Math.sqrt( 1 - z * z ); // Let r = sqrt(1-z^2).
         output[0] = r * Math.cos( theta );
         output[1] = r * Math.sin( theta );
@@ -37,35 +36,35 @@ public class PhysiCellUtilities
         return output;
     }
 
-    public static double[] UniformOnUnitCircle()
+    public static double[] UniformOnUnitCircle(Model model)
     {
         double[] output = {0, 0, 0};
-        double theta = UniformRandom(); //  BioFVM::uniform_random();
+        double theta = model.getRNG().UniformRandom(); //  BioFVM::uniform_random();
         theta *= 2 * Math.PI;//two_pi; // Choose theta uniformly distributed on [0, 2*pi).
         output[0] = Math.cos( theta );
         output[1] = Math.sin( theta ); // (cos(t) , sin(t) , 0 )
         return output;
     }
 
-    public static double UniformRandom(double min, double max)
-    {
-        return min + ( max - min ) * r.nextDouble();
-    }
-
-    public static double NormalRandom()
-    {
-        return r.nextGaussian();
-    }
-
-    public static double NormalRandom(double m, double var)
-    {
-        return m + var * r.nextGaussian();
-    }
-
-    public static double NormalRestricted(double m, double var, double min, double max)
-    {
-        return restrict( m + var * r.nextGaussian(), min, max );
-    }
+    //    public static double UniformRandom(double min, double max)
+    //    {
+    //        return min + ( max - min ) * r.nextDouble();
+    //    }
+    //
+    //    public static double NormalRandom()
+    //    {
+    //        return r.nextGaussian();
+    //    }
+    //
+    //    public static double NormalRandom(double m, double var)
+    //    {
+    //        return m + var * r.nextGaussian();
+    //    }
+    //
+    //    public static double NormalRestricted(double m, double var, double min, double max)
+    //    {
+    //        return restrict( m + var * r.nextGaussian(), min, max );
+    //    }
 
     public static double restrict(double val, double min, double max)
     {
@@ -92,19 +91,19 @@ public class PhysiCellUtilities
         return sdf.format( cal.getTime() );
     }
 
-    public static boolean checkRandom(double probability)
-    {
-        if (probability <= 0)
-            return false;
-        else if (probability >= 1)
-            return true;
-        return r.nextDouble() < probability;
-    }
+    //    public static boolean checkRandom(double probability)
+    //    {
+    //        if (probability <= 0)
+    //            return false;
+    //        else if (probability >= 1)
+    //            return true;
+    //        return r.nextDouble() < probability;
+    //    }
     
-    public static double UniformRandom()
-    {
-        return r.nextDouble();
-    }
+    //    public static double UniformRandom()
+    //    {
+    //        return r.nextDouble();
+    //    }
 
     public static double[] getCenter(GeneralMesh mesh)
     {
@@ -124,12 +123,13 @@ public class PhysiCellUtilities
 
     public static void placeInBox(double[] box, CellDefinition cd, int number, Model model)
     {
+        RandomGenerator rng = model.getRNG();
         for( int i = 0; i < number; i++ )
         {
             double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( box[0], box[3] );
-            position[1] = PhysiCellUtilities.UniformRandom( box[1], box[4] );
-            position[2] = PhysiCellUtilities.UniformRandom( box[2], box[5] );
+            position[0] = rng.UniformRandom( box[0], box[3] );
+            position[1] = rng.UniformRandom( box[1], box[4] );
+            position[2] = rng.UniformRandom( box[2], box[5] );
             Cell.createCell( cd, model, position );
         }
     }
@@ -168,12 +168,13 @@ public class PhysiCellUtilities
     public static void placeInBox(double[] box, String type, int number, Model model)
     {
         CellDefinition cd = model.getCellDefinition( type );
+        RandomGenerator rng = model.getRNG();
         for( int i = 0; i < number; i++ )
         {
             double[] position = {0, 0, 0};
-            position[0] = PhysiCellUtilities.UniformRandom( box[0], box[3] );
-            position[1] = PhysiCellUtilities.UniformRandom( box[1], box[4] );
-            position[2] = PhysiCellUtilities.UniformRandom( box[2], box[5] );
+            position[0] = rng.UniformRandom( box[0], box[3] );
+            position[1] = rng.UniformRandom( box[1], box[4] );
+            position[2] = rng.UniformRandom( box[2], box[5] );
             Cell.createCell( cd, model, position );
         }
     }

@@ -56,7 +56,7 @@ public class BasicAgent
 
     static int maxBasicAgentId = 0;
 
-    private Model model;
+    protected Model model;
     protected Microenvironment m;
     int selected_microenvironment;
 

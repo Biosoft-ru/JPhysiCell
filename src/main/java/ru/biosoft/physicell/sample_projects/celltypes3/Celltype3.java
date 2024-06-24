@@ -4,8 +4,7 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
-import ru.biosoft.physicell.core.SignalBehavior;
+import ru.biosoft.physicell.core.RandomGenerator;
 import ru.biosoft.physicell.ui.Visualizer;
 
 /*
@@ -80,8 +79,8 @@ public class Celltype3 extends Model
     public void init() throws Exception
     {
         super.init();
-        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( this );
+        setSeed( getParameterInt( "random_seed" ) );
+        signals.setupDictionaries( this );
         createCellTypes();
         setupTissue();
         for( Visualizer visualizer : getVisualizers() )
@@ -160,15 +159,16 @@ public class Celltype3 extends Model
      */
     private static void placeInRadius(CellDefinition cd, Model m, int number, double[] range, double maxRadius)
     {
+        RandomGenerator rng = m.getRNG();
         for( int n = 0; n < number; n++ )
         {
             double[] position = {0, 0, 0};
             double r = maxRadius + 1;
             while( r > maxRadius )
             {
-                position[0] = PhysiCellUtilities.UniformRandom( range[0], range[3] );
-                position[1] = PhysiCellUtilities.UniformRandom( range[1], range[4] );
-                position[2] = PhysiCellUtilities.UniformRandom( range[2], range[5] );
+                position[0] = rng.UniformRandom( range[0], range[3] );
+                position[1] = rng.UniformRandom( range[1], range[4] );
+                position[2] = rng.UniformRandom( range[2], range[5] );
                 r = VectorUtil.norm( position );
             }
             Cell.createCell( cd, m, position );

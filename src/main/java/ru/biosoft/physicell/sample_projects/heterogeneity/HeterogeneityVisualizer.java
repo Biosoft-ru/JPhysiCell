@@ -9,11 +9,13 @@ import ru.biosoft.physicell.ui.AgentVisualizer;
 
 public class HeterogeneityVisualizer extends AgentVisualizer
 {
-    double pMin;
-    double pMax;
+    private double pMin;
+    private double pMax;
+    private SignalBehavior signals;
 
     public HeterogeneityVisualizer(Model model)
     {
+        signals = model.getSignals();
         pMin = model.getParameterDouble( "oncoprotein_min" );
         pMax = model.getParameterDouble( "oncoprotein_max" );
     }
@@ -21,7 +23,7 @@ public class HeterogeneityVisualizer extends AgentVisualizer
     @Override
     public Color[] findColors(Cell pCell)
     {
-        double p = SignalBehavior.getSingleSignal( pCell, "custom:oncoprotein" );
+        double p = signals.getSingleSignal( pCell, "custom:oncoprotein" );
 
         // immune are black
         Color[] output = new Color[] {Color.black, Color.black, Color.black, Color.black};
@@ -51,14 +53,14 @@ public class HeterogeneityVisualizer extends AgentVisualizer
         }
 
         // if not, dead colors 
-        if( SignalBehavior.getSingleSignal( pCell, "apoptotic" ) > 0.5 )
+        if( signals.getSingleSignal( pCell, "apoptotic" ) > 0.5 )
         {
             output[0] = new Color( 255, 0, 0 );
             output[2] = new Color( 125, 0, 0 );
         }
 
         // Necrotic - Brown
-        if( SignalBehavior.getSingleSignal( pCell, "necrotic" ) > 0.5 )
+        if( signals.getSingleSignal( pCell, "necrotic" ) > 0.5 )
         {
             output[0] = new Color( 250, 138, 38 );
             output[2] = new Color( 139, 69, 19 );

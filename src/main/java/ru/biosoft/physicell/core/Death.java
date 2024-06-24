@@ -128,7 +128,7 @@ public class Death implements Cloneable
         return 0;
     }
 
-    boolean checkForDeath(double dt)
+    boolean checkForDeath(RandomGenerator rng, double dt)
     {
         if( dead )
             return false; // If the cell is already dead, exit.
@@ -138,7 +138,7 @@ public class Death implements Cloneable
         while( !dead && i < rates.size() )
         {
             double rate = rates.get( i );
-            if( PhysiCellUtilities.checkRandom( rate * dt) )
+            if( rng.checkRandom( rate * dt ) )
             {
                 dead = true;
                 currentDeathModelIndex = i;

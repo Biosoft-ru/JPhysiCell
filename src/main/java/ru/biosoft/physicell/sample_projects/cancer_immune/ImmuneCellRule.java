@@ -3,11 +3,18 @@ package ru.biosoft.physicell.sample_projects.cancer_immune;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellFunctions.CustomCellRule;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
+import ru.biosoft.physicell.core.RandomGenerator;
 
 public class ImmuneCellRule extends CustomCellRule
 {
+    private RandomGenerator rng;
+
+    public ImmuneCellRule(Model model)
+    {
+        rng = model.getRNG();
+    }
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
         int attach_lifetime_i = pCell.customData.findVariableIndex( "attachment_lifetime" );
@@ -34,7 +41,7 @@ public class ImmuneCellRule extends CustomCellRule
             }
 
             // decide whether to detach 
-            if( PhysiCellUtilities.checkRandom( dt / ( pCell.customData.get( attach_lifetime_i ) + 1e-15 )) )
+            if( rng.checkRandom( dt / ( pCell.customData.get( attach_lifetime_i ) + 1e-15 ) ) )
                 detachMe = true;
 
             // if I dettach, resume motile behavior 
@@ -63,7 +70,7 @@ public class ImmuneCellRule extends CustomCellRule
         return true;
     }
 
-    static boolean attemptApoptosis(Cell pAttacker, Cell pTarget, double dt)
+    boolean attemptApoptosis(Cell pAttacker, Cell pTarget, double dt)
     {
         int oncoproteinIndex = pTarget.customData.findVariableIndex( "oncoprotein" );
         int killRateIndex = pAttacker.customData.findVariableIndex( "kill_rate" );
@@ -79,12 +86,12 @@ public class ImmuneCellRule extends CustomCellRule
         double scale = ( targetOconoprotein - oncoproteinThreshold ) / oncoproteinDifference;
         scale = Math.min( scale, 1.0 );
 
-        if( PhysiCellUtilities.checkRandom( pAttacker.customData.get( killRateIndex ) * scale * dt) )
+        if( rng.checkRandom( pAttacker.customData.get( killRateIndex ) * scale * dt ) )
             return true;
         return false;
     }
 
-    public static Cell checkNeighborsForAttachment(Cell pAttacker, double dt)
+    public Cell checkNeighborsForAttachment(Cell pAttacker, double dt)
     {
         for( Cell nearbyCell : pAttacker.cells_in_my_container() )
         {
@@ -97,7 +104,7 @@ public class ImmuneCellRule extends CustomCellRule
         return null;
     }
 
-    static boolean attemptAttachment(Cell pAttacker, Cell pTarget, double dt)
+    boolean attemptAttachment(Cell pAttacker, Cell pTarget, double dt)
     {
         double oncoprotein_saturation = pAttacker.customData.get( "oncoprotein_saturation" );
         double oncoprotein_threshold = pAttacker.customData.get( "oncoprotein_threshold" );
@@ -114,7 +121,7 @@ public class ImmuneCellRule extends CustomCellRule
             double scale = ( targetOncoprotein - oncoprotein_threshold ) / ( oncoprotein_saturation - oncoprotein_threshold );
             double distanceScale = ( maxAttachmentDistance - distance ) / ( maxAttachmentDistance - minAttachmentDistance );
             attachRate *= Math.min( scale, 1.0 ) * Math.min( distanceScale, 1.0 );
-            if( PhysiCellUtilities.checkRandom( attachRate * dt) )
+            if( rng.checkRandom( attachRate * dt ) )
                 Cell.attachcCells( pAttacker, pTarget );
             return true;//TODO: should we return true only if attached successfully?
         }

@@ -8,7 +8,7 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Model.Event;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
+import ru.biosoft.physicell.core.RandomGenerator;
 
 public class ImmunityEvent extends Event
 {
@@ -28,8 +28,9 @@ public class ImmunityEvent extends Event
         introduceOmmuneCells( model, use2d );
     }
     
-    public static void introduceOmmuneCells(Model model, boolean use2d)
+    public void introduceOmmuneCells(Model model, boolean use2d)
     {
+        RandomGenerator rng = model.getRNG();
         CellDefinition cd = model.getCellDefinition( "immune cell" );
         Microenvironment m = model.getMicroenvironment();
         Set<Cell> cells = m.getAgents( Cell.class );
@@ -70,8 +71,8 @@ public class ImmunityEvent extends Event
             number_of_immune_cells /= 10;
             for( int i = 0; i < number_of_immune_cells; i++ )
             {
-                double theta = PhysiCellUtilities.UniformRandom() * 6.283185307179586476925286766559;
-                double radius = PhysiCellUtilities.NormalRandom( mean_radius, std_radius );
+                double theta = rng.UniformRandom() * 6.283185307179586476925286766559;
+                double radius = rng.NormalRandom( mean_radius, std_radius );
                 double[] position = new double[] {radius * Math.cos( theta ), radius * Math.sin( theta ), 0};
                 Cell.createCell( cd, model, position );
             }
@@ -80,9 +81,9 @@ public class ImmunityEvent extends Event
         {
             for( int i = 0; i < number_of_immune_cells; i++ )
             {
-                double theta = PhysiCellUtilities.UniformRandom() * 6.283185307179586476925286766559;
-                double phi = Math.acos( 2.0 * PhysiCellUtilities.UniformRandom() - 1.0 );
-                double radius = PhysiCellUtilities.NormalRandom( mean_radius, std_radius );
+                double theta = rng.UniformRandom() * 6.283185307179586476925286766559;
+                double phi = Math.acos( 2.0 * rng.UniformRandom() - 1.0 );
+                double radius = rng.NormalRandom( mean_radius, std_radius );
                 double[] position = new double[] {radius * Math.cos( theta ) * Math.sin( phi ),
                         radius * Math.sin( theta ) * Math.sin( phi ), radius * Math.cos( phi )};
                 Cell.createCell( cd, model, position );

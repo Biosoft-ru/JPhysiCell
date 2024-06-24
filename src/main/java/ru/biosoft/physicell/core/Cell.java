@@ -177,8 +177,8 @@ public class Cell extends BasicAgent
         //        else
         //        {
         //assign a random unit vector
-        double theta = PhysiCellUtilities.UniformRandom() * 6.28318530717959; //rand*2*pi
-        double z = 2 * PhysiCellUtilities.UniformRandom() - 1;
+        double theta = model.rng.UniformRandom() * 6.28318530717959; //rand*2*pi
+        double z = 2 * model.rng.UniformRandom() - 1;
         double temp = Math.sqrt( 1 - z * z );
         state.orientation[0] = temp * Math.cos( theta );
         state.orientation[1] = temp * Math.sin( theta );
@@ -339,7 +339,7 @@ public class Cell extends BasicAgent
         rand_vec *= radius; // multiply direction times the displacement 
         */
 
-        double[] rand_vec = PhysiCellUtilities.UniformOnUnitSphere();//cell_division_orientation();
+        double[] rand_vec = PhysiCellUtilities.UniformOnUnitSphere( model );//cell_division_orientation();
         if( getMicroenvironment().options.simulate2D )
             rand_vec[2] = 0;
         double multiplier = phenotype.geometry.polarity
@@ -695,7 +695,7 @@ public class Cell extends BasicAgent
             return;
         }
 
-        if( phenotype.motility.persistenceTime < dt || PhysiCellUtilities.checkRandom( dt / phenotype.motility.persistenceTime)  )
+        if( phenotype.motility.persistenceTime < dt || model.rng.checkRandom( dt / phenotype.motility.persistenceTime ) )
         {
             /*
             // choose a uniformly random unit vector 
@@ -722,11 +722,11 @@ public class Cell extends BasicAgent
             double[] randvec;
             if( phenotype.motility.restrictTo2D )
             {
-                randvec = PhysiCellUtilities.UniformOnUnitCircle();
+                randvec = PhysiCellUtilities.UniformOnUnitCircle( model );
             }
             else
             {
-                randvec = PhysiCellUtilities.UniformOnUnitSphere();
+                randvec = PhysiCellUtilities.UniformOnUnitCircle( model );
             }
 
             // if the update_bias_vector function is set, use it  
@@ -1173,7 +1173,7 @@ public class Cell extends BasicAgent
         phenotype.geometry.update( this, phenotype, dt );
 
         // check for new death events 
-        if( phenotype.death.checkForDeath( dt ) )
+        if( phenotype.death.checkForDeath( model.getRNG(), dt ) )
         {
             // if so, change the cycle model to the current death model 
             phenotype.cycle = phenotype.death.currentModel();

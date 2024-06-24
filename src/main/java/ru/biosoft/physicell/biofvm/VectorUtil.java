@@ -2,7 +2,7 @@ package ru.biosoft.physicell.biofvm;
 
 import java.util.Arrays;
 
-import ru.biosoft.physicell.core.PhysiCellUtilities;
+import ru.biosoft.physicell.core.RandomGenerator;
 
 /*
 #############################################################################
@@ -421,22 +421,22 @@ public class VectorUtil
     /**
      * Modifies given array: sets all its values to random uniformly distributed numbers between -1 and 1
      */
-    public static void randomize(double[] v)
+    public static void randomize(RandomGenerator rng, double[] v)
     {
         for( int i = 0; i < v.length; i++ )
         {
-            v[i] = -1 + 2 * PhysiCellUtilities.UniformRandom();
+            v[i] = -1 + 2 * rng.UniformRandom();
         }
     }
 
     /**
      * Creates and returns random vector of length size, each value is a random number uniformly distributed between min and max
      */
-    public static double[] random(int size, double min, double max)
+    public static double[] random(RandomGenerator rng, int size, double min, double max)
     {
         double[] result = new double[size];
         for( int i = 0; i < size; i++ )
-            result[i] = min + ( max - min ) * PhysiCellUtilities.UniformRandom();
+            result[i] = min + ( max - min ) * rng.UniformRandom();
         return result;
     }
 

@@ -4,8 +4,6 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.PhysiCellUtilities;
-import ru.biosoft.physicell.core.SignalBehavior;
 import ru.biosoft.physicell.ui.Visualizer;
 
 /*
@@ -83,8 +81,8 @@ public class Heterogeneity extends Model
     public void init() throws Exception
     {
         super.init();
-        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
-        SignalBehavior.setupDictionaries( this );
+        setSeed( getParameterInt( "random_seed" ) );
+        signals.setupDictionaries( this );
         createCellTypes();
         setupTissue();
         //        printSummary( m, CUSTOM_ONCOPROTEIN );
@@ -95,7 +93,7 @@ public class Heterogeneity extends Model
     void createCellTypes()
     {
         CellDefinition pCD = getCellDefinition( "cancer cell" );
-        pCD.functions.updatePhenotype = new TumorPhenotype();
+        pCD.functions.updatePhenotype = new TumorPhenotype( this );
         pCD.parameters.o2_proliferation_saturation = 38;
         pCD.parameters.o2_reference = 38;
     }
@@ -125,26 +123,26 @@ public class Heterogeneity extends Model
             while( x < xOuter )
             {
                 cell = Cell.createCell( pCD, this, new double[] {x, y, 0.0} ); // tumor cell 
-                double p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
-                SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
+                double p = rng.NormalRestricted( pMean, pSD, pMin, pMax );
+                signals.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
 
                 if( Math.abs( y ) > 0.01 )
                 {
                     cell = Cell.createCell( pCD, this, new double[] {x, -y, 0.0} ); // tumor cell 
-                    p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
-                    SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
+                    p = rng.NormalRestricted( pMean, pSD, pMin, pMax );
+                    signals.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
                 }
                 if( Math.abs( x ) > 0.01 )
                 {
                     cell = Cell.createCell( pCD, this, new double[] { -x, y, 0} ); // tumor cell 
-                    p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
-                    SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
+                    p = rng.NormalRestricted( pMean, pSD, pMin, pMax );
+                    signals.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
 
                     if( Math.abs( y ) > 0.01 )
                     {
                         cell = Cell.createCell( pCD, this, new double[] { -x, -y, 0} ); // tumor cell
-                        p = PhysiCellUtilities.NormalRestricted( pMean, pSD, pMin, pMax );
-                        SignalBehavior.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
+                        p = rng.NormalRestricted( pMean, pSD, pMin, pMax );
+                        signals.setSingleBehavior( cell, CUSTOM_ONCOPROTEIN, p );
                     }
                 }
                 x += cellSpacing;
@@ -161,7 +159,7 @@ public class Heterogeneity extends Model
         double max = -9e9;
         for( Cell cell : m.getAgents( Cell.class ) )
         {
-            double r = SignalBehavior.getSingleSignal( cell, parameter );
+            double r = signals.getSingleSignal( cell, parameter );
             sum += r;
             min = Math.min( r, min );
             max = Math.max( r, max );
@@ -172,7 +170,7 @@ public class Heterogeneity extends Model
         sum = 0.0;
         for( Cell cell : m.getAgents( Cell.class ) )
         {
-            double r = SignalBehavior.getSingleSignal( cell, parameter );
+            double r = signals.getSingleSignal( cell, parameter );
             sum += ( r - mean ) * ( r - mean );
         }
         double sd = Math.sqrt( sum / ( size - 1.0 + 1e-15 ) );

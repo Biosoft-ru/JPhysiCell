@@ -1,31 +1,39 @@
 package ru.biosoft.physicell.sample_projects.mechano;
 
 import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.SignalBehavior;
-import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 
 public class CancerPhenotype extends UpdatePhenotype
 {
+    SignalBehavior signals;
+
+    public CancerPhenotype(Model model)
+    {
+        signals = model.getSignals();
+    }
+
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        if( SignalBehavior.getSingleSignal( pCell, "dead" ) > 0.5 )
+        if( signals.getSingleSignal( pCell, "dead" ) > 0.5 )
         {
             return;
         }
 
-        double b = SignalBehavior.get_single_base_behavior( pCell, "cycle entry" );
-        if( SignalBehavior.getSingleSignal( pCell, "pressure" ) > 0.75 )
+        double b = signals.get_single_base_behavior( pCell, "cycle entry" );
+        if( signals.getSingleSignal( pCell, "pressure" ) > 0.75 )
         {
             b = 0;
         }
-        SignalBehavior.setSingleBehavior( pCell, "cycle entry", b );
+        signals.setSingleBehavior( pCell, "cycle entry", b );
 
-        if( SignalBehavior.getSingleSignal( pCell, "time" ) > 10000 )
+        if( signals.getSingleSignal( pCell, "time" ) > 10000 )
         {
-            SignalBehavior.setSingleBehavior( pCell, "apoptosis", 9e99 );
-            SignalBehavior.setSingleBehavior( pCell, "cell detachment rate", 9e9 );
+            signals.setSingleBehavior( pCell, "apoptosis", 9e99 );
+            signals.setSingleBehavior( pCell, "cell detachment rate", 9e9 );
         }
     }
 }
