@@ -2,6 +2,8 @@ package ru.biosoft.physicell.sample_projects.virus_macrophage;
 
 import java.io.InputStream;
 
+import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
+import ru.biosoft.physicell.core.CellContainerParallel;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
 
@@ -75,7 +77,7 @@ public class Main
 {
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/virus_macrophage/resultTOR";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/virus_macrophage/pdomain";
 
     public static void main(String ... strings) throws Exception
     {
@@ -85,11 +87,18 @@ public class Main
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
         Model model = new ModelReader().read( settings, VirusMacrophage.class );
         double mechanics_voxel_size = 30;
-        model.createContainer( mechanics_voxel_size );
+        ConstantCoefficientsLOD3D solver = new ConstantCoefficientsLOD3D();
+        solver.setPrallel( false );
+        model.getMicroenvironment().setSolver( solver );
+        model.createContainer( mechanics_voxel_size, CellContainerParallel.PARALLEL_CONTAINER_NAME );
+        model.setResultFolder( resultPath );
+        model.setWriteDensity( false );
+        model.setSaveFull( false );
+        model.setSaveImg( false );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addVisualizer( 0, "virus" ).setStubstrateIndex( 0 ).setMaxDensity( 1E-4 );
-        model.addVisualizer( 0, "interferon" ).setStubstrateIndex( 1 ).setMaxDensity( 1E-4 );
+        model.addGIFVisualizer( 0, "virus" ).setStubstrateIndex( 0 ).setMaxDensity( 1E-4 );
+        model.addGIFVisualizer( 0, "interferon" ).setStubstrateIndex( 1 ).setMaxDensity( 1E-4 );
         model.init();
         System.out.println( model.display() );
         model.simulate();

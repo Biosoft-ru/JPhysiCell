@@ -2,6 +2,8 @@ package ru.biosoft.physicell.sample_projects.heterogeneity;
 
 import java.io.InputStream;
 
+import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
+import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
 
@@ -74,7 +76,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/heterogeneity/result4";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/heterogeneity/optimized";
 
     public static void main(String ... strings) throws Exception
     {
@@ -83,13 +85,37 @@ public class Main
 
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
         Model model = new ModelReader().read( settings, Heterogeneity.class );
-
+        model.setWriteDensity( false );
+        model.setSaveFull( false );
+        model.setSaveImg( false );
         double mechanics_voxel_size = 30;
-        model.createContainer( mechanics_voxel_size );
+        model.createContainer( mechanics_voxel_size, CellContainer.DEFAULT_NAME );
+        //        model.createContainer( mechanics_voxel_size, CellContainerExperimental.EXPERIMENTAL_CONTAINER_NAME );
+        //        model.createContainer( mechanics_voxel_size, CellContainerParallel.PARALLEL_CONTAINER_NAME );
+        ConstantCoefficientsLOD3D solver = new ConstantCoefficientsLOD3D();
+        solver.setPrallel( false );
+        model.getMicroenvironment().setSolver( solver );
+
         model.setResultFolder( resultPath );
-        model.setWriteDensity( true );
-        model.addVisualizer( 0, "figure1_no_apop" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
+        //        model.setWriteDensity( true );
+        //        model.addGIFVisualizer( 0, "figure1_no_apop" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
         model.init();
+        double tStart = System.nanoTime();
         model.simulate();
+        tStart = System.nanoTime() - tStart;
+
+        System.out.println( "Total " + tStart / 1E9 );
+        System.out.println( "Diffusion " + Model.tDiffusion / 1E9 );
+        System.out.println( "Secretion " + CellContainer.tSecretion / 1E9 );
+        System.out.println( "Phenotype " + CellContainer.tPhenotype / 1E9 );
+        System.out.println( "Velocity " + CellContainer.tVelocity / 1E9 );
+        System.out.println( "Interaction " + CellContainer.tInteraction / 1E9 );
+        System.out.println( "Contact " + CellContainer.tContact / 1E9 );
+        System.out.println( "Custom " + CellContainer.tCustom / 1E9 );
+        System.out.println( "Attachment " + CellContainer.tAttachment / 1E9 );
+        System.out.println( "Divide " + CellContainer.tDivide / 1E9 );
+        System.out.println( "Rest " + CellContainer.tRestAll / 1E9 );
+        System.out.println( "Gradient " + CellContainer.tGradient / 1E9 );
+        System.out.println( "Total cell " + CellContainer.tTotal / 1E9 );
     }
 }

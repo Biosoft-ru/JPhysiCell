@@ -87,7 +87,7 @@ public class Main
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 38 );
+        model.addGIFVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 38 );
         model.init();
         System.out.println( model.display() );
         model.simulate();

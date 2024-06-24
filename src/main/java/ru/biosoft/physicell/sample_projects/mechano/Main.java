@@ -92,10 +92,10 @@ public class Main
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addVisualizer( 0, "substrate" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 0, "substrate" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
 
         model.init();
-        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( SHELL_PATH ), model.getMicroenvironment() );
+        CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( SHELL_PATH ), model );
         System.out.println( model.display() );
         model.simulate();
     }

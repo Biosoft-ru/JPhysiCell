@@ -22,9 +22,9 @@ public class Main
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
         model.setSaveFull( true );
-        model.addVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 38 );
-        model.addVisualizer( 0, "glucose" ).setStubstrateIndex( 1 ).setMaxDensity( 50 );
-        model.addVisualizer( 0, "acetate" ).setStubstrateIndex( 2 ).setMaxDensity( 50 );
+        model.addGIFVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 38 );
+        model.addGIFVisualizer( 0, "glucose" ).setStubstrateIndex( 1 ).setMaxDensity( 50 );
+        model.addGIFVisualizer( 0, "acetate" ).setStubstrateIndex( 2 ).setMaxDensity( 50 );
 
         model.init();
         System.out.println( model.display() );

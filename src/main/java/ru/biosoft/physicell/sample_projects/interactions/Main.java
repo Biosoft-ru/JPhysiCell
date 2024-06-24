@@ -2,6 +2,8 @@ package ru.biosoft.physicell.sample_projects.interactions;
 
 import java.io.InputStream;
 
+import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
+import ru.biosoft.physicell.core.CellContainerParallel;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.ui.AgentVisualizer2;
 import ru.biosoft.physicell.xml.ModelReader;
@@ -76,7 +78,7 @@ public class Main
 {
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/interactions/Simple2";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/interactions/exp_seq3";
 
     public static void main(String ... strings) throws Exception
     {
@@ -86,14 +88,16 @@ public class Main
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
         Model model = new ModelReader().read( settings, Interactions.class );
         double mechanics_voxel_size = 30;
-        model.createContainer( mechanics_voxel_size );
+        ConstantCoefficientsLOD3D solver = new ConstantCoefficientsLOD3D();
+        solver.setPrallel( false );
+        model.getMicroenvironment().setSolver( solver );
+        model.createContainer( mechanics_voxel_size, CellContainerParallel.PARALLEL_CONTAINER_NAME );
         model.setResultFolder( resultPath );
-        model.setWriteDensity( true );
-        model.addVisualizer( 0, "fig_resources" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "fig_toxin" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "fig_quorum" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "fig_pro_inflam" ).setStubstrateIndex( 3 ).setMaxDensity( 1 );
-        model.addVisualizer( 0, "fig_debris" ).setStubstrateIndex( 4 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 0, "fig_resources" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 0, "fig_toxin" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 0, "fig_quorum" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 0, "fig_pro_inflam" ).setStubstrateIndex( 3 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 0, "fig_debris" ).setStubstrateIndex( 4 ).setMaxDensity( 1 );
         model.getVisualizers().forEach( v -> v.setAgentVisualizer( new AgentVisualizer2() ) );
         model.init();
         System.out.println( model.display() );
