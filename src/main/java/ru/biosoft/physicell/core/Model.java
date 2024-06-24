@@ -17,6 +17,9 @@ import ru.biosoft.physicell.ui.Visualizer.Section;
 
 public class Model
 {
+    protected SignalBehavior signals;
+    protected RandomGenerator rng;
+
     private List<CellDefinition> cellDefinitions = new ArrayList<>();
     private Map<Integer, Integer> typeToIndex = new HashMap<>();
     private Map<String, CellDefinition> cellDefinitionNames = new HashMap<>();
@@ -58,9 +61,30 @@ public class Model
     private boolean rulesEnabled = false;
     private String rulesPath = null;
 
+
+    public void setSeed(long seed)
+    {
+        this.rng.setSeed( seed );
+    }
+
+    public long getSeed()
+    {
+        return rng.getSeed();
+    }
+
     public Iterable<Visualizer> getVisualizers()
     {
         return visualizers;
+    }
+
+    public SignalBehavior getSignals()
+    {
+        return signals;
+    }
+
+    public RandomGenerator getRNG()
+    {
+        return rng;
     }
 
     public void setResultFolder(String folder)
@@ -100,11 +124,15 @@ public class Model
     public Model()
     {
         m = new Microenvironment();
+        this.signals = new SignalBehavior();
+        this.rng = new RandomGenerator();
     }
 
     public Model(Microenvironment m)
     {
         this.m = m;
+        this.signals = new SignalBehavior();
+        this.rng = new RandomGenerator();
     }
 
     public Microenvironment getMicroenvironment()
@@ -195,7 +223,7 @@ public class Model
                 if( saveFull )
                     saveFull();
                 if( verbose )
-                System.out.println( getLogInfo() );
+                    System.out.println( getLogInfo() );
                 saveFullNext += saveFullInterval;
             }
             if( saveImg && ( Math.abs( curTime - saveImgNext ) < 0.01 * diffusion_dt || eventsFired ) )
@@ -413,7 +441,7 @@ public class Model
         sb.append( "\n================================" );
         sb.append( "\n\tMaximum Time: " + tMax );
         sb.append( "\tSave interval " + saveFullInterval );
-        sb.append( "\tSeed " + PhysiCellUtilities.getSeed() );
+        sb.append( "\tSeed " + getSeed() );
         sb.append( "\tCell update: " + ( (CellContainer)m.agentContainer ).getName() );
         sb.append( "\tDiffusion: " + m.getSolver().getName() );
         sb.append( "\n\n" + getMicroenvironment().display() );
