@@ -17,11 +17,11 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Executor
 {
     private static String PROJECTS_FILE = "projects";
-
-    public static String PATH_TO_SETTINGS = "config/PhysiCell_settings.xml";
+    private static String PATH_TO_SETTINGS = "config/PhysiCell_settings.xml";
     private static String HELP_FILE = "help";
-    public static String help;
-    public static Map<String, String> projects;
+    private static String VERSION_FILE = "version";
+    private static String LICENSE_FILE = "license";
+    private static Map<String, String> projects;
 
     public static void main(String ... args)
     {
@@ -40,9 +40,19 @@ public class Executor
 
         if( parameters.showHelp )
         {
-            if( help == null )
-                findHelp();
-            log( help );
+            log( getResource( HELP_FILE ) );
+            return;
+        }
+
+        if( parameters.showVersion )
+        {
+            log( getResource( VERSION_FILE ) );
+            return;
+        }
+
+        if( parameters.showLicense )
+        {
+            log( getResource( LICENSE_FILE ) );
             return;
         }
 
@@ -132,8 +142,7 @@ public class Executor
                 model.simulate();
                 tStart = System.nanoTime() - tStart;
 
-                log( "Completed, elapsed time: "
-                        + ( System.nanoTime() - startTime ) / 1E9 + " s." );
+                log( "Completed, elapsed time: " + ( System.nanoTime() - startTime ) / 1E9 + " s." );
             }
             else
             {
@@ -164,11 +173,13 @@ public class Executor
         System.out.println( PhysiCellUtilities.getCurrentTime() + s );
     }
 
-    public static void findHelp()
+    public static String getResource(String name)
     {
-        InputStream stream = Executor.class.getResourceAsStream( HELP_FILE );
+        InputStream stream = Executor.class.getResourceAsStream( name );
+        if( stream == null )
+            return "Can not find resource :" + name;
         BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
-        help = reader.lines().collect( Collectors.joining( "\n" ) );
+        return reader.lines().collect( Collectors.joining( "\n" ) );
     }
 
     public static void findProjects()

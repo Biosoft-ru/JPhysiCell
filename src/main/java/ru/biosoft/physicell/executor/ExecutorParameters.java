@@ -21,10 +21,15 @@ public class ExecutorParameters
     boolean simulate;
     boolean showHelp;
     boolean listProjects;
+    boolean showVersion;
+    boolean showLicense;
 
     public static String PROJECTS_CMD = "--projects";
     public static String HELP_CMD = "--help";
     public static String SHORT_HELP_CMD = "-h";
+    public static String VERSION_CMD = "--version";
+    public static String SHORT_VERSION_CMD = "-v";
+    public static String LICENSE_CMD = "--license";
 
     public ExecutorParameters(String ... args)
     {
@@ -40,6 +45,16 @@ public class ExecutorParameters
             if( HELP_CMD.equals( arg ) || SHORT_HELP_CMD.equals( arg ) )
             {
                 this.showHelp = true;
+                return;
+            }
+            if( VERSION_CMD.equals( arg ) || SHORT_VERSION_CMD.equals( arg ) )
+            {
+                this.showVersion = true;
+                return;
+            }
+            if( LICENSE_CMD.equals( arg ) )
+            {
+                this.showLicense = true;
                 return;
             }
 

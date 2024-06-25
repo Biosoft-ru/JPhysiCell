@@ -19,6 +19,8 @@ All options:
 		-p --parallel       update cells in parallel.
 		-d --diff-parallel  simulate diffusion in parallel.
 		-x -experimental    update cells in experimental regime.
+		-v --version        show version of JPhysicell and its components
+		   --license        show licenses
 		
 One letter arguments may be joined: "-rqid" = "-r -q -i -d"
 
