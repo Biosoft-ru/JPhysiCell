@@ -53,28 +53,28 @@ public class update_cell extends VolumeUpdate
         double acetate_density = density[acetate_idx]; // dived by voxel size?
 
         double oxygen_flux_bound = -1 * ( O2_Vmax * oxygen_density ) / ( oxygen_density + O2_Km );
-        intra.model.setReactionLowerBound( oxygen_flux_id, oxygen_flux_bound );
+        intra.fbaModel.setReactionLowerBound( oxygen_flux_id, oxygen_flux_bound );
         double glucose_flux_bound = -1 * ( glc_Vmax * glucose_density ) / ( glucose_density + glc_Km );
-        intra.model.setReactionLowerBound( glucose_flux_id, glucose_flux_bound );
+        intra.fbaModel.setReactionLowerBound( glucose_flux_id, glucose_flux_bound );
         double acetate_flux_bound = -1 * ( lac_Vmax * acetate_density ) / ( acetate_density + lac_Km );
-        intra.model.setReactionLowerBound( acetate_flux_id, 1 );//acetate_flux_id, acetate_flux_bound );
+        intra.fbaModel.setReactionLowerBound( acetate_flux_id, 1 );//acetate_flux_id, acetate_flux_bound );
 
         //        System.out.println( "Oxygen density: " + oxygen_density + " => " + intra.model.fbcModel.getLowerBound( oxygen_flux_id ) );
         //        System.out.println( "Glucose density: " + glucose_density + " => " + intra.model.fbcModel.getLowerBound( glucose_flux_id ) );
         //        System.out.println( "Acetate density: " + acetate_density + " => " + intra.model.fbcModel.getLowerBound( acetate_flux_id ) );
 
-        intra.model.runFBA();
+        intra.fbaModel.runFBA();
 
         //                System.out.println( "Optimized R_EX_o2_e " + intra.model.getFlux( "R_EX_o2_e" ) );
-        if( intra.model.getSolutionStatus() )
+        if( intra.fbaModel.getSolutionStatus() )
         {
-            double oxygen_flux = intra.model.getFlux( oxygen_flux_id );
+            double oxygen_flux = intra.fbaModel.getFlux( oxygen_flux_id );
             //            System.out.println( "Oxygen: " + oxygen_flux );
             //	std::cout << "Oxygen flux: " << oxygen_flux << std::endl;
-            double glucose_flux = intra.model.getFlux( glucose_flux_id );
+            double glucose_flux = intra.fbaModel.getFlux( glucose_flux_id );
             //            System.out.println( "Glucose: " + glucose_flux );
             //	std::cout << "glucose flux: " << glucose_flux << std::endl;
-            double acetate_flux = intra.model.getFlux( acetate_flux_id );
+            double acetate_flux = intra.fbaModel.getFlux( acetate_flux_id );
             //            System.out.println( "Acetate: " + acetate_flux );
             //	std::cout << "acetate flux: " << acetate_flux << std::endl;
             System.out.println( "ACetate " + acetate_flux );
