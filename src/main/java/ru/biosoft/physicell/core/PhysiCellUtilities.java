@@ -121,7 +121,7 @@ public class PhysiCellUtilities
         return Math.round( v * 2 ) / 2;
     }
 
-    public static void placeInBox(double[] box, CellDefinition cd, int number, Model model)
+    public static void placeInBox(double[] box, CellDefinition cd, int number, Model model) throws Exception
     {
         RandomGenerator rng = model.getRNG();
         for( int i = 0; i < number; i++ )
@@ -134,7 +134,7 @@ public class PhysiCellUtilities
         }
     }
 
-    public static void place2D(Model model, String type, int number)
+    public static void place2D(Model model, String type, int number) throws Exception
     {
         double[] box = model.m.mesh.boundingBox.clone();
         box[2] = 0.0;
@@ -142,7 +142,7 @@ public class PhysiCellUtilities
         placeInBox( box, type, number, model );
     }
 
-    public static void place(Model model, CellDefinition cd, int number)
+    public static void place(Model model, CellDefinition cd, int number) throws Exception
     {
         Microenvironment m = model.getMicroenvironment();
         double[] box = m.mesh.boundingBox.clone();
@@ -154,7 +154,7 @@ public class PhysiCellUtilities
         placeInBox( box, cd, number, model );
     }
 
-    public static void place(Model model, String type, int number)
+    public static void place(Model model, String type, int number) throws Exception
     {
         double[] box = model.m.mesh.boundingBox.clone();
         if( model.m.options.simulate2D )
@@ -165,7 +165,7 @@ public class PhysiCellUtilities
         placeInBox( box, type, number, model );
     }
 
-    public static void placeInBox(double[] box, String type, int number, Model model)
+    public static void placeInBox(double[] box, String type, int number, Model model) throws Exception
     {
         CellDefinition cd = model.getCellDefinition( type );
         RandomGenerator rng = model.getRNG();
