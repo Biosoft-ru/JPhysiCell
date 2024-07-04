@@ -4,8 +4,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -59,10 +61,16 @@ import java.util.stream.IntStream;
 public class Microenvironment
 {
     private Set<BasicAgent> agents = new HashSet<>();
+    private Map<String, Integer> substrateToIndex;
 
     public <T extends BasicAgent> Set<T> getAgents(Class<T> clazz)
     {
         return (Set<T>)agents;
+    }
+
+    public int getSubstrateIndex(String name)
+    {
+        return substrateToIndex.get( name );
     }
 
     public Set<BasicAgent> getAgents()
@@ -1014,6 +1022,10 @@ public class Microenvironment
         // }
         m.initDirichlet();
         m.displayInformation();
+
+        m.substrateToIndex = new HashMap<>();
+        for( int i = 0; i < m.densityNames.length; i++ )
+            m.substrateToIndex.put( m.densityNames[i], i );
     }
 
     void setDirichletActivation(int substrateIndex, boolean value)
