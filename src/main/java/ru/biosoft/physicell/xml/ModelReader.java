@@ -572,7 +572,7 @@ public class ModelReader extends ModelReaderSupport
                         readCellTransformations( el, cd, model );
                         break;
                     case "intracellular":
-                        readIntracellular( el, model, cd );
+                        readIntracellular( f, el, model, cd );
                         break;
                 }
             }
@@ -581,11 +581,16 @@ public class ModelReader extends ModelReaderSupport
         }
     }
 
-    public void readIntracellular(Element el, Model model, CellDefinition cd) throws Exception
+    public void readIntracellular(File f, Element el, Model model, CellDefinition cd) throws Exception
     {
         if( intracellularReader == null )
             throw new Exception( "No intracellular reader set" );
-        intracellularReader.readIntracellular( el, model, cd );
+        intracellularReader.readIntracellular( f, el, model, cd );
+    }
+
+    public void setIntracellularReader(IntracellularReader reader)
+    {
+        this.intracellularReader = reader;
     }
 
     private void readCycle(Element el, CellDefinition cd) throws Exception
