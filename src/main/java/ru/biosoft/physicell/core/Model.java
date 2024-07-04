@@ -33,11 +33,11 @@ public class Model
     private double tMax;
     protected double startTime;
     protected double curTime = 0;
-    protected double diffusion_dt;
-    protected double mechanics_dt = 0.1;
-    protected double phenotype_dt = 6.0;
-    protected double intracellular_dt = 0.01;
-    protected double next_intracellular_update = intracellular_dt;
+    protected double diffusionStep;
+    protected double mechanicsStep = 0.1;
+    protected double phenotypeStep = 6.0;
+    protected double intracellularStep = 0.01;
+    protected double nextIntracellularUpdate = intracellularStep;
 
     private boolean hasEvents = false;
     private List<Event> events = new ArrayList<>();
@@ -61,6 +61,7 @@ public class Model
     private boolean rulesEnabled = false;
     private String rulesPath = null;
 
+    public static double tDiffusion = 0;
 
     public void setSeed(long seed)
     {
@@ -193,6 +194,8 @@ public class Model
 
         startTime = System.currentTimeMillis();
         hasEvents = !events.isEmpty();
+
+        signals.setupDictionaries( this );
     }
 
     public void init() throws Exception
@@ -215,10 +218,10 @@ public class Model
 
     public void simulate() throws Exception
     {
-        while( curTime < tMax + 0.1 * diffusion_dt )
+        while( curTime < tMax + 0.1 * diffusionStep )
         {
             boolean eventsFired = executeEvents( curTime );
-            if( ( Math.abs( curTime - saveFullNext ) < 0.01 * diffusion_dt || eventsFired ) )
+            if( ( Math.abs( curTime - saveFullNext ) < 0.01 * diffusionStep || eventsFired ) )
             {
                 if( saveFull )
                     saveFull();
@@ -226,7 +229,7 @@ public class Model
                     System.out.println( getLogInfo() );
                 saveFullNext += saveFullInterval;
             }
-            if( saveImg && ( Math.abs( curTime - saveImgNext ) < 0.01 * diffusion_dt || eventsFired ) )
+            if( saveImg && ( Math.abs( curTime - saveImgNext ) < 0.01 * diffusionStep || eventsFired ) )
             {
                 saveImg();
                 saveImgNext += saveImgInterval;
@@ -243,24 +246,41 @@ public class Model
     {
         return curTime;
     }
-    public static double tDiffusion = 0;
+
     public void doStep() throws Exception
     {
         double tDiff = System.nanoTime();
-        m.simulateDiffusionDecay( diffusion_dt );
+        m.simulateDiffusionDecay( diffusionStep );
         tDiff = System.nanoTime() - tDiff;
         tDiffusion += tDiff;
-        ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
-        if( curTime >= next_intracellular_update )
-        {
-            updateIntracellular();
-            next_intracellular_update += intracellular_dt;
-        }
-        curTime += diffusion_dt;
+        ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotypeStep, mechanicsStep, diffusionStep );
+        updateIntracellular();
+        curTime += diffusionStep;
         m.time = curTime;
+    }
 
-        //        System.out.println( curTime+" | "+ StandardUpdateVelocity.addPTime/1E9+" | "+StandardUpdateVelocity.totalTime/1E9 );
-        //        System.out.println( Cell.calls + " ( " + Cell.badCalls + ")" );
+    public void updateIntracellular() throws Exception
+    {
+        if( curTime >= nextIntracellularUpdate )
+        {
+            m.getAgents( Cell.class ).parallelStream().filter( cell -> !cell.isOutOfDomain ).forEach( cell -> {
+                try
+                {
+                    Intracellular intra = cell.phenotype.intracellular;
+                    if( intra != null )
+                    {
+                        intra.updateIntracellularParameters( m, cell.phenotype );
+                        intra.step();
+                        intra.updatePhenotypeParameters( m, cell.phenotype );
+                    }
+                }
+                catch( Exception ex )
+                {
+                    ex.printStackTrace();
+                }
+            } );
+            nextIntracellularUpdate += intracellularStep;
+        }
     }
 
     private void saveImg() throws Exception
@@ -302,7 +322,7 @@ public class Model
             Set<Event> executedEvens = new HashSet<>();
             for( Event event : events )
             {
-                if( curTime > event.executionTime - 0.01 * diffusion_dt )
+                if( curTime > event.executionTime - 0.01 * diffusionStep )
                 {
                     event.execute( this );
                     executedEvens.add( event );
@@ -351,9 +371,15 @@ public class Model
         return new double[] {sum, number};
     }
 
+
     public void addParameter(String name, String val)
     {
         this.parameters.put( name, val );
+    }
+
+    public Set<String> getParameters()
+    {
+        return parameters.keySet();
     }
 
     public String getParameter(String name)
@@ -383,17 +409,17 @@ public class Model
 
     public void setDiffusionDt(double dt)
     {
-        this.diffusion_dt = dt;
+        this.diffusionStep = dt;
     }
 
     public void setMechanicsDt(double dt)
     {
-        this.mechanics_dt = dt;
+        this.mechanicsStep = dt;
     }
 
     public void setPhenotypeDt(double dt)
     {
-        this.phenotype_dt = dt;
+        this.phenotypeStep = dt;
     }
 
     public void setSaveFullInterval(double interval)
@@ -495,11 +521,6 @@ public class Model
     public String getReportHeader()
     {
         return "ID\tX\tY\tZ\tCycle\tElapsed";
-    }
-
-    public void updateIntracellular() throws Exception
-    {
-
     }
 
     public String getLogInfo() throws Exception

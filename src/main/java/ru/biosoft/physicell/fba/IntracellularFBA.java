@@ -6,12 +6,14 @@ import java.util.Map.Entry;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Intracellular;
+import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
 
 public class IntracellularFBA extends Intracellular
 {
-    public FBAModel model;
+    public FBAModel fbaModel;
 
     public Map<String, String> parameterMapping = new HashMap<>();
 
@@ -20,9 +22,9 @@ public class IntracellularFBA extends Intracellular
 
     double next_model_run = 0;
 
-
-    public IntracellularFBA()
+    public IntracellularFBA(Model model, CellDefinition cd)
     {
+        super( model, cd );
         this.intracellular_type = "dfba";
     }
 
@@ -42,16 +44,16 @@ public class IntracellularFBA extends Intracellular
         public kinetic_parm Vmax;
     };
 
-    IntracellularFBA(IntracellularFBA copy)
-    {
-        intracellular_type = copy.intracellular_type;
-        //        sbml_filename = copy.sbml_filename;
-        parameters = copy.parameters;
-        // model = copy.model;
-        //        model.readSBMLModel( copy.sbml_filename.c_str() );
-        //        model.initLpModel();
-        model.runFBA();
-    }
+    //    IntracellularFBA(IntracellularFBA copy)
+    //    {
+    //        intracellular_type = copy.intracellular_type;
+    //        //        sbml_filename = copy.sbml_filename;
+    //        parameters = copy.parameters;
+    //        // model = copy.model;
+    //        //        model.readSBMLModel( copy.sbml_filename.c_str() );
+    //        //        model.initLpModel();
+    //        model.runFBA();
+    //    }
 
     public String exchange_flux_density_map(String name)
     {
@@ -61,8 +63,8 @@ public class IntracellularFBA extends Intracellular
     @Override
     public IntracellularFBA clone()
     {
-        IntracellularFBA result = new IntracellularFBA();
-        result.model = model.clone();
+        IntracellularFBA result = new IntracellularFBA( model, cd );
+        result.fbaModel = fbaModel.clone();
         result.parameterMapping.putAll( parameterMapping );
         result.parameters.putAll( parameters );
         result.substrate_exchanges.putAll( substrate_exchanges );
@@ -106,9 +108,9 @@ public class IntracellularFBA extends Intracellular
             //            System.out.println( " - [" + substrate_name + "] = " + substrate_conc );
             //            System.out.println( " ==> " + ex_strut.fba_flux_id + " = " + flux_bound );
 
-            this.model.setReactionLowerBound( ex_strut.fba_flux_id, flux_bound );
+            this.fbaModel.setReactionLowerBound( ex_strut.fba_flux_id, flux_bound );
         }
-        this.model.runFBA();
+        this.fbaModel.runFBA();
         this.update_phenotype_parameters( phenotype );//TODO???
         // return 0;
     }
@@ -131,7 +133,7 @@ public class IntracellularFBA extends Intracellular
             String fba_flux_id = ex_strut.fba_flux_id;
             //        FBA_reaction exchange = this.model.getReaction(fba_flux_id);
             //        double flux = exchange.getFluxValue();
-            double flux = model.getFlux( fba_flux_id );
+            double flux = fbaModel.getFlux( fba_flux_id );
             // how to rescale FBA exchanges into net_export_rates
             float scaling = 1;
             flux *= scaling;
@@ -191,10 +193,50 @@ public class IntracellularFBA extends Intracellular
     }
 
     @Override
-    public int updatePhenotypeParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception
+    public void updatePhenotypeParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception
     {
         // TODO Auto-generated method stub
-        return 0;
+    }
+
+    @Override
+    public void updateIntracellularParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception
+    {
+        
+    }
+
+    @Override
+    public String[] getInputs()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String[] getOutputs()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getVariableName(String name)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setInputs(String[] outputs)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void setOutputs(String[] inputs)
+    {
+        // TODO Auto-generated method stub
+
     }
 
 }

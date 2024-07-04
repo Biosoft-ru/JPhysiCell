@@ -70,9 +70,22 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 */
 public abstract class Intracellular implements Cloneable
 {
+    protected Model model;
+    protected CellDefinition cd;
 
+    public Intracellular(Model model, CellDefinition cd)
+    {
+        this.model = model;
+        this.cd = cd;
+    }
 
     protected String intracellular_type; // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
+
+    public abstract String[] getInputs();
+    public abstract void setInputs(String[] outputs);
+    public abstract String[] getOutputs();
+    public abstract void setOutputs(String[] inputs);
+    public abstract String getVariableName(String name);
 
     public void start()
     {
@@ -96,7 +109,8 @@ public abstract class Intracellular implements Cloneable
 
     public abstract void setDT(double dt);
 
-    public abstract int updatePhenotypeParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception;
+    public abstract void updatePhenotypeParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception;
+    public abstract void updateIntracellularParameters(Microenvironment microenvirionment, Phenotype phenotype) throws Exception;
 
     @Override
     public Intracellular clone()
