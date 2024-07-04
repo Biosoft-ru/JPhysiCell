@@ -875,7 +875,7 @@ public class SignalBehavior
         setSingleBehavior( cell, index, parameter );
     }
 
-    int findBehaviorIndex(String responseName)
+    public int findBehaviorIndex(String responseName)
     {
         Integer result = behavior_to_int.get( responseName );
         if( result == null )
