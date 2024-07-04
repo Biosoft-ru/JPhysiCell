@@ -68,7 +68,7 @@ package ru.biosoft.physicell.core;
 */
 public class Phase
 {
-    int index; // an internal index for the cycle model
+    public int index; // an internal index for the cycle model
     public int code; // a global identifier code 
     public String name;
     public boolean divisionAtExit; // does this phase trigger division? 
