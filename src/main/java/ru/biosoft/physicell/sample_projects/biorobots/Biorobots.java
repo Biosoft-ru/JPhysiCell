@@ -97,7 +97,7 @@ public class Biorobots extends Model
     /** 
      * Create a hollow cluster at position, with random orientation 
      */
-    void createCargoCluster6(double[] center, Microenvironment m)
+    void createCargoCluster6(double[] center, Microenvironment m) throws Exception
     {
         CellDefinition pCargoDef = getCellDefinition( "cargo cell" );
         double spacing = 0.95 * pCargoDef.phenotype.geometry.radius * 2.0;
@@ -117,7 +117,7 @@ public class Biorobots extends Model
     /**
      * Creates a filled cluster at position, with random orientation 
      */
-    void createCargoCluster7(double[] center, Microenvironment m)
+    void createCargoCluster7(double[] center, Microenvironment m) throws Exception
     {
         CellDefinition pCargoDef = getCellDefinition( "cargo cell" );
         createCargoCluster6( center, m );
@@ -127,7 +127,7 @@ public class Biorobots extends Model
     /**
      *  Creates a small cluster at position, with random orientation 
      */
-    void createCargoCluster3(double[] center, Model model)
+    void createCargoCluster3(double[] center, Model model) throws Exception
     {
         CellDefinition pCargoDef = getCellDefinition( "cargo cell" );
         double spacing = 0.95 * pCargoDef.phenotype.geometry.radius * 1.0;

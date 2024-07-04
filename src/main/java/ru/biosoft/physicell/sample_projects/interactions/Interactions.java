@@ -125,7 +125,7 @@ public class Interactions extends Model
 
     }
 
-    void setupTissue()
+    void setupTissue() throws Exception
     {
         PhysiCellUtilities.place( this, "bacteria", getParameterInt( "number_of_bacteria" ) );
         PhysiCellUtilities.place( this, "blood vessel", getParameterInt( "number_of_blood_vessels" ) );

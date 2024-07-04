@@ -88,7 +88,7 @@ public class CellDefinition
         //        parameters.pReference_live_phenotype = phenotype; //TODO: check
         // set up the default custom data, the default Custom_Cell_Data constructor should take care of this
         // set up the default functions 
-        functions.instantiate_cell = null;
+        functions.instantiator = null;
         functions.updateVolume = null; // standard_volume_update_function;
         functions.updateMigration = null;
 

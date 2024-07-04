@@ -12,7 +12,7 @@ import ru.biosoft.physicell.core.CellFunctions.UpdateMigrationBias;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.CellFunctions.UpdateVelocity;
 import ru.biosoft.physicell.core.CellFunctions.VolumeUpdate;
-import ru.biosoft.physicell.core.CellFunctions.instantiate_cell;
+import ru.biosoft.physicell.core.CellFunctions.Instantiator;
 import ru.biosoft.physicell.core.CellFunctions.set_orientation;
 import ru.biosoft.physicell.sample_projects.pred_prey_farmer.AvoidBoundariesRule;
 import ru.biosoft.physicell.sample_projects.pred_prey_farmer.WrapBoundariesRule;
@@ -76,9 +76,9 @@ public class FunctionRegistry
         return new Contact[] {new StandardElasticContact()};
     }
 
-    public static instantiate_cell[] getIntsnatiateFunctions()
+    public static Instantiator[] getIntsnatiateFunctions()
     {
-        return new instantiate_cell[] {};
+        return new Instantiator[] {};
     }
 
     public static set_orientation[] getOrientationFunctions()

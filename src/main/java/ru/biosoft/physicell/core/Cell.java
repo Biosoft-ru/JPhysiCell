@@ -5,7 +5,7 @@ import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.BasicAgent;
 import ru.biosoft.physicell.biofvm.VectorUtil;
-import ru.biosoft.physicell.core.CellFunctions.instantiate_cell;
+import ru.biosoft.physicell.core.CellFunctions.Instantiator;
 import ru.biosoft.physicell.core.standard.StandardModels;
 
 /*
@@ -192,14 +192,15 @@ public class Cell extends BasicAgent
         return currentMechanicsVoxelIndex;
     }
 
-    public static Cell createCell(CellDefinition cd, Model model, double[] position)
+    public static Cell createCell(CellDefinition cd, Model model, double[] position) throws Exception
     {
-        return createCell( null, cd, model, position );
+        Instantiator instantiator = cd.functions.instantiator;
+        return createCell( instantiator, cd, model, position );
     }
 
-    public static Cell createCell(instantiate_cell custom_instantiate, CellDefinition cd, Model model, double[] position)
+    public static Cell createCell(Instantiator instantiator, CellDefinition cd, Model model, double[] position) throws Exception
     {
-        Cell pNew = custom_instantiate == null ? new Cell( cd, model ) : custom_instantiate.execute();
+        Cell pNew = instantiator == null ? new Cell( cd, model ) : instantiator.execute( cd, model );
         pNew.index = model.getMicroenvironment().getAgentsCount();
         //        pNew.registerMicroenvironment( m );
         // All the phenotype and other data structures are already set by virtue of the default Cell constructor. 
@@ -279,7 +280,7 @@ public class Cell extends BasicAgent
         //        delete pDeleteMe; 
     }
 
-    public Cell divide()
+    public Cell divide() throws Exception
     {
         //        System.out.println( toString() + " divided" );
         //commented in original code
@@ -353,7 +354,7 @@ public class Cell extends BasicAgent
         double[] pos = VectorUtil.newSum( position, rand_vec );
         //        System.out.println( type_name + "\tdivided\t" + position[0] + "\t" + position[1] + "\t" + position[2] + "\t->\t" + pos[0] + "\t"
         //                + pos[1] + "\t" + pos[2] );
-        Cell child = createCell( functions.instantiate_cell, definition, getModel(), pos );
+        Cell child = createCell( functions.instantiator, definition, getModel(), pos );
         child.copyData( this );
         child.copyFunctionPointers( this );
         child.parameters = parameters;

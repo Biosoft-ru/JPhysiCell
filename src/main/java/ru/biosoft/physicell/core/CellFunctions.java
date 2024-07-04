@@ -69,7 +69,7 @@ package ru.biosoft.physicell.core;
 public class CellFunctions
 {
     Model model;
-    public instantiate_cell instantiate_cell;
+    public Instantiator instantiator;
     public VolumeUpdate updateVolume;
     public UpdateMigrationBias updateMigration;
     public CustomCellRule customCellRule;
@@ -88,7 +88,7 @@ public class CellFunctions
         CellFunctions result = new CellFunctions();
         try
         {
-            result.instantiate_cell = instantiate_cell;// == null ? null : instantiate_cell.getClass().newInstance();
+            result.instantiator = instantiator;// == null ? null : instantiate_cell.getClass().newInstance();
             result.updateVolume = updateVolume;// == null ? null : updateVolume.getClass().newInstance();
             result.updateMigration = updateMigration;// == null ? null : updateMigration.getClass().newInstance();
             result.updatePhenotype = updatePhenotype;// == null ? null : updatePhenotype.clone();
@@ -187,10 +187,9 @@ public class CellFunctions
         public abstract void execute(Cell pCell, Phenotype phenotype, Cell cell2, Phenotype phenotype2, double dt);
     }
 
-    @FunctionalInterface
-    public static interface instantiate_cell
+    public static abstract class Instantiator extends Function
     {
-        public Cell execute();
+        public abstract Cell execute(CellDefinition cd, Model model) throws Exception;
     }
 
     @Override

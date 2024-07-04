@@ -34,9 +34,9 @@ public class EcoliAceticSwitch extends Model
 
     public void doStep() throws Exception
     {
-        ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotype_dt, mechanics_dt, diffusion_dt );
+        ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotypeStep, mechanicsStep, diffusionStep );
         updateIntracellular();
-        curTime += diffusion_dt;
+        curTime += diffusionStep;
         m.time = curTime;
     }
 
@@ -122,7 +122,7 @@ public class EcoliAceticSwitch extends Model
         createBacteriaDefinition();
     }
 
-    void setupTissue()
+    void setupTissue() throws Exception
     {
         CellDefinition cd = getCellDefinition( "bacteria cell" );
         // place a bacterial colony at the center 

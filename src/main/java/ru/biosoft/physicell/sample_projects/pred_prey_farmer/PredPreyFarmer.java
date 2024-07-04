@@ -99,7 +99,7 @@ public class PredPreyFarmer extends Model
         pPredDef.functions.updateMigration = new WeightedMotility();
     }
 
-    void setupTissue()
+    void setupTissue() throws Exception
     {
         PhysiCellUtilities.place( this, "farmer", getParameterInt( "number_of_farmers" ) );
         PhysiCellUtilities.place( this, "prey", getParameterInt( "number_of_prey" ) );

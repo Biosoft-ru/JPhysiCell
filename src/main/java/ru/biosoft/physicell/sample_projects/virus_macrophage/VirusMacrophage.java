@@ -114,7 +114,7 @@ public class VirusMacrophage extends Model
         pMacrophage.functions.customCellRule = new AvoidBoundaries();
     }
 
-    void setupTissue()
+    void setupTissue() throws Exception
     {
         int nVirus = m.findDensityIndex( "virus" );
         PhysiCellUtilities.place2D( this, "epithelial cell", getParameterInt( "number_of_infected_cells" ) );

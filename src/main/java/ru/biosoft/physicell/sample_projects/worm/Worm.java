@@ -95,7 +95,7 @@ public class Worm extends Model
         getVisualizers().forEach( v -> v.setAgentVisualizer( new WormVisualizer() ) );
     }
 
-    void setupTissue()
+    void setupTissue() throws Exception
     {
         PhysiCellUtilities.place( this, "worm", getParameterInt( "number_of_cells" ) );
 

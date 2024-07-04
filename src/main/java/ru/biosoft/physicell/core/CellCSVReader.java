@@ -38,7 +38,7 @@ public class CellCSVReader
         //        }
     }
 
-    static Cell process_csv_v2_line(String line, String[] labels, Model model)
+    static Cell process_csv_v2_line(String line, String[] labels, Model model) throws Exception
     {
         String[] tokens = line.split( "," );
         double[] position = new double[3];

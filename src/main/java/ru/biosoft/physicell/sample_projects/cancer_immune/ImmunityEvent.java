@@ -28,7 +28,7 @@ public class ImmunityEvent extends Event
         introduceOmmuneCells( model, use2d );
     }
     
-    public void introduceOmmuneCells(Model model, boolean use2d)
+    public void introduceOmmuneCells(Model model, boolean use2d) throws Exception
     {
         RandomGenerator rng = model.getRNG();
         CellDefinition cd = model.getCellDefinition( "immune cell" );

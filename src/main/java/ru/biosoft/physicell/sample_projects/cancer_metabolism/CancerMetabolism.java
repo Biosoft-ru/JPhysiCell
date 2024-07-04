@@ -150,7 +150,7 @@ public class CancerMetabolism extends Model
     public void updateIntracellular() throws Exception
     {
         for( Cell cell : m.getAgents( Cell.class ) )
-            updateCell( cell, cell.phenotype, diffusion_dt );
+            updateCell( cell, cell.phenotype, diffusionStep );
     }
 
     void updateCell(Cell cell, Phenotype phenotype, double dt)

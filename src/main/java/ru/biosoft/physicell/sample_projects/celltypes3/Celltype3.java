@@ -102,7 +102,7 @@ public class Celltype3 extends Model
     /**
      * Creates all cells for the model
      */
-    void setupTissue()
+    void setupTissue() throws Exception
     {
         double xMin = m.mesh.boundingBox[0];
         double yMin = m.mesh.boundingBox[1];
@@ -157,7 +157,7 @@ public class Celltype3 extends Model
      * @param range - bounding box: xMin, yMin, zMin, xMax, yMax, zMax
      * @param maxRadius - maximum radius
      */
-    private static void placeInRadius(CellDefinition cd, Model m, int number, double[] range, double maxRadius)
+    private static void placeInRadius(CellDefinition cd, Model m, int number, double[] range, double maxRadius) throws Exception
     {
         RandomGenerator rng = m.getRNG();
         for( int n = 0; n < number; n++ )
