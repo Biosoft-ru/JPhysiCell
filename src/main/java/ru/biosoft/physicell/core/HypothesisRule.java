@@ -336,10 +336,6 @@ public class HypothesisRule
 
     double evaluate(Cell cell) throws Exception
     {
-        if( !cell.phenotype.cycle.name.equals( "Flow cytometry model (separated)" ) )
-        {
-            double a = 5;
-        }
         double[] signalValues = new double[signals.size()];
         for( int i = 0; i < signals.size(); i++ )
             signalValues[i] = signalBehavior.getSingleSignal( cell, signals.get( i ) );
