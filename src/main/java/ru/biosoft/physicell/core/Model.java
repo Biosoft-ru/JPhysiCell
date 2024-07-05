@@ -18,7 +18,12 @@ import ru.biosoft.physicell.ui.Visualizer.Section;
 public class Model
 {
     protected SignalBehavior signals;
+
+    //Random number generator for the model
     protected RandomGenerator rng;
+
+    //Generates report for all cells at each time point of simulation
+    protected ReportGenerator reportGenerator = new ReportGenerator();
 
     private List<CellDefinition> cellDefinitions = new ArrayList<>();
     private Map<Integer, Integer> typeToIndex = new HashMap<>();
@@ -263,7 +268,8 @@ public class Model
     {
         if( curTime >= nextIntracellularUpdate )
         {
-            m.getAgents( Cell.class ).parallelStream().filter( cell -> !cell.isOutOfDomain ).forEach( cell -> {
+            m.getAgents( Cell.class ).parallelStream().filter( cell -> !cell.isOutOfDomain && !cell.phenotype.death.dead )
+                    .forEach( cell -> {
                 try
                 {
                     Intracellular intra = cell.phenotype.intracellular;
@@ -324,7 +330,7 @@ public class Model
             {
                 if( curTime > event.executionTime - 0.01 * diffusionStep )
                 {
-                    event.execute( this );
+                    event.execute();
                     executedEvens.add( event );
                     eventsFired = true;
                 }
@@ -449,13 +455,14 @@ public class Model
 
     public static abstract class Event
     {
-        public double executionTime;
+        protected double executionTime;
+        protected Model model;
         public boolean executed = false;
-        public abstract void execute(Model model) throws Exception;
+        public abstract void execute() throws Exception;
 
-        public Event(double executionTime)
+        public Event(Model model)
         {
-            this.executionTime = executionTime;
+            this.model = model;
         }
     }
 
@@ -501,15 +508,13 @@ public class Model
         return initialPath;
     }
 
-    public String[] getReportHeaderElements()
+    public void setReportGenerator(ReportGenerator reportGenerator)
     {
-        return new String[] {"ID", "X", "Y", "Z", "Cycle", "Elapsed"};
+        this.reportGenerator = reportGenerator;
     }
-
-    public Object[] getReportElements(Cell cell) throws Exception
+    public ReportGenerator getReportGenerator()
     {
-        return new Object[] {cell.ID, cell.position[0], cell.position[1], cell.position[2], cell.phenotype.cycle.currentPhase().name,
-                cell.phenotype.cycle.data.elapsedTimePhase};
+        return reportGenerator;
     }
 
     public String getReport(Cell cell) throws Exception

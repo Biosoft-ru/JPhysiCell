@@ -9,13 +9,15 @@ import ru.biosoft.physicell.core.RandomGenerator;
 
 public class TherapyEvent extends Event
 {
-    public TherapyEvent(double executionTime)
+
+    public TherapyEvent(Model model)
     {
-        super( executionTime );
+        super( model );
+        executionTime = model.getParameterDouble( "therapy_activation_time" );
     }
 
     @Override
-    public void execute(Model model) throws Exception
+    public void execute() throws Exception
     {
         //        System.out.println( "Therapy started!" );
         model.setSaveFullInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 

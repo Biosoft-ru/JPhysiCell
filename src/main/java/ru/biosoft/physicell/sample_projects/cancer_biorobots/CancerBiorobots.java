@@ -83,7 +83,7 @@ public class CancerBiorobots extends Model
         signals.setupDictionaries( this );
         createCellTypes();
         setupTissue();
-        addEvent( new TherapyEvent( getParameterDouble( "therapy_activation_time" ) ) );
+        addEvent( new TherapyEvent( this ) );
         for( Visualizer visualizer : getVisualizers() )
         {
             visualizer.setAgentVisualizer( new CancerBiorobotsVisualizer( this ) );

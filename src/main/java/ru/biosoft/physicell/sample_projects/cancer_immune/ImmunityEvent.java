@@ -14,14 +14,15 @@ public class ImmunityEvent extends Event
 {
     private boolean use2d;
     
-    public ImmunityEvent(double executionTime, boolean use2d)
+    public ImmunityEvent(Model model, boolean use2D) //double executionTime, boolean use2d)
     {
-        super( executionTime );
-        this.use2d = use2d;
+        super( model );
+        executionTime = model.getParameterDouble( "immune_activation_time" );
+        this.use2d = use2D;
     }
 
     @Override
-    public void execute(Model model) throws Exception
+    public void execute() throws Exception
     {
         //        System.out.println( "Therapy started!" );
         model.setSaveFullInterval( model.getParameterDouble( "save_interval_after_therapy_start" ) ); // 3.0; 

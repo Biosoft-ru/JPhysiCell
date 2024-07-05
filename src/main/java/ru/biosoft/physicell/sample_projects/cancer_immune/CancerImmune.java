@@ -95,7 +95,7 @@ public class CancerImmune extends Model
         createCancerCell();
         createImmuneCell();
         setupTissue( use2D );
-        addEvent( new ImmunityEvent( getParameterDouble( "immune_activation_time" ), use2D ) );
+        addEvent( new ImmunityEvent( this, use2D ) );
         for( Visualizer visualizer : getVisualizers() )
         {
             visualizer.setAgentVisualizer( new CancerImmunityVisualizer() );
