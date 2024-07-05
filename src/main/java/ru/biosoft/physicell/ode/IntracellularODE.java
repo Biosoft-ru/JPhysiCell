@@ -239,8 +239,7 @@ public abstract class IntracellularODE extends Intracellular
                     String[] tokens = phenotypeName.split( delimiter );
                     int start_index = Integer.parseInt( tokens[1] );
                     int end_index = Integer.parseInt( tokens[2] );
-                    phenotype.cycle.data.getTransitionRate( start_index, end_index );
-                    //                    value = phenotype.cycle.data.getTransitionRate( start_index, end_index, getParameterValue( variableName ) );
+                    value = phenotype.cycle.data.getTransitionRate( start_index, end_index );
                 }
             }
 
