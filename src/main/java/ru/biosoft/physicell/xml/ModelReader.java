@@ -26,6 +26,7 @@ import ru.biosoft.physicell.core.Motility;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.PhysiCellSettings;
+import ru.biosoft.physicell.core.Rules;
 import ru.biosoft.physicell.core.Secretion;
 import ru.biosoft.physicell.core.Volume;
 import ru.biosoft.physicell.core.standard.AdvancedChemotaxis;
@@ -86,7 +87,7 @@ public class ModelReader extends ModelReaderSupport
         return model;
     }
 
-    private void readRules(Element physicell, Model model)
+    private void readRules(Element physicell, Model model) throws Exception
     {
         Element rulesElement = findElement( physicell, "cell_rules" );
         if( rulesElement == null )
@@ -105,6 +106,13 @@ public class ModelReader extends ModelReaderSupport
             String folder = getVal( folderElement );
             Element filenameElement = findElement( rulesetElement, "filename" );
             String filename = getVal( filenameElement );
+
+
+            File rulesFile = new File( new File( this.f.getParent() ).getParent(), folder + "/" + filename );
+            String path = rulesFile.getAbsolutePath();
+            model.getSignals().setupDictionaries( model );
+            Rules.setupRules( model );
+            Rules.parseCSVRules2( model, path );
             model.setRulesPath( folder + "/" + filename );
         }
     }

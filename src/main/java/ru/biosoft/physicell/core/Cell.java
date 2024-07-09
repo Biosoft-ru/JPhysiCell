@@ -1142,7 +1142,7 @@ public class Cell extends BasicAgent
         // New March 2023 in Version 1.12.0 
         // call the rules-based code to update the phenotype 
         if( rulesEnabled )
-            Rules.applyRuleset( this );
+            model.rules.applyRuleset( this );
         //        if( SignalBehavior.getSingleSignal( this, "necrotic" ) > 0.5 )
         //        {
         //            double rupture = this.phenotype.volume.rupture_volume;

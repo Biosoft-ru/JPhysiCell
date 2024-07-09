@@ -1,24 +1,25 @@
 package ru.biosoft.physicell.core;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 
 public class SignalBehavior
 {
-    public Map<String, Integer> behavior_to_int = new HashMap<>();
-    public Map<Integer, String> int_to_behavior = new HashMap<>();
-    static Map<Integer, String> int_to_signal = new HashMap<>();
-    public Map<String, Integer> signal_to_int = new HashMap<>();
+    public Map<String, Integer> behaviorToInt = new HashMap<>();
+    public Map<Integer, String> indexToBehavior = new HashMap<>();
+    public Map<Integer, String> indexToSignal = new HashMap<>();
+    public Map<String, Integer> signalToIndex = new HashMap<>();
     public double[] signalScales = new double[0];
-
-    private boolean setupDone = false;
 
     public double getSingleSignal(Cell pCell, int index)
     {
-        Microenvironment microenvironment = pCell.getMicroenvironment();//Microenvironment.get_default_microenvironment();
+        Microenvironment microenvironment = pCell.getMicroenvironment();
         int m = microenvironment.numberDensities();
         int n = pCell.getModel().getDefinitionsCount();
 
@@ -223,10 +224,83 @@ public class SignalBehavior
         return 0.0;
     }
 
+    public static Set<String> getSignals(String[] densities, String[] cellTypes, String[] custom)
+    {
+        Set<String> signals = new HashSet<>();
+        signals.add( "pressure" );
+        signals.add( "volume" );
+        signals.add( "contact with live cell" );
+        signals.add( "contact with dead cell" );
+        signals.add( "contact with basement membrane" );
+        signals.add( "damage" );
+        signals.add( "is dead" );
+        signals.add( "total attack time" );
+        signals.add( "time" );
+        signals.add( "apoptotic" );
+        signals.add( "nectrotic" );
+        for( String s : densities )
+        {
+            signals.add( s );
+            signals.add( "intracellular " + s );
+            signals.add( "gradient of " + s );
+        }
+        Stream.of( cellTypes ).forEach( s -> signals.add( "contact with " + s ) );
+        Stream.of( custom ).forEach( s -> signals.add( "custom: " + s ) );
+        return signals;
+    }
+
+    public static Set<String> getBehaviors(String[] densities, String[] cellTypes, String[] custom)
+    {
+        Set<String> behaviors = new HashSet<String>();
+        behaviors.add( "cycle entry" );
+        behaviors.add( "exit from cycle phase " );//number of phases
+        behaviors.add( "apoptosis" );
+        behaviors.add( "necrosis" );
+        behaviors.add( "apoptosis" );
+        behaviors.add( "migration speed" );
+        behaviors.add( "migration bias" );
+        behaviors.add( "migration persistence time" );
+        behaviors.add( "cell-cell adhesion" );
+        behaviors.add( "cell-cell adhesion elastic constant" );
+        behaviors.add( "relative maximum adhesion distance" );
+        behaviors.add( "cell-cell repulsion" );
+        behaviors.add( "cell-membrane adhesion" );
+        behaviors.add( "cell-membrane repulsion" );
+        behaviors.add( "phagocytosis of dead cells" );
+        behaviors.add( "cell attachment rate" );
+        behaviors.add( "cell detachment rate" );
+        behaviors.add( "maximum number of cell attachments" );
+        behaviors.add( "damage rate" );
+        behaviors.add( "is movable" );
+
+        for( String cellType : cellTypes )
+        {
+            behaviors.add( "adhesive affinity to " + cellType );
+            behaviors.add( "phagocytosis of " + cellType );
+            behaviors.add( "attack " + cellType );
+            behaviors.add( "fuse to " + cellType );
+            behaviors.add( "transform to " + cellType );
+            behaviors.add( "immunogenicity to " + cellType );
+        }
+
+        for( String d : densities )
+        {
+            behaviors.add( d + " secretion" );
+            behaviors.add( d + " secretion target" );
+            behaviors.add( d + " secretion saturation density" );
+            behaviors.add( d + " uptake" );
+            behaviors.add( d + " export" );
+            behaviors.add( "chemotactic response to " + d );
+        }
+        Stream.of( custom ).forEach( s -> behaviors.add( "custom: " + s ) );
+
+        return behaviors;
+    }
+
     int findSignalIndex(String name)
     {
-        if( signal_to_int.containsKey( name ) )
-            return signal_to_int.get( name );
+        if( signalToIndex.containsKey( name ) )
+            return signalToIndex.get( name );
         System.out.println( "having trouble finding " + name );
         return -1;
     }
@@ -236,106 +310,97 @@ public class SignalBehavior
         return getSingleSignal( pCell, findSignalIndex( name ) );
     }
 
-    private void register(String name, int index)
+    private void registerSignal(String name, int index)
     {
-        signal_to_int.put( name, index );// ] = m+i;
-        int_to_signal.put( index, name );//] = name; 
+        signalToIndex.put( name, index );// ] = m+i;
+        indexToSignal.put( index, name );//] = name; 
     }
 
     private void registerBehavior(String name, int index)
     {
-        behavior_to_int.put( name, index );// ] = m+i;
-        int_to_behavior.put( index, name );//] = name; 
+        behaviorToInt.put( name, index );// ] = m+i;
+        indexToBehavior.put( index, name );//] = name; 
     }
 
     public void setupDictionaries(Model model)
     {
-        // set key parameters on number of signals, etc. 
-        // make registry of signals 
-        // make registry of responses 
-        if( setupDone == true )
-            return;
-        setupDone = true;
         Microenvironment microenvironment = model.getMicroenvironment();
         int m = microenvironment.numberDensities();
 
-        signal_to_int.clear();
-        int_to_signal.clear();
+        signalToIndex.clear();
+        indexToSignal.clear();
 
-        // construct signals 
-
-        // substrate densities 
         for( int i = 0; i < m; i++ )
         {
-            register( microenvironment.densityNames[i], i );
+            registerSignal( microenvironment.densityNames[i], i );
         }
 
         // internalized substrates 
-        int map_index = m;
+        int mapIndex = m;
         for( int i = 0; i < m; i++ )
         {
-            register( "intracellular " + microenvironment.densityNames[i], m + i );
-            signal_to_int.put( "internalized " + microenvironment.densityNames[i], m + i );//[ name ] = m+i; 
+            registerSignal( "intracellular " + microenvironment.densityNames[i], m + i );
+            signalToIndex.put( "internalized " + microenvironment.densityNames[i], m + i );//[ name ] = m+i; 
         }
 
         // substrate gradients 
-        map_index = 2 * m;
+        mapIndex = 2 * m;
         for( int i = 0; i < m; i++ )
         {
-            register( microenvironment.densityNames[i] + " gradient", map_index );
-            signal_to_int.put( "grad(" + microenvironment.densityNames[i] + ")", map_index );//[ name ] = map_index;
-            signal_to_int.put( "gradient of " + microenvironment.densityNames[i], map_index );// ] = map_index;
-            map_index++;
+            registerSignal( microenvironment.densityNames[i] + " gradient", mapIndex );
+            signalToIndex.put( "grad(" + microenvironment.densityNames[i] + ")", mapIndex );//[ name ] = map_index;
+            signalToIndex.put( "gradient of " + microenvironment.densityNames[i], mapIndex );// ] = map_index;
+            mapIndex++;
         }
 
         // mechanical pressure 
-        register( "pressure", map_index );
+        registerSignal( "pressure", mapIndex );
 
         // total volume 
-        map_index++;
-        register( "volume", map_index );
+        mapIndex++;
+        registerSignal( "volume", mapIndex );
 
         // contact with each cell type 
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            map_index++;
-            signal_to_int.put( "contact with " + cd.name, map_index );
-            register( "contact with cell type " + cd.type, map_index );
+            mapIndex++;
+            signalToIndex.put( "contact with " + cd.name, mapIndex );
+            registerSignal( "contact with cell type " + cd.type, mapIndex );
         }
 
         // contact with (any) live cell 
-        map_index++;
-        register( "contact with live cell", map_index );
-        signal_to_int.put( "contact with live cells", map_index );
+        mapIndex++;
+        registerSignal( "contact with live cell", mapIndex );
+        signalToIndex.put( "contact with live cells", mapIndex );
 
         // contact with dead cell 
-        map_index++;
-        register( "contact with dead cell", map_index );
-        signal_to_int.put( "contact with dead cells", map_index );
+        mapIndex++;
+        registerSignal( "contact with dead cell", mapIndex );
+        signalToIndex.put( "contact with dead cells", mapIndex );
 
         // contact with basement membrane 
-        map_index++;
-        register( "contact with basement membrane", map_index );
-        signal_to_int.put( "contact with BM", map_index );
+        mapIndex++;
+        registerSignal( "contact with basement membrane", mapIndex );
+        signalToIndex.put( "contact with BM", mapIndex );
 
         // damage state 
-        map_index++;
-        register( "damage", map_index );
+        mapIndex++;
+        registerSignal( "damage", mapIndex );
 
         // live / dead state 
-        map_index++;
-        register( "dead", map_index );
-        signal_to_int.put( "is dead", map_index );
+        mapIndex++;
+        registerSignal( "dead", mapIndex );
+        signalToIndex.put( "is dead", mapIndex );
 
         // total attack time 
-        map_index++;
-        register( "total attack time", map_index );
+        mapIndex++;
+        registerSignal( "total attack time", mapIndex );
 
         // current time
-        map_index++;
-        register( "time", map_index );
-        signal_to_int.put( "current time", map_index );
-        signal_to_int.put( "global time", map_index );
+        mapIndex++;
+        registerSignal( "time", mapIndex );
+        signalToIndex.put( "current time", mapIndex );
+        signalToIndex.put( "global time", mapIndex );
 
         int nc = 0;
         //        Set<String> customVars = new HashSet<>();
@@ -349,20 +414,20 @@ public class SignalBehavior
         for( Variable var : def.custom_data.variables )
         {
             String varName = var.name;
-            map_index++;
-            register( "custom:" + varName, map_index );
-            signal_to_int.put( "custom: " + varName, map_index );
-            signal_to_int.put( "custom " + nc, map_index );
+            mapIndex++;
+            registerSignal( "custom:" + varName, mapIndex );
+            signalToIndex.put( "custom: " + varName, mapIndex );
+            signalToIndex.put( "custom " + nc, mapIndex );
             nc++;
         }
 
-        map_index++;
-        register( "apoptotic", map_index );
-        signal_to_int.put( "is_apoptotic", map_index );
+        mapIndex++;
+        registerSignal( "apoptotic", mapIndex );
+        signalToIndex.put( "is_apoptotic", mapIndex );
 
-        map_index++;
-        register( "necrotic", map_index );
-        signal_to_int.put( "is_necrotic", map_index );
+        mapIndex++;
+        registerSignal( "necrotic", mapIndex );
+        signalToIndex.put( "is_necrotic", mapIndex );
 
         /*
         // immunogenicity to each cell type 
@@ -380,142 +445,142 @@ public class SignalBehavior
         */
 
         /* add new signals above this line */
-        behavior_to_int.clear();
-        int_to_behavior.clear();
+        behaviorToInt.clear();
+        indexToBehavior.clear();
 
         // construct behaviors 
         String name;
         for( int i = 0; i < m; i++ )
         {
-            map_index = i;
+            mapIndex = i;
             name = microenvironment.densityNames[i];
 
             // secretion rate 
-            registerBehavior( name + " " + "secretion", map_index );
+            registerBehavior( name + " " + "secretion", mapIndex );
 
             // secretion target 
-            map_index = m + i;
-            registerBehavior( name + " " + "secretion target", map_index );
+            mapIndex = m + i;
+            registerBehavior( name + " " + "secretion target", mapIndex );
 
             // synonym 
-            behavior_to_int.put( name + " " + "secretion saturation density", map_index );
+            behaviorToInt.put( name + " " + "secretion saturation density", mapIndex );
 
             // uptake rate 
-            map_index = 2 * m + i;
-            registerBehavior( name + " " + "uptake", map_index );
+            mapIndex = 2 * m + i;
+            registerBehavior( name + " " + "uptake", mapIndex );
 
             // net export rate 
-            map_index = 3 * m + i;
-            registerBehavior( name + " " + "export", map_index );
+            mapIndex = 3 * m + i;
+            registerBehavior( name + " " + "export", mapIndex );
         }
 
-        map_index = 4 * m;
-        registerBehavior( "cycle entry", map_index );
+        mapIndex = 4 * m;
+        registerBehavior( "cycle entry", mapIndex );
 
         // synonym 
-        behavior_to_int.put( "exit from cycle phase 0", map_index );
+        behaviorToInt.put( "exit from cycle phase 0", mapIndex );
 
         // other cyle phases 
         for( int i = 1; i < 6; i++ )
         {
-            map_index++;
-            registerBehavior( "exit from cycle phase " + i, map_index );
+            mapIndex++;
+            registerBehavior( "exit from cycle phase " + i, mapIndex );
         }
 
-        map_index++;
-        registerBehavior( "apoptosis", map_index );
+        mapIndex++;
+        registerBehavior( "apoptosis", mapIndex );
 
-        map_index++;
-        registerBehavior( "necrosis", map_index );
+        mapIndex++;
+        registerBehavior( "necrosis", mapIndex );
 
-        map_index++;
-        registerBehavior( "migration speed", map_index );
+        mapIndex++;
+        registerBehavior( "migration speed", mapIndex );
 
-        map_index++;
-        registerBehavior( "migration bias", map_index );
+        mapIndex++;
+        registerBehavior( "migration bias", mapIndex );
 
-        map_index++;
-        registerBehavior( "migration persistence time", map_index );
+        mapIndex++;
+        registerBehavior( "migration persistence time", mapIndex );
 
         // chemotactic sensitivities 
         for( int i = 0; i < m; i++ )
         {
-            map_index++;
-            registerBehavior( "chemotactic response to " + microenvironment.densityNames[i], map_index );
-            behavior_to_int.put( "chemotactic sensitivity to " + microenvironment.densityNames[i], map_index );
+            mapIndex++;
+            registerBehavior( "chemotactic response to " + microenvironment.densityNames[i], mapIndex );
+            behaviorToInt.put( "chemotactic sensitivity to " + microenvironment.densityNames[i], mapIndex );
         }
 
         // cell-cell adhesion 
-        map_index++;
-        registerBehavior( "cell-cell adhesion", map_index );
+        mapIndex++;
+        registerBehavior( "cell-cell adhesion", mapIndex );
 
-        map_index++;
-        registerBehavior( "cell-cell adhesion elastic constant", map_index );
+        mapIndex++;
+        registerBehavior( "cell-cell adhesion elastic constant", mapIndex );
 
         // cell adhesion affinities 
         // cell-type specific adhesion 
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            map_index++;
-            registerBehavior( "adhesive affinity to " + cd.name, map_index );
-            behavior_to_int.put( "adhesive affinity to cell type " + cd.type, map_index );
+            mapIndex++;
+            registerBehavior( "adhesive affinity to " + cd.name, mapIndex );
+            behaviorToInt.put( "adhesive affinity to cell type " + cd.type, mapIndex );
         }
 
         // max adhesion distance 
-        map_index++;
-        registerBehavior( "relative maximum adhesion distance", map_index );
+        mapIndex++;
+        registerBehavior( "relative maximum adhesion distance", mapIndex );
 
         // cell-cell repulsion 
-        map_index++;
-        registerBehavior( "cell-cell repulsion", map_index );
+        mapIndex++;
+        registerBehavior( "cell-cell repulsion", mapIndex );
 
         // cell-BM adhesion 
-        map_index++;
-        registerBehavior( "cell-BM adhesion", map_index );
-        behavior_to_int.put( "cell-membrane adhesion", map_index );
+        mapIndex++;
+        registerBehavior( "cell-BM adhesion", mapIndex );
+        behaviorToInt.put( "cell-membrane adhesion", mapIndex );
 
         // cell-BM repulsion 
-        map_index++;
-        registerBehavior( "cell-BM repulsion", map_index );
-        behavior_to_int.put( "cell-membrane repulsion", map_index );
+        mapIndex++;
+        registerBehavior( "cell-BM repulsion", mapIndex );
+        behaviorToInt.put( "cell-membrane repulsion", mapIndex );
 
         // phagocytosis of dead cell
-        map_index++;
-        registerBehavior( "phagocytose dead cell", map_index );
-        behavior_to_int.put( "phagocytosis of dead cell", map_index );
-        behavior_to_int.put( "phagocytosis of dead cells", map_index );
+        mapIndex++;
+        registerBehavior( "phagocytose dead cell", mapIndex );
+        behaviorToInt.put( "phagocytosis of dead cell", mapIndex );
+        behaviorToInt.put( "phagocytosis of dead cells", mapIndex );
 
         // phagocytosis of each live cell type 
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            map_index++;
-            registerBehavior( "phagocytose " + cd.name, map_index );
-            behavior_to_int.put( "phagocytose cell type " + cd.type, map_index );
-            behavior_to_int.put( "phagocytosis of " + cd.type, map_index );
+            mapIndex++;
+            registerBehavior( "phagocytose " + cd.name, mapIndex );
+            behaviorToInt.put( "phagocytose cell type " + cd.type, mapIndex );
+            behaviorToInt.put( "phagocytosis of " + cd.type, mapIndex );
         }
 
         // attack of each live cell type 
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            map_index++;
-            registerBehavior( "attack " + cd.name, map_index );
-            behavior_to_int.put( "attack cell type " + cd.type, map_index );
+            mapIndex++;
+            registerBehavior( "attack " + cd.name, mapIndex );
+            behaviorToInt.put( "attack cell type " + cd.type, mapIndex );
         }
 
         // fusion 
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            map_index++;
-            registerBehavior( "fuse to " + cd.name, map_index );
-            behavior_to_int.put( "fuse to cell type " + cd.type, map_index );
+            mapIndex++;
+            registerBehavior( "fuse to " + cd.name, mapIndex );
+            behaviorToInt.put( "fuse to cell type " + cd.type, mapIndex );
         }
 
         // transformation 
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            map_index++;
-            registerBehavior( "transform to " + cd.name, map_index );
-            behavior_to_int.put( "transform to cell type " + cd.type, map_index );
+            mapIndex++;
+            registerBehavior( "transform to " + cd.name, mapIndex );
+            behaviorToInt.put( "transform to cell type " + cd.type, mapIndex );
         }
 
         // custom behaviors
@@ -523,43 +588,43 @@ public class SignalBehavior
         for( Variable var : def.custom_data.variables )
         {
             String varName = var.name;
-            map_index++;
-            registerBehavior( "custom:" + varName, map_index );
-            behavior_to_int.put( "custom: " + varName, map_index );
-            behavior_to_int.put( "custom " + nc, map_index );
+            mapIndex++;
+            registerBehavior( "custom:" + varName, mapIndex );
+            behaviorToInt.put( "custom: " + varName, mapIndex );
+            behaviorToInt.put( "custom " + nc, mapIndex );
             nc++;
         }
 
-        map_index++;
-        registerBehavior( "is_movable", map_index );
-        behavior_to_int.put( "movable", map_index );
-        behavior_to_int.put( "is movable", map_index );
+        mapIndex++;
+        registerBehavior( "is_movable", mapIndex );
+        behaviorToInt.put( "movable", mapIndex );
+        behaviorToInt.put( "is movable", mapIndex );
 
         // immunogenicity to each cell type 
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            map_index++;
-            registerBehavior( "immunogenicity to " + cd.name, map_index );
-            behavior_to_int.put( "immunogenicity to cell type " + cd.type, map_index );
+            mapIndex++;
+            registerBehavior( "immunogenicity to " + cd.name, mapIndex );
+            behaviorToInt.put( "immunogenicity to cell type " + cd.type, mapIndex );
         }
 
-        map_index++;
-        registerBehavior( "cell attachment rate", map_index );
+        mapIndex++;
+        registerBehavior( "cell attachment rate", mapIndex );
 
-        map_index++;
-        registerBehavior( "cell detachment rate", map_index );
+        mapIndex++;
+        registerBehavior( "cell detachment rate", mapIndex );
 
-        map_index++;
-        registerBehavior( "maximum number of cell attachments", map_index );
+        mapIndex++;
+        registerBehavior( "maximum number of cell attachments", mapIndex );
 
-        map_index++;
-        registerBehavior( "damage rate", map_index );
+        mapIndex++;
+        registerBehavior( "damage rate", mapIndex );
 
         /* add new behaviors above this line */
 
         // resize scales; 
         //        signal_scales.resize( int_to_signal.size() , 1.0 ); 
-        signalScales = VectorUtil.resize( signalScales, int_to_signal.size(), 1.0 );
+        signalScales = VectorUtil.resize( signalScales, indexToSignal.size(), 1.0 );
         //        System.out.println();
         //        display_signal_dictionary(); 
         //        display_behavior_dictionary(); 
@@ -877,7 +942,7 @@ public class SignalBehavior
 
     public int findBehaviorIndex(String responseName)
     {
-        Integer result = behavior_to_int.get( responseName );
+        Integer result = behaviorToInt.get( responseName );
         if( result == null )
             return -1;
         return result;
@@ -1149,7 +1214,7 @@ public class SignalBehavior
         int m = microenvironment.numberDensities();
         int n = model.getDefinitionsCount();//.size();  
 
-        double[] parameters = new double[int_to_behavior.size()];//( int_to_behavior.size() , 0.0 ); 
+        double[] parameters = new double[indexToBehavior.size()];//( int_to_behavior.size() , 0.0 ); 
 
         // substrate-related behaviors 
 

@@ -80,28 +80,21 @@ import java.util.Map;
 
 public class Rules
 {
-    public static Map<CellDefinition, HypothesisRuleset> hypothesisRulesets = new HashMap<>();
+    public Map<CellDefinition, HypothesisRuleset> hypothesisRulesets = new HashMap<>();
 
-    static void add_hypothesis_ruleset(Model model, CellDefinition cd)
+    void add_hypothesis_ruleset(Model model, CellDefinition cd)
     {
-
-        //        auto search = hypothesis_rulesets.find( pCD );
-        //        if( search == hypothesis_rulesets.end() )
-        //        {
         HypothesisRuleset ruleset = new HypothesisRuleset();
         ruleset.sync( model, cd );
-        //            hypothesis_rulesets[pCD] = HRS; 
-        //        }
         hypothesisRulesets.put( cd, ruleset );
     }
 
-    static void intialize_hypothesis_rulesets(Model model)
+    public void initRulesets(Model model)
     {
-        hypothesisRulesets.clear(); // empty(); 
+        hypothesisRulesets.clear();
 
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            //            CellDefinition pCD = CellDefinitions_by_index[n];
             add_hypothesis_ruleset( model, cd );
         }
     }
@@ -111,17 +104,17 @@ public class Rules
         return hypothesisRulesets.get( cd );
     }
 
-    static HypothesisRuleset findRuleset(CellDefinition cd)
+    public HypothesisRuleset findRuleset(CellDefinition cd)
     {
         return ( hypothesisRulesets.get( cd ) );
     }
 
-    public static String display_hypothesis_rulesets(Model model)
+    public String display_hypothesis_rulesets(Model model)
     {
         StringBuilder sb = new StringBuilder();
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            sb.append( hypothesisRulesets.get( cd ).display() );//CellDefinitions_by_index[n]] );
+            sb.append( hypothesisRulesets.get( cd ).display() );
         }
         return sb.toString();
     }
@@ -136,13 +129,13 @@ public class Rules
         return sb.toString();
     }
 
-    void addRule(Model model, String type, String signal, String behavior, String response) throws Exception
+    public static void addRule(Model model, String type, String signal, String behavior, String response) throws Exception
     {
         CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             System.out.println( "Warning: Attempted to add rule for " + type + ", but no cell definition found for this type." );
 
-        HypothesisRuleset pHRS = findRuleset( cd );
+        HypothesisRuleset pHRS = model.rules.findRuleset( cd );
         if( pHRS == null )
             System.out.println( "Warning: Attempted to add rule for " + type + ", but no hypothesis ruleset found for this type." );
 
@@ -158,13 +151,14 @@ public class Rules
         pHRS.get( behavior ).addSignal( signal, response );
     }
 
-    static void addRule(Model model, String type, String signal, String behavior, String response, boolean useForDead) throws Exception
+    public static void addRule(Model model, String type, String signal, String behavior, String response, boolean useForDead)
+            throws Exception
     {
         CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception( "Warning: Attempted to add rule for " + type + ", but no cell definition found for this type." );
 
-        HypothesisRuleset pHRS = findRuleset( cd );
+        HypothesisRuleset pHRS = model.rules.findRuleset( cd );
         if( pHRS == null )
             throw new Exception( "Warning: Attempted to add rule for " + type + ", but no hypothesis ruleset found for this type." );
 
@@ -183,7 +177,7 @@ public class Rules
         pHRS.get( behavior ).appliesToDead.set( n, useForDead );
     }
 
-    static void set_hypothesis_parameters(Model model, String type, String signal, String behavior, double max, double hillPower)
+    void set_hypothesis_parameters(Model model, String type, String signal, String behavior, double max, double hillPower)
             throws Exception
     {
         CellDefinition cd = model.getCellDefinition( type );
@@ -208,101 +202,102 @@ public class Rules
         hypothesisRulesets.get( cd ).get( behavior ).setHillPower( signal, hillPower );
     }
 
-    void setBehaviorParameters(Model model, String type, String behavior, double min, double max) throws Exception
+    public static void setBehaviorParameters(Model model, String type, String behavior, double min, double max) throws Exception
     {
         CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception(
                     "Warning: Attempted to set parameters for " + behavior + " in " + type + ", but the cell definition is not found." );
 
-        if( findRuleset( cd ) == null )
+        if( model.rules.findRuleset( cd ) == null )
             throw new Exception( "Warning: Attempted to set parameters for " + behavior + " in " + type
                     + ", but there is no hypothesis ruleset for this cell type." );
 
-        if( hypothesisRulesets.get( cd ).findBehavior( behavior ) == null )
+        if( model.rules.hypothesisRulesets.get( cd ).findBehavior( behavior ) == null )
             throw new Exception( "Warning: Attempted to set parameters for " + behavior + " in " + type
                     + ", but there is no rules for this behavior for this cell type." );
 
-        hypothesisRulesets.get( cd ).get( behavior ).minValue = min;
-        hypothesisRulesets.get( cd ).get( behavior ).maxValue = max;
+        model.rules.hypothesisRulesets.get( cd ).get( behavior ).minValue = min;
+        model.rules.hypothesisRulesets.get( cd ).get( behavior ).maxValue = max;
     }
 
-    void setBehaviorParameters(Model model, String type, String behavior, double min, double base, double max) throws Exception
+    public static void setBehaviorParameters(Model model, String type, String behavior, double min, double base, double max)
+            throws Exception
     {
         CellDefinition pCD = model.getCellDefinition( type );
         if( pCD == null )
             throw new Exception(
                     "Warning: Attempted to set parameters for " + behavior + " in " + type + ", but the cell definition is not found." );
 
-        if( findRuleset( pCD ) == null )
+        if( model.rules.findRuleset( pCD ) == null )
             throw new Exception( "Warning: Attempted to set parameters for " + behavior + " in " + type
                     + ", but there is no hypothesis ruleset for this cell type." );
 
-        if( hypothesisRulesets.get( pCD ).findBehavior( behavior ) == null )
+        if( model.rules.hypothesisRulesets.get( pCD ).findBehavior( behavior ) == null )
             throw new Exception( "Warning: Attempted to set parameters for " + behavior + " in " + type
                     + ", but there is no rules for this behavior for this cell type." );
 
-        hypothesisRulesets.get( pCD ).get( behavior ).minValue = min;
-        hypothesisRulesets.get( pCD ).get( behavior ).maxValue = max;
-        hypothesisRulesets.get( pCD ).get( behavior ).baseValue = base;
+        model.rules.hypothesisRulesets.get( pCD ).get( behavior ).minValue = min;
+        model.rules.hypothesisRulesets.get( pCD ).get( behavior ).maxValue = max;
+        model.rules.hypothesisRulesets.get( pCD ).get( behavior ).baseValue = base;
     }
 
 
-    static void setBehaviorBaseValue(Model model, String type, String behavior, double base) throws Exception
+    public static void setBehaviorBaseValue(Model model, String type, String behavior, double base) throws Exception
     {
         CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but the cell definition is not found." );
 
-        if( findRuleset( cd ) == null )
+        if( model.rules.findRuleset( cd ) == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but no hypothesis ruleset found for this cell type." );
 
-        if( hypothesisRulesets.get( cd ).findBehavior( behavior ) == null )
+        if( model.rules.hypothesisRulesets.get( cd ).findBehavior( behavior ) == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but no rule for this behavior found for this cell type." );
 
-        hypothesisRulesets.get( cd ).get( behavior ).baseValue = base;
+        model.rules.hypothesisRulesets.get( cd ).get( behavior ).baseValue = base;
     }
 
-    static void setBehaviorMinValue(Model model, String type, String behavior, double value) throws Exception
+    public static void setBehaviorMinValue(Model model, String type, String behavior, double value) throws Exception
     {
         CellDefinition cd = model.getCellDefinition( type );
         if( cd == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but the cell definition is not found." );
 
-        if( findRuleset( cd ) == null )
+        if( model.rules.findRuleset( cd ) == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but no hypothesis ruleset found for this cell type." );
 
-        if( hypothesisRulesets.get( cd ).findBehavior( behavior ) == null )
+        if( model.rules.hypothesisRulesets.get( cd ).findBehavior( behavior ) == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but no rule for this behavior found for this cell type." );
 
-        hypothesisRulesets.get( cd ).get( behavior ).minValue = value;
+        model.rules.hypothesisRulesets.get( cd ).get( behavior ).minValue = value;
     }
 
-    static void set_behavior_max_value(Model model, String type, String behavior, double max) throws Exception
+    public static void set_behavior_max_value(Model model, String type, String behavior, double max) throws Exception
     {
         CellDefinition pCD = model.getCellDefinition( type );
         if( pCD == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but the cell definition is not found." );
 
-        if( findRuleset( pCD ) == null )
+        if( model.rules.findRuleset( pCD ) == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but no hypothesis ruleset found for this cell type." );
 
-        if( hypothesisRulesets.get( pCD ).findBehavior( behavior ) == null )
+        if( model.rules.hypothesisRulesets.get( pCD ).findBehavior( behavior ) == null )
             throw new Exception( "Warning: Attempted to set base parameter for " + behavior + " in " + type
                     + ", but no rule for this behavior found for this cell type." );
 
-        hypothesisRulesets.get( pCD ).get( behavior ).maxValue = max;
+        model.rules.hypothesisRulesets.get( pCD ).get( behavior ).maxValue = max;
     }
 
-    static void applyRuleset(Cell cell) throws Exception
+    void applyRuleset(Cell cell) throws Exception
     {
         CellDefinition cd = cell.getModel().getCellDefinition( cell.typeName );
         hypothesisRulesets.get( cd ).apply( cell );
@@ -791,6 +786,7 @@ public class Rules
 
     static void parseCSVRule2(Model model, String[] input) throws Exception
     {
+        Rules rules = model.rules;
         boolean skip = false;
         if( input.length != 8 )
             skip = true;
@@ -834,16 +830,16 @@ public class Rules
 
         // add_rule(cell_type,signal,behavior,response);  
         addRule( model, cell_type, signal, behavior, response, use_for_dead );
-        set_hypothesis_parameters( model, cell_type, signal, behavior, half_max, hill_power );
+        rules.set_hypothesis_parameters( model, cell_type, signal, behavior, half_max, hill_power );
 
         // compare to base behavior value in cell def for discrepancies 
         CellDefinition pCD = model.getCellDefinition( cell_type );
         double ref_base_value = model.getSignals().getSingleBaseBehavior( model, pCD, behavior );
-        setBehaviorBaseValue( model, cell_type, behavior, ref_base_value );
+        rules.setBehaviorBaseValue( model, cell_type, behavior, ref_base_value );
         if( response.equals( "increases" ) )
-            set_behavior_max_value( model, cell_type, behavior, max_response );
+            rules.set_behavior_max_value( model, cell_type, behavior, max_response );
         else
-            setBehaviorMinValue( model, cell_type, behavior, max_response );
+            rules.setBehaviorMinValue( model, cell_type, behavior, max_response );
     }
 
     public static boolean parseBoolean(String val)
@@ -888,7 +884,7 @@ public class Rules
         sb.append( "Cell Hypothesis Rules\n\n" );
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            HypothesisRuleset pHRS = findRuleset( cd );
+            HypothesisRuleset pHRS = model.rules.findRuleset( cd );
             sb.append( "In " + pHRS.type + " cells:\n" );
             for( int k = 0; k < pHRS.rules.size(); k++ )
                 sb.append( pHRS.rules.get( k ).English_display() );
@@ -904,7 +900,7 @@ public class Rules
         for( CellDefinition cd : model.getCellDefinitions() )
         {
             sb.append( "<p>" );
-            HypothesisRuleset pHRS = findRuleset( cd );
+            HypothesisRuleset pHRS = model.rules.findRuleset( cd );
             sb.append( "In " + pHRS.type + " cells:\n" );
             sb.append( "<ul>\n" );
             for( int k = 0; k < pHRS.rules.size(); k++ )
@@ -929,7 +925,7 @@ public class Rules
         sb.append( "Cell Hypothesis Rules (detailed)\n\n" );
         for( CellDefinition cd : model.getCellDefinitions() )
         {
-            HypothesisRuleset pHRS = findRuleset( cd );
+            HypothesisRuleset pHRS = model.rules.findRuleset( cd );
             sb.append( "In " + pHRS.type + " cells:\n" );
             for( int k = 0; k < pHRS.rules.size(); k++ )
             {
@@ -947,7 +943,7 @@ public class Rules
         for( CellDefinition cd : model.getCellDefinitions() )
         {
             sb.append( "<p>" );
-            HypothesisRuleset pHRS = findRuleset( cd );
+            HypothesisRuleset pHRS = model.rules.findRuleset( cd );
             sb.append( "In " + pHRS.type + " cells:\n" );
             sb.append( "<ul>" );// + std::endl; 
             for( int k = 0; k < pHRS.rules.size(); k++ )
@@ -1012,7 +1008,7 @@ public class Rules
         for( CellDefinition pCD : model.getCellDefinitions() )// n=0; n < CellDefinitions_by_index.size(); n++ )
         {
             //            CellDefinition pCD = CellDefinitions_by_index[n]; 
-            HypothesisRuleset pHRS = findRuleset( pCD );
+            HypothesisRuleset pHRS = model.rules.findRuleset( pCD );
 
             String cell_type = pHRS.type;
             try (BufferedWriter bw = new BufferedWriter( new FileWriter( new File( filename ) ) ))
@@ -1078,7 +1074,7 @@ public class Rules
             for( CellDefinition pCD : model.getCellDefinitions() )//int n=0; n < CellDefinitions_by_index.size(); n++ )
             {
                 //            CellDefinition pCD = CellDefinitions_by_index[n]; 
-                HypothesisRuleset pHRS = findRuleset( pCD );
+                HypothesisRuleset pHRS = model.rules.findRuleset( pCD );
 
                 String cell_type = pHRS.type;
 
@@ -1264,7 +1260,7 @@ public class Rules
     public static void setupRules(Model model)
     {
         // setup 
-        intialize_hypothesis_rulesets( model );
+        model.rules.initRulesets( model );
 
         // load rules 
         //        parse_rules_from_pugixml(); 

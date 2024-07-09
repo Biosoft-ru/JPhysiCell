@@ -128,6 +128,51 @@ public class HypothesisRule
         cd = null;
     }
 
+    public String getBehavior()
+    {
+        return behavior;
+    }
+
+    public double getBaseValue()
+    {
+        return baseValue;
+    }
+
+    public double getMaxValue()
+    {
+        return maxValue;
+    }
+
+    public double getMinValue()
+    {
+        return minValue;
+    }
+
+    public List<String> getSignals()
+    {
+        return signals;
+    }
+
+    public List<Boolean> getResponses()
+    {
+        return responses;
+    }
+
+    public List<Boolean> isAppliesToDead()
+    {
+        return appliesToDead;
+    }
+
+    public List<Double> getHalfMaxes()
+    {
+        return halfMaxes;
+    }
+
+    public List<Double> getHillPowers()
+    {
+        return hillPowers;
+    }
+
     String convert(boolean input)
     {
         return ( input ) ? "increases" : "decreases";

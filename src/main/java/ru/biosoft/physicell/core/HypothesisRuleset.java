@@ -12,12 +12,17 @@ public class HypothesisRuleset
     CellDefinition cd;
     List<HypothesisRule> rules = new ArrayList<>();
 
-    HypothesisRuleset()
+    public HypothesisRuleset()
     {
         type = "none";
         cd = null;
         rules = new ArrayList<>();
         rulesMap.clear();
+    }
+
+    public List<HypothesisRule> getRules()
+    {
+        return rules;
     }
 
     public String display()

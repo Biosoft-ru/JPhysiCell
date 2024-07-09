@@ -17,6 +17,8 @@ import ru.biosoft.physicell.ui.Visualizer.Section;
 
 public class Model
 {
+    protected Rules rules = new Rules();
+
     protected SignalBehavior signals;
 
     //Random number generator for the model
@@ -76,6 +78,11 @@ public class Model
     public long getSeed()
     {
         return rng.getSeed();
+    }
+
+    public Rules getRules()
+    {
+        return rules;
     }
 
     public Iterable<Visualizer> getVisualizers()
@@ -264,27 +271,34 @@ public class Model
         m.time = curTime;
     }
 
+    public void setRulesEnabled(boolean rulesEnabled)
+    {
+        this.rulesEnabled = rulesEnabled;
+        if( m.agentContainer instanceof CellContainer )
+            ( (CellContainer)m.agentContainer ).setRulesEnabled( rulesEnabled );
+    }
+
     public void updateIntracellular() throws Exception
     {
         if( curTime >= nextIntracellularUpdate )
         {
             m.getAgents( Cell.class ).parallelStream().filter( cell -> !cell.isOutOfDomain && !cell.phenotype.death.dead )
                     .forEach( cell -> {
-                try
-                {
-                    Intracellular intra = cell.phenotype.intracellular;
-                    if( intra != null )
-                    {
-                        intra.updateIntracellularParameters( m, cell.phenotype );
-                        intra.step();
-                        intra.updatePhenotypeParameters( m, cell.phenotype );
-                    }
-                }
-                catch( Exception ex )
-                {
-                    ex.printStackTrace();
-                }
-            } );
+                        try
+                        {
+                            Intracellular intra = cell.phenotype.intracellular;
+                            if( intra != null )
+                            {
+                                intra.updateIntracellularParameters( m, cell.phenotype );
+                                intra.step();
+                                intra.updatePhenotypeParameters( m, cell.phenotype );
+                            }
+                        }
+                        catch( Exception ex )
+                        {
+                            ex.printStackTrace();
+                        }
+                    } );
             nextIntracellularUpdate += intracellularStep;
         }
     }

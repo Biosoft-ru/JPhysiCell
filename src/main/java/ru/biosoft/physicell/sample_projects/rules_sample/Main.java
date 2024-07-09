@@ -3,7 +3,6 @@ package ru.biosoft.physicell.sample_projects.rules_sample;
 import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
 import ru.biosoft.physicell.core.CellContainerParallel;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.Rules;
 import ru.biosoft.physicell.xml.ModelReader;
 
 /*
@@ -99,7 +98,7 @@ public class Main
         model.init();
 
         System.out.println( model.display() );
-        System.out.println( Rules.display_hypothesis_rulesets( model ) );
+        System.out.println( model.getRules().display_hypothesis_rulesets( model ) );
         //        double tStart = System.nanoTime();
         model.simulate();
         //        tStart = System.nanoTime() - tStart;
