@@ -62,6 +62,7 @@ public class Microenvironment
 {
     private Set<BasicAgent> agents = new HashSet<>();
     private Map<String, Integer> substrateToIndex;
+    public MicroenvironmentOptions options;
 
     public <T extends BasicAgent> Set<T> getAgents(Class<T> clazz)
     {
@@ -93,7 +94,6 @@ public class Microenvironment
         return agents.size();
     }
 
-    public MicroenvironmentOptions options;
     public MicroenvironmentOptions getOptions()
     {
         return options;
@@ -592,8 +592,6 @@ public class Microenvironment
         int numDens = numberDensities();
 
         IntStream.range( 0, zLength ).parallel().forEach( k ->
-        //                #pragma omp parallel for 
-        //        for( int k = 0; k < zLength; k++ )
         {
             for( int j = 0; j < yLength; j++ )
             {
@@ -622,9 +620,8 @@ public class Microenvironment
 
             }
         } );
-        //        #pragma omp parallel for 
+
         IntStream.range( 0, zLength ).parallel().forEach( k ->
-        //        for( int k = 0; k < zLength; k++ )
         {
             for( int i = 0; i < xLength; i++ )
             {
@@ -655,9 +652,8 @@ public class Microenvironment
         } );
         if( zLength == 1 ) // don't bother computing z component if there is no z-directoin 
             return;
-        //        #pragma omp parallel for 
+
         IntStream.range( 0, yLength ).parallel().forEach( j ->
-        //        for( int j = 0; j < yLength; j++ )
         {
             for( int i = 0; i < xLength; i++ )
             {
@@ -703,11 +699,7 @@ public class Microenvironment
     public void addDirichletNode(int voxelIndex, double[] value)
     {
         mesh.voxels[voxelIndex].isDirichlet = true;
-        /*
-        dirichlet_indices.push_back( voxel_index );
-        dirichlet_value_vectors.push_back( value ); 
-        */
-        dirichletValue[voxelIndex] = value.clone(); // .assign( mesh.voxels.size(), one ); 
+        dirichletValue[voxelIndex] = value.clone();
     }
 
     public double[][] getGradient(int n)
@@ -765,18 +757,7 @@ public class Microenvironment
     public static void initialize(Microenvironment m)
     {
         MicroenvironmentOptions options = m.options;
-        //        Microenvironment microenvironment = new Microenvironment(m.name, m.timeUnits, m.spatialUnits);
-        // register the diffusion solver 
-        //        if( options.simulate2D == true )
-        //        {
-        //            //            microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
-        //        }
-        //        else
-        //        {
-        //            m.solver = new ConstantCoefficientsLOD3D();// diffusion_decay_solver__constant_coefficients_LOD_3D; 
-        //        }
 
-        // resize the microenvironment  
         if( options.simulate2D )
         {
             options.Z_range[0] = -options.dz / 2.0;
@@ -785,14 +766,8 @@ public class Microenvironment
         m.resizeSpace( options.X_range[0], options.X_range[1], options.Y_range[0], options.Y_range[1], options.Z_range[0],
                 options.Z_range[1], options.dx, options.dy, options.dz );
 
-        // set units
-        //        microenvironment.spatial_units = default_microenvironment_options.spatial_units;
-        //        microenvironment.time_units = default_microenvironment_options.time_units;
         m.mesh.units = options.spatial_units;
 
-        // set the initial densities to the values set in the initial_condition_vector
-
-        // if the initial condition vector has not been set, use the Dirichlet condition vector 
         if( options.initial_condition_vector.length != m.numberDensities() )
         {
             System.out.println( "BioFVM Warning: Initial conditions not set. "
@@ -803,12 +778,9 @@ public class Microenvironment
 
         // set the initial condition 
         for( int n = 0; n < m.numberVoxels(); n++ )
-        {
             m.density[n] = options.initial_condition_vector.clone();
-        }
 
         // now, figure out which sides have BCs (for at least one substrate): 
-
         boolean xmin = false;
         boolean xmax = false;
         boolean ymin = false;
@@ -816,210 +788,113 @@ public class Microenvironment
         boolean zmin = false;
         boolean zmax = false;
 
-        if( options.outer_Dirichlet_conditions == true )
+        if( options.outer_Dirichlet_conditions )
         {
             for( int n = 0; n < m.numberDensities(); n++ )
             {
                 if( options.Dirichlet_all[n] || options.Dirichlet_xmin[n] )
-                {
                     xmin = true;
-                }
 
                 if( options.Dirichlet_all[n] || options.Dirichlet_xmax[n] )
-                {
                     xmax = true;
-                }
 
                 if( options.Dirichlet_all[n] || options.Dirichlet_ymin[n] )
-                {
                     ymin = true;
-                }
 
                 if( options.Dirichlet_all[n] || options.Dirichlet_ymax[n] )
-                {
                     ymax = true;
-                }
 
                 if( options.Dirichlet_all[n] || options.Dirichlet_zmin[n] )
-                {
                     zmin = true;
-                }
 
                 if( options.Dirichlet_all[n] || options.Dirichlet_zmax[n] )
-                {
                     zmax = true;
-                }
             }
-
-            // add the Dirichlet nodes in the right places 
-
         }
-        //        System.out.println( "which boundaries?" );
-        //        System.out.println( xmin + " " + xmax + " " + ymin + " " + ymax + " " + zmin + " " + zmax );// << std::endl; 
 
-        // add the Dirichlet nodes in the right places now, go in and set the values 
-        if( options.outer_Dirichlet_conditions == true )
+        int xLength = m.mesh.x_coordinates.length;
+        int yLength = m.mesh.y_coordinates.length;
+        int zLength = m.mesh.z_coordinates.length;
+
+        if( options.outer_Dirichlet_conditions )
         {
-            // set xmin if xmin = true or all = true 
             if( xmin )
             {
-                for( int k = 0; k < m.mesh.z_coordinates.length; k++ )
+                for( int k = 0; k < zLength; k++ )
                 {
-                    int I = 0;
-                    // set Dirichlet conditions along the xmin outer edges 
-                    for( int j = 0; j < m.mesh.y_coordinates.length; j++ )
+                    for( int j = 0; j < yLength; j++ )
                     {
-                        // set the value 
-                        m.addDirichletNode( m.getVoxelIndex( I, j, k ), options.Dirichlet_xmin_values );
-
-                        // set the activation 
-                        m.setSubstrateActivation( m.getVoxelIndex( I, j, k ), options.Dirichlet_xmin );
+                        m.addDirichletNode( m.getVoxelIndex( 0, j, k ), options.Dirichlet_xmin_values );
+                        m.setSubstrateActivation( m.getVoxelIndex( 0, j, k ), options.Dirichlet_xmin );
 
                     }
                 }
             }
 
-            // set xmax if xmax = true or all = true 
             if( xmax )
             {
-                for( int k = 0; k < m.mesh.z_coordinates.length; k++ )
+                for( int k = 0; k < zLength; k++ )
                 {
-                    int I = m.mesh.x_coordinates.length - 1;
-                    // set Dirichlet conditions along the xmax outer edges 
-                    for( int j = 0; j < m.mesh.y_coordinates.length; j++ )
+                    for( int j = 0; j < yLength; j++ )
                     {
-                        // set the values 
-                        m.addDirichletNode( m.getVoxelIndex( I, j, k ), options.Dirichlet_xmax_values );
-
-                        // set the activation 
-                        m.setSubstrateActivation( m.getVoxelIndex( I, j, k ), options.Dirichlet_xmax );
+                        m.addDirichletNode( m.getVoxelIndex( xLength - 1, j, k ), options.Dirichlet_xmax_values );
+                        m.setSubstrateActivation( m.getVoxelIndex( xLength - 1, j, k ), options.Dirichlet_xmax );
                     }
                 }
             }
 
-            // set ymin if ymin = true or all = true 
             if( ymin )
             {
-                for( int k = 0; k < m.mesh.z_coordinates.length; k++ )
+                for( int k = 0; k < zLength; k++ )
                 {
-                    int J = 0; // microenvironment.mesh.x_coordinates.size()-1;; 
-                    // set Dirichlet conditions along the ymin outer edges 
-                    for( int i = 0; i < m.mesh.x_coordinates.length; i++ )
+                    for( int i = 0; i < xLength; i++ )
                     {
-                        // set the values 
-                        m.addDirichletNode( m.getVoxelIndex( i, J, k ), options.Dirichlet_ymin_values );
-
-                        // set the activation 
-                        m.setSubstrateActivation( m.getVoxelIndex( i, J, k ), options.Dirichlet_ymin );
+                        m.addDirichletNode( m.getVoxelIndex( i, 0, k ), options.Dirichlet_ymin_values );
+                        m.setSubstrateActivation( m.getVoxelIndex( i, 0, k ), options.Dirichlet_ymin );
                     }
                 }
             }
 
-            // set ymzx if ymax = true or all = true; 
             if( ymax )
             {
-                for( int k = 0; k < m.mesh.z_coordinates.length; k++ )
+                for( int k = 0; k < zLength; k++ )
                 {
-                    int J = m.mesh.y_coordinates.length - 1;
-                    ;
-                    // set Dirichlet conditions along the ymin outer edges 
-                    for( int i = 0; i < m.mesh.x_coordinates.length; i++ )
+                    for( int i = 0; i < xLength; i++ )
                     {
-                        // set the value 
-                        m.addDirichletNode( m.getVoxelIndex( i, J, k ), options.Dirichlet_ymax_values );
-
-                        // set the activation 
-                        m.setSubstrateActivation( m.getVoxelIndex( i, J, k ), options.Dirichlet_ymax );
+                        m.addDirichletNode( m.getVoxelIndex( i, yLength - 1, k ), options.Dirichlet_ymax_values );
+                        m.setSubstrateActivation( m.getVoxelIndex( i, yLength - 1, k ), options.Dirichlet_ymax );
                     }
                 }
             }
 
-            // if not 2D:
             if( !options.simulate2D )
             {
-                // set zmin if zmin = true or all = true 
-                if( zmin == true )
+                if( zmin )
                 {
-                    for( int j = 0; j < m.mesh.y_coordinates.length; j++ )
+                    for( int j = 0; j < yLength; j++ )
                     {
-                        int K = 0; // microenvironment.mesh.z_coordinates.size()-1;; 
-                        // set Dirichlet conditions along the ymin outer edges 
-                        for( int i = 0; i < m.mesh.x_coordinates.length; i++ )
+                        for( int i = 0; i < xLength; i++ )
                         {
-                            // set the value 
-                            m.addDirichletNode( m.getVoxelIndex( i, j, K ), options.Dirichlet_zmin_values );
-
-                            // set the activation 
-                            m.setSubstrateActivation( m.getVoxelIndex( i, j, K ), options.Dirichlet_zmin );
+                            m.addDirichletNode( m.getVoxelIndex( i, j, 0 ), options.Dirichlet_zmin_values );
+                            m.setSubstrateActivation( m.getVoxelIndex( i, j, 0 ), options.Dirichlet_zmin );
                         }
                     }
                 }
 
-                // set zmax if zmax = true or all = true 
                 if( zmax )
                 {
-                    for( int j = 0; j < m.mesh.y_coordinates.length; j++ )
+                    for( int j = 0; j < yLength; j++ )
                     {
-                        int K = m.mesh.z_coordinates.length - 1;
-                        // set Dirichlet conditions along the ymin outer edges 
-                        for( int i = 0; i < m.mesh.x_coordinates.length; i++ )
+                        for( int i = 0; i < xLength; i++ )
                         {
-                            // set the value 
-                            m.addDirichletNode( m.getVoxelIndex( i, j, K ), options.Dirichlet_zmax_values );
-
-                            // set the activation 
-                            m.setSubstrateActivation( m.getVoxelIndex( i, j, K ), options.Dirichlet_zmax );
+                            m.addDirichletNode( m.getVoxelIndex( i, j, zLength - 1 ), options.Dirichlet_zmax_values );
+                            m.setSubstrateActivation( m.getVoxelIndex( i, j, zLength - 1 ), options.Dirichlet_zmax );
                         }
                     }
                 }
             }
-
         }
 
-        /*
-        if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
-        {
-            
-            for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
-            {
-                // set Dirichlet conditions along the 4 outer edges 
-                for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
-                {
-                    int J = microenvironment.mesh.y_coordinates.size()-1;
-                    microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,0,k) , default_microenvironment_options.Dirichlet_condition_vector );
-                    microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_condition_vector );
-                }
-                int I = microenvironment.mesh.x_coordinates.size()-1;
-                for( unsigned int j=1; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
-                {
-                    microenvironment.add_dirichlet_node( microenvironment.voxel_index(0,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
-                    microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
-                }       
-            }
-            // if 3-D, also along the corresponding additional faces 
-            if( default_microenvironment_options.simulate_2D == false )
-            {
-                int K = microenvironment.mesh.z_coordinates.size()-1; 
-                for( unsigned int j=1 ; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
-                {
-                    for( unsigned int i=1; i < microenvironment.mesh.x_coordinates.size()-1 ; i++ )
-                    {
-                        microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,0) , default_microenvironment_options.Dirichlet_condition_vector );
-                        microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_condition_vector );
-                    }   
-                }   
-            }
-            
-        }
-        */
-
-        // April 2023: no longer necessary after flipping our approach and doing an "additive" instead of "subtractive" DCs handling. I.e., we assume DC activation is false by default; make true on-demand.
-
-        // // set the Dirichlet condition activation vector to match the microenvironment options 
-        // for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
-        // {
-        //  microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
-        // }
         m.initDirichlet();
         m.displayInformation();
 

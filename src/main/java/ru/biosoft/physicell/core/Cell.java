@@ -76,6 +76,9 @@ import ru.biosoft.physicell.core.standard.StandardModels;
 */
 public class Cell extends BasicAgent
 {
+    public static int calls = 0;
+    public static int badCalls = 0;
+
     public static double[] cell_division_orientation;
     CellContainer container;
     int currentMechanicsVoxelIndex;
@@ -141,10 +144,7 @@ public class Cell extends BasicAgent
     {
         super.setTotalVolume( volume );
 
-        // If the new volume is significantly different than the 
-        // current total volume, adjust all the sub-volumes 
-        // proportionally. 
-
+        // If the new volume is significantly different than the current total volume, adjust all the sub-volumes proportionally. 
         if( Math.abs( phenotype.volume.total - volume ) > 1e-16 )
         {
             double ratio = volume / ( phenotype.volume.total + 1e-16 );
@@ -183,7 +183,6 @@ public class Cell extends BasicAgent
         state.orientation[0] = temp * Math.cos( theta );
         state.orientation[1] = temp * Math.sin( theta );
         state.orientation[2] = z;
-        //        }
     }
 
     @Override
@@ -202,7 +201,6 @@ public class Cell extends BasicAgent
     {
         Cell pNew = instantiator == null ? new Cell( cd, model ) : instantiator.execute( cd, model );
         pNew.index = model.getMicroenvironment().getAgentsCount();
-        //        pNew.registerMicroenvironment( m );
         // All the phenotype and other data structures are already set by virtue of the default Cell constructor. 
         pNew.setTotalVolume( pNew.phenotype.volume.total );
         pNew.assignPosition( position );
@@ -211,7 +209,6 @@ public class Cell extends BasicAgent
 
     public void die()
     {
-        //        System.out.println( "DIED " + this );
         deleteCell( this );
     }
 
@@ -220,13 +217,9 @@ public class Cell extends BasicAgent
     {
         if( m.options.simulate2D )
             velocity[2] = 0.0;
-        // use Adams-Bashforth 
+
         VectorUtil.axpy( position, 1.5 * dt, velocity );
         VectorUtil.axpy( position, -0.5 * dt, prevVelocity );
-        // overwrite previous_velocity for future use 
-        // if(sqrt(dist(old_position, position))>3* phenotype.geometry.radius)
-        // std::cout<<sqrt(dist(old_position, position))<<"old_position: "<<old_position<<", new position: "<< position<<", velocity: "<<velocity<<", previous_velocity: "<< previous_velocity<<std::endl;
-
         prevVelocity = velocity.clone();
         VectorUtil.zero( velocity );
 
@@ -245,55 +238,19 @@ public class Cell extends BasicAgent
 
     public static void deleteCell(Cell cell)
     {
-        //  std::cout << __FUNCTION__ << " " << (*all_cells)[index] 
-        //  << " " << (*all_cells)[index]->type_name << std::endl; 
-
-        //        Cell pDeleteMe = (Cell)BasicAgent.allBasicAgents.get( index );
-        //        System.out.println( "Died " );
-        // release any attached cells (as of 1.7.2 release)
         cell.removeAllAttachedCells();
-        // 1.11.0 
         cell.removeAllSpringAttachments();
-
-        // released internalized substrates (as of 1.5.x releases)
         cell.releaseSubstrates();
-
-        // performance goal: don't delete in the middle -- very expensive reallocation
-        // alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
-
-        // move last item to index location 
-        //        BasicAgent.allBasicAgents.remove( index );
-
-        //        BasicAgent last = BasicAgent.allBasicAgents.get( BasicAgent.allBasicAgents.size() - 1 );
-        //        last.index = index;
-        //        BasicAgent.allBasicAgents.set( index, last );
-        //        BasicAgent.allBasicAgents.remove( BasicAgent.allBasicAgents.size() - 1 );
-        //        (*all_cells)[ (*all_cells).size()-1 ]->index=index;
-        //        (*all_cells)[index] = (*all_cells)[ (*all_cells).size()-1 ];
-        //        // shrink the vector
-        //        (*all_cells).pop_back();    
-
-        // deregister agent in from the agent container
         cell.getMicroenvironment().removeAgent( cell );
         cell.get_container().remove_agent( cell );
-        // de-allocate (delete) the cell; 
-        //        delete pDeleteMe; 
     }
 
     public Cell divide() throws Exception
     {
-        //        System.out.println( toString() + " divided" );
-        //commented in original code
-        // phenotype.flagged_for_division = false; 
-        // phenotype.flagged_for_removal = false; 
-
-        // make sure ot remove adhesions 
         removeAllAttachedCells();
         removeAllSpringAttachments();
 
-        // version 1.10.3: 
-        // conserved quantitites in custom data aer divided in half
-        // so that each daughter cell gets half of the original ;
+        // conserved quantitites in custom data aer divided in half so that each daughter cell gets half of the original ;
         for( int nn = 0; nn < customData.variables.size(); nn++ )
         {
             if( customData.variables.get( nn ).conserved_quantity )
@@ -309,37 +266,6 @@ public class Cell extends BasicAgent
             }
         }
 
-        // The following is already performed by create_cell(). JULY 2017 ***
-        // child->register_microenvironment( get_microenvironment() );
-
-        // randomly place the new agent close to me, accounting for orientation and 
-        // polarity (if assigned)
-
-        // May 30, 2020: 
-        // Set cell_division_orientation = LegacyRandomOnUnitSphere to 
-        // reproduce this code 
-        /*
-        double temp_angle = 6.28318530717959*UniformRandom();
-        double temp_phi = 3.1415926535897932384626433832795*UniformRandom();
-        
-        double radius= phenotype.geometry.radius;
-        std::vector<double> rand_vec (3, 0.0);
-        
-        rand_vec[0]= cos( temp_angle ) * sin( temp_phi );
-        rand_vec[1]= sin( temp_angle ) * sin( temp_phi );
-        rand_vec[2]= cos( temp_phi );
-        
-        rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
-            rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;
-        
-        if( norm(rand_vec) < 1e-16 )
-        {
-            std::cout<<"************ERROR********************"<<std::endl;
-        }
-        normalize( &rand_vec ); 
-        rand_vec *= radius; // multiply direction times the displacement 
-        */
-
         double[] rand_vec = PhysiCellUtilities.UniformOnUnitSphere( model );//cell_division_orientation();
         if( getMicroenvironment().options.simulate2D )
             rand_vec[2] = 0;
@@ -347,25 +273,18 @@ public class Cell extends BasicAgent
                 * ( rand_vec[0] * state.orientation[0] + rand_vec[1] * state.orientation[1] + rand_vec[2] * state.orientation[2] );
 
         VectorUtil.naxpy( rand_vec, multiplier, state.orientation );
-        //        rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
-        //            rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;   
-        //        rand_vec *= phenotype.geometry.radius;
         VectorUtil.prod( rand_vec, phenotype.geometry.radius );
         double[] pos = VectorUtil.newSum( position, rand_vec );
-        //        System.out.println( type_name + "\tdivided\t" + position[0] + "\t" + position[1] + "\t" + position[2] + "\t->\t" + pos[0] + "\t"
-        //                + pos[1] + "\t" + pos[2] );
         Cell child = createCell( functions.instantiator, definition, getModel(), pos );
         child.copyData( this );
         child.copyFunctionPointers( this );
         child.parameters = parameters;
 
-        // evenly divide internalized substrates 
-        // if these are not actively tracked, they are zero anyway 
+        // evenly divide internalized substrates if these are not actively tracked, they are zero anyway 
         VectorUtil.prod( internalizedSubstrates, 0.5 );
         child.internalizedSubstrates = internalizedSubstrates.clone();
 
-        //change my position to keep the center of mass intact 
-        // and then see if I need to update my voxel index
+        //change my position to keep the center of mass intact and then see if I need to update my voxel index
         double negative_one_half = -0.5;
         VectorUtil.axpy( position, negative_one_half, rand_vec ); // position = position - 0.5*rand_vec; 
 
@@ -390,10 +309,7 @@ public class Cell extends BasicAgent
             child.phenotype.intracellular.start();
             child.phenotype.intracellular.inherit( this );
         }
-        // #ifdef ADDON_PHYSIDFBA
-        //  child->fba_model = this->fba_model;
-        // #endif
-        // changes for new phenotyp March 2022
+
         state.damage = 0.0;
         state.totalAttackTime = 0;
         child.state.damage = 0.0;
@@ -500,7 +416,6 @@ public class Cell extends BasicAgent
             {
                 get_container().add_agent_to_outer_voxel( this );
             }
-            // std::cout<<"cell out of boundary..."<< __LINE__<<" "<<ID<<std::endl;
             currentMechanicsVoxelIndex = -1;
             isOutOfDomain = true;
             isActive = false;
@@ -509,7 +424,6 @@ public class Cell extends BasicAgent
 
         // temp_current_voxel_index= get_current_mechanics_voxel_index();
         // updated_current_mechanics_voxel_index=get_container()->underlying_mesh.nearest_voxel_index( position );
-
         // update mesh indices (if needed)
         if( updated_current_mechanics_voxel_index != get_current_mechanics_voxel_index() )
         {
@@ -590,8 +504,7 @@ public class Cell extends BasicAgent
             phenotype.cycle.data.currentPhase().entryFunction.execute( this, phenotype, 0.0 );
         }
     }
-    public static int calls = 0;
-    public static int badCalls = 0;
+
 
     
  
@@ -658,13 +571,8 @@ public class Cell extends BasicAgent
 
         if( distance < max_interactive_distance )
         {
-            // double temp_a = 1 - distance/max_interactive_distance; 
-            //            double temp_a = -distance; // -d
-            //            temp_a /= max_interactive_distance; // -d/S
-            //            temp_a += 1.0; // 1 - d/S
             double temp_a = 1 - distance / max_interactive_distance;
             temp_a *= temp_a; // (1-d/S)^2 
-            // temp_a *= phenotype.mechanics.cell_cell_adhesion_strength; // original 
 
             // August 2017 - back to the original if both have same coefficient 
             // May 2022 - back to original if both affinities are 1
@@ -679,7 +587,6 @@ public class Cell extends BasicAgent
             temp_a *= effective_adhesion;
             temp_r -= temp_a;
             state.neighbors.add( other );// move here in 1.10.2 so non-adhesive cells also added. 
-            //            state.neighbors.push_back(other_agent); 
         }
         if( Math.abs( temp_r ) < 1e-16 )
             return 0;
@@ -698,28 +605,6 @@ public class Cell extends BasicAgent
 
         if( phenotype.motility.persistenceTime < dt || model.rng.checkRandom( dt / phenotype.motility.persistenceTime ) )
         {
-            /*
-            // choose a uniformly random unit vector 
-            double temp_angle = 6.28318530717959*UniformRandom();
-            double temp_phi = 3.1415926535897932384626433832795*UniformRandom();
-            
-            double sin_phi = sin(temp_phi);
-            double cos_phi = cos(temp_phi);
-            
-            if( phenotype.motility.restrict_to_2D == true )
-            { 
-                sin_phi = 1.0; 
-                cos_phi = 0.0;
-            }
-            
-            std::vector<double> randvec; 
-            randvec.resize(3,sin_phi); 
-            
-            randvec[0] *= cos( temp_angle ); // cos(theta)*sin(phi)
-            randvec[1] *= sin( temp_angle ); // sin(theta)*sin(phi)
-            randvec[2] = cos_phi; //  cos(phi)
-            */
-            //            std::vector<double> randvec(3,0.0);
             double[] randvec;
             if( phenotype.motility.restrictTo2D )
             {
@@ -736,8 +621,6 @@ public class Cell extends BasicAgent
                 functions.updateMigration.execute( this, phenotype, dt );
             }
 
-            //            phenotype.motility.motility_vector = phenotype.motility.migration_bias_direction; // motiltiy = bias_vector
-            //            phenotype.motility.motility_vector *= phenotype.motility.migration_bias; // motility = bias*bias_vector 
             phenotype.motility.motilityVector = VectorUtil.newProd( phenotype.motility.migrationBiasDirection,
                     phenotype.motility.migrationBias );
 
@@ -745,7 +628,6 @@ public class Cell extends BasicAgent
             VectorUtil.axpy( ( phenotype.motility.motilityVector ), one_minus_bias, randvec ); // motility = (1-bias)*randvec + bias*bias_vector
             VectorUtil.normalize( ( phenotype.motility.motilityVector ) );
             VectorUtil.prod( phenotype.motility.motilityVector, phenotype.motility.migrationSpeed );
-            //            phenotype.motility.motility_vector *= phenotype.motility.migration_speed; 
         }
     }
 
@@ -804,7 +686,6 @@ public class Cell extends BasicAgent
                 return false;
             return true;
         }
-        //        double[] corner_point= 0.5*(my_voxel_center+other_voxel_center);
         double[] cornerPoint = VectorUtil.newSum( my_voxel_center, other_voxel_center );
         VectorUtil.prod( cornerPoint, 0.5 );
         double distance_squared = ( cornerPoint[0] - pCell.position[0] ) * ( cornerPoint[0] - pCell.position[0] )
@@ -955,20 +836,15 @@ public class Cell extends BasicAgent
             return; // don't ingest a cell that's already fused or fuse self 
 
         // make this thread safe 
-        //        #pragma omp critical
         {
 
             // set new position at center of volume 
             // x_new = (vol_B * x_B + vol_S * x_S ) / (vol_B + vol_S )
-
-            //            std::vector<double> new_position = position; // x_B
-            //            new_position *= phenotype.volume.total; // vol_B * x_B 
             double[] newPosition = VectorUtil.newProd( position, phenotype.volume.total );
             double total_volume = phenotype.volume.total;
             total_volume += pCellToFuse.phenotype.volume.total;
 
             VectorUtil.axpy( newPosition, pCellToFuse.phenotype.volume.total, pCellToFuse.position ); // vol_B*x_B + vol_S*x_S
-            //            new_position /= total_volume; // (vol_B*x_B+vol_S*x_S)/(vol_B+vol_S);
             VectorUtil.div( newPosition, total_volume );
 
             double xL = m.mesh.boundingBox[0];
@@ -985,8 +861,6 @@ public class Cell extends BasicAgent
             {
                 System.out.println( "cell fusion at " + newPosition + " violates domain bounds" );
                 System.out.println( m.mesh.boundingBox );
-                //                std::cout << "cell fusion at " << new_position << " violates domain bounds" << std::endl; 
-                //                std::cout << get_default_microenvironment().mesh.bounding_box << std::endl << std::endl; 
             }
             position = newPosition;
             updateVoxelInContainer();
@@ -1037,11 +911,7 @@ public class Cell extends BasicAgent
             setTotalVolume( phenotype.volume.total );
             pCellToFuse.setTotalVolume( 0.0 );
 
-            // absorb the internalized substrates 
-
-            //            *internalized_substrates += *(pCell_to_fuse.internalized_substrates); 
-            //            static int n_substrates = internalized_substrates.size(); 
-            //            pCell_to_fuse.internalized_substrates.assign( n_substrates , 0.0 );   
+            // absorb the internalized substrates   
             VectorUtil.sum( internalizedSubstrates, pCellToFuse.internalizedSubstrates );
             pCellToFuse.internalizedSubstrates = new double[internalizedSubstrates.length];
             // set target volume(s)
@@ -1085,9 +955,7 @@ public class Cell extends BasicAgent
     {
         // don't lyse a cell that's already lysed 
         if( phenotype.volume.total < 1e-15 )
-        {
             return;
-        }
 
         // flag for removal 
         flagForRemoval(); // should be safe now 
@@ -1118,7 +986,6 @@ public class Cell extends BasicAgent
 
     public void convert(CellDefinition cd)
     {
-        // use the cell defaults; 
         type = cd.type;
         typeName = cd.name;
         customData = cd.custom_data.clone();
@@ -1136,7 +1003,6 @@ public class Cell extends BasicAgent
     {
         // New March 2022
         // perform transformations 
-        //        System.out.println( "Step: " + dt_ );
         StandardModels.standard_cell_transformations( this, this.phenotype, dt );
 
         // New March 2023 in Version 1.12.0 
@@ -1178,8 +1044,6 @@ public class Cell extends BasicAgent
         {
             // if so, change the cycle model to the current death model 
             phenotype.cycle = phenotype.death.currentModel();
-
-            // also, turn off motility.
             phenotype.motility.disable();
             functions.updateMigration = null;
 
@@ -1269,18 +1133,6 @@ public class Cell extends BasicAgent
                 neighbors.add( neighbor );
             }
         }
-        // First check the neighbors in my current voxel
-        //        std::vector<Cell*>::iterator neighbor;
-        //        std::vector<Cell*>::iterator end = pCell.get_container().agent_grid[pCell.get_current_mechanics_voxel_index()].end();
-        //        for( neighbor = pCell.get_container().agent_grid[pCell.get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
-        //        {
-        //            std::vector<double> displacement = (neighbor).position - pCell.position; 
-        //            double distance = norm( displacement ); 
-        //            if( distance <= pCell.phenotype.mechanics.relative_maximum_adhesion_distance * pCell.phenotype.geometry.radius 
-        //                + (neighbor).phenotype.mechanics.relative_maximum_adhesion_distance * (neighbor).phenotype.geometry.radius 
-        //                && (neighbor) != pCell )
-        //            { neighbors.push_back( neighbor ); }
-        //        }
 
         for( int neighbor_voxel_index : pCell.get_container().mesh.moore_connected_voxel_indices[pCell
                 .get_current_mechanics_voxel_index()] )
@@ -1292,7 +1144,6 @@ public class Cell extends BasicAgent
             for( Cell neighbor : pCell.get_container().agentGrid.get( neighbor_voxel_index ) )
             {
                 double distance = VectorUtil.dist( neighbor.position, pCell.position );
-                //                double distance = norm( displacement ); 
                 if( distance <= pCell.phenotype.mechanics.relMaxAdhesionDistance * pCell.phenotype.geometry.radius
                         + ( neighbor ).phenotype.mechanics.relMaxAdhesionDistance * ( neighbor ).phenotype.geometry.radius
                         && ( neighbor ) != pCell )
@@ -1301,29 +1152,6 @@ public class Cell extends BasicAgent
                 }
             }
         }
-        //        std::vector<int>::iterator neighbor_voxel_index;
-        //        std::vector<int>::iterator neighbor_voxel_index_end = 
-        //            pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()].end();
-
-        //        for( neighbor_voxel_index = 
-        //            pCell.get_container().underlying_mesh.moore_connected_voxel_indices[pCell.get_current_mechanics_voxel_index()].begin();
-        //            neighbor_voxel_index != neighbor_voxel_index_end; 
-        //            ++neighbor_voxel_index )
-        //        {
-        //            if(!is_neighbor_voxel(pCell, pCell.get_container().underlying_mesh.voxels[pCell.get_current_mechanics_voxel_index()].center, pCell.get_container().underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
-        //                continue;
-        //            end = pCell.get_container().agent_grid[neighbor_voxel_index].end();
-        //            for(neighbor = pCell.get_container().agent_grid[neighbor_voxel_index].begin();neighbor != end; ++neighbor)
-        //            {
-        //                double[] displacement = (neighbor).position - pCell.position; 
-        //                double distance = norm( displacement ); 
-        //                if( distance <= pCell.phenotype.mechanics.relative_maximum_adhesion_distance * pCell.phenotype.geometry.radius 
-        //                    + (neighbor).phenotype.mechanics.relative_maximum_adhesion_distance * (neighbor).phenotype.geometry.radius
-        //                    && (neighbor) != pCell )
-        //                { neighbors.add( neighbor ); }
-        //            }
-        //        }
-
         return neighbors;
     }
 

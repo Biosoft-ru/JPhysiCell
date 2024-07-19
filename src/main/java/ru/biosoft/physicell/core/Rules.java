@@ -1259,31 +1259,6 @@ public class Rules
 
     public static void setupRules(Model model)
     {
-        // setup 
         model.rules.initRulesets( model );
-
-        // load rules 
-        //        parse_rules_from_pugixml(); 
-
-        // display rules to screen
-        //        display_hypothesis_rulesets( );
-
-        // save annotations 
-        //        save_annotated_detailed_English_rules(); 
-        //        save_annotated_detailed_English_rules_HTML(); 
-        //        save_annotated_English_rules(); 
-        //        save_annotated_English_rules_HTML(); 
-
-        // save dictionaries 
-        //        String dictionary_file = "./" + PhysiCellSettings.folder + "/dictionaries.txt";
-        //        std::ofstream dict_of( dictionary_file , std::ios::out ); 
-
-        //        display_signal_dictionary( dict_of ); // done 
-        //        display_behavior_dictionary( dict_of ); // done 
-        //        dict_of.close(); 
-
-        // save rules (v1)
-        //        String rules_file = PhysiCellSettings.folder + "/cell_rules.csv"; 
-        //        export_rules_csv_v1( rusles_file ); 
     }
 }

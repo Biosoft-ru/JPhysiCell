@@ -119,11 +119,6 @@ public class Mechanics implements Cloneable
         maxAttachmentRate = 1.0;
     }
 
-    //    public void sync_to_cell_definitions()
-    //    {
-    //        initialize( CellDefinition.getDefinitionsCount() );
-    //    }
-
     public void initialize(Model model)
     {
         cellAdhesionAffinities = VectorUtil.resize( cellAdhesionAffinities, model.getDefinitionsCount(), 1.0 );
@@ -137,22 +132,15 @@ public class Mechanics implements Cloneable
 
     void setFullyHeterotypic(Model model)
     {
-        //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        int number_of_cell_defs = model.getDefinitionsCount();
-        //        cell_adhesion_affinities.assign( number_of_cell_defs, 1.0);
-        cellAdhesionAffinities = VectorUtil.assign( number_of_cell_defs, 1.0 );
+        cellAdhesionAffinities = VectorUtil.assign( model.getDefinitionsCount(), 1.0 );
     }
 
     void setFullyHomotypic(Cell pC)
     {
-        //        extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-        int number_of_cell_defs = pC.getModel().getDefinitionsCount();
-        //        cell_adhesion_affinities.assign( number_of_cell_defs, 0.0);
-        cellAdhesionAffinities = new double[number_of_cell_defs];
+        cellAdhesionAffinities = new double[pC.getModel().getDefinitionsCount()];
         // now find my type and set to 1 
         //  cell_adhesion_affinity( pC->type_name ) = 1.0; 
     }
-
 
     // new on July 29, 2018
     // change the ratio without changing the repulsion strength or equilibrium spacing 

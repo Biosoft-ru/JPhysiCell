@@ -104,52 +104,25 @@ public class CellInteractions implements Cloneable
         immunogenicities = VectorUtil.resize( immunogenicities, size, 1 );
     }
 
-    //    public double getLivePhagocytosisRate(String name)
-    //    {
-    //        int n = CellDefinition.getCellDefinition( name ).type;
-    //        return livePhagocytosisRates[n];
-    //    }
-
     public double getLivePhagocytosisRate(int type)
     {
-        //        int n = CellDefinition.getCellDefinition( name ).type;
         return livePhagocytosisRates[type];
     }
+
     public double getAttackRate(int type)
     {
-        //        int n = CellDefinition.getCellDefinition( name ).type;
         return attackRates[type];
     }
 
     public double getImmunogenicity(int type)
     {
-        //        int n = CellDefinition.getCellDefinition( name ).type;
         return immunogenicities[type];
     }
 
     public double getFusionRate(int type)
     {
-        //        int n = CellDefinition.getCellDefinition( name ).type;
         return fusionRates[type];
     }
-
-    //    public double getAttackRate(String name)
-    //    {
-    //        int n = CellDefinition.getCellDefinition( name ).type;
-    //        return attackRates[n];
-    //    }
-
-    //    public double getFusionRate(String name)
-    //    {
-    //        int n = CellDefinition.getCellDefinition( name ).type;
-    //        return fusionRates[n];
-    //    }
-
-    //    public double getImmunogenicity(String name)
-    //    {
-    //        int n = CellDefinition.getCellDefinition( name ).type;
-    //        return immunogenicities[n];
-    //    }
 
     @Override
     public CellInteractions clone()
