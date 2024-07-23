@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
+import ru.biosoft.physicell.biouml.BioUMLIntraReader;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
 import ru.biosoft.physicell.xml.ModelReader;
@@ -82,8 +83,13 @@ public class Executor
                     stream = new FileInputStream( new File( parameters.settingdPath ) );
                 }
                 else
+                {
                     stream = c.getResourceAsStream( PATH_TO_SETTINGS );
-                Model model = new ModelReader().read( stream, c );
+                }
+
+                ModelReader reader = new ModelReader();
+                reader.setIntracellularReader( new BioUMLIntraReader() );
+                Model model = reader.read( stream, c );
                 runProject( model, parameters );
             }
             catch( Exception ex )
@@ -105,12 +111,12 @@ public class Executor
             if( params.resultPath != null )
             {
                 String path = params.resultPath;
-                if( params.localResult )
-                {
-                    String jarPath = Executor.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-                    String parent = new File( jarPath ).getParent();
-                    path = parent + "/" + path;
-                }
+                //                if( params.localResult )
+                //                {
+                //                    String jarPath = Executor.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+                //                    String parent = new File( jarPath ).getParent();
+                //                    path = parent + "/" + path;
+                //                }
                 model.setResultFolder( path );
                 model.setSaveFull( true );
                 model.setSaveImg( true );
