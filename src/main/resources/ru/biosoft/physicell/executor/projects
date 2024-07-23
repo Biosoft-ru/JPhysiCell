@@ -9,3 +9,4 @@ mechano	ru.biosoft.physicell.sample_projects.mechano.Mechano
 rules_sample	ru.biosoft.physicell.sample_projects.rules_sample.RulesSample
 virus_macrophage	ru.biosoft.physicell.sample_projects.virus_macrophage.VirusMacrophage
 worm	ru.biosoft.physicell.sample_projects.worm.Worm
+ode_energy	ru.biosoft.physicell.sample_projects.ode_energy.OdeEnergy
