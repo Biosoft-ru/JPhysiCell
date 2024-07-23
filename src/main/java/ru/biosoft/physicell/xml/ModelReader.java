@@ -39,9 +39,8 @@ import ru.biosoft.physicell.core.standard.StandardModels;
 public class ModelReader extends ModelReaderSupport
 {
     private IntracellularReader intracellularReader = null;
-
     private static final String OPTIONS = "options";
-    private File f;
+
     public Model read(InputStream is) throws Exception
     {
         return this.read( is, null );
@@ -57,7 +56,6 @@ public class ModelReader extends ModelReaderSupport
 
     public Model read(File f, Class clazz) throws Exception
     {
-        this.f = f;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse( f );
@@ -98,7 +96,6 @@ public class ModelReader extends ModelReaderSupport
             boolean enabled = getBoolAttr( rulesetElement, "enabled" );
             if( !enabled )
                 continue;
-            //            PhysiCellSettings.rules_enabled = true;
             String format = getAttr( rulesetElement, "format" );
             String version = getAttr( rulesetElement, "version" );
             String protocol = getAttr( rulesetElement, "CBHG" );
@@ -106,13 +103,12 @@ public class ModelReader extends ModelReaderSupport
             String folder = getVal( folderElement );
             Element filenameElement = findElement( rulesetElement, "filename" );
             String filename = getVal( filenameElement );
-
-
-            File rulesFile = new File( new File( this.f.getParent() ).getParent(), folder + "/" + filename );
-            String path = rulesFile.getAbsolutePath();
+            if( folder.startsWith( "./" ) )
+                folder = folder.substring( 2 );
+            InputStream rulesStream = model.getClass().getResourceAsStream( folder + "/" + filename );
             model.getSignals().setupDictionaries( model );
             Rules.setupRules( model );
-            Rules.parseCSVRules2( model, path );
+            Rules.parseCSVRules2( model, rulesStream );
             model.setRulesPath( folder + "/" + filename );
         }
     }
@@ -580,7 +576,7 @@ public class ModelReader extends ModelReaderSupport
                         readCellTransformations( el, cd, model );
                         break;
                     case "intracellular":
-                        readIntracellular( f, el, model, cd );
+                        readIntracellular( el, model, cd );
                         break;
                 }
             }
@@ -589,11 +585,11 @@ public class ModelReader extends ModelReaderSupport
         }
     }
 
-    public void readIntracellular(File f, Element el, Model model, CellDefinition cd) throws Exception
+    public void readIntracellular(Element el, Model model, CellDefinition cd) throws Exception
     {
         if( intracellularReader == null )
             throw new Exception( "No intracellular reader set" );
-        intracellularReader.readIntracellular( f, el, model, cd );
+        intracellularReader.readIntracellular( el, model, cd );
     }
 
     public void setIntracellularReader(IntracellularReader reader)
