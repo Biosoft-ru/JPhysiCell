@@ -9,7 +9,6 @@
   <version>1.0-SNAPSHOT</version>
 
   <name>physicell</name>
-  <!-- FIXME change it to the project's website -->
   <url>http://www.biouml.org</url>
 
   <properties>
@@ -25,40 +24,306 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    
+     <dependency>
+    <groupId>biouml.workbench</groupId>
+    <artifactId>biouml.workbench</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/biouml.workbench_0.9.10.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>biouml.plugins.sbml</groupId>
+    <artifactId>biouml.plugins.sbml</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/biouml.plugins.sbml_0.9.10.jar</systemPath>
+    </dependency>
+
+    <dependency>
+    <groupId>biouml.plugins.simulation</groupId>
+    <artifactId>biouml.plugins.simulation</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/biouml.plugins.simulation_0.9.10.jar</systemPath>
+    </dependency>
+    
+    <!--<dependency>
+    <groupId>src</groupId>
+    <artifactId>src</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/src.jar</systemPath>
+    </dependency>-->
+     
+    <dependency>
+    <groupId>com.developmentontheedge.beans</groupId>
+    <artifactId>com.developmentontheedge.beans</artifactId>
+    <version>3.0.4</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/com.developmentontheedge.beans-3.0.4.jar</systemPath>
+    </dependency>
+
+    <dependency>
+    <groupId>com.developmentontheedge.util</groupId>
+    <artifactId>com.developmentontheedge.util</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/com.developmentontheedge.util_0.9.10.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>ru.biosoft.access</groupId>
+    <artifactId>ru.biosoft.access</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/ru.biosoft.access_0.9.10.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>colt</groupId>
+    <artifactId>colt</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/colt.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>ru.biosoft.jobcontrol</groupId>
+    <artifactId>ru.biosoft.jobcontrol</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/ru.biosoft.jobcontrol-2.0.0.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>ru.biosoft.exception</groupId>
+    <artifactId>ru.biosoft.exception</artifactId>
+    <version>1.0.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/ru.biosoft.exception-1.0.0.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>ru.biosoft.math</groupId>
+    <artifactId>ru.biosoft.math</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/ru.biosoft.math_0.9.10.jar</systemPath>
+    </dependency>
+       
+    <dependency>
+    <groupId>org.apache.velocity</groupId>
+    <artifactId>org.apache.velocity</artifactId>
+    <version>1.6.2</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.apache.velocity_1.6.2.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>ru.biosoft.graphics</groupId>
+    <artifactId>ru.biosoft.graphics</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/ru.biosoft.graphics_0.9.10.jar</systemPath>
+    </dependency>
+    
+     <dependency>
+    <groupId>ru.biosoft.graph</groupId>
+    <artifactId>ru.biosoft.graph</artifactId>
+    <version>0.9.10</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/ru.biosoft.graph_0.9.10.jar</systemPath>
+    </dependency>
+     
+    <dependency>
+    <groupId>one.util.streamex</groupId>
+    <artifactId>streamex</artifactId>
+    <version>0.7.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/streamex-0.7.0.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.json</groupId>
+    <artifactId>org.json</artifactId>
+    <version>20170516</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.json-20170516.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.eclipse.core.runtime</groupId>
+    <artifactId>org.eclipse.core.runtime</artifactId>
+    <version>3.13.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.core.runtime_3.13.0.v20170207-1030.jar</systemPath>
+    </dependency>
+    
+     <dependency>
+    <groupId>org.eclipse.osgi</groupId>
+    <artifactId>org.eclipse.osgi</artifactId>
+    <version>3.12.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.osgi_3.12.0.v20170512-1932.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.eclipse.core.jobs</groupId>
+    <artifactId>org.eclipse.core.jobs</artifactId>
+    <version>3.9.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.core.jobs_3.9.0.v20170322-0013.jar</systemPath>
+    </dependency>
+    
+        <dependency>
+    <groupId>org.eclipse.equinox.app</groupId>
+    <artifactId>org.eclipse.equinox.app</artifactId>
+    <version>1.3.400</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.equinox.app_1.3.400.v20150715-1528.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.eclipse.equinox.app</groupId>
+    <artifactId>org.eclipse.equinox.app</artifactId>
+    <version>1.3.400</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.equinox.common_3.9.0.v20170207-1454.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.eclipse.equinox.launcher</groupId>
+    <artifactId>org.eclipse.equinox.launcher</artifactId>
+    <version>1.4.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.equinox.launcher_1.4.0.v20161219-1356.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.eclipse.equinox.preferences</groupId>
+    <artifactId>org.eclipse.equinox.preferences</artifactId>
+    <version>3.7.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.equinox.preferences_3.7.0.v20170126-2132.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.eclipse.equinox.registry</groupId>
+    <artifactId>org.eclipse.equinox.registry</artifactId>
+    <version>3.7.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.equinox.registry_3.7.0.v20170222-1344.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.eclipse.update.configurator</groupId>
+    <artifactId>org.eclipse.update.configurator</artifactId>
+    <version>3.3.100</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.eclipse.update.configurator_3.3.100.v20100512.jar</systemPath>
+    </dependency>
+
+  <dependency>
+    <groupId>org.apache.commons.collections</groupId>
+    <artifactId>org.apache.commons.collections</artifactId>
+    <version>3.2.1</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.apache.commons.collections_3.2.1.jar</systemPath>
+    </dependency>
+
+  <dependency>
+    <groupId>org.apache.commons.lang</groupId>
+    <artifactId>org.apache.commons.lang</artifactId>
+    <version>2.4.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.apache.commons.lang_2.4.0.jar</systemPath>
+    </dependency>
+
+  <dependency>
+    <groupId>org.apache.commons.math3</groupId>
+    <artifactId>org.apache.commons.math3</artifactId>
+    <version>3.3</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.apache.commons.math3_3.3.jar</systemPath>
+    </dependency>
+
+  <dependency>
+    <groupId>org.apache.velocity</groupId>
+    <artifactId>org.apache.velocity</artifactId>
+    <version>1.6.2</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/org.apache.velocity_1.6.2.jar</systemPath>
+    </dependency>
+    
+    <dependency>
+    <groupId>com.eclipsesource.json</groupId>
+    <artifactId>com.eclipsesource.json</artifactId>
+    <version>0.9.4</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/com.eclipsesource.json_0.9.4.jar</systemPath>
+    </dependency>
+    
+    
   </dependencies>
 
   <build>
    <finalName>${project.artifactId}-${project.version}</finalName>    
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+
       <plugins>
-       <plugin>
+      
+        <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+            <execution>
+                <id>copy-dependencies</id>
+                <phase>package</phase>
+                <goals>
+                    <goal>copy-dependencies</goal>
+                </goals>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                    <overWriteIfNewer>true</overWriteIfNewer>
+                    <overWriteReleases>false</overWriteReleases>
+                    <overWriteSnapshots>true</overWriteSnapshots>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+      
+  <plugin>
+  <!--groupId>org.dstovall</groupId--> <!-- not available on the central -->
+  <groupId>com.jolira</groupId>
+  <artifactId>onejar-maven-plugin</artifactId>
+  <executions>
+    <execution>
+      <configuration>
+        <mainClass>ru.biosoft.physicell.executor.Executor</mainClass>
+        <attachToBuild>true</attachToBuild>
+        <!-- https://code.google.com/p/onejar-maven-plugin/issues/detail?id=8 -->
+        <!-- classifier>onejar</classifier -->
+        <filename>${project.build.finalName}-onejar.${project.packaging}</filename>
+      </configuration>
+      <goals>
+        <goal>one-jar</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+    
+       <!--<plugin>
        <groupId>org.apache.maven.plugins</groupId>
        <artifactId>maven-jar-plugin</artifactId>
        <version>3.0.2</version>
-       <configuration>         
+       <configuration>   
          <archive>
             <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
          </archive>
        </configuration>
-     </plugin> 
-     <!--<plugin>
-       <groupId>org.apache.felix</groupId>
-       <artifactId>maven-bundle-plugin</artifactId>
-       <version>2.4.0</version>
-       <extensions>true</extensions>
-       <configuration>
-         <instructions>
-           <Bundle-SymbolicName>${project.artifactId};singleton:=true</Bundle-SymbolicName>
-         </instructions>
-       </configuration>
-       <executions>
-         <execution>
-           <id>bundle-manifest</id>
-           <phase>process-classes</phase>
-           <goals><goal>manifest</goal></goals>
-         </execution>
-       </executions>
-     </plugin>-->
+     </plugin> -->
      
         <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
         <plugin>
@@ -78,10 +343,6 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.1</version>
         </plugin>
-        <!--<plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.0.2</version>
-        </plugin>-->
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
           <version>2.5.2</version>
@@ -100,6 +361,6 @@
           <version>3.0.0</version>
         </plugin>
       </plugins>
-    </pluginManagement>
+
   </build>
 </project>
