@@ -1,5 +1,6 @@
 package ru.biosoft.physicell.sample_projects.ode_energy;
 
+import ru.biosoft.physicell.biouml.BioUMLIntraReader;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;
 
@@ -79,7 +80,9 @@ public class Main
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
-        Model model = new ModelReader().read( Main.class.getResourceAsStream( settingsPath ), OdeEnergy.class );
+        ModelReader reader = new ModelReader();
+        reader.setIntracellularReader( new BioUMLIntraReader() );
+        Model model = reader.read( Main.class.getResourceAsStream( settingsPath ), OdeEnergy.class );
         double mechanics_voxel_size = 30;
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
