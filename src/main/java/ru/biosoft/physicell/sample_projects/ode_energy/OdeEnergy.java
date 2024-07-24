@@ -102,7 +102,6 @@ public class OdeEnergy extends Model
         defaults.functions.customCellRule = null;
         defaults.functions.membraneInteraction = null;
         defaults.functions.membraneDistanceCalculator = null;
-        //        defaults.phenotype.intracellular = new IntracellularEuler( new ToyMetabolicModel() );
         signals.setupDictionaries( this );
     }
 
@@ -141,12 +140,9 @@ public class OdeEnergy extends Model
         int glucoseIndex = m.findDensityIndex( "glucose" );
         int lactateIndex = m.findDensityIndex( "lactate" );
 
-        //    #pragma omp parallel for 
-        for( Cell cell : m.getAgents( Cell.class ) )
-        {
-            if( !cell.isOutOfDomain )
+        m.getAgents( Cell.class ).parallelStream().filter( cell -> !cell.isOutOfDomain ).forEach( cell -> {
+            try
             {
-                // Cell Volume
                 double cellVolume = cell.phenotype.volume.total;
 
                 // Get Intracellular Concentrations
@@ -178,18 +174,19 @@ public class OdeEnergy extends Model
                 signals.setSingleBehavior( cell, "custom:intra_lac", intra.getParameterValue( "Lactate" ) );
                 signals.setSingleBehavior( cell, "custom:intra_energy", intra.getParameterValue( "Energy" ) );
             }
-        }
+            catch( Exception ex )
+            {
+                ex.printStackTrace();
+            }
+        } );
     }
 
     public static List<double[]> createCirclePositions(double cellRadius, double sphereRadius)
     {
         List<double[]> result = new ArrayList<>();
-        //	std::vector<std::vector<double>> cells;
         int xc = 0, yc = 0, zc = 0;
         double xSpacing = cellRadius * Math.sqrt( 3 );
         double ySpacing = cellRadius * Math.sqrt( 3 );
-
-        //	std::vector<double> tempPoint(3,0.0);
 
         for( double x = -sphereRadius; x < sphereRadius; x += xSpacing, xc++ )
         {
