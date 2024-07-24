@@ -1,8 +1,13 @@
 package ru.biosoft.physicell.biouml;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import biouml.model.Diagram;
 import biouml.plugins.simulation.InfiniteSpan;
@@ -15,6 +20,7 @@ import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Intracellular;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.ode.IntracellularODE;
+import ru.biosoft.util.TempFiles;
 
 public class IntracellularODEBioUML extends IntracellularODE
 {
@@ -34,16 +40,21 @@ public class IntracellularODEBioUML extends IntracellularODE
         super( model, cd );
     }
 
+    public static String copySRC() throws IOException
+    {
+        InputStream is = IntracellularODEBioUML.class.getResourceAsStream( "src.jar" );
+        Path path = TempFiles.dir( "JPhysicell_temp" ).toPath().resolve( "src.jar" );
+        Files.copy( is, path, new CopyOption[0] );
+        return path.toString();
+    }
+
     public void setDiagram(Diagram diagram) throws Exception
     {
         this.diagram = diagram;
         engine.setDiagram( diagram );
-
-        File dir = new File( System.getProperty( "user.dir" ) );
-        File lib = new File( dir, "lib" );
-        File src = new File( lib, "src.jar" );
-        System.out.println( src.getAbsolutePath() );
-        engine.setClassPath( "C:/Users/Damag/git/JPhysiCell/lib/src.jar" );
+        String path = copySRC();
+        engine.setClassPath( path );
+        engine.setLogLevel( Level.OFF );
         model = engine.createModel();
         variableIndex = engine.getShortNameMapping();
         model.init();
@@ -168,7 +179,7 @@ public class IntracellularODEBioUML extends IntracellularODE
     @Override
     public String[] getOutputs()
     {
-        return outputs;
+        return this.phenotypeSpecies.keySet().toArray( String[]::new );
     }
 
     @Override
