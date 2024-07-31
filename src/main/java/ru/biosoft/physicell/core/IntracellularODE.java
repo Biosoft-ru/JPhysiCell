@@ -1,4 +1,4 @@
-package ru.biosoft.physicell.ode;
+package ru.biosoft.physicell.core;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,12 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
-import ru.biosoft.physicell.core.CellDefinition;
-import ru.biosoft.physicell.core.Intracellular;
-import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.Phase;
-import ru.biosoft.physicell.core.PhaseLink;
-import ru.biosoft.physicell.core.Phenotype;
 
 public abstract class IntracellularODE extends Intracellular
 {

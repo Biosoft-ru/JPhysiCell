@@ -18,8 +18,8 @@ import biouml.plugins.simulation.java.JavaSimulationEngine;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Intracellular;
+import ru.biosoft.physicell.core.IntracellularODE;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.ode.IntracellularODE;
 import ru.biosoft.util.TempFiles;
 
 public class IntracellularODEBioUML extends IntracellularODE
