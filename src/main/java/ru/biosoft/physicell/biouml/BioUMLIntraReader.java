@@ -2,6 +2,8 @@ package ru.biosoft.physicell.biouml;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 
@@ -16,13 +18,7 @@ import ru.biosoft.physicell.xml.ModelReaderSupport;
 public class BioUMLIntraReader extends ModelReaderSupport implements IntracellularReader
 {
     @Override
-    public void readIntracellular(File f, Element el, Model model, CellDefinition cd) throws Exception
-    {
-
-    }
-
-    @Override
-    public void readIntracellular(Element el, Model model, CellDefinition cd) throws Exception
+    public void readIntracellular(Path path, Element el, Model model, CellDefinition cd) throws Exception
     {
         Phenotype p = cd.phenotype;
         String type = getAttr( el, "type" );
@@ -70,5 +66,10 @@ public class BioUMLIntraReader extends ModelReaderSupport implements Intracellul
     public Diagram readSBML(InputStream stream, String name) throws Exception
     {
         return SbmlModelFactory.readDiagram( stream, name, null, name );
+    }
+
+    @Override
+    public void setAdditionalFiles(Map<String, File> additional)
+    {
     }
 }

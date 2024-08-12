@@ -14,6 +14,7 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer.Section;
+import ru.biosoft.physicell.xml.ModelReader.ExternalFile;
 
 public class Model
 {
@@ -64,10 +65,12 @@ public class Model
     private String cellDataFolder = null;
     private String modelFile = null;
 
-    private String initialPath = null;
     private boolean rulesEnabled = false;
-    private String rulesPath = null;
 
+    public ExternalFile initialInfo = null;
+    public ExternalFile reportInfo = null;
+    public ExternalFile visualizerInfo = null;
+    
     public static double tDiffusion = 0;
 
     public void setSeed(long seed)
@@ -112,7 +115,7 @@ public class Model
     public void setRulesPath(String path)
     {
         rulesEnabled = true;
-        rulesPath = path;
+//        rulesPath = path;
     }
 
     public void addEvent(Event event)
@@ -426,15 +429,28 @@ public class Model
     {
         this.tMax = tMax;
     }
+    public double getTMax()
+    {
+        return tMax;
+    }
 
     public void setDiffusionDt(double dt)
     {
         this.diffusionStep = dt;
     }
+    public double getDiffusionDt()
+    {
+        return diffusionStep;
+    }
 
     public void setMechanicsDt(double dt)
     {
         this.mechanicsStep = dt;
+    }
+    
+    public double getMechanicsDt()
+    {
+        return mechanicsStep;
     }
 
     public void setPhenotypeDt(double dt)
@@ -442,14 +458,29 @@ public class Model
         this.phenotypeStep = dt;
     }
 
+    public double getPhenotypeDt()
+    {
+        return phenotypeStep;
+    }
+    
     public void setSaveFullInterval(double interval)
     {
         this.saveFullInterval = interval;
+    }
+    
+    public double getSaveFullInterval()
+    {
+        return saveFullInterval;
     }
 
     public void setSaveImgInterval(double interval)
     {
         this.saveImgInterval = interval;
+    }
+    
+    public double getSaveImgInterval()
+    {
+        return saveImgInterval;
     }
 
     public void setSaveFull(boolean enable)
@@ -511,15 +542,32 @@ public class Model
                 result++;
         return result;
     }
-
-    public void setInitialPath(String path)
+    
+    public ExternalFile getVisualizerInfo()
     {
-        this.initialPath = path;
+        return visualizerInfo;
+    }
+    public void setVisualizerInfo(ExternalFile visualizerInfo)
+    {
+        this.visualizerInfo = visualizerInfo;
+    }
+    
+    public ExternalFile getReportInfo()
+    {
+        return reportInfo;
+    }
+    public void setReportInfo(ExternalFile reportInfo)
+    {
+        this.reportInfo = reportInfo;
     }
 
-    public String getInitialPath()
+    public void setInitialInfo(ExternalFile info)
     {
-        return initialPath;
+        this.initialInfo = info;
+    }
+    public ExternalFile getInitialInfo()
+    {
+        return initialInfo;
     }
 
     public void setReportGenerator(ReportGenerator reportGenerator)

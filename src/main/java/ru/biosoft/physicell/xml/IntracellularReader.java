@@ -1,6 +1,8 @@
 package ru.biosoft.physicell.xml;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 
@@ -9,7 +11,6 @@ import ru.biosoft.physicell.core.Model;
 
 public interface IntracellularReader
 {
-    public void readIntracellular(File f, Element el, Model model, CellDefinition cd) throws Exception;
-
-    public void readIntracellular(Element el, Model model, CellDefinition cd) throws Exception;
+    public void setAdditionalFiles(Map<String, File> additional);
+    public void readIntracellular(Path path, Element el, Model model, CellDefinition cd) throws Exception;
 }

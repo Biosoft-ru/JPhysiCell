@@ -1,8 +1,12 @@
 package ru.biosoft.physicell.xml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,7 +43,12 @@ import ru.biosoft.physicell.core.standard.StandardModels;
 public class ModelReader extends ModelReaderSupport
 {
     private IntracellularReader intracellularReader = null;
+    private FunctionsReader functionsReader = null;
     private static final String OPTIONS = "options";
+    private Map<String, File> additionalFiles = new HashMap<>();
+
+    //folder from which we read file
+    private Path filePath = null;
 
     public Model read(InputStream is) throws Exception
     {
@@ -59,6 +68,7 @@ public class ModelReader extends ModelReaderSupport
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse( f );
+        filePath = f.toPath();
         return read( doc, clazz );
     }
 
@@ -85,6 +95,11 @@ public class ModelReader extends ModelReaderSupport
         return model;
     }
 
+    public void setAdditionalFiles(Map<String, File> additionalFiles)
+    {
+        this.additionalFiles = additionalFiles;
+    }
+
     private void readRules(Element physicell, Model model) throws Exception
     {
         Element rulesElement = findElement( physicell, "cell_rules" );
@@ -103,12 +118,25 @@ public class ModelReader extends ModelReaderSupport
             String folder = getVal( folderElement );
             Element filenameElement = findElement( rulesetElement, "filename" );
             String filename = getVal( filenameElement );
+
+            InputStream is = null;
+
             if( folder.startsWith( "./" ) )
                 folder = folder.substring( 2 );
-            InputStream rulesStream = model.getClass().getResourceAsStream( folder + "/" + filename );
+            String relativePath = folder + "/" + filename;
+            if( additionalFiles.containsKey( relativePath ) )
+            {
+                is = new FileInputStream( additionalFiles.get( relativePath ) );
+            }
+            else if( filePath != null )
+            {
+                Path rulesPath = filePath.getParent().resolve( folder, filename );
+                is = new FileInputStream( rulesPath.toFile() );
+            }
+
             model.getSignals().setupDictionaries( model );
             Rules.setupRules( model );
-            Rules.parseCSVRules2( model, rulesStream );
+            Rules.parseCSVRules2( model, is );
             model.setRulesPath( folder + "/" + filename );
         }
     }
@@ -275,6 +303,28 @@ public class ModelReader extends ModelReaderSupport
                     if( enabledElement != null )
                     {
                         //                        enabled = getBoolVal( enabledElement );
+                    }
+                    break;
+                case "report":
+                    boolean enabled = getBoolAttr( el, "enabled" );
+                    if( enabled )
+                    {
+                        String folder = getVal( findElement( el, "folder" ) );
+                        String filename = getVal( findElement( el, "filename" ) );
+                        String format = getAttr( el, "format" );
+                        String path = folder + "/" + filename;
+                        model.setReportInfo( new ExternalFile( format, path ) );
+                    }
+                    break;
+                case "visualizer":
+                    enabled = getBoolAttr( el, "enabled" );//findElement( el, "enable" );
+                    if( enabled )
+                    {
+                        String folder = getVal( findElement( el, "folder" ) );
+                        String filename = getVal( findElement( el, "filename" ) );
+                        String format = getAttr( el, "format" );
+                        String path = folder + "/" + filename;
+                        model.setVisualizerInfo( new ExternalFile(format, path) );
                     }
                     break;
             }
@@ -511,6 +561,11 @@ public class ModelReader extends ModelReaderSupport
             //                System.out.println( "\tCopying from type " + parent.name + " ... " );
             //                cd = parent.clone( name, id, m );
             //            }
+
+            Element functionsElement = findElement( cdElement, "functions" );
+            if( functionsElement != null )
+                readFunctions( functionsElement, cd );
+
             model.registerCellDefinition( cd );
         }
     }
@@ -589,7 +644,7 @@ public class ModelReader extends ModelReaderSupport
     {
         if( intracellularReader == null )
             throw new Exception( "No intracellular reader set" );
-        intracellularReader.readIntracellular( el, model, cd );
+        intracellularReader.readIntracellular( filePath, el, model, cd );
     }
 
     public void setIntracellularReader(IntracellularReader reader)
@@ -1333,15 +1388,38 @@ public class ModelReader extends ModelReaderSupport
         if( parametersElement != null )
         {
             Element positionsElement = findElement( parametersElement, "cell_positions" );
+            String type = getAttr( positionsElement, "format" );
             boolean enabled = getBoolAttr( positionsElement, "enabled" );
             if( !enabled )
                 return;
             String folder = getVal( findElement( positionsElement, "folder" ) );
             String fileName = getVal( findElement( positionsElement, "filename" ) );
             String inputFilename = folder + "/" + fileName;
-            m.setInitialPath( inputFilename );
-            //            CellCSVReader.load_cells_csv( input_filename, m.getMicroenvironment() );
+            m.setInitialInfo( new ExternalFile( type, inputFilename ) );
+            //                        CellCSVReader.load_cells_csv( input_filename, m.getMicroenvironment() );
         }
     }
 
+    public static class ExternalFile
+    {
+        public String format;
+        public String path;
+
+        public ExternalFile(String format, String path)
+        {
+            this.format = format;
+            this.path = path;
+        }
+    }
+
+    public void setFunctionsReader(FunctionsReader reader)
+    {
+        this.functionsReader = reader;
+    }
+
+    public void readFunctions(Element el, CellDefinition cd)
+    {
+        if( functionsReader != null )
+            functionsReader.readFunctions( el, cd );
+    }
 }
