@@ -167,7 +167,7 @@ public class Microenvironment
     std::vector<bool> dirichlet_node_map; 
     */
     double[][] dirichletValue;
-    boolean[] dirichletActivation;
+    public boolean[] dirichletActivation;
     /* new in Version 1.7.0 -- activation vectors can be specified on a voxel-by-voxel basis */
     boolean[][] dirichletActivations;
 
