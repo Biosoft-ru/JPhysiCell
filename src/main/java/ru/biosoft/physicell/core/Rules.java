@@ -300,7 +300,9 @@ public class Rules
     void applyRuleset(Cell cell) throws Exception
     {
         CellDefinition cd = cell.getModel().getCellDefinition( cell.typeName );
-        hypothesisRulesets.get( cd ).apply( cell );
+        HypothesisRuleset set = hypothesisRulesets.get( cd );
+        if( set != null )
+            set.apply( cell );
     }
 
     void rule_phenotype_function(Cell cell, Phenotype phenotype, double dt) throws Exception
