@@ -116,7 +116,7 @@ public class SignalBehavior
             }
 
             int dead_contact_ind = findSignalIndex( "contact with dead cell" );
-            // index == dead_contact_ind TODO: check
+            index = dead_contact_ind;
             out = dead_cells;
             out /= signalScales[index];
             return out;

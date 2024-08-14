@@ -9,7 +9,6 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
-import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.Secretion;
 import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.core.standard.StandardVolumeUpdate;
@@ -114,8 +113,8 @@ public class CancerMetabolism extends Model
         double y_spacing = cell_radius * 2;
         double z_spacing = cell_radius * Math.sqrt( 3 );
 
-        //        for( double z = -sphere_radius; z < sphere_radius; z += z_spacing, zc++ )
-        //        {
+        for( double z = -sphere_radius; z < sphere_radius; z += z_spacing, zc++ )
+        {
             for( double x = -sphere_radius; x < sphere_radius; x += x_spacing, xc++ )
             {
                 for( double y = -sphere_radius; y < sphere_radius; y += y_spacing )
@@ -129,7 +128,7 @@ public class CancerMetabolism extends Model
                         cells.add( position );
                 }
             }
-            //        }
+        }
         return cells;
 
     }
@@ -178,8 +177,8 @@ public class CancerMetabolism extends Model
         }
 
         // update the transition rate according to growth rate?
-//        int cycle_start_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
-//        int cycle_end_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
+        //        int cycle_start_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
+        //        int cycle_end_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
 
         //static int oncoprotein_i = pCell->custom_data.find_variable_index( "oncoprotein" );
         //phenotype.cycle.data.transition_rate( cycle_start_index ,cycle_end_index ) *= pCell->custom_data[oncoprotein_i] ;

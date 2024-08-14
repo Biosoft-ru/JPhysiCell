@@ -116,7 +116,7 @@ public class CycleModel implements Cloneable
     {
         List<PhaseLink> links = phaseLinks.get( startIndex );
         int n = links.size();
-        PhaseArrest arrest = arrestFunction == null ? null : arrestFunction.getClass().newInstance();
+        PhaseArrest arrest = arrestFunction == null ? null : arrestFunction.getClass().getDeclaredConstructor( ).newInstance();
         Phase start = phases.get( startIndex );
         Phase end = phases.get( endIndex );
         links.add( new PhaseLink( start, startIndex, end, endIndex, arrest ) );

@@ -190,6 +190,6 @@ public class IntracellularODEBioUML extends IntracellularODE
     @Override
     public void setOutputs(String[] outputs)
     {
-        this.outputs = outputs;
+
     }
 }
