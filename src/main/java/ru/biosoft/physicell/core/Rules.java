@@ -404,7 +404,7 @@ public class Rules
         output += strings[7];
 
         output += ".";
-        boolean use_when_dead = false;
+//        boolean use_when_dead = false;
         char start_char = Character.toUpperCase( strings[8].charAt( 0 ) );
         //        char start_char = toupper( strings[8][0] );
         if( start_char == 'T' || start_char == '1' )
@@ -448,7 +448,7 @@ public class Rules
         output += strings[6];
 
         output += ".";
-        boolean use_when_dead = false;
+//        boolean use_when_dead = false;
         char start_char = Character.toUpperCase( strings[7].charAt( 0 ) );//toupper( strings[7][0] );
         if( start_char == 'T' || start_char == '1' )
         {
@@ -499,7 +499,7 @@ public class Rules
         output += strings[8];
 
         output += ".";
-        boolean use_when_dead = false;
+//        boolean use_when_dead = false;
         char start_char = strings[9].charAt( 0 );// toupper( strings[9][0] );
         if( start_char == 'T' || start_char == '1' )
         {
@@ -550,7 +550,7 @@ public class Rules
         output += strings[8];
 
         output += ".";
-        boolean use_when_dead = false;
+//        boolean use_when_dead = false;
         char start_char = Character.toUpperCase( strings[9].charAt( 0 ) );//toupper( strings[9][0] );
         if( start_char == 'T' || start_char == '1' )
         {
@@ -582,7 +582,7 @@ public class Rules
             return;
         }
 
-        String temp = csv_strings_to_English( input, false );
+//        String temp = csv_strings_to_English( input, false );
 
         // string portions of the rule
         String type = input[0];
@@ -683,7 +683,7 @@ public class Rules
             return;
         }
 
-        String temp = csv_strings_to_English_v1( input, false ); // need a v1 version of this
+//        String temp = csv_strings_to_English_v1( input, false ); // need a v1 version of this
 
         // string portions of the rule
         String type = input[0];
@@ -806,7 +806,7 @@ public class Rules
             return;
         }
 
-        String temp = csv_strings_to_English_v2( input, false ); // need a v1 version of this
+//        String temp = csv_strings_to_English_v2( input, false ); // need a v1 version of this
 
         // string portions of the rule
         String cell_type = input[0];
@@ -837,11 +837,11 @@ public class Rules
         // compare to base behavior value in cell def for discrepancies 
         CellDefinition pCD = model.getCellDefinition( cell_type );
         double ref_base_value = model.getSignals().getSingleBaseBehavior( model, pCD, behavior );
-        rules.setBehaviorBaseValue( model, cell_type, behavior, ref_base_value );
+        Rules.setBehaviorBaseValue( model, cell_type, behavior, ref_base_value );
         if( response.equals( "increases" ) )
-            rules.set_behavior_max_value( model, cell_type, behavior, max_response );
+            Rules.set_behavior_max_value( model, cell_type, behavior, max_response );
         else
-            rules.setBehaviorMinValue( model, cell_type, behavior, max_response );
+            Rules.setBehaviorMinValue( model, cell_type, behavior, max_response );
     }
 
     public static boolean parseBoolean(String val)
@@ -917,7 +917,7 @@ public class Rules
     {
         //        String filename = PhysiCellSettings.folder + "/rules.txt";
         //        std::ofstream of( filename , std::ios::out );
-        String text = stream_annotated_English_rules( model );
+//        String text = stream_annotated_English_rules( model );
         //        of.close(); 
     }
 
@@ -1149,7 +1149,7 @@ public class Rules
 
                     double min_value = pHRS.rules.get( k ).minValue;
                     double max_value = pHRS.rules.get( k ).maxValue;
-                    double base_value = pHRS.rules.get( k ).baseValue;
+//                    double base_value = pHRS.rules.get( k ).baseValue;
                     for( int i = 0; i < pHRS.rules.get( k ).signals.size(); i++ )
                     {
                         String signal = pHRS.rules.get( k ).signals.get( i );

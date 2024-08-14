@@ -91,7 +91,7 @@ public class IntracellularFBA extends Intracellular
     {
         for( Entry<String, exchange_data> entry : substrate_exchanges.entrySet() )
         {
-            String substrate_name = entry.getKey();
+//            String substrate_name = entry.getKey();
             exchange_data ex_strut = entry.getValue();
 
             double Vmax = ex_strut.Vmax.value;
@@ -128,7 +128,7 @@ public class IntracellularFBA extends Intracellular
         */
         for( Entry<String, exchange_data> entry : substrate_exchanges.entrySet() )
         {
-            String substrate_name = entry.getKey();
+//            String substrate_name = entry.getKey();
             exchange_data ex_strut = entry.getValue();
             String fba_flux_id = ex_strut.fba_flux_id;
             //        FBA_reaction exchange = this.model.getReaction(fba_flux_id);
@@ -142,7 +142,7 @@ public class IntracellularFBA extends Intracellular
         }
 
         double delta_vol = 1;
-        double growth_rate = 1; //
+//        double growth_rate = 1; //
         //    phenotype.volume.total; // FBA predicts growth rate mu
         phenotype.volume.multiply_by_ratio( delta_vol );
 

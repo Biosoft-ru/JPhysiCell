@@ -575,7 +575,7 @@ public class CartesianMesh extends GeneralMesh
         int k_jump = x_coordinates.length * y_coordinates.length;
 
         // x-aligned connections 
-        int count = 0;
+//        int count = 0;
         for( int k = 0; k < z_coordinates.length; k++ )
         {
             for( int j = 0; j < y_coordinates.length; j++ )
@@ -584,7 +584,7 @@ public class CartesianMesh extends GeneralMesh
                 {
                     int n1 = voxel_index( i, j, k );
                     connect_voxels_indices_only( n1, n1 + i_jump, dS_yz );
-                    count++;
+//                    count++;
                 }
             }
         }

@@ -56,7 +56,7 @@ public class update_cell extends VolumeUpdate
         intra.fbaModel.setReactionLowerBound( oxygen_flux_id, oxygen_flux_bound );
         double glucose_flux_bound = -1 * ( glc_Vmax * glucose_density ) / ( glucose_density + glc_Km );
         intra.fbaModel.setReactionLowerBound( glucose_flux_id, glucose_flux_bound );
-        double acetate_flux_bound = -1 * ( lac_Vmax * acetate_density ) / ( acetate_density + lac_Km );
+//        double acetate_flux_bound = -1 * ( lac_Vmax * acetate_density ) / ( acetate_density + lac_Km );
         intra.fbaModel.setReactionLowerBound( acetate_flux_id, 1 );//acetate_flux_id, acetate_flux_bound );
 
         //        System.out.println( "Oxygen density: " + oxygen_density + " => " + intra.model.fbcModel.getLowerBound( oxygen_flux_id ) );

@@ -26,7 +26,7 @@ public class CellCSVReader
             if( pCD != null )
             {
                 //                System.out.println( "Creating " + pCD.name + " (type=" + pCD.type + ") at " + VectorUtil.print( position ) );
-                Cell pCell = Cell.createCell( pCD, model, position );
+                Cell.createCell( pCD, model, position );
             }
             else
             {

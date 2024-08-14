@@ -75,7 +75,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
 
-    private static String DOUBLE_MEMBRANE_PATH = "config/cells-double-membrane.csv";
+//    private static String DOUBLE_MEMBRANE_PATH = "config/cells-double-membrane.csv";
     private static String SHELL_PATH = "config/cells-shell.csv";
 
     private static String settingsPath = "config/PhysiCell_settings.xml";

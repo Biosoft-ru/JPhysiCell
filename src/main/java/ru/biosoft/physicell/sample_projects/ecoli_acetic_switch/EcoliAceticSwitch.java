@@ -68,8 +68,6 @@ public class EcoliAceticSwitch extends Model
         bacteria_cell.phenotype.motility.restrictTo2D = true;
 
         // use default proliferation and death
-        int cycle_start_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
-        int cycle_end_index = StandardModels.live.findPhaseIndex( PhysiCellConstants.live );
         int apoptosis_index = bacteria_cell.phenotype.death.findDeathModelIndex( PhysiCellConstants.apoptosis_death_model );
 
         bacteria_cell.phenotype.death.rates.set( apoptosis_index, 0.0 );

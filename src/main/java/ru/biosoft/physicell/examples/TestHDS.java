@@ -109,7 +109,7 @@ public class TestHDS
     static List<double[]> create_sphere(double cell_radius, double sphere_radius)
     {
         List<double[]> cells = new ArrayList<>();
-        int xc = 0, yc = 0, zc = 0;
+        int xc = 0, zc = 0;
         double x_spacing = cell_radius * Math.sqrt( 3 );
         double y_spacing = cell_radius * 2;
         double z_spacing = cell_radius * Math.sqrt( 3 );
@@ -119,7 +119,7 @@ public class TestHDS
 
         for( double z = -sphere_radius; z < sphere_radius; z += z_spacing, zc++ )
             for( double x = -sphere_radius; x < sphere_radius; x += x_spacing, xc++ )
-                for( double y = -sphere_radius; y < sphere_radius; y += y_spacing, yc++ )
+                for( double y = -sphere_radius; y < sphere_radius; y += y_spacing )
                 {
                     double[] tempPoint = new double[3];
                     tempPoint[0] = x + ( zc % 2 ) * 0.5 * cell_radius;
@@ -145,7 +145,7 @@ public class TestHDS
         double t_output_interval = 60.0; // 1.0; 
         double t_max = 365 * 24 * 60;
         double t_next_output_time = 0;
-        int next_output_index = 0;
+//        int next_output_index = 0;
 
         double dx;
         double dy;

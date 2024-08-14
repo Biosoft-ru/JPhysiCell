@@ -306,7 +306,7 @@
 				</cell_transformations>
 
 				<intracellular type="roadrunner">
-					<sbml_filename>./config/Toy_Metabolic_Model.xml</sbml_filename>
+					<sbml_filename>Toy_Metabolic_Model.xml</sbml_filename>
                     <intracellular_dt>0.01</intracellular_dt>
                     <map PC_substrate="oxygen" sbml_species="Oxygen"></map >
                     <map PC_substrate="lactate" sbml_species="Lactate"></map >
@@ -330,7 +330,7 @@
 	
 	<initial_conditions>
 		<cell_positions type="csv" enabled="false">
-			<folder>./config</folder>
+			<folder>.</folder>
 			<filename>cells.csv</filename>
 		</cell_positions>
 	</initial_conditions>	

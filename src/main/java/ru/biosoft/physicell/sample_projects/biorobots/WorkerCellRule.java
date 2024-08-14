@@ -29,7 +29,6 @@ public class WorkerCellRule extends UpdatePhenotype
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
         double director_signal = pCell.getModel().getSignals().getSingleSignal( pCell, "director signal" );
-        double cargo_signal = signals.getSingleSignal( pCell, "cargo signal" );
 
         signals.setSingleBehavior( pCell, "cell-cell adhesion elastic constant", elasticCoefficient );
 

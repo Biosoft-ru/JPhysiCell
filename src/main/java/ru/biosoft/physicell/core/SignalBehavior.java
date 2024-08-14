@@ -1211,8 +1211,6 @@ public class SignalBehavior
         CellDefinition pCD = pCell.getModel().getCellDefinition( pCell.typeName );
         Model model = pCell.getModel();
         Microenvironment microenvironment = pCell.getMicroenvironment();
-        int m = microenvironment.numberDensities();
-        int n = model.getDefinitionsCount();//.size();  
 
         double[] parameters = new double[indexToBehavior.size()];//( int_to_behavior.size() , 0.0 ); 
 
@@ -1367,7 +1365,6 @@ public class SignalBehavior
 
         // custom behavior
         int first_custom_ind = findBehaviorIndex( "custom 0" );
-        int max_custom_ind = first_custom_ind + pCell.customData.variables.size();
         if( first_custom_ind >= 0 )
         {
             for( int nc = 0; nc < pCell.customData.variables.size(); nc++ )

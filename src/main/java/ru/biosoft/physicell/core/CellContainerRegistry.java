@@ -14,7 +14,7 @@ public class CellContainerRegistry
 
     private static void init()
     {
-        containersMap = new HashMap();
+        containersMap = new HashMap<>();
         for( CellContainer container : containers )
             containersMap.put( container.getName(), container.getClass() );
         isInit = true;
@@ -38,6 +38,6 @@ public class CellContainerRegistry
     public static CellContainer createCellContainer(String name) throws Exception
     {
         Class<? extends CellContainer> clazz = getClass( name );
-        return clazz.getConstructor( null ).newInstance( null );
+        return clazz.getConstructor( ).newInstance( );
     }
 }

@@ -63,7 +63,8 @@ public class Microenvironment
     private Set<BasicAgent> agents = new HashSet<>();
     private Map<String, Integer> substrateToIndex;
     public MicroenvironmentOptions options;
-
+  
+    @SuppressWarnings ( "unchecked" )
     public <T extends BasicAgent> Set<T> getAgents(Class<T> clazz)
     {
         return (Set<T>)agents;

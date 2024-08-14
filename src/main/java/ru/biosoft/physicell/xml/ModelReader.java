@@ -18,6 +18,7 @@ import org.w3c.dom.NodeList;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.MicroenvironmentOptions;
 import ru.biosoft.physicell.biofvm.VectorUtil;
+import ru.biosoft.physicell.core.CellCSVReader;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CellInteractions;
 import ru.biosoft.physicell.core.CellTransformations;
@@ -47,6 +48,7 @@ public class ModelReader extends ModelReaderSupport
     private static final String OPTIONS = "options";
     private Map<String, File> additionalFiles = new HashMap<>();
 
+    private boolean readFromJAR = false;
     //folder from which we read file
     private Path filePath = null;
 
@@ -55,7 +57,7 @@ public class ModelReader extends ModelReaderSupport
         return this.read( is, null );
     }
 
-    public Model read(InputStream is, Class clazz) throws Exception
+    public Model read(InputStream is, Class<?> clazz) throws Exception
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -63,7 +65,7 @@ public class ModelReader extends ModelReaderSupport
         return read( doc, clazz );
     }
 
-    public Model read(File f, Class clazz) throws Exception
+    public Model read(File f, Class<?> clazz) throws Exception
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -72,7 +74,7 @@ public class ModelReader extends ModelReaderSupport
         return read( doc, clazz );
     }
 
-    public Model read(Document doc, Class clazz) throws Exception
+    public Model read(Document doc, Class<?> clazz) throws Exception
     {
         NodeList nodes = doc.getChildNodes();
 
@@ -80,7 +82,7 @@ public class ModelReader extends ModelReaderSupport
         if( physicell == null )
             throw new Exception( "Physicell base element not found" );
 
-        Model model = clazz != null ? (Model)clazz.newInstance() : null;
+        Model model = clazz != null ? (Model)clazz.getDeclaredConstructor().newInstance() : null;
         Microenvironment m = model.getMicroenvironment();
         readDomain( physicell, m );
         readOverall( physicell, model );
@@ -100,6 +102,11 @@ public class ModelReader extends ModelReaderSupport
         this.additionalFiles = additionalFiles;
     }
 
+    public void setReadFromJAR(boolean readFromJAR)
+    {
+        this.readFromJAR = readFromJAR;
+    }
+
     private void readRules(Element physicell, Model model) throws Exception
     {
         Element rulesElement = findElement( physicell, "cell_rules" );
@@ -111,9 +118,9 @@ public class ModelReader extends ModelReaderSupport
             boolean enabled = getBoolAttr( rulesetElement, "enabled" );
             if( !enabled )
                 continue;
-            String format = getAttr( rulesetElement, "format" );
-            String version = getAttr( rulesetElement, "version" );
-            String protocol = getAttr( rulesetElement, "CBHG" );
+//            String format = getAttr( rulesetElement, "format" );
+//            String version = getAttr( rulesetElement, "version" );
+//            String protocol = getAttr( rulesetElement, "CBHG" );
             Element folderElement = findElement( rulesetElement, "folder" );
             String folder = getVal( folderElement );
             Element filenameElement = findElement( rulesetElement, "filename" );
@@ -266,7 +273,7 @@ public class ModelReader extends ModelReaderSupport
             switch( el.getTagName() )
             {
                 case "folder":
-                    String folderName = getVal( el );
+//                    String folderName = getVal( el );
                     break;
                 case "full_data":
                     Element intervalElement = findElement( el, "interval" );
@@ -324,7 +331,7 @@ public class ModelReader extends ModelReaderSupport
                         String filename = getVal( findElement( el, "filename" ) );
                         String format = getAttr( el, "format" );
                         String path = folder + "/" + filename;
-                        model.setVisualizerInfo( new ExternalFile(format, path) );
+                        model.setVisualizerInfo( new ExternalFile( format, path ) );
                     }
                     break;
             }
@@ -537,7 +544,7 @@ public class ModelReader extends ModelReaderSupport
             String name = getAttr( cdElement, "name" );
             Integer ID = getIntAttr( cdElement, "ID" );
             int id = ID == null ? -1 : ID;
-            boolean defaultDefinition = name.equals( "default" );// || id == 0;
+            boolean defaultDefinition = name.equals( "default" );
             if( defaultDefinition ) //TODO: check ID=0 
                 cd = StandardModels.createFromDefault( name, id, m );
             else
@@ -545,23 +552,12 @@ public class ModelReader extends ModelReaderSupport
 
             CellDefinition parent = null;
             String parentType = getAttr( cdElement, "parent_type" );
-            //                        if( ! )
-            //                            parent = CellDefinition.getCellDefinition( parentType );
-            //            boolean use_default_as_parent_without_specifying = false;
+
             if( parentType.isEmpty() && !defaultDefinition )
             {
                 parent = StandardModels.createFromDefault( "default", -1, m );
                 cd = parent.clone( name, id, m );
-                //                use_default_as_parent_without_specifying = true;
             }
-            //
-            //            // if we found something to inherit from, then do it! 
-            //            if( parent != null )
-            //            {
-            //                System.out.println( "\tCopying from type " + parent.name + " ... " );
-            //                cd = parent.clone( name, id, m );
-            //            }
-
             Element functionsElement = findElement( cdElement, "functions" );
             if( functionsElement != null )
                 readFunctions( functionsElement, cd );
@@ -586,14 +582,7 @@ public class ModelReader extends ModelReaderSupport
             String parentType = getAttr( cdElement, "parent_type" );
             if( !parentType.isEmpty() )
                 parent = model.getCellDefinition( parentType );
-            //            boolean use_default_as_parent_without_specifying = false;
-            //            if( parent == null && !defaultDefinition )
-            //            {
-            //                parent = StandardModels.createFromDefault( "default", -1, m );
-            //                //                use_default_as_parent_without_specifying = true;
-            //            }
 
-            // if we found something to inherit from, then do it! 
             if( parent != null )
             {
                 CellDefinition.copy( parent, cd );
@@ -665,11 +654,8 @@ public class ModelReader extends ModelReaderSupport
                     + getIntAttr( el, "code" ) + ")" );
         model.addPhase( code, name );
 
-        // Set the model, but only if it was specified. 
         if( getIntAttr( el, "code" ) != null )
         {
-            // set the model 
-            //switch( model )   // do not use a switch stmt to avoid compile errors related to "static const int" on various compilers
             if( code == PhysiCellConstants.advanced_Ki67_cycle_model )
             {
                 p.cycle = StandardModels.Ki67_advanced.clone();
@@ -734,21 +720,15 @@ public class ModelReader extends ModelReaderSupport
                 }
             }
         }
-        // Check for phase durations (as an alternative to transition rates)
         Element durationElement = findElement( el, "phase_durations" );
-        //        if( node.child( "phase_durations" ) )
-        //        { node = node.child( "phase_durations" ); }
         if( durationElement != null )
         {
             for( Element duration : findAllElements( durationElement, "duration" ) )
             {
                 int start = getIntAttr( duration, "index" );
                 boolean fixed = getBoolAttr( duration, "fixed_duration" );
-                // actual value of the duration 
                 double value = getDoubleVal( duration );
-                // set the transition rate 
                 p.cycle.data.setExitRate( start, 1.0 / ( value + 1e-16 ) );
-                // set it to fixed / non-fixed 
                 p.cycle.phaseLinks.get( start ).get( 0 ).fixedDuration = fixed;
             }
         }
@@ -1321,7 +1301,7 @@ public class ModelReader extends ModelReaderSupport
             double[] values; // ( length, 0.0 ); 
 
             // conserved quantity 
-            boolean conserved = getBoolAttr( child, "conserved" );
+//            boolean conserved = getBoolAttr( child, "conserved" );
 
             // get value(s)
             String str_values = getVal( child );
@@ -1396,7 +1376,11 @@ public class ModelReader extends ModelReaderSupport
             String fileName = getVal( findElement( positionsElement, "filename" ) );
             String inputFilename = folder + "/" + fileName;
             m.setInitialInfo( new ExternalFile( type, inputFilename ) );
-            //                        CellCSVReader.load_cells_csv( input_filename, m.getMicroenvironment() );
+
+            if( readFromJAR )
+            {
+                CellCSVReader.load_cells_csv( m.getClass().getResourceAsStream( inputFilename ), m );
+            }
         }
     }
 

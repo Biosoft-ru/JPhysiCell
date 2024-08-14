@@ -3,15 +3,11 @@ package ru.biosoft.physicell.ui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -40,14 +36,11 @@ public class SimpleVisualizer
     {
         try (BufferedReader br = new BufferedReader( new FileReader( new File( path ) ) ))
         {
-            double[] p;
             String data = br.readLine();
 
             while( !"HEADER".equals( data ) )
                 data = br.readLine();
             String[] vals = data.split( "\t" );
-            int voxels = Integer.valueOf( vals[1] );
-            p = new double[voxels];
             while( !"DATA".equals( data ) )
                 data = br.readLine();
 
@@ -92,7 +85,7 @@ public class SimpleVisualizer
         public void paintComponent(Graphics g)
         {
             super.paintComponent( g );
-            Graphics2D g2d = (Graphics2D)g;
+//            Graphics2D g2d = (Graphics2D)g;
             int xLength = 100;
             int yLength = 100;
             double[] p = new double[xLength * yLength];
@@ -142,16 +135,6 @@ public class SimpleVisualizer
         drawText( m, time, g );
         ImageIO.write( img, "PNG", new File( fileName ) );
 		return img;
-    }
-
-    private static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException
-    {
-        Image resultingImage = originalImage.getScaledInstance( targetWidth, targetHeight, Image.SCALE_REPLICATE );
-        BufferedImage resizedImage = new BufferedImage( targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB );
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage( resultingImage, 0, 0, targetWidth, targetHeight, null );
-        graphics2D.dispose();
-        return resizedImage;
     }
 
     private static void drawText(Microenvironment m, double time, Graphics g)

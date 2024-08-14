@@ -76,7 +76,7 @@ public class Executor
             String path = projects.get( project );
             try
             {
-                Class c = Class.forName( path );
+                Class<?> c = Class.forName( path );
                 InputStream stream = null;
                 if( parameters.settingdPath != null )
                 {
@@ -88,6 +88,7 @@ public class Executor
                 }
 
                 ModelReader reader = new ModelReader();
+                reader.setReadFromJAR( true );
                 reader.setIntracellularReader( new BioUMLIntraReader() );
                 Model model = reader.read( stream, c );
                 runProject( model, parameters );

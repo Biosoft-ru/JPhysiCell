@@ -32,7 +32,6 @@ public class IntracellularODEBioUML extends IntracellularODE
     private double dt;
     private String sbmlPath;
     private String[] inputs;
-    private String[] outputs;
     private JavaSimulationEngine engine = new JavaSimulationEngine();
 
     public IntracellularODEBioUML(ru.biosoft.physicell.core.Model model, CellDefinition cd) throws Exception
@@ -158,7 +157,7 @@ public class IntracellularODEBioUML extends IntracellularODE
             if( model != null )
                 result.model = model.clone();
             if( solver != null )
-                result.solver = solver.getClass().newInstance();
+                result.solver = solver.getClass().getDeclaredConstructor( ).newInstance();
             result.dt = dt;
             result.solver.init( result.model, result.model.getInitialValues(), new InfiniteSpan( dt ), null, null );
             return result;

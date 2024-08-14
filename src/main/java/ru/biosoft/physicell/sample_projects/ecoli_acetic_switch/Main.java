@@ -1,7 +1,6 @@
 package ru.biosoft.physicell.sample_projects.ecoli_acetic_switch;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.xml.ModelReader;

@@ -15,7 +15,6 @@ public class DomainEdgeAvoidance extends MembraneInteractions
         }
         phenotype.mechanics.cellBMRepulsionStrength = 100;
 
-        double max_interactive_distance = phenotype.mechanics.relMaxAdhesionDistance * phenotype.geometry.radius;
         double distance = pCell.functions.membraneDistanceCalculator.execute( pCell, phenotype, dt );
         //Note that the distance_to_membrane function must set displacement values (as a normal vector)
 

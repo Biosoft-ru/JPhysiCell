@@ -480,8 +480,6 @@ public class StandardModels
 
         // check for new attachments; 
         double attachment_probability = phenotype.mechanics.attachmentRate * dt;
-        boolean done = false;
-        int j = 0;
 
         for( Cell pTest : pCell.state.neighbors )
         {
@@ -496,7 +494,6 @@ public class StandardModels
                     Cell.attachCellsAsSpring( pCell, pTest );
                     if( pCell.state.springAttachments.size() >= phenotype.mechanics.maxAttachments )
                     {
-                        done = true;
                         break;
                     }
                 }
@@ -600,7 +597,6 @@ public class StandardModels
         RandomGenerator rng = pCell.getModel().getRNG();
         //        Cell pTarget = null; 
         int type = -1;
-        String type_name = "none";
         double probability = 0.0;
 
         boolean attacked = false;
@@ -613,7 +609,6 @@ public class StandardModels
         for( Cell pTarget : pCell.state.neighbors )
         {
             type = pTarget.type;
-            type_name = pTarget.typeName;
 
             if( pTarget.phenotype.volume.total < 1e-15 )
             {

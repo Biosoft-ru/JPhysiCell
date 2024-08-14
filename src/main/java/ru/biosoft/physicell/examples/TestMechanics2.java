@@ -210,7 +210,7 @@ public class TestMechanics2
     public static List<double[]> createSphere(double cellRadius, double sphereRadius)
     {
         List<double[]> cells = new ArrayList<>();
-        int xc = 0, yc = 0, zc = 0;
+        int xc = 0, zc = 0;
         double x_spacing = cellRadius * Math.sqrt( 3 );
         double y_spacing = cellRadius * 2;
         double z_spacing = cellRadius * Math.sqrt( 3 );
@@ -220,7 +220,7 @@ public class TestMechanics2
 
         for( double z = -sphereRadius; z < sphereRadius; z += z_spacing, zc++ )
             for( double x = -sphereRadius; x < sphereRadius; x += x_spacing, xc++ )
-                for( double y = -sphereRadius; y < sphereRadius; y += y_spacing, yc++ )
+                for( double y = -sphereRadius; y < sphereRadius; y += y_spacing )
                 {
                     double[] tempPoint = new double[3];
                     tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius;

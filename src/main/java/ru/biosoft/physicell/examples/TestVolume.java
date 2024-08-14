@@ -122,7 +122,7 @@ public class TestVolume
         int necrosisModelIndex = cd.phenotype.death.findDeathModelIndex( "Necrosis" );
 
         int K1_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_premitotic );
-        int K2_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
+//        int K2_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_positive_postmitotic );
         int Q_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.Ki67_negative );
         //        int A_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.apoptotic );
         //        int N_index = StandardModels.Ki67_advanced.findPhaseIndex( PhysiCellConstants.necrotic_swelling );
@@ -161,7 +161,7 @@ public class TestVolume
                 if( Math.abs( t - nextOutputTime ) < 0.001 )
                 {
                     String report = cell.ID + "\t" + cell.phenotype.cycle.currentPhase().name + "\t"
-                            + format.format( cell.get_total_volume() ) + "\t" + format.format( cell.phenotype.volume.fluid ) + "\t"
+                            + format.format( cell.phenotype.volume.total ) + "\t" + format.format( cell.phenotype.volume.fluid ) + "\t"
                             + format.format( cell.phenotype.volume.nuclear_solid ) + "\t"
                             + format.format( cell.phenotype.volume.cytoplasmic_solid ) + "\n";
                     //                    String report = cell.ID + "\t" + m.get( cell.currentVoxelIndex )[0];

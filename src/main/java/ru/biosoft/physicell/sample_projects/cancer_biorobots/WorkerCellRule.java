@@ -49,7 +49,6 @@ public class WorkerCellRule extends CustomCellRule
         }
 
         // from prior motility function
-        double o2 = signals.getSingleSignal( pCell, "oxygen" );
         double chemoattractant = signals.getSingleSignal( pCell, "chemoattractant" );
         double detectionThreshold = signals.getSingleSignal( pCell, "custom:motility_shutdown_detection_threshold" );
 

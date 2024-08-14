@@ -14,7 +14,6 @@ class Epithelial extends UpdatePhenotype
         Microenvironment microenvironment = pCell.getMicroenvironment();
         int nVirus = microenvironment.findDensityIndex( "virus" );
         int nInterferon = microenvironment.findDensityIndex( "interferon" );
-        int apoptosis_model_index = pCell.phenotype.death.findDeathModelIndex( "Apoptosis" );
 
         // compare against viral load. Should I commit apoptosis? 
         double virus = phenotype.molecular.internSubstrates[nVirus];

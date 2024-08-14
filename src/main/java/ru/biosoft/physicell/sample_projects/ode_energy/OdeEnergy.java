@@ -184,13 +184,13 @@ public class OdeEnergy extends Model
     public static List<double[]> createCirclePositions(double cellRadius, double sphereRadius)
     {
         List<double[]> result = new ArrayList<>();
-        int xc = 0, yc = 0, zc = 0;
+        int xc = 0;
         double xSpacing = cellRadius * Math.sqrt( 3 );
         double ySpacing = cellRadius * Math.sqrt( 3 );
 
         for( double x = -sphereRadius; x < sphereRadius; x += xSpacing, xc++ )
         {
-            for( double y = -sphereRadius; y < sphereRadius; y += ySpacing, yc++ )
+            for( double y = -sphereRadius; y < sphereRadius; y += ySpacing )
             {
                 double[] tempPoint = new double[3];
                 tempPoint[1] = y + ( xc % 2 ) * cellRadius;

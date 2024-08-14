@@ -94,7 +94,7 @@ public class TestDCIS
     static double duct_radius = 158.75;
     private static String resultPath = "C:/Users/Damag/BIOFVM/DCIS/POV";
     //    private static String resultName = "result";
-    private static int zSlice = 100;
+//    private static int zSlice = 100;
 
     static double dt = 0.01; // reaction-diffusion time-step
     static double mechanics_dt = 0.1;
@@ -265,14 +265,14 @@ public class TestDCIS
     static List<double[]> createSphere(double cell_radius, double sphere_radius)
     {
         List<double[]> result = new ArrayList<>();
-        int xc = 0, yc = 0, zc = 0;
+        int xc = 0, zc = 0;
         double x_spacing = cell_radius * Math.sqrt( 3 );
         double y_spacing = cell_radius * 2;
         double z_spacing = cell_radius * Math.sqrt( 3 );
 
         for( double z = -sphere_radius; z < sphere_radius; z += z_spacing, zc++ )
             for( double x = -sphere_radius; x < sphere_radius; x += x_spacing, xc++ )
-                for( double y = -sphere_radius; y < sphere_radius; y += y_spacing, yc++ )
+                for( double y = -sphere_radius; y < sphere_radius; y += y_spacing )
                 {
                     double[] tempPoint = new double[3];
                     tempPoint[0] = x + ( zc % 2 ) * 0.5 * cell_radius;

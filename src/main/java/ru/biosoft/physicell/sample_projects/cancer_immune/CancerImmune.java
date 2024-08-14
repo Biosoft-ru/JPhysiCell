@@ -108,8 +108,6 @@ public class CancerImmune extends Model
         CellDefinition cancerCellCD = getCellDefinition( "cancer cell" );
 
         int oxygen_ID = m.findDensityIndex( "oxygen" );
-        int immuno_ID = m.findDensityIndex( "immunostimulatory factor" );
-
         // reduce o2 uptake 
         cd.phenotype.secretion.uptakeRates[oxygen_ID] *= getParameterDouble( "immune_o2_relative_uptake" );
 
@@ -150,7 +148,7 @@ public class CancerImmune extends Model
     static List<double[]> createSpherePositions(double cellRadius, double sphereRadius, boolean use2D)
     {
         List<double[]> cells = new ArrayList<>();
-        int xc = 0, yc = 0, zc = 0;
+        int xc = 0, zc = 0;
         double xSpacing = cellRadius * Math.sqrt( 3 );
         double ySpacing = cellRadius * 2;
         double zSpacing = cellRadius * Math.sqrt( 3 );
@@ -159,7 +157,7 @@ public class CancerImmune extends Model
         {
             for( double x = -sphereRadius; x < sphereRadius; x += xSpacing, xc++ )
             {
-                for( double y = -sphereRadius; y < sphereRadius; y += ySpacing, yc++ )
+                for( double y = -sphereRadius; y < sphereRadius; y += ySpacing )
                 {
                     double[] tempPoint = new double[3];
                     tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius;
@@ -179,7 +177,7 @@ public class CancerImmune extends Model
             {
                 for( double x = -sphereRadius; x < sphereRadius; x += xSpacing, xc++ )
                 {
-                    for( double y = -sphereRadius; y < sphereRadius; y += ySpacing, yc++ )
+                    for( double y = -sphereRadius; y < sphereRadius; y += ySpacing )
                     {
                         double[] tempPoint = new double[3];
                         tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius;

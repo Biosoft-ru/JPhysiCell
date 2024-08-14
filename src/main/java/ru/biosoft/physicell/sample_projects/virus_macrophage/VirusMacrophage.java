@@ -92,7 +92,6 @@ public class VirusMacrophage extends Model
 
         // first find index for a few key variables. 
         int virus_index = m.findDensityIndex( "virus" );
-        int nInterferon = m.findDensityIndex( "interferon" );
 
         CellDefinition pEpithelial = getCellDefinition( "epithelial cell" );
         CellDefinition pMacrophage = getCellDefinition( "macrophage" );
