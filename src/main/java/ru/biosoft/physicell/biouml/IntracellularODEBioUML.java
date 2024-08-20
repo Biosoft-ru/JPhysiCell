@@ -178,7 +178,7 @@ public class IntracellularODEBioUML extends IntracellularODE
     @Override
     public String[] getOutputs()
     {
-        return this.phenotypeSpecies.keySet().toArray( String[]::new );
+        return this.phenotypeSpecies.keySet().toArray( new String[0] );
     }
 
     @Override

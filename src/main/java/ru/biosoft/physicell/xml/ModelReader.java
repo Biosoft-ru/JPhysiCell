@@ -137,8 +137,9 @@ public class ModelReader extends ModelReaderSupport
             }
             else if( filePath != null )
             {
-                Path rulesPath = filePath.getParent().resolve( folder, filename );
-                is = new FileInputStream( rulesPath.toFile() );
+                //Path rulesPath = filePath.getParent().resolve( folder, filename );
+                //is = new FileInputStream( rulesPath.toFile() );
+                is = new FileInputStream( new File( folder, filename ) );
             }
 
             model.getSignals().setupDictionaries( model );
