@@ -27,6 +27,8 @@ public class Model
 
     //Generates report for all cells at each time point of simulation
     protected ReportGenerator reportGenerator = new ReportGenerator();
+    
+    protected GlobalReportGenerator globalReportGenerator = new GlobalReportGenerator();
 
     private List<CellDefinition> cellDefinitions = new ArrayList<>();
     private Map<Integer, Integer> typeToIndex = new HashMap<>();
@@ -578,12 +580,23 @@ public class Model
     {
         return reportGenerator;
     }
+    
+    public void setReportGenerator(GlobalReportGenerator globalReportGenerator)
+    {
+        this.globalReportGenerator = globalReportGenerator;
+    }
+    public GlobalReportGenerator getGlobalReportGenerator()
+    {
+        return globalReportGenerator;
+    }
 
     public String getReport(Cell cell) throws Exception
     {
         return "\n" + cell.ID + "\t" + cell.position[0] + "\t" + cell.position[1] + "\t" + cell.position[2] + "\t"
                 + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase;
     }
+    
+    
 
     public String getReportHeader()
     {
