@@ -38,7 +38,7 @@ public class Model
     private List<Visualizer> visualizers = new ArrayList<Visualizer>();
     private String logFile;
     protected Microenvironment m;
-    private Map<String, String> parameters = new HashMap<>();
+    private Map<String, UserParameter> parameters = new HashMap<>();
 
     private double tMax;
     protected double startTime;
@@ -397,9 +397,9 @@ public class Model
     }
 
 
-    public void addParameter(String name, String val)
+    public void addParameter(String name, String val, String description)
     {
-        this.parameters.put( name, val );
+        this.parameters.put( name, new UserParameter(name, val, description) );
     }
 
     public Set<String> getParameters()
@@ -409,22 +409,22 @@ public class Model
 
     public String getParameter(String name)
     {
-        return parameters.get( name );
+        return parameters.get( name ).getValue();
     }
 
     public int getParameterInt(String name)
     {
-        return Integer.parseInt( parameters.get( name ) );
+        return Integer.parseInt( parameters.get( name ).getValue() );
     }
 
     public double getParameterDouble(String name)
     {
-        return Double.parseDouble( parameters.get( name ) );
+        return Double.parseDouble( parameters.get( name ).getValue() );
     }
 
     public boolean getParameterBoolean(String name)
     {
-        return Boolean.parseBoolean( parameters.get( name ) );
+        return Boolean.parseBoolean( parameters.get( name ).getValue() );
     }
 
     public void setTMax(double tMax)

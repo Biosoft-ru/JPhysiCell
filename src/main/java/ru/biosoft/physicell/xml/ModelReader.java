@@ -1357,7 +1357,7 @@ public class ModelReader extends ModelReaderSupport
             for( Element element : getAllElements( parametersElement ) )
             {
                 if( element.hasChildNodes() )
-                    model.addParameter( element.getTagName(), getVal( element ) );
+                    model.addParameter( element.getTagName(), getVal( element ), getAttr( element, "description" ) );
             }
         }
     }
