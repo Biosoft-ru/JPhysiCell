@@ -82,10 +82,10 @@ public class CellContainerParallel extends CellContainer
 
 
     @Override
-    public void updateAllCells(Microenvironment m, double t, double phenotypeDT, double mechanicsDT, double diffusionDT) throws Exception
+    public void updateAllCells(Model model, double t, double phenotypeDT, double mechanicsDT, double diffusionDT) throws Exception
     {
         double tTot = System.nanoTime();
-
+        Microenvironment m = model.getMicroenvironment();
         Set<Cell> cells = m.getAgents( Cell.class );
 
         double tSecr = System.nanoTime();
@@ -224,7 +224,7 @@ public class CellContainerParallel extends CellContainer
 
             // new March 2023: dynamic spring attachments, followed by built-in springs
             double tAttach = System.nanoTime();
-            if( !PhysiCellSettings.disable_automated_spring_adhesions )
+            if( !model.disableAutomatedSpringAdhesions )
             {
                 for( Cell cell : cells )
                 {

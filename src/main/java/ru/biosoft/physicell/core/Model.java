@@ -20,7 +20,7 @@ public class Model
 {
     protected Rules rules = new Rules();
 
-    protected SignalBehavior signals;
+    public SignalBehavior signals;
 
     //Random number generator for the model
     protected RandomGenerator rng;
@@ -49,6 +49,8 @@ public class Model
     protected double intracellularStep = 0.01;
     protected double nextIntracellularUpdate = intracellularStep;
 
+    public boolean disableAutomatedSpringAdhesions = false;
+    
     private boolean hasEvents = false;
     private List<Event> events = new ArrayList<>();
 
@@ -270,7 +272,7 @@ public class Model
         m.simulateDiffusionDecay( diffusionStep );
         tDiff = System.nanoTime() - tDiff;
         tDiffusion += tDiff;
-        ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotypeStep, mechanicsStep, diffusionStep );
+        ( (CellContainer)m.agentContainer ).updateAllCells( this, curTime, phenotypeStep, mechanicsStep, diffusionStep );
         updateIntracellular();
         curTime += diffusionStep;
         m.time = curTime;
@@ -399,15 +401,20 @@ public class Model
 
     public void addParameter(String name, String val, String description)
     {
-        this.parameters.put( name, new UserParameter(name, val, description) );
+        this.parameters.put( name, new UserParameter(name, description, val) );
     }
 
     public Set<String> getParameters()
     {
         return parameters.keySet();
     }
+    
+    public UserParameter getParameter(String name)
+    {
+        return parameters.get( name );
+    }
 
-    public String getParameter(String name)
+    public String getParameterString(String name)
     {
         return parameters.get( name ).getValue();
     }

@@ -139,9 +139,9 @@ public class CellContainer extends AgentContainer
             agents_in_outer_voxels.add( new HashSet<Cell>() );
     }
 
-    public void updateAllCells(Microenvironment m, double t, double dt) throws Exception
+    public void updateAllCells(Model model, double t, double dt) throws Exception
     {
-        updateAllCells( m, t, dt, dt, dt );
+        updateAllCells( model, t, dt, dt, dt );
     }
 
     public static double tSecretion = 0;
@@ -156,8 +156,9 @@ public class CellContainer extends AgentContainer
     public static double tDivide = 0;
     public static double tGradient = 0;
 
-    public void updateAllCells(Microenvironment m, double t, double phenotypeDT, double mechanicsDT, double diffusionDT) throws Exception
+    public void updateAllCells(Model model, double t, double phenotypeDT, double mechanicsDT, double diffusionDT) throws Exception
     {
+        Microenvironment m = model.getMicroenvironment();
         double tTot = System.nanoTime();
         // secretions and uptakes. Syncing with BioFVM is automated. 
         //            #pragma omp parallel for 
@@ -304,7 +305,7 @@ public class CellContainer extends AgentContainer
 
             // new March 2023: dynamic spring attachments, followed by built-in springs
             double tAttach = System.nanoTime();
-            if( !PhysiCellSettings.disable_automated_spring_adhesions )
+            if( !model.disableAutomatedSpringAdhesions )
             {
                 //                    #pragma omp parallel for 
                 for( Cell cell : cells )

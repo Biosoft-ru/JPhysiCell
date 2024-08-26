@@ -15,8 +15,9 @@ public class CellContainerExperimental extends CellContainer
     }
 
     @Override
-    public void updateAllCells(Microenvironment m, double t, double phenotypeDT, double mechanicsDT, double diffusionDT) throws Exception
+    public void updateAllCells(Model model, double t, double phenotypeDT, double mechanicsDT, double diffusionDT) throws Exception
     {
+        Microenvironment m = model.getMicroenvironment();
         double tTot = System.nanoTime();
         Set<Cell> cells = m.getAgents( Cell.class );
 
@@ -116,7 +117,7 @@ public class CellContainerExperimental extends CellContainer
                         if( cell.functions.updateVelocity != null && cell.isMovable )
                             cell.functions.updateVelocity.execute( cell, cell.phenotype, tslm );
                     }
-                    if( !PhysiCellSettings.disable_automated_spring_adhesions )
+                    if( !model.disableAutomatedSpringAdhesions )
                     {
                         StandardModels.dynamic_spring_attachments( cell, cell.phenotype, tslm );
                         if( cell.isMovable )

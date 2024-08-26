@@ -30,7 +30,6 @@ import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Motility;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.core.PhysiCellSettings;
 import ru.biosoft.physicell.core.Rules;
 import ru.biosoft.physicell.core.Secretion;
 import ru.biosoft.physicell.core.Volume;
@@ -86,7 +85,7 @@ public class ModelReader extends ModelReaderSupport
         Microenvironment m = model.getMicroenvironment();
         readDomain( physicell, m );
         readOverall( physicell, model );
-        readOptions( physicell );
+        readOptions( physicell, model);
         readSave( physicell, model );
         readMicroenvironmentSetup( physicell, m );
         readCellDefinitions( physicell, m, model );
@@ -319,18 +318,18 @@ public class ModelReader extends ModelReaderSupport
                     {
                         String folder = getVal( findElement( el, "folder" ) );
                         String filename = getVal( findElement( el, "filename" ) );
-                        String format = getAttr( el, "format" );
+                        String format = getAttr( el, "type" );
                         String path = folder + "/" + filename;
                         model.setReportInfo( new ExternalFile( format, path ) );
                     }
                     break;
                 case "visualizer":
-                    enabled = getBoolAttr( el, "enabled" );//findElement( el, "enable" );
+                    enabled = getBoolAttr( el, "enabled" );
                     if( enabled )
                     {
                         String folder = getVal( findElement( el, "folder" ) );
                         String filename = getVal( findElement( el, "filename" ) );
-                        String format = getAttr( el, "format" );
+                        String format = getAttr( el, "type" );
                         String path = folder + "/" + filename;
                         model.setVisualizerInfo( new ExternalFile( format, path ) );
                     }
@@ -339,7 +338,7 @@ public class ModelReader extends ModelReaderSupport
         }
     }
 
-    public void readOptions(Element physicell)
+    public void readOptions( Element physicell, Model model)
     {
         Element optionsElement = findElement( physicell, OPTIONS );
         for( Element el : getAllElements( optionsElement ) )
@@ -365,7 +364,7 @@ public class ModelReader extends ModelReaderSupport
                     }
                 }
                 case "disable_automated_spring_adhesions":
-                    PhysiCellSettings.disable_automated_spring_adhesions = getBoolVal( el );
+                    model.disableAutomatedSpringAdhesions = getBoolVal( el );
                     break;
             }
         }
@@ -1369,7 +1368,7 @@ public class ModelReader extends ModelReaderSupport
         if( parametersElement != null )
         {
             Element positionsElement = findElement( parametersElement, "cell_positions" );
-            String type = getAttr( positionsElement, "format" );
+            String type = getAttr( positionsElement, "type" );
             boolean enabled = getBoolAttr( positionsElement, "enabled" );
             if( !enabled )
                 return;
