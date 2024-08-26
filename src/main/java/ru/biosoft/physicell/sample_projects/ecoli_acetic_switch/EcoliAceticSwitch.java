@@ -34,7 +34,7 @@ public class EcoliAceticSwitch extends Model
 
     public void doStep() throws Exception
     {
-        ( (CellContainer)m.agentContainer ).updateAllCells( m, curTime, phenotypeStep, mechanicsStep, diffusionStep );
+        ( (CellContainer)m.agentContainer ).updateAllCells( this, curTime, phenotypeStep, mechanicsStep, diffusionStep );
         updateIntracellular();
         curTime += diffusionStep;
         m.time = curTime;

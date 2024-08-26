@@ -18,9 +18,9 @@ public class BiorobotsVisualizer extends AgentVisualizer
         int cargoType = model.getCellDefinition( "cargo cell" ).type;
         int workerType = model.getCellDefinition( "worker cell" ).type;
         int directorType = model.getCellDefinition( "director cell" ).type;
-        colors.put( cargoType, ModelReader.readColor( model.getParameter( "cargo_color" ) ) );
-        colors.put( workerType, ModelReader.readColor( model.getParameter( "worker_color" ) ) );
-        colors.put( directorType, ModelReader.readColor( model.getParameter( "director_color" ) ) );
+        colors.put( cargoType, ModelReader.readColor( model.getParameterString( "cargo_color" ) ) );
+        colors.put( workerType, ModelReader.readColor( model.getParameterString( "worker_color" ) ) );
+        colors.put( directorType, ModelReader.readColor( model.getParameterString( "director_color" ) ) );
     }
 
     @Override

@@ -11,16 +11,21 @@ import ru.biosoft.physicell.core.PhysiCellConstants;
 
 public class StemPhenotype extends UpdatePhenotype
 {
+    private boolean isInit = false;
     double maxStemDiff;
 
-    public StemPhenotype(Model model)
+    private void init(Model model)
     {
         maxStemDiff = model.getParameterDouble( "max_stem_differentiation" );
+        isInit = true;
     }
 
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
+        if (!isInit)
+            init(pCell.getModel());
+
         CellDefinition pCD = pCell.getModel().getCellDefinition( pCell.typeName );
         Microenvironment m = pCell.getMicroenvironment();
 

@@ -6,6 +6,7 @@ import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Phenotype;
+import ru.biosoft.physicell.core.standard.UpDownSignal;
 
 public class PhenotypeC extends UpdatePhenotype
 {
@@ -61,9 +62,9 @@ public class PhenotypeC extends UpdatePhenotype
         UpDownSignal sig = new UpDownSignal( model );
         sig.baseParameter = param0;
         sig.maxParameter = model.getParameterDouble( "C_max_cycle" );
-        sig.addEffect( A, model.getParameter( "C_cycle_A" ) );// A
-        sig.addEffect( B, model.getParameter( "C_cycle_B" ) ); // B
-        sig.addEffect( C, model.getParameter( "C_cycle_C" ) ); // C 
+        sig.addEffect( A, model.getParameterString( "C_cycle_A" ) );// A
+        sig.addEffect( B, model.getParameterString( "C_cycle_B" ) ); // B
+        sig.addEffect( C, model.getParameterString( "C_cycle_C" ) ); // C 
         phenotype.cycle.data.setTransitionRate( 0, 0, sig.computeEffect() );
         if( p > model.getParameterDouble( "C_cycle_pressure_threshold" ) )
         {
@@ -76,10 +77,10 @@ public class PhenotypeC extends UpdatePhenotype
         sig.reset();
         sig.baseParameter = base_death_rate;
         sig.maxParameter = max_death_rate;
-        sig.addEffect( A, model.getParameter( "C_death_A" ) );// A
-        sig.addEffect( B, model.getParameter( "C_death_B" ) );// B
-        sig.addEffect( C, model.getParameter( "C_death_C" ) );// C 
-        sig.addEffect( C, model.getParameter( "C_death_R" ) ); // R 
+        sig.addEffect( A, model.getParameterString( "C_death_A" ) );// A
+        sig.addEffect( B, model.getParameterString( "C_death_B" ) );// B
+        sig.addEffect( C, model.getParameterString( "C_death_C" ) );// C 
+        sig.addEffect( C, model.getParameterString( "C_death_R" ) ); // R 
         phenotype.death.rates.set( nApoptosis, sig.computeEffect() );
         if( p > model.getParameterDouble( "C_apoptosis_pressure_threshold" ) )
             phenotype.death.rates.set( nApoptosis, 10.0 );
@@ -90,10 +91,10 @@ public class PhenotypeC extends UpdatePhenotype
         sig.reset();
         sig.baseParameter = base_speed;
         sig.maxParameter = max_speed;
-        sig.addEffect( A, model.getParameter( "C_speed_A" ) );// A 
-        sig.addEffect( B, model.getParameter( "C_speed_B" ) );// B 
-        sig.addEffect( C, model.getParameter( "C_speed_C" ) );// C 
-        sig.addEffect( C, model.getParameter( "C_speed_R" ) ); // R 
+        sig.addEffect( A, model.getParameterString( "C_speed_A" ) );// A 
+        sig.addEffect( B, model.getParameterString( "C_speed_B" ) );// B 
+        sig.addEffect( C, model.getParameterString( "C_speed_C" ) );// C 
+        sig.addEffect( C, model.getParameterString( "C_speed_R" ) ); // R 
         phenotype.motility.migrationSpeed = sig.computeEffect();
 
         // secretion 
@@ -102,10 +103,10 @@ public class PhenotypeC extends UpdatePhenotype
         sig.reset();
         sig.baseParameter = base_secretion;
         sig.maxParameter = max_secretion;
-        sig.addEffect( A, model.getParameter( "C_signal_A" ) ); // A 
-        sig.addEffect( B, model.getParameter( "C_signal_B" ) ); // B
-        sig.addEffect( C, model.getParameter( "C_signal_C" ) ); // C 
-        sig.addEffect( R, model.getParameter( "C_signal_R" ) );// R 
+        sig.addEffect( A, model.getParameterString( "C_signal_A" ) ); // A 
+        sig.addEffect( B, model.getParameterString( "C_signal_B" ) ); // B
+        sig.addEffect( C, model.getParameterString( "C_signal_C" ) ); // C 
+        sig.addEffect( R, model.getParameterString( "C_signal_R" ) );// R 
         phenotype.secretion.secretionRates[nC] = sig.computeEffect();
     }
 

@@ -289,7 +289,7 @@ public class TestHDS
             }
             microenvironment.simulateSourcesSinks( dt );
             microenvironment.simulateDiffusionDecay( dt );
-            ( (CellContainer)microenvironment.agentContainer ).updateAllCells( microenvironment, t, cell_cycle_dt, mechanics_dt, dt );
+            ( (CellContainer)microenvironment.agentContainer ).updateAllCells( model, t, cell_cycle_dt, mechanics_dt, dt );
             t += dt;
             //                output_index++;
         }

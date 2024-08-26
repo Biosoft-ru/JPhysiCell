@@ -238,7 +238,7 @@ public class TestDCIS
             }
             m.simulateSourcesSinks( dt );
             m.simulateDiffusionDecay( dt );
-            ( (CellContainer)m.agentContainer ).updateAllCells( m, t, cell_cycle_dt, mechanics_dt, dt );
+            ( (CellContainer)m.agentContainer ).updateAllCells( model, t, cell_cycle_dt, mechanics_dt, dt );
             t += dt;
         }
         for( Visualizer listener : resultListeners )

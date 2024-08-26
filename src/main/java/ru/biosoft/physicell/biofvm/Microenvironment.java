@@ -167,10 +167,10 @@ public class Microenvironment
     std::vector< std::vector<double> > dirichlet_value_vectors; 
     std::vector<bool> dirichlet_node_map; 
     */
-    double[][] dirichletValue;
+    public double[][] dirichletValue;
     public boolean[] dirichletActivation;
     /* new in Version 1.7.0 -- activation vectors can be specified on a voxel-by-voxel basis */
-    boolean[][] dirichletActivations;
+    public boolean[][] dirichletActivations;
 
     /*! The mesh for the diffusing quantities */
     public CartesianMesh mesh;

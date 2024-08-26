@@ -228,7 +228,7 @@ public class TestCellCycle
                 tNextOutputTime += tOutputInterval;
                 System.out.println( t + ", cell count " + m.getAgentsCount() );
             }
-            ( (CellContainer)m.agentContainer ).updateAllCells( m, t, dt, dt, dt );
+            ( (CellContainer)m.agentContainer ).updateAllCells( model, t, dt, dt, dt );
             t += dt;
         }
         visualizer.finish();

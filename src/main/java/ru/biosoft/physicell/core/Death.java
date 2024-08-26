@@ -120,7 +120,7 @@ public class Death implements Cloneable
     {
         for( int i = 0; i < models.size(); i++ )
         {
-            if( models.get( i ).name == name )
+            if( models.get( i ).name.equals( name ) )
             {
                 return i;
             }

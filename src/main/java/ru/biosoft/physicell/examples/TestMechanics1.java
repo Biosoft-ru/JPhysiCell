@@ -146,7 +146,7 @@ public class TestMechanics1
                 visualizer.saveResult( m, t );
                 t_next_output_time += t_output_interval;
             }
-            ( (CellContainer)m.agentContainer ).updateAllCells( m, t, dt, dt, dt );
+            ( (CellContainer)m.agentContainer ).updateAllCells( model, t, dt, dt, dt );
             t += dt;
         }
         visualizer.finish();

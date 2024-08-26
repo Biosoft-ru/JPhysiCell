@@ -181,7 +181,7 @@ public class TestVolume
                     Cell.deleteCell( toDelete );
                     bw.append( "New cell deleted \n" );
                 }
-                ( (CellContainer)m.agentContainer ).updateAllCells( m, t, dt, dt, dt );
+                ( (CellContainer)m.agentContainer ).updateAllCells( model, t, dt, dt, dt );
                 t += dt;
             }
         }

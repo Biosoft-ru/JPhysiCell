@@ -176,7 +176,7 @@ public class TestMechanics2
                     listener.saveResult( m, t );
                 nextOutputTime += outputInterval;
             }
-            ( (CellContainer)m.agentContainer ).updateAllCells( m, t, dt, dt, dt );
+            ( (CellContainer)m.agentContainer ).updateAllCells( model, t, dt, dt, dt );
             t += dt;
         }
         if( outputReport )

@@ -97,7 +97,7 @@ public class Interactions extends Model
 
         // set up stem cells 
         pCD = getCellDefinition( "stem" );
-        pCD.functions.updatePhenotype = new StemPhenotype( this );
+        pCD.functions.updatePhenotype = new StemPhenotype( );
         // pCD.phenotype.cell_transformations.transformation_rate("differentiated") = 0.0001; 
 
         // set up differentiated cells 

@@ -1,17 +1,17 @@
-package ru.biosoft.physicell.sample_projects.celltypes3;
+package ru.biosoft.physicell.core.standard;
 
 import ru.biosoft.physicell.core.Model;
 
-class UpDownSignal
+public class UpDownSignal
 {
-    double up;
-    double down;
-    boolean noPromoters;
-    boolean noInhibitors;
-    double baseParameter;
-    double maxParameter;
-    double hillPower;
-    double halfMax;
+    public double up;
+    public double down;
+    public boolean noPromoters;
+    public boolean noInhibitors;
+    public double baseParameter;
+    public double maxParameter;
+    public double hillPower;
+    public double halfMax;
 
     public UpDownSignal(Model model)
     {
@@ -33,7 +33,7 @@ class UpDownSignal
         this.halfMax = halfMax;
     }
 
-    void addEffect(double factor, char factor_type)
+    public void addEffect(double factor, char factor_type)
     {
         // neutral signal 
         if( factor_type == 'N' || factor_type == 'n' )
@@ -59,7 +59,7 @@ class UpDownSignal
         }
     }
 
-    void addEffect(double factor, String factor_type)
+    public void addEffect(double factor, String factor_type)
     {
         this.addEffect( factor, factor_type.charAt( 0 ) );
     }
@@ -74,12 +74,12 @@ class UpDownSignal
         return ( baseParameter + ( maxParameter - baseParameter ) * up2 ) * down2; // return UP * DOWN;
     }
 
-    double computeEffect()
+    public double computeEffect()
     {
         return computeEffectHill();
     }
 
-    void reset()
+    public void reset()
     {
         up = 0.0;
         down = 0.0;

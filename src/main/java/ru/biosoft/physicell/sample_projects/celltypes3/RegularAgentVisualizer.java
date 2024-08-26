@@ -18,9 +18,9 @@ public class RegularAgentVisualizer extends AgentVisualizer
     public RegularAgentVisualizer(Model model)
     {
         this.model = model;
-        aColor = ModelReader.readColor( model.getParameter( "A_color" ) );
-        bColor = ModelReader.readColor( model.getParameter( "B_color" ) );
-        cColor = ModelReader.readColor( model.getParameter( "C_color" ) );
+        aColor = ModelReader.readColor( model.getParameterString( "A_color" ) );
+        bColor = ModelReader.readColor( model.getParameterString( "B_color" ) );
+        cColor = ModelReader.readColor( model.getParameterString( "C_color" ) );
     }
 
     @Override
