@@ -177,7 +177,7 @@ public class BasicAgent
         int length = density.length;
 
         secretionRates = VectorUtil.resize( secretionRates, length );
-        saturationDensities = VectorUtil.resize( saturationDensities, length );
+        saturationDensities = VectorUtil.resize( saturationDensities, length, 1.0 );
         uptakeRates = VectorUtil.resize( uptakeRates, length );
         netExportRates = VectorUtil.resize( netExportRates, length );
 
