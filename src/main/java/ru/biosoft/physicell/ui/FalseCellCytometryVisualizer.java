@@ -5,7 +5,7 @@ import java.awt.Color;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 
-public class FalseCellCytometryVisualizer extends AgentVisualizer
+public class FalseCellCytometryVisualizer extends AgentVisualizer2
 {
     public Color[] findColors(Cell pCell)
     {
