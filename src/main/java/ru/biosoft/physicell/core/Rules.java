@@ -177,7 +177,7 @@ public class Rules
         pHRS.get( behavior ).appliesToDead.set( n, useForDead );
     }
 
-    void set_hypothesis_parameters(Model model, String type, String signal, String behavior, double max, double hillPower)
+    public void set_hypothesis_parameters(Model model, String type, String signal, String behavior, double max, double hillPower)
             throws Exception
     {
         CellDefinition cd = model.getCellDefinition( type );
@@ -996,7 +996,7 @@ public class Rules
 
     // v0 version 
 
-    static void export_rules_csv_v0(Model model, String filename) throws Exception
+    public static void export_rules_csv_v0(Model model, String filename) throws Exception
     {
         File f = new File( filename );
         if( !f.exists() )
@@ -1061,7 +1061,7 @@ public class Rules
 
     // v1 
 
-    static void export_rules_csv_v1(Model model, String filename) throws Exception
+    public static void export_rules_csv_v1(Model model, String filename) throws Exception
     {
         File f = new File( filename );
         if( !f.exists() )
@@ -1123,7 +1123,7 @@ public class Rules
         System.out.println( "Done!" );
     }
 
-    void export_rules_csv_v2(String filename, Model model) throws Exception
+    public void export_rules_csv_v2(String filename, Model model) throws Exception
     {
         //        std::fstream fs( filename, std::ios::out );
         File f = new File( filename );
