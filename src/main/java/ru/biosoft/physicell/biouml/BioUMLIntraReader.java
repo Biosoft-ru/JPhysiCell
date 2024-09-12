@@ -53,11 +53,10 @@ public class BioUMLIntraReader extends ModelReaderSupport implements Intracellul
             }
             else if( tag.equals( "sbml_filename" ) )
             {
-                String value = getVal( child );
-                String name = value.substring( value.lastIndexOf( "/" ) );
-                if( value.startsWith( "./" ) )
-                    value = value.substring( 2 );
-                InputStream stream = model.getClass().getResourceAsStream( value );
+                String name = getVal( child );
+//                if (name.contains("/"))
+//                    name = name.substring( name.lastIndexOf( "/" ) );
+                InputStream stream = model.getClass().getResourceAsStream( name );
                 intracellular.setDiagram( readSBML( stream, name ) );
             }
         }
