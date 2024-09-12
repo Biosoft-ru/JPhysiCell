@@ -85,7 +85,7 @@ public class ModelReader extends ModelReaderSupport
         Microenvironment m = model.getMicroenvironment();
         readDomain( physicell, m );
         readOverall( physicell, model );
-        readOptions( physicell, model);
+        readOptions( physicell, model );
         readSave( physicell, model );
         readMicroenvironmentSetup( physicell, m );
         readCellDefinitions( physicell, m, model );
@@ -117,9 +117,9 @@ public class ModelReader extends ModelReaderSupport
             boolean enabled = getBoolAttr( rulesetElement, "enabled" );
             if( !enabled )
                 continue;
-//            String format = getAttr( rulesetElement, "format" );
-//            String version = getAttr( rulesetElement, "version" );
-//            String protocol = getAttr( rulesetElement, "CBHG" );
+            //            String format = getAttr( rulesetElement, "format" );
+            //            String version = getAttr( rulesetElement, "version" );
+            //            String protocol = getAttr( rulesetElement, "CBHG" );
             Element folderElement = findElement( rulesetElement, "folder" );
             String folder = getVal( folderElement );
             Element filenameElement = findElement( rulesetElement, "filename" );
@@ -127,9 +127,10 @@ public class ModelReader extends ModelReaderSupport
 
             InputStream is = null;
 
-            if( folder.startsWith( "./" ) )
-                folder = folder.substring( 2 );
             String relativePath = folder + "/" + filename;
+
+            if( relativePath.startsWith( "./" ) )
+                relativePath = relativePath.substring( 2 );
             if( additionalFiles.containsKey( relativePath ) )
             {
                 is = new FileInputStream( additionalFiles.get( relativePath ) );
@@ -138,13 +139,17 @@ public class ModelReader extends ModelReaderSupport
             {
                 //Path rulesPath = filePath.getParent().resolve( folder, filename );
                 //is = new FileInputStream( rulesPath.toFile() );
-                is = new FileInputStream( new File( folder, filename ) );
+                File parent = new File( filePath.getParent().toFile(), folder );
+                is = new FileInputStream( new File( parent, filename ) );
             }
 
-            model.getSignals().setupDictionaries( model );
-            Rules.setupRules( model );
-            Rules.parseCSVRules2( model, is );
-            model.setRulesPath( folder + "/" + filename );
+            if( is != null )
+            {
+                model.getSignals().setupDictionaries( model );
+                Rules.setupRules( model );
+                Rules.parseCSVRules2( model, is );
+                model.setRulesPath( folder + "/" + filename );
+            }
         }
     }
 
@@ -273,7 +278,7 @@ public class ModelReader extends ModelReaderSupport
             switch( el.getTagName() )
             {
                 case "folder":
-//                    String folderName = getVal( el );
+                    //                    String folderName = getVal( el );
                     break;
                 case "full_data":
                     Element intervalElement = findElement( el, "interval" );
@@ -338,7 +343,7 @@ public class ModelReader extends ModelReaderSupport
         }
     }
 
-    public void readOptions( Element physicell, Model model)
+    public void readOptions(Element physicell, Model model)
     {
         Element optionsElement = findElement( physicell, OPTIONS );
         for( Element el : getAllElements( optionsElement ) )
@@ -630,10 +635,9 @@ public class ModelReader extends ModelReaderSupport
     }
 
     public void readIntracellular(Element el, Model model, CellDefinition cd) throws Exception
-    {
-        if( intracellularReader == null )
-            throw new Exception( "No intracellular reader set" );
-        intracellularReader.readIntracellular( filePath, el, model, cd );
+    {//            throw new Exception( "No intracellular reader set" );
+        if( intracellularReader != null )
+            intracellularReader.readIntracellular( filePath, el, model, cd );
     }
 
     public void setIntracellularReader(IntracellularReader reader)
@@ -1301,7 +1305,7 @@ public class ModelReader extends ModelReaderSupport
             double[] values; // ( length, 0.0 ); 
 
             // conserved quantity 
-//            boolean conserved = getBoolAttr( child, "conserved" );
+            //            boolean conserved = getBoolAttr( child, "conserved" );
 
             // get value(s)
             String str_values = getVal( child );
