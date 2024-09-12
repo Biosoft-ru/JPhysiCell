@@ -87,7 +87,7 @@ public class Secretion implements Cloneable
         substrates = m.densityNames;
         secretionRates = VectorUtil.resize( secretionRates, size );
         uptakeRates = VectorUtil.resize( uptakeRates, size );
-        saturationDensities = VectorUtil.resize( saturationDensities, size );
+        saturationDensities = VectorUtil.resize( saturationDensities, size, 1.0 );
         netExportRates = VectorUtil.resize( netExportRates, size );
     }
 
