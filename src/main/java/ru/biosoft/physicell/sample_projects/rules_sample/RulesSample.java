@@ -84,6 +84,7 @@ public class RulesSample extends Model
         createCellTypes();
         signals.setupDictionaries( this );
         Rules.setupRules( this );
+        this.setRulesEnabled( true );
         setupTissue();
         getVisualizers().forEach( v -> v.setAgentVisualizer( new AgentVisualizer2() ) );
 
