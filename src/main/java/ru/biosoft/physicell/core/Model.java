@@ -27,7 +27,7 @@ public class Model
 
     //Generates report for all cells at each time point of simulation
     protected ReportGenerator reportGenerator = new ReportGenerator();
-    
+
     protected GlobalReportGenerator globalReportGenerator = new GlobalReportGenerator();
 
     private List<CellDefinition> cellDefinitions = new ArrayList<>();
@@ -47,10 +47,10 @@ public class Model
     protected double mechanicsStep = 0.1;
     protected double phenotypeStep = 6.0;
     protected double intracellularStep = 0.01;
-    protected double nextIntracellularUpdate = intracellularStep;
+    protected double nextIntracellularUpdate = 0;
 
     public boolean disableAutomatedSpringAdhesions = false;
-    
+
     private boolean hasEvents = false;
     private List<Event> events = new ArrayList<>();
 
@@ -74,7 +74,7 @@ public class Model
     public ExternalFile initialInfo = null;
     public ExternalFile reportInfo = null;
     public ExternalFile visualizerInfo = null;
-    
+
     public static double tDiffusion = 0;
 
     public void setSeed(long seed)
@@ -119,7 +119,7 @@ public class Model
     public void setRulesPath(String path)
     {
         rulesEnabled = true;
-//        rulesPath = path;
+        //        rulesPath = path;
     }
 
     public void addEvent(Event event)
@@ -401,14 +401,14 @@ public class Model
 
     public void addParameter(String name, String val, String description)
     {
-        this.parameters.put( name, new UserParameter(name, description, val) );
+        this.parameters.put( name, new UserParameter( name, description, val ) );
     }
 
     public Set<String> getParameters()
     {
         return parameters.keySet();
     }
-    
+
     public UserParameter getParameter(String name)
     {
         return parameters.get( name );
@@ -456,7 +456,7 @@ public class Model
     {
         this.mechanicsStep = dt;
     }
-    
+
     public double getMechanicsDt()
     {
         return mechanicsStep;
@@ -471,12 +471,12 @@ public class Model
     {
         return phenotypeStep;
     }
-    
+
     public void setSaveFullInterval(double interval)
     {
         this.saveFullInterval = interval;
     }
-    
+
     public double getSaveFullInterval()
     {
         return saveFullInterval;
@@ -486,7 +486,7 @@ public class Model
     {
         this.saveImgInterval = interval;
     }
-    
+
     public double getSaveImgInterval()
     {
         return saveImgInterval;
@@ -551,7 +551,7 @@ public class Model
                 result++;
         return result;
     }
-    
+
     public ExternalFile getVisualizerInfo()
     {
         return visualizerInfo;
@@ -560,7 +560,7 @@ public class Model
     {
         this.visualizerInfo = visualizerInfo;
     }
-    
+
     public ExternalFile getReportInfo()
     {
         return reportInfo;
@@ -587,7 +587,7 @@ public class Model
     {
         return reportGenerator;
     }
-    
+
     public void setReportGenerator(GlobalReportGenerator globalReportGenerator)
     {
         this.globalReportGenerator = globalReportGenerator;
@@ -602,8 +602,8 @@ public class Model
         return "\n" + cell.ID + "\t" + cell.position[0] + "\t" + cell.position[1] + "\t" + cell.position[2] + "\t"
                 + cell.phenotype.cycle.currentPhase().name + "\t" + cell.phenotype.cycle.data.elapsedTimePhase;
     }
-    
-    
+
+
 
     public String getReportHeader()
     {
