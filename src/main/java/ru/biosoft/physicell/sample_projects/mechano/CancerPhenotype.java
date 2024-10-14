@@ -23,7 +23,7 @@ public class CancerPhenotype extends UpdatePhenotype
             return;
         }
 
-        double b = signals.get_single_base_behavior( pCell, "cycle entry" );
+        double b = signals.getSinglBaseBehavior( pCell, "cycle entry" );
         if( signals.getSingleSignal( pCell, "pressure" ) > 0.75 )
         {
             b = 0;
