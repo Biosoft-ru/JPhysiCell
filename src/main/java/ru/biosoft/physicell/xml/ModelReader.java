@@ -47,7 +47,6 @@ public class ModelReader extends ModelReaderSupport
     private static final String OPTIONS = "options";
     private Map<String, File> additionalFiles = new HashMap<>();
 
-    private boolean readFromJAR = false;
     //folder from which we read file
     private Path filePath = null;
 
@@ -101,10 +100,10 @@ public class ModelReader extends ModelReaderSupport
         this.additionalFiles = additionalFiles;
     }
 
-    public void setReadFromJAR(boolean readFromJAR)
-    {
-        this.readFromJAR = readFromJAR;
-    }
+//    public void setReadFromJAR(boolean readFromJAR)
+//    {
+//        this.readFromJAR = readFromJAR;
+//    }
 
     private void readRules(Element physicell, Model model) throws Exception
     {
@@ -1380,11 +1379,6 @@ public class ModelReader extends ModelReaderSupport
             String fileName = getVal( findElement( positionsElement, "filename" ) );
             String inputFilename = folder + "/" + fileName;
             m.setInitialInfo( new ExternalFile( type, inputFilename ) );
-
-            if( readFromJAR )
-            {
-                CellCSVReader.load_cells_csv( m.getClass().getResourceAsStream( inputFilename ), m );
-            }
         }
     }
 
