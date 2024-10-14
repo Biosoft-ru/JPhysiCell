@@ -4,7 +4,6 @@ import ru.biosoft.physicell.core.CellCSVReader;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.Rules;
-import ru.biosoft.physicell.ui.AgentVisualizer2;
 
 /*
 ###############################################################################
@@ -86,8 +85,6 @@ public class RulesSample extends Model
         Rules.setupRules( this );
         this.setRulesEnabled( true );
         setupTissue();
-        getVisualizers().forEach( v -> v.setAgentVisualizer( new AgentVisualizer2() ) );
-
         Rules.parseCSVRules2( this, Main.class.getResourceAsStream( CELL_RULES_PATH ) );
         CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( CELLS_PATH ), this );
 
