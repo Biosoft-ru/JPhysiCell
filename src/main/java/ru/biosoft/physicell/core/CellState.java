@@ -2,6 +2,7 @@ package ru.biosoft.physicell.core;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /*
 ###############################################################################
@@ -80,14 +81,14 @@ public class CellState
 	public double damage;
     double totalAttackTime;
     boolean contactWithBasementMembrane; // not implemented yet 
-
+    
     public CellState()
     {
         neighbors = new HashSet<Cell>();
         springAttachments = new HashSet<>();
         orientation = new double[3];
         simplePressure = 0.0;
-        attachedCells = new HashSet<>();
+        attachedCells =  new CopyOnWriteArraySet<Cell>();
         numberNuclei = 1;
         damage = 0.0;
         totalAttackTime = 0.0;
