@@ -13,7 +13,8 @@ import java.util.Set;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.ui.Visualizer;
-import ru.biosoft.physicell.ui.Visualizer.Section;
+import ru.biosoft.physicell.ui.Visualizer2D;
+import ru.biosoft.physicell.ui.Visualizer2D.Section;
 import ru.biosoft.physicell.xml.ModelReader.ExternalFile;
 
 public class Model
@@ -134,9 +135,9 @@ public class Model
         return visualizer;
     }
 
-    public Visualizer addGIFVisualizer(int zSlice, String name)
+    public Visualizer2D addGIFVisualizer(int zSlice, String name)
     {
-        Visualizer visualizer = Visualizer.createWithGIF( resultFolder, name, Section.Z, zSlice );
+        Visualizer2D visualizer = Visualizer2D.createWithGIF( resultFolder, name, Section.Z, zSlice );
         this.visualizers.add( visualizer );
         return visualizer;
     }
@@ -341,7 +342,7 @@ public class Model
         //        System.out.println( getLogInfo() );
     }
 
-    private boolean executeEvents(double curTime) throws Exception
+    public boolean executeEvents(double curTime) throws Exception
     {
         boolean eventsFired = false;
         if( hasEvents )
@@ -509,7 +510,7 @@ public class Model
 
     public static abstract class Event
     {
-        protected double executionTime;
+        public double executionTime;
         protected Model model;
         public boolean executed = false;
         public abstract void execute() throws Exception;

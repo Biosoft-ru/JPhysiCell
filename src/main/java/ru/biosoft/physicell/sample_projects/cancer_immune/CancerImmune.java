@@ -9,7 +9,6 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.ui.Visualizer;
 
 /**
 ###############################################################################
@@ -96,10 +95,6 @@ public class CancerImmune extends Model
         createImmuneCell();
         setupTissue( use2D );
         addEvent( new ImmunityEvent( this, use2D ) );
-        for( Visualizer visualizer : getVisualizers() )
-        {
-            visualizer.setAgentVisualizer( new CancerImmunityVisualizer() );
-        }
     }
 
     void createImmuneCell()
@@ -145,7 +140,7 @@ public class CancerImmune extends Model
     }
 
 
-    static List<double[]> createSpherePositions(double cellRadius, double sphereRadius, boolean use2D)
+    static List<double[]> createSpherePositions(double[] center, double cellRadius, double sphereRadius, boolean use2D)
     {
         List<double[]> cells = new ArrayList<>();
         int xc = 0, zc = 0;
@@ -160,9 +155,9 @@ public class CancerImmune extends Model
                 for( double y = -sphereRadius; y < sphereRadius; y += ySpacing )
                 {
                     double[] tempPoint = new double[3];
-                    tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius;
-                    tempPoint[1] = y + ( xc % 2 ) * cellRadius;
-                    tempPoint[2] = 0;
+                    tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius + sphereRadius;
+                    tempPoint[1] = y + ( xc % 2 ) * cellRadius + sphereRadius;
+                    tempPoint[2] = sphereRadius;
 
                     if( Math.sqrt( VectorUtil.norm_squared( tempPoint ) ) < sphereRadius )
                     {
@@ -180,11 +175,11 @@ public class CancerImmune extends Model
                     for( double y = -sphereRadius; y < sphereRadius; y += ySpacing )
                     {
                         double[] tempPoint = new double[3];
-                        tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius;
-                        tempPoint[1] = y + ( xc % 2 ) * cellRadius;
-                        tempPoint[2] = z;
+                        tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius + center[0];
+                        tempPoint[1] = y + ( xc % 2 ) * cellRadius + center[1];
+                        tempPoint[2] = z + center[2];
 
-                        if( Math.sqrt( VectorUtil.norm_squared( tempPoint ) ) < sphereRadius )
+                        if( VectorUtil.dist( tempPoint, center ) < sphereRadius )
                         {
                             cells.add( tempPoint );
                         }
@@ -204,7 +199,7 @@ public class CancerImmune extends Model
 
         double tumorRadius = getParameterDouble( "tumor_radius" );// 250.0;  
 
-        List<double[]> positions = createSpherePositions( cellRadius, tumorRadius, use2D );
+        List<double[]> positions = createSpherePositions( new double[] {750,750,750}, cellRadius, tumorRadius, use2D );
         //        System.out.println( "creating " + positions.size() + " closely-packed tumor cells ... " );
 
         double imm_mean = getParameterDouble( "tumor_mean_immunogenicity" );
