@@ -31,6 +31,9 @@ public class ImmunityEvent extends Event
     
     public void introduceOmmuneCells(Model model, boolean use2d) throws Exception
     {
+        double[] box = model.getMicroenvironment().mesh.boundingBox;
+        double[] center = new double[] {(box[0] +box[3])/2, (box[1] + box[4])/2, (box[2] + box[5])/2};
+        
         RandomGenerator rng = model.getRNG();
         CellDefinition cd = model.getCellDefinition( "immune cell" );
         Microenvironment m = model.getMicroenvironment();
@@ -41,21 +44,21 @@ public class ImmunityEvent extends Event
         // for the loop, deal with the (faster) norm squared 
         for( Cell cell : cells )//int i=0; i < (all_cells).size() ; i++ )
         {
-            temp_radius = VectorUtil.norm_squared( cell.position );
+            temp_radius = VectorUtil.dist( center, cell.position );////VectorUtil.norm_squared( cell.position );
             if( temp_radius > tumor_radius )
             {
                 tumor_radius = temp_radius;
             }
         }
         // now square root to get to radius 
-        tumor_radius = Math.sqrt( tumor_radius );
+//        tumor_radius = Math.sqrt( tumor_radius );
 
         // if this goes wackadoodle, choose 250 
-        if( tumor_radius < 250.0 )
-        {
-            tumor_radius = 250.0;
-        }
-
+//        if( tumor_radius < 100.0 )
+//        {
+//            tumor_radius = 100.0;
+//        }
+//        tumor_radius = 100;
         System.out.println( "current tumor radius: " + tumor_radius );
 
         // now seed immune cells 
@@ -85,8 +88,8 @@ public class ImmunityEvent extends Event
                 double theta = rng.UniformRandom() * 6.283185307179586476925286766559;
                 double phi = Math.acos( 2.0 * rng.UniformRandom() - 1.0 );
                 double radius = rng.NormalRandom( mean_radius, std_radius );
-                double[] position = new double[] {radius * Math.cos( theta ) * Math.sin( phi ),
-                        radius * Math.sin( theta ) * Math.sin( phi ), radius * Math.cos( phi )};
+                double[] position = new double[] {radius * Math.cos( theta ) * Math.sin( phi ) +center[0],
+                        radius * Math.sin( theta ) * Math.sin( phi )+center[1], radius * Math.cos( phi )+center[2]};
                 Cell.createCell( cd, model, position );
             }
         }
