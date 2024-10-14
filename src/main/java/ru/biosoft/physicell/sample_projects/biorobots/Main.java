@@ -89,7 +89,7 @@ public class Main
         model.setResultFolder( resultPath );
         model.setSaveFull( false );
         model.setSaveImg( false );
-        model.addGIFVisualizer( 0, "figure1" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 ).setAgentVisualizer( new BiorobotsVisualizer( this ) ) );;
+        model.addGIFVisualizer( 0, "figure1" ).setStubstrateIndex( 1 ).setMaxDensity( 0.5 ).setAgentVisualizer( new BiorobotsVisualizer( model ) );
         model.init();
         System.out.println( model.display() );
 
