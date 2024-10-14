@@ -3,6 +3,7 @@ package ru.biosoft.physicell.sample_projects.mechano;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.ui.Visualizer2D;
 
 /*
 ###############################################################################
@@ -79,7 +80,7 @@ public class Mechano extends Model
         super.init();
         createCellTypes();
         setupTissue();
-        getVisualizers().forEach( v -> v.setAgentVisualizer( new MechanoVisualizer() ) );
+        getVisualizers().forEach( v ->  ((Visualizer2D)v).setAgentVisualizer( new MechanoVisualizer() ) );
     }
 
     void createCellTypes()
