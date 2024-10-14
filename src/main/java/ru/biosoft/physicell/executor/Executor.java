@@ -88,7 +88,6 @@ public class Executor
                 }
 
                 ModelReader reader = new ModelReader();
-                reader.setReadFromJAR( true );
                 reader.setIntracellularReader( new BioUMLIntraReader() );
                 Model model = reader.read( stream, c );
                 runProject( model, parameters );
