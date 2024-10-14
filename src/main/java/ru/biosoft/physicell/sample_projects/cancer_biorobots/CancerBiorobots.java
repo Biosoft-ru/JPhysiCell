@@ -3,8 +3,7 @@ package ru.biosoft.physicell.sample_projects.cancer_biorobots;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.core.standard.StandardModels;
-import ru.biosoft.physicell.ui.Visualizer;
+import ru.biosoft.physicell.core.standard.StandardModels;;
 
 /*
 ###############################################################################
@@ -84,10 +83,6 @@ public class CancerBiorobots extends Model
         createCellTypes();
         setupTissue();
         addEvent( new TherapyEvent( this ) );
-        for( Visualizer visualizer : getVisualizers() )
-        {
-            visualizer.setAgentVisualizer( new CancerBiorobotsVisualizer( this ) );
-        }
     }
 
     private void createCellTypes()

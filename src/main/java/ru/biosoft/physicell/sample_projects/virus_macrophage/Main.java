@@ -97,8 +97,10 @@ public class Main
         model.setSaveImg( false );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addGIFVisualizer( 0, "virus" ).setStubstrateIndex( 0 ).setMaxDensity( 1E-4 );
-        model.addGIFVisualizer( 0, "interferon" ).setStubstrateIndex( 1 ).setMaxDensity( 1E-4 );
+        model.addGIFVisualizer( 0, "virus" ).setStubstrateIndex( 0 ).setMaxDensity( 1E-4 )
+                .setAgentVisualizer( new VirusVisualizer( model ) );
+        model.addGIFVisualizer( 0, "interferon" ).setStubstrateIndex( 1 ).setMaxDensity( 1E-4 )
+                .setAgentVisualizer( new VirusVisualizer( model ) );
         model.init();
         System.out.println( model.display() );
         model.simulate();

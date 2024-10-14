@@ -74,22 +74,26 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_biorobots/result3";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_biorobots/result67";
 
     public static void main(String ... strings) throws Exception
     {
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
-
-        InputStream settings = Main.class.getResourceAsStream( settingsPath );
-        Model model = new ModelReader().read( settings, CancerBiorobots.class );
-        double mechanics_voxel_size = 30;
-        model.createContainer( mechanics_voxel_size );
-        model.setResultFolder( resultPath );
-        model.setWriteDensity( true );
-        model.addGIFVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 38 );
-        model.init();
-        System.out.println( model.display() );
-        model.simulate();
+        for( int i = 0; i < 100; i++ )
+        {
+            InputStream settings = Main.class.getResourceAsStream( settingsPath );
+            Model model = new ModelReader().read( settings, CancerBiorobots.class );
+            double mechanics_voxel_size = 30;
+            model.createContainer( mechanics_voxel_size );
+            model.setResultFolder( resultPath );
+            model.setWriteDensity( false );
+            model.setSaveFull( false );
+            model.addGIFVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 38 )
+                    .setAgentVisualizer( new CancerBiorobotsVisualizer( model ) );
+            model.init();
+            System.out.println( model.display() );
+            model.simulate();
+        }
     }
 }

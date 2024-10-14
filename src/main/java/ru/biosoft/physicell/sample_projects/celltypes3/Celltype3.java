@@ -5,7 +5,6 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.RandomGenerator;
-import ru.biosoft.physicell.ui.Visualizer;
 
 /*
 ###############################################################################
@@ -83,10 +82,6 @@ public class Celltype3 extends Model
         signals.setupDictionaries( this );
         createCellTypes();
         setupTissue();
-        for( Visualizer visualizer : getVisualizers() )
-        {
-            visualizer.setAgentVisualizer( new FluorescenceAgentVisualizer() );
-        }
     }
 
     /**

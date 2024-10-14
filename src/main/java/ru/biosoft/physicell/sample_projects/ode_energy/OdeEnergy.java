@@ -89,7 +89,6 @@ public class OdeEnergy extends Model
         setSeed( getParameterInt( "random_seed" ) );
         createCellTypes();
         setupTissue();
-        getVisualizers().forEach( v -> v.setAgentVisualizer( new EnergyVisualizer() ) );
     }
 
     public void createCellTypes() throws Exception

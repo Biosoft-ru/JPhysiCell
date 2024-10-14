@@ -84,7 +84,6 @@ public class VirusMacrophage extends Model
         setSeed( getParameterInt( "random_seed" ) );
         createCellTypes();
         setupTissue();
-        getVisualizers().forEach( v -> v.setAgentVisualizer( new VirusVisualizer( this ) ) );
     }
 
     void createCellTypes() throws Exception

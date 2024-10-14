@@ -70,7 +70,6 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
-
 public class Worm extends Model
 {
 
@@ -92,7 +91,6 @@ public class Worm extends Model
         cd.functions.updatePhenotype = null;
         cd.functions.membraneInteraction = null;
         cd.functions.membraneDistanceCalculator = null;
-        getVisualizers().forEach( v -> v.setAgentVisualizer( new WormVisualizer() ) );
     }
 
     void setupTissue() throws Exception

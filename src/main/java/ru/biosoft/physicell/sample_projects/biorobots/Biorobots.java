@@ -16,7 +16,6 @@ public class Biorobots extends Model
         //        PhysiCellUtilities.setSeed( getParameterInt( "random_seed" ) );
         createCellTypes();
         setupTissue();
-        getVisualizers().forEach( v -> v.setAgentVisualizer( new BiorobotsVisualizer( this ) ) );
     }
 
     void createCellTypes() throws Exception

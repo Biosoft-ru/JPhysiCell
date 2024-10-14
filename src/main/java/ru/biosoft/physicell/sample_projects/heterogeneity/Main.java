@@ -5,6 +5,8 @@ import java.io.InputStream;
 import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.ui.Visualizer;
+import ru.biosoft.physicell.ui.Visualizer2D;
 import ru.biosoft.physicell.xml.ModelReader;
 
 /*
@@ -83,6 +85,8 @@ public class Main
         if( strings != null && strings.length > 0 )
             resultPath = strings[0];
 
+        for (int i=0; i<100; i++)
+        {
         InputStream settings = Main.class.getResourceAsStream( settingsPath );
         Model model = new ModelReader().read( settings, Heterogeneity.class );
         model.setWriteDensity( false );
@@ -99,23 +103,25 @@ public class Main
         model.setResultFolder( resultPath );
         //        model.setWriteDensity( true );
         //        model.addGIFVisualizer( 0, "figure1_no_apop" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
+        for( Visualizer v : model.getVisualizers() )
+            ((Visualizer2D)v).setAgentVisualizer( new HeterogeneityVisualizer( model ) );
         model.init();
         double tStart = System.nanoTime();
         model.simulate();
         tStart = System.nanoTime() - tStart;
-
-        System.out.println( "Total " + tStart / 1E9 );
-        System.out.println( "Diffusion " + Model.tDiffusion / 1E9 );
-        System.out.println( "Secretion " + CellContainer.tSecretion / 1E9 );
-        System.out.println( "Phenotype " + CellContainer.tPhenotype / 1E9 );
-        System.out.println( "Velocity " + CellContainer.tVelocity / 1E9 );
-        System.out.println( "Interaction " + CellContainer.tInteraction / 1E9 );
-        System.out.println( "Contact " + CellContainer.tContact / 1E9 );
-        System.out.println( "Custom " + CellContainer.tCustom / 1E9 );
-        System.out.println( "Attachment " + CellContainer.tAttachment / 1E9 );
-        System.out.println( "Divide " + CellContainer.tDivide / 1E9 );
-        System.out.println( "Rest " + CellContainer.tRestAll / 1E9 );
-        System.out.println( "Gradient " + CellContainer.tGradient / 1E9 );
-        System.out.println( "Total cell " + CellContainer.tTotal / 1E9 );
+        }
+//        System.out.println( "Total " + tStart / 1E9 );
+//        System.out.println( "Diffusion " + Model.tDiffusion / 1E9 );
+//        System.out.println( "Secretion " + CellContainer.tSecretion / 1E9 );
+//        System.out.println( "Phenotype " + CellContainer.tPhenotype / 1E9 );
+//        System.out.println( "Velocity " + CellContainer.tVelocity / 1E9 );
+//        System.out.println( "Interaction " + CellContainer.tInteraction / 1E9 );
+//        System.out.println( "Contact " + CellContainer.tContact / 1E9 );
+//        System.out.println( "Custom " + CellContainer.tCustom / 1E9 );
+//        System.out.println( "Attachment " + CellContainer.tAttachment / 1E9 );
+//        System.out.println( "Divide " + CellContainer.tDivide / 1E9 );
+//        System.out.println( "Rest " + CellContainer.tRestAll / 1E9 );
+//        System.out.println( "Gradient " + CellContainer.tGradient / 1E9 );
+//        System.out.println( "Total cell " + CellContainer.tTotal / 1E9 );
     }
 }

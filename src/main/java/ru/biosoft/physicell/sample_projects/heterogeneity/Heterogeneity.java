@@ -4,7 +4,6 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.ui.Visualizer;
 
 /*
 ###############################################################################
@@ -86,8 +85,6 @@ public class Heterogeneity extends Model
         createCellTypes();
         setupTissue();
         //        printSummary( m, CUSTOM_ONCOPROTEIN );
-        for( Visualizer visualizer : getVisualizers() )
-            visualizer.setAgentVisualizer( new HeterogeneityVisualizer( this ) );
     }
 
     void createCellTypes()

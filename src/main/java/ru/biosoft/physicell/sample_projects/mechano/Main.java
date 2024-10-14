@@ -75,7 +75,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
 
-//    private static String DOUBLE_MEMBRANE_PATH = "config/cells-double-membrane.csv";
+    //    private static String DOUBLE_MEMBRANE_PATH = "config/cells-double-membrane.csv";
     private static String SHELL_PATH = "config/cells-shell.csv";
 
     private static String settingsPath = "config/PhysiCell_settings.xml";
@@ -92,7 +92,7 @@ public class Main
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addGIFVisualizer( 0, "substrate" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 0, "substrate" ).setStubstrateIndex( 0 ).setMaxDensity( 1 ).setAgentVisualizer( new MechanoVisualizer() );
 
         model.init();
         CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( SHELL_PATH ), model );

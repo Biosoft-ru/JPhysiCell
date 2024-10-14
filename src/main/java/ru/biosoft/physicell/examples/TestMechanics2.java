@@ -18,8 +18,8 @@ import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.StandardModels;
-import ru.biosoft.physicell.ui.Visualizer;
-import ru.biosoft.physicell.ui.Visualizer.Section;
+import ru.biosoft.physicell.ui.Visualizer2D;
+import ru.biosoft.physicell.ui.Visualizer2D.Section;
 
 public class TestMechanics2
 {
@@ -106,11 +106,11 @@ public class TestMechanics2
     static double volume = 2.4943e+03;
     static double sphereRadius = 80;
 
-    private static List<Visualizer> resultListeners = new ArrayList<>();
+    private static List<Visualizer2D> resultListeners = new ArrayList<>();
 
     static
     {
-        Visualizer visualizer = Visualizer.createWithGIF( resultPath, "Z500", Section.Z, zSlice );
+        Visualizer2D visualizer = Visualizer2D.createWithGIF( resultPath, "Z500", Section.Z, zSlice );
         visualizer.setDrawDensity( false );
         visualizer.setColorPhase( "Ki67-", Color.lightGray );
         visualizer.setColorPhase( "Ki67+ (premitotic)", Color.green );
@@ -118,7 +118,7 @@ public class TestMechanics2
         visualizer.setColorPhase( "Apoptotic", Color.red );
         resultListeners.add( visualizer );
 
-        Visualizer visualizer2 = Visualizer.createWithGIF( resultPath, "Z590", Section.Z, zSlice - 10 );
+        Visualizer2D visualizer2 = Visualizer2D.createWithGIF( resultPath, "Z590", Section.Z, zSlice - 10 );
         visualizer2.setDrawDensity( false );
         visualizer2.setColorPhase( "Ki67-", Color.gray );
         visualizer2.setColorPhase( "Ki67+ (premitotic)", Color.green );
@@ -126,7 +126,7 @@ public class TestMechanics2
         visualizer2.setColorPhase( "Apoptotic", Color.red );
         resultListeners.add( visualizer2 );
 
-        Visualizer visualizer3 = Visualizer.createWithGIF( resultPath, "Y500", Section.Y, zSlice );
+        Visualizer2D visualizer3 = Visualizer2D.createWithGIF( resultPath, "Y500", Section.Y, zSlice );
         visualizer3.setDrawDensity( false );
         visualizer3.setColorPhase( "Ki67-", Color.gray );
         visualizer3.setColorPhase( "Ki67+ (premitotic)", Color.green );
@@ -160,7 +160,7 @@ public class TestMechanics2
         }
         //        for( int i = 250; i < 260; i += 1 )
         //            visualizer.draw( microenvironment, i, i, resultPath + "/slice_" + i + ".png" );
-        for( Visualizer listener : resultListeners )
+        for( Visualizer2D listener : resultListeners )
             listener.init();
 
         double startSimulation = System.currentTimeMillis();
@@ -172,7 +172,7 @@ public class TestMechanics2
             {
                 if( outputReport )
                     writeCellReport( m, resultPath + "/Report_" + (int)t + ".txt" );
-                for( Visualizer listener : resultListeners )
+                for( Visualizer2D listener : resultListeners )
                     listener.saveResult( m, t );
                 nextOutputTime += outputInterval;
             }
@@ -181,7 +181,7 @@ public class TestMechanics2
         }
         if( outputReport )
             writeCellReport( m, resultPath + "/Report_" + (int)t + ".txt" );
-        for( Visualizer listener : resultListeners )
+        for( Visualizer2D listener : resultListeners )
             listener.finish();
         System.out.println( "Done. Elapsed time: " + ( System.currentTimeMillis() - startSimulation ) / 1000 );
     }

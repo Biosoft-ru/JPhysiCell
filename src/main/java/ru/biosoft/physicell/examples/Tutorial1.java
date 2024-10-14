@@ -5,8 +5,8 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.VectorUtil;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellUtilities;
-import ru.biosoft.physicell.ui.Visualizer;
-import ru.biosoft.physicell.ui.Visualizer.Section;
+import ru.biosoft.physicell.ui.Visualizer2D;
+import ru.biosoft.physicell.ui.Visualizer2D.Section;
 
 /*
 #############################################################################
@@ -62,7 +62,7 @@ public class Tutorial1
     private static double outputInterval = 0.1; // time delta between images
     private static boolean outputTables = false;
 
-    static Visualizer visualizer = Visualizer.createWithGIF( resultPath, "Z5003", Section.Z, zSlice );
+    static Visualizer2D visualizer = Visualizer2D.createWithGIF( resultPath, "Z5003", Section.Z, zSlice );
 
     public static void main(String ... args) throws Exception
     {

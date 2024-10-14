@@ -17,8 +17,8 @@ import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.O2based;
 import ru.biosoft.physicell.core.standard.StandardModels;
-import ru.biosoft.physicell.ui.Visualizer;
-import ru.biosoft.physicell.ui.Visualizer.Section;
+import ru.biosoft.physicell.ui.Visualizer2D;
+import ru.biosoft.physicell.ui.Visualizer2D.Section;
 
 /*
 ###############################################################################
@@ -94,7 +94,7 @@ public class TestCellCycle
     private static String resultName = "CellCycle4";
     private static int zSlice = 100;
     //visualizer settings
-    private static Visualizer visualizer = Visualizer.createWithGIF( resultPath, resultName, Section.Z, zSlice );
+    private static Visualizer2D visualizer = Visualizer2D.createWithGIF( resultPath, resultName, Section.Z, zSlice );
     static
     {
         visualizer.setDrawDensity( false );

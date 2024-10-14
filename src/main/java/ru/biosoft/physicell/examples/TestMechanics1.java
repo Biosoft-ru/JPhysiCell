@@ -8,8 +8,8 @@ import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.StandardModels;
-import ru.biosoft.physicell.ui.Visualizer;
-import ru.biosoft.physicell.ui.Visualizer.Section;
+import ru.biosoft.physicell.ui.Visualizer2D;
+import ru.biosoft.physicell.ui.Visualizer2D.Section;
 
 public class TestMechanics1
 {
@@ -90,7 +90,7 @@ public class TestMechanics1
     private static double[] point2 = new double[] {105.73, 100, 100};
     private static double volume = 4188.790204786391;
 
-    private static Visualizer visualizer = Visualizer.createWithGIF( resultPath, resultName, Section.Z, 100 );
+    private static Visualizer2D visualizer = Visualizer2D.createWithGIF( resultPath, resultName, Section.Z, 100 );
     static
     {
         visualizer.setDrawDensity( false );

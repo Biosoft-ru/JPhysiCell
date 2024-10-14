@@ -13,8 +13,8 @@ import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.O2based;
 import ru.biosoft.physicell.core.standard.StandardModels;
-import ru.biosoft.physicell.ui.Visualizer;
-import ru.biosoft.physicell.ui.Visualizer.Section;
+import ru.biosoft.physicell.ui.Visualizer2D;
+import ru.biosoft.physicell.ui.Visualizer2D.Section;
 
 /*
 ###############################################################################
@@ -88,7 +88,7 @@ public class TestHDS
     private static String resultPath = "C:/Users/Damag/BIOFVM/HDS";
     //    private static String resultName = "result";
 
-    private static List<Visualizer> resultListeners = new ArrayList<>();
+    private static List<Visualizer2D> resultListeners = new ArrayList<>();
     static
     {
         addListener( "Result_X", Section.X, 0 );
@@ -98,7 +98,7 @@ public class TestHDS
 
     private static void addListener(String name, Section sec, int slice)
     {
-        Visualizer visualizer3 = Visualizer.createWithGIF( resultPath, name, sec, slice );
+        Visualizer2D visualizer3 = Visualizer2D.createWithGIF( resultPath, name, sec, slice );
         visualizer3.setSaveImage( false );
         //        visualizer3.setDrawDensity( false );
         visualizer3.setMaxDensity( o2_conc * 2 );
@@ -275,7 +275,7 @@ public class TestHDS
         //        try 
         //        {       
 
-        for( Visualizer listener : resultListeners )
+        for( Visualizer2D listener : resultListeners )
             listener.init();
         while( t < t_max )
         {
@@ -283,7 +283,7 @@ public class TestHDS
             {
                 //                    log_output(t, output_index, microenvironment, report_file);
 
-                for( Visualizer listener : resultListeners )
+                for( Visualizer2D listener : resultListeners )
                     listener.saveResult( microenvironment, t );
                 t_next_output_time += t_output_interval;
             }
@@ -293,7 +293,7 @@ public class TestHDS
             t += dt;
             //                output_index++;
         }
-        for( Visualizer listener : resultListeners )
+        for( Visualizer2D listener : resultListeners )
             listener.finish();
         //            log_output(t, output_index, microenvironment, report_file);
         //            report_file.close();

@@ -5,6 +5,8 @@ import java.io.InputStream;
 import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
 import ru.biosoft.physicell.core.CellContainer;
 import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.ui.GIFGenerator;
+import ru.biosoft.physicell.ui.render.Visualizer3D;
 import ru.biosoft.physicell.xml.ModelReader;
 
 /*
@@ -76,7 +78,7 @@ import ru.biosoft.physicell.xml.ModelReader;
 public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/perd_prey_farmer/August2";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/perd_prey_farmer/October";
 
     public static void main(String ... strings) throws Exception
     {
@@ -94,9 +96,13 @@ public class Main
         model.setWriteDensity( false );
         model.setSaveFull( true );
         model.setSaveImg( true );
-        model.addGIFVisualizer( 0, "food" ).setStubstrateIndex( 0 ).setMaxDensity( 10 );
-        model.addGIFVisualizer( 0, "prey signal" ).setStubstrateIndex( 1 ).setMaxDensity( 10 );
-        model.addGIFVisualizer( 0, "predator signal" ).setStubstrateIndex( 2 ).setMaxDensity( 10 );
+
+        Visualizer3D visualizer = new Visualizer3D( resultPath, "3d" );
+        visualizer.addResultGenerator( new GIFGenerator( resultPath, "3d.gif" ) );
+        model.addVisualizer( visualizer );
+//        model.addGIFVisualizer( 0, "food" ).setStubstrateIndex( 0 ).setMaxDensity( 10 ).setAgentVisualizer( new PPFVisualizer() );
+        //        model.addGIFVisualizer( 0, "prey signal" ).setStubstrateIndex( 1 ).setMaxDensity( 10 ).setAgentVisualizer( new PPFVisualizer() );
+        //        model.addGIFVisualizer( 0, "predator signal" ).setStubstrateIndex( 2 ).setMaxDensity( 10 ).setAgentVisualizer( new PPFVisualizer() );
         model.init();
         System.out.println( model.display() );
         model.simulate();

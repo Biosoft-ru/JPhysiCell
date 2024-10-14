@@ -12,7 +12,6 @@ import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.Secretion;
 import ru.biosoft.physicell.core.standard.StandardModels;
 import ru.biosoft.physicell.core.standard.StandardVolumeUpdate;
-import ru.biosoft.physicell.ui.Visualizer;
 
 /*
 ###############################################################################
@@ -88,8 +87,6 @@ public class CancerMetabolism extends Model
         super.init();
         createCellTypes();
         setupTissue();
-        for( Visualizer visualizer : getVisualizers() )
-            visualizer.setAgentVisualizer( new CancerMetabolismVisualizer() );
     }
 
     void createCellTypes() throws Exception

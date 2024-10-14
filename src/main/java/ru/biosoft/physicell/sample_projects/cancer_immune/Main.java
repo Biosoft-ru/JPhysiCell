@@ -5,6 +5,8 @@ import java.io.InputStream;
 import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
 import ru.biosoft.physicell.core.CellContainerParallel;
 import ru.biosoft.physicell.core.Model;
+import ru.biosoft.physicell.ui.GIFGenerator;
+import ru.biosoft.physicell.ui.render.Visualizer3D;
 import ru.biosoft.physicell.xml.ModelReader;
 
 /*
@@ -77,7 +79,7 @@ public class Main
 {
     private static String settingsPath = "config/PhysiCell_settings.xml";
     //    private static String settingsPath = "config/PhysiCell_settings2D.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_immune/exp2";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_immune/October";
 
     public static void main(String ... strings) throws Exception
     {
@@ -93,11 +95,17 @@ public class Main
         model.getMicroenvironment().setSolver( solver );
         model.createContainer( mechanics_voxel_size, CellContainerParallel.PARALLEL_CONTAINER_NAME );
         model.setResultFolder( resultPath );
-        model.setSaveFull( false );
-        model.setSaveImg( false );
+        model.setSaveFull( true );
+        model.setSaveImg( true );
         model.setWriteDensity( false );
-        model.addGIFVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
-        model.addGIFVisualizer( 0, "figure0" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        
+        Visualizer3D visualizer = new Visualizer3D( resultPath, "3d" );
+        visualizer.addResultGenerator( new GIFGenerator( resultPath, "3d.gif" ) );
+        visualizer.setAgentColorer( new CancerImmunityVisualizer() );
+        model.addVisualizer( visualizer );
+        
+//        model.addGIFVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 750, "factor" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
         model.init();
         System.out.println( model.display() );
         //        double tStart = System.nanoTime();

@@ -80,7 +80,6 @@ public class Mechano extends Model
         super.init();
         createCellTypes();
         setupTissue();
-        getVisualizers().forEach( v ->  ((Visualizer2D)v).setAgentVisualizer( new MechanoVisualizer() ) );
     }
 
     void createCellTypes()
