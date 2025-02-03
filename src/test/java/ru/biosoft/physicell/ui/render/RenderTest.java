@@ -1,7 +1,5 @@
 package ru.biosoft.physicell.ui.render;
 
-import java.util.List;
-
 import javax.swing.JFrame;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
@@ -9,6 +7,7 @@ import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.util.List;
 
 
 public class RenderTest
@@ -39,8 +38,10 @@ public class RenderTest
         frame.setSize( 1000, 1000 );
 
 
-        headingSlider.setValue( -44 );
-        pitchSlider.setValue( -22 );
+//        headingSlider.setValue( -44 );
+//        pitchSlider.setValue( -22 );
+        headingSlider.setValue( 0 );
+      pitchSlider.setValue( 0 );
         frame.setVisible( true );
     }
 
@@ -48,16 +49,16 @@ public class RenderTest
     {
         Scene result = new Scene();
 
-        List<Vertex> positions = SceneHelper.createPositions( new Vertex( 500, 500, 500 ), 200, 10 );
-        for( Vertex v : positions )
-        {
-            result.add( SceneHelper.createSphere( v.x, v.y, v.z, 5 + 6 * Math.random(), Color.gray ) );
-        }
-        //        result.add( SceneHelper.createSphere( 300, 400, -400, 10 ) );
+//        List<Vertex> positions = SceneHelper.createPositions( new Vertex( 500, 500, 500 ), 200, 10 );
+//        for( Vertex v : positions )
+//        {
+//            result.add( SceneHelper.createSphere( v.x, v.y, v.z, 5 + 6 * Math.random(), Color.gray ) );
+//        }
+//                result.add( SceneHelper.createSphere( 300, 400, -400, 20, Color.gray ) );
         //        result.add( SceneHelper.createSphere( 350, 400, -300, 10 ) );
         //        result.add( SceneHelper.createSphere( 400, 400, -200, 10 ) );
         //        result.add( SceneHelper.createSphere( 450, 400, -100, 10 ) );
-        //        result.add( SceneHelper.createSphere( 500, 400, 0, 10 ) );
+//                result.add( SceneHelper.createSphere( 500, 400, 0, 10, Color.gray  ) );
         //        result.add( SceneHelper.createSphere( 550, 400, 100, 10 ) );
         //        result.add( SceneHelper.createSphere( 600, 400, 200, 10 ) );
         //        result.add( SceneHelper.createSphere( 650, 400, 300, 10 ) );
@@ -74,7 +75,7 @@ public class RenderTest
         //        for( int i = 0; i < 100; i++ )
         //            meshes.add( createSphere( 1000 * Math.random(), 1000 * Math.random(), 1000 * Math.random(), 10 + Math.random() * 10 ) );
 
-        //        polygons.add( addSphere( 100, 100, 0, 10 ) );
+        result.add(  SceneHelper.createSphere( 300, 300, 0, 100, Color.gray ) );
         //        polygons.add( addSphere( 200, 200, 0, 10 ) );
         //        polygons.add( addSphere( 100, 200, 0, 10 ) );
         //        polygons.add( addSphere( 200, 100, 0, 10 ) );

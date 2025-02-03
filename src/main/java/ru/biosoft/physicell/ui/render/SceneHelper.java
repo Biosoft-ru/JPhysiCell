@@ -14,6 +14,11 @@ public class SceneHelper
 
     public static Mesh createSphere(double x, double y, double z, double r, Color color)
     {
+        return createSphere( x, y, z, r, color, 3);
+    }
+    
+    public static Mesh createSphere(double x, double y, double z, double r, Color color, int quality)
+    {
         Mesh mesh = new Mesh();
         mesh.setColor( color );
         mesh.add( new Triangle( new Vertex( r, r, r ), new Vertex( -r, -r, r ), new Vertex( -r, r, -r ) ) );
@@ -23,7 +28,7 @@ public class SceneHelper
 
         mesh.offset( x, y, z );
 
-        for( int i = 0; i < 3; i++ )
+        for( int i = 0; i < quality; i++ )
             mesh = inflate( mesh, r );
         return mesh;
     }
@@ -38,9 +43,13 @@ public class SceneHelper
             Vertex c23 = Util.center( t.v2, t.v3 );
             Vertex c31 = Util.center( t.v3, t.v1 );
 
+            //            if( !Renderer3D.isBehind( new Triangle( t.v1, c12, c31) , mesh.center ) )
             result.add( new Triangle( t.v1, c12, c31 ) );
+            //            if( !Renderer3D.isBehind( new Triangle( t.v2, c12, c23 ), mesh.center ) )
             result.add( new Triangle( t.v2, c12, c23 ) );
+            //            if( !Ren/derer3D.isBehind(  new Triangle( t.v3, c23, c31 ), mesh.center ) )
             result.add( new Triangle( t.v3, c23, c31 ) );
+            //            if( !Re/nderer3D.isBehind( new Triangle( c12, c23, c31 ), mesh.center ) )
             result.add( new Triangle( c12, c23, c31 ) );
         }
 
@@ -64,8 +73,7 @@ public class SceneHelper
             {
                 for( double y = -sphereRadius; y < sphereRadius * 2; y += ySpacing )
                 {
-                    Vertex tempPoint = new Vertex( x + ( zc % 2 ) * 0.5 * cellRadius ,
-                            y + ( xc % 2 ) * cellRadius, z  );
+                    Vertex tempPoint = new Vertex( x + ( zc % 2 ) * 0.5 * cellRadius, y + ( xc % 2 ) * cellRadius, z );
                     tempPoint.offset( center );
                     if( Util.distance( tempPoint, center ) < sphereRadius )
                     {

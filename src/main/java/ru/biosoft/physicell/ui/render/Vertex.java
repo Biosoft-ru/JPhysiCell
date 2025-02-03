@@ -35,6 +35,7 @@ public class Vertex
         this.z -= shift.z;
         return this;
     }
+    
 
     public String toString()
     {
