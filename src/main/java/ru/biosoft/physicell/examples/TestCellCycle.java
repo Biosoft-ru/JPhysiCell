@@ -17,6 +17,7 @@ import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.O2based;
 import ru.biosoft.physicell.core.standard.StandardModels;
+import ru.biosoft.physicell.ui.AgentColorerSimple;
 import ru.biosoft.physicell.ui.Visualizer2D;
 import ru.biosoft.physicell.ui.Visualizer2D.Section;
 
@@ -94,14 +95,15 @@ public class TestCellCycle
     private static String resultName = "CellCycle4";
     private static int zSlice = 100;
     //visualizer settings
-    private static Visualizer2D visualizer = Visualizer2D.createWithGIF( resultPath, resultName, Section.Z, zSlice );
+    private static Visualizer2D visualizer = Visualizer2D.createWithGIF( resultPath, resultName, Section.Z, zSlice )
+            .setDrawDensity( false );
+    private static AgentColorerSimple colorer = new AgentColorerSimple();
     static
     {
-        visualizer.setDrawDensity( false );
-        visualizer.setColorPhase( "Ki67-", Color.gray );
-        visualizer.setColorPhase( "Ki67+ (premitotic)", Color.blue );
-        visualizer.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 180, 0 ) );
-        visualizer.setColorPhase( "Apoptotic", Color.red );
+        colorer.addPhaseColor( "Ki67-", Color.gray );
+        colorer.addPhaseColor( "Ki67+ (premitotic)", Color.blue );
+        colorer.addPhaseColor( "Ki67+ (postmitotic)", new Color( 0, 180, 0 ) );
+        colorer.addPhaseColor( "Apoptotic", Color.red );
     }
 
     //Cell types
@@ -212,7 +214,7 @@ public class TestCellCycle
             agent.setUptakeConstants( dt );
 
         visualizer.init();
-
+        visualizer.setAgentColorer( colorer );
         //Simulation starts
         double t = 0.0;
         double tOutputInterval = Math.max( outputInterval, dt );

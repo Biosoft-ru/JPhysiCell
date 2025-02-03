@@ -18,6 +18,8 @@ import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.standard.StandardModels;
+import ru.biosoft.physicell.ui.AgentColorerSimple;
+import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer2D;
 import ru.biosoft.physicell.ui.Visualizer2D.Section;
 
@@ -106,33 +108,18 @@ public class TestMechanics2
     static double volume = 2.4943e+03;
     static double sphereRadius = 80;
 
-    private static List<Visualizer2D> resultListeners = new ArrayList<>();
+    private static List<Visualizer> resultListeners = new ArrayList<>();
 
     static
     {
-        Visualizer2D visualizer = Visualizer2D.createWithGIF( resultPath, "Z500", Section.Z, zSlice );
-        visualizer.setDrawDensity( false );
-        visualizer.setColorPhase( "Ki67-", Color.lightGray );
-        visualizer.setColorPhase( "Ki67+ (premitotic)", Color.green );
-        visualizer.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
-        visualizer.setColorPhase( "Apoptotic", Color.red );
-        resultListeners.add( visualizer );
-
-        Visualizer2D visualizer2 = Visualizer2D.createWithGIF( resultPath, "Z590", Section.Z, zSlice - 10 );
-        visualizer2.setDrawDensity( false );
-        visualizer2.setColorPhase( "Ki67-", Color.gray );
-        visualizer2.setColorPhase( "Ki67+ (premitotic)", Color.green );
-        visualizer2.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
-        visualizer2.setColorPhase( "Apoptotic", Color.red );
-        resultListeners.add( visualizer2 );
-
-        Visualizer2D visualizer3 = Visualizer2D.createWithGIF( resultPath, "Y500", Section.Y, zSlice );
-        visualizer3.setDrawDensity( false );
-        visualizer3.setColorPhase( "Ki67-", Color.gray );
-        visualizer3.setColorPhase( "Ki67+ (premitotic)", Color.green );
-        visualizer3.setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
-        visualizer3.setColorPhase( "Apoptotic", Color.red );
-        resultListeners.add( visualizer3 );
+        AgentColorerSimple colorer = new AgentColorerSimple();
+        colorer.addPhaseColor( "Ki67-", Color.lightGray );
+        colorer.addPhaseColor( "Ki67+ (premitotic)", Color.green );
+        colorer.addPhaseColor( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
+        colorer.addPhaseColor( "Apoptotic", Color.red );
+        resultListeners.add( Visualizer2D.createWithGIF( resultPath, "Z500", Section.Z, zSlice ).setDrawDensity( false ).setAgentColorer( colorer ) );
+        resultListeners.add( Visualizer2D.createWithGIF( resultPath, "Z590", Section.Z, zSlice - 10 ).setDrawDensity( false ).setAgentColorer( colorer ) );
+        resultListeners.add( Visualizer2D.createWithGIF( resultPath, "Y500", Section.Y, zSlice ).setDrawDensity( false ).setAgentColorer( colorer ) ) ;
     }
 
     public static void main(String ... argv) throws Exception
@@ -160,7 +147,7 @@ public class TestMechanics2
         }
         //        for( int i = 250; i < 260; i += 1 )
         //            visualizer.draw( microenvironment, i, i, resultPath + "/slice_" + i + ".png" );
-        for( Visualizer2D listener : resultListeners )
+        for( Visualizer listener : resultListeners )
             listener.init();
 
         double startSimulation = System.currentTimeMillis();
@@ -172,7 +159,7 @@ public class TestMechanics2
             {
                 if( outputReport )
                     writeCellReport( m, resultPath + "/Report_" + (int)t + ".txt" );
-                for( Visualizer2D listener : resultListeners )
+                for( Visualizer listener : resultListeners )
                     listener.saveResult( m, t );
                 nextOutputTime += outputInterval;
             }
@@ -181,7 +168,7 @@ public class TestMechanics2
         }
         if( outputReport )
             writeCellReport( m, resultPath + "/Report_" + (int)t + ".txt" );
-        for( Visualizer2D listener : resultListeners )
+        for( Visualizer listener : resultListeners )
             listener.finish();
         System.out.println( "Done. Elapsed time: " + ( System.currentTimeMillis() - startSimulation ) / 1000 );
     }
