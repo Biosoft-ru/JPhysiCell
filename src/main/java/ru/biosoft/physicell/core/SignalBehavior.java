@@ -212,7 +212,7 @@ public class SignalBehavior
         return behaviors;
     }
 
-    int findSignalIndex(String name)
+    public int findSignalIndex(String name)
     {
         if( signalToIndex.containsKey( name ) )
             return signalToIndex.get( name );
