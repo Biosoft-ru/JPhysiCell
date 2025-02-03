@@ -91,7 +91,7 @@ public class Main
         model.createContainer( mechanics_voxel_size, CellContainerParallel.PARALLEL_CONTAINER_NAME );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addGIFVisualizer( 0, "signal" ).setStubstrateIndex( 0 ).setMaxDensity( 10 ).setAgentVisualizer( new WormVisualizer() );
+        model.addGIFVisualizer( 0, "signal" ).setStubstrateIndex( 0 ).setMaxDensity( 10 ).setAgentColorer( new WormVisualizer() );
         model.init();
         CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( CELLS_PATH ), model );
         System.out.println( model.display() );

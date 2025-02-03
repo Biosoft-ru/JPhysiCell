@@ -104,7 +104,7 @@ public class Main
         //        model.setWriteDensity( true );
         //        model.addGIFVisualizer( 0, "figure1_no_apop" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
         for( Visualizer v : model.getVisualizers() )
-            ((Visualizer2D)v).setAgentVisualizer( new HeterogeneityVisualizer( model ) );
+            ((Visualizer2D)v).setAgentColorer( new HeterogeneityVisualizer( model ) );
         model.init();
         double tStart = System.nanoTime();
         model.simulate();

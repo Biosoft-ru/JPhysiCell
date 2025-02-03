@@ -3,9 +3,9 @@ package ru.biosoft.physicell.sample_projects.worm;
 import java.awt.Color;
 
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.ui.AgentVisualizer;
+import ru.biosoft.physicell.ui.AgentColorer;
 
-public class WormVisualizer extends AgentVisualizer
+public class WormVisualizer implements AgentColorer
 {
     public Color[] findColors(Cell cell)
     {

@@ -2,29 +2,16 @@ package ru.biosoft.physicell.ui;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.HashMap;
-import java.util.Map;
 
 import ru.biosoft.physicell.core.Cell;
 
 public class AgentVisualizer
 {
-    Map<Integer, Color> typeColor = new HashMap<>();
-    Map<String, Color> phaseColor = new HashMap<>();
-
-    public void addTypeColor(Integer type, Color color)
-    {
-        typeColor.put( type, color );
-    }
-
-    public void addPhaseColor(String type, Color color)
-    {
-        phaseColor.put( type, color );
-    }
+    private AgentColorer agentColorer = new AgentColorerDefault();
 
     public void drawAgent(Cell cell, int x, int y, int r, Graphics g)
     {
-        Color[] colors = findColors( cell );
+        Color[] colors = agentColorer.findColors( cell );
         g.setColor( colors[0] );
         g.fillOval( x - r, y - r, 2 * r, 2 * r );
         g.setColor( colors[1] );
@@ -33,7 +20,7 @@ public class AgentVisualizer
 
     public void drawAgent(Cell cell, int x, int y, int r, int nr, Graphics g)
     {
-        Color[] colors = findColors( cell );
+        Color[] colors =  agentColorer.findColors( cell );
         g.setColor( colors[0] );
         g.fillOval( x - r, y - r, 2 * r, 2 * r );
         if( colors.length > 1 )
@@ -50,29 +37,8 @@ public class AgentVisualizer
         }
     }
 
-    public Color findBorderColor(Cell cell)
+    public void setAgentColorer(AgentColorer colorer)
     {
-        return Color.black;
+        this.agentColorer = colorer;
     }
-
-    public Color findColor(Cell cell)
-    {
-        Color c = Color.white;
-        int type = cell.type;
-        if( typeColor.containsKey( type ) )
-            c = typeColor.get( type );
-        else
-        {
-            String phase = cell.phenotype.cycle.currentPhase().name;
-            if( phaseColor.containsKey( phase ) )
-                c = phaseColor.get( phase );
-        }
-        return c;
-    }
-
-    public Color[] findColors(Cell cell)
-    {
-        return new Color[] {Color.black, Color.white, Color.white, Color.white};
-    }
-
 }

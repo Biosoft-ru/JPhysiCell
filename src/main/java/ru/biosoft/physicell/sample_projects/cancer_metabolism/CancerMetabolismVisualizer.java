@@ -3,9 +3,9 @@ package ru.biosoft.physicell.sample_projects.cancer_metabolism;
 import java.awt.Color;
 
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.ui.AgentVisualizer;
+import ru.biosoft.physicell.ui.AgentColorer;
 
-public class CancerMetabolismVisualizer extends AgentVisualizer
+public class CancerMetabolismVisualizer implements AgentColorer
 {
     @Override
     public Color[] findColors(Cell cell)

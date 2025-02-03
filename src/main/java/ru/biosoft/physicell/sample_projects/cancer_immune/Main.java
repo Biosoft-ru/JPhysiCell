@@ -77,9 +77,9 @@ import ru.biosoft.physicell.xml.ModelReader;
 */
 public class Main
 {
-    private static String settingsPath = "config/PhysiCell_settings.xml";
+    private static String settingsPath = "config/PhysiCell_settings2D.xml";
     //    private static String settingsPath = "config/PhysiCell_settings2D.xml";
-    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_immune/October";
+    private static String resultPath = "C:/Users/Damag/BIOFVM/projects/cancer_immune/December";
 
     public static void main(String ... strings) throws Exception
     {
@@ -99,13 +99,13 @@ public class Main
         model.setSaveImg( true );
         model.setWriteDensity( false );
         
-        Visualizer3D visualizer = new Visualizer3D( resultPath, "3d" );
+        Visualizer3D visualizer = new Visualizer3D( resultPath, "3d", model.getMicroenvironment() );
         visualizer.addResultGenerator( new GIFGenerator( resultPath, "3d.gif" ) );
         visualizer.setAgentColorer( new CancerImmunityVisualizer() );
         model.addVisualizer( visualizer );
         
 //        model.addGIFVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 1 );
-        model.addGIFVisualizer( 750, "factor" ).setStubstrateIndex( 1 ).setMaxDensity( 1 );
+        model.addGIFVisualizer( 0, "factor" ).setStubstrateIndex( 1 ).setMaxDensity( 1 ).setAgentColorer( new CancerImmunityVisualizer() );
         model.init();
         System.out.println( model.display() );
         //        double tStart = System.nanoTime();

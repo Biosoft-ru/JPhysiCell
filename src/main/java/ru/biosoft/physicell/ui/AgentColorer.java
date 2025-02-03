@@ -6,9 +6,6 @@ import ru.biosoft.physicell.core.Cell;
 
 public interface AgentColorer
 {
-    public Color findBorderColor(Cell cell);
-    public Color findColor(Cell cell);
-    
     /**
      * returns array of colors for agent drawing
      * [0] -> agent border

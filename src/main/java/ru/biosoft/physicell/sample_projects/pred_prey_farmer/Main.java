@@ -97,7 +97,7 @@ public class Main
         model.setSaveFull( true );
         model.setSaveImg( true );
 
-        Visualizer3D visualizer = new Visualizer3D( resultPath, "3d" );
+        Visualizer3D visualizer = new Visualizer3D( resultPath, "3d", model.getMicroenvironment() );
         visualizer.addResultGenerator( new GIFGenerator( resultPath, "3d.gif" ) );
         model.addVisualizer( visualizer );
 //        model.addGIFVisualizer( 0, "food" ).setStubstrateIndex( 0 ).setMaxDensity( 10 ).setAgentVisualizer( new PPFVisualizer() );

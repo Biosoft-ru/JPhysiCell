@@ -12,7 +12,7 @@ public interface Visualizer
     public void addResultGenerator(ResultGenerator generator);
     public void clearResultGenerators();
     public Iterable<ResultGenerator> getGenerators();
-    public void setAgentColorer(AgentColorer colorer);
+    public Visualizer setAgentColorer(AgentColorer colorer);
 
     public void init() throws IOException;
 

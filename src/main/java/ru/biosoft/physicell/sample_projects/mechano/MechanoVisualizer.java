@@ -3,9 +3,9 @@ package ru.biosoft.physicell.sample_projects.mechano;
 import java.awt.Color;
 
 import ru.biosoft.physicell.core.Cell;
-import ru.biosoft.physicell.ui.AgentVisualizer;
+import ru.biosoft.physicell.ui.AgentColorer;
 
-public class MechanoVisualizer extends AgentVisualizer
+public class MechanoVisualizer implements AgentColorer
 {
     @Override
     public Color[] findColors(Cell cell)

@@ -5,9 +5,9 @@ import java.awt.Color;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.ui.AgentVisualizer;
+import ru.biosoft.physicell.ui.AgentColorer;
 
-public class VirusBarVisualizer extends AgentVisualizer
+public class VirusBarVisualizer implements AgentColorer
 {
     private int nVirus;
 

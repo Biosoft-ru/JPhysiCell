@@ -5,16 +5,9 @@ import java.awt.Color;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.ui.AgentColorer;
-import ru.biosoft.physicell.ui.AgentVisualizer;
 
-public class CancerImmunityVisualizer extends AgentVisualizer implements AgentColorer 
+public class CancerImmunityVisualizer implements AgentColorer 
 {
-    @Override
-    public Color findBorderColor(Cell cell)
-    {
-        return Color.black;
-    }
-
     @Override
     public Color[] findColors(Cell cell)
     {
@@ -62,11 +55,5 @@ public class CancerImmunityVisualizer extends AgentVisualizer implements AgentCo
             return output;
         }
         return output;
-    }
-
-    @Override
-    public Color findColor(Cell cell)
-    {
-        return null;
     }
 }

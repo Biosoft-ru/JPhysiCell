@@ -79,7 +79,7 @@ import ru.biosoft.physicell.core.Model;
 
 public class CancerImmune extends Model
 {
-    private boolean use2D = false;
+    private boolean use2D = true;
 
     @Override
     public void init() throws Exception
@@ -142,6 +142,7 @@ public class CancerImmune extends Model
 
     static List<double[]> createSpherePositions(double[] center, double cellRadius, double sphereRadius, boolean use2D)
     {
+        
         List<double[]> cells = new ArrayList<>();
         int xc = 0, zc = 0;
         double xSpacing = cellRadius * Math.sqrt( 3 );
@@ -155,9 +156,9 @@ public class CancerImmune extends Model
                 for( double y = -sphereRadius; y < sphereRadius; y += ySpacing )
                 {
                     double[] tempPoint = new double[3];
-                    tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius + sphereRadius;
-                    tempPoint[1] = y + ( xc % 2 ) * cellRadius + sphereRadius;
-                    tempPoint[2] = sphereRadius;
+                    tempPoint[0] = x + ( zc % 2 ) * 0.5 * cellRadius + sphereRadius+ center[0];
+                    tempPoint[1] = y + ( xc % 2 ) * cellRadius + sphereRadius+ center[1];
+                    tempPoint[2] = 0;
 
                     if( Math.sqrt( VectorUtil.norm_squared( tempPoint ) ) < sphereRadius )
                     {
@@ -199,7 +200,7 @@ public class CancerImmune extends Model
 
         double tumorRadius = getParameterDouble( "tumor_radius" );// 250.0;  
 
-        List<double[]> positions = createSpherePositions( new double[] {750,750,750}, cellRadius, tumorRadius, use2D );
+        List<double[]> positions = createSpherePositions( new double[] {500,500,0}, cellRadius, tumorRadius, use2D );
         //        System.out.println( "creating " + positions.size() + " closely-packed tumor cells ... " );
 
         double imm_mean = getParameterDouble( "tumor_mean_immunogenicity" );

@@ -6,21 +6,15 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.SignalBehavior;
-import ru.biosoft.physicell.ui.AgentVisualizer;
+import ru.biosoft.physicell.ui.AgentColorer;
 
-public class CancerBiorobotsVisualizer extends AgentVisualizer
+public class CancerBiorobotsVisualizer implements AgentColorer
 {
     private SignalBehavior signals;
 
     public CancerBiorobotsVisualizer(Model model)
     {
        signals = model.getSignals(); 
-    }
-
-    @Override
-    public Color findBorderColor(Cell cell)
-    {
-        return Color.black;
     }
 
     @Override

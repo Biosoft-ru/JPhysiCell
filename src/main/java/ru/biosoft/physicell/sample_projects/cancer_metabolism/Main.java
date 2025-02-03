@@ -20,9 +20,9 @@ public class Main
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
         model.setSaveFull( true );
-        model.addGIFVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 38 ).setAgentVisualizer( new CancerMetabolismVisualizer() );
-        model.addGIFVisualizer( 0, "glucose" ).setStubstrateIndex( 1 ).setMaxDensity( 50 ).setAgentVisualizer( new CancerMetabolismVisualizer() );
-        model.addGIFVisualizer( 0, "lactate" ).setStubstrateIndex( 2 ).setMaxDensity( 50 ).setAgentVisualizer( new CancerMetabolismVisualizer() );
+        model.addGIFVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 38 ).setAgentColorer( new CancerMetabolismVisualizer() );
+        model.addGIFVisualizer( 0, "glucose" ).setStubstrateIndex( 1 ).setMaxDensity( 50 ).setAgentColorer( new CancerMetabolismVisualizer() );
+        model.addGIFVisualizer( 0, "lactate" ).setStubstrateIndex( 2 ).setMaxDensity( 50 ).setAgentColorer( new CancerMetabolismVisualizer() );
         model.init();
         System.out.println( model.display() );
         model.simulate();

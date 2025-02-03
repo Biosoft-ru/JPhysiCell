@@ -3,7 +3,7 @@ package ru.biosoft.physicell.sample_projects.rules_sample;
 import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
 import ru.biosoft.physicell.core.CellContainerParallel;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.ui.AgentVisualizer2;
+import ru.biosoft.physicell.ui.AgentColorerDefault;
 import ru.biosoft.physicell.xml.ModelReader;
 
 /*
@@ -90,11 +90,11 @@ public class Main
         model.createContainer( mechanics_voxel_size, CellContainerParallel.PARALLEL_CONTAINER_NAME );
         model.setResultFolder( resultPath );
 
-        model.addGIFVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 10 ).setAgentVisualizer( new AgentVisualizer2() );
-        model.addGIFVisualizer( 0, "apoptotic debris" ).setStubstrateIndex( 1 ).setMaxDensity( 1 ).setAgentVisualizer( new AgentVisualizer2() );
-        model.addGIFVisualizer( 0, "necrotic debris" ).setStubstrateIndex( 2 ).setMaxDensity( 1 ).setAgentVisualizer( new AgentVisualizer2() );
-        model.addGIFVisualizer( 0, "pro-inflammatory factor" ).setStubstrateIndex( 3 ).setMaxDensity( 1 ).setAgentVisualizer( new AgentVisualizer2() );
-        model.addGIFVisualizer( 0, "anti-inflammatory factor" ).setStubstrateIndex( 4 ).setMaxDensity( 1 ).setAgentVisualizer( new AgentVisualizer2() );
+        model.addGIFVisualizer( 0, "oxygen" ).setStubstrateIndex( 0 ).setMaxDensity( 10 ).setAgentColorer( new AgentColorerDefault() );
+        model.addGIFVisualizer( 0, "apoptotic debris" ).setStubstrateIndex( 1 ).setMaxDensity( 1 ).setAgentColorer( new AgentColorerDefault() );
+        model.addGIFVisualizer( 0, "necrotic debris" ).setStubstrateIndex( 2 ).setMaxDensity( 1 ).setAgentColorer( new AgentColorerDefault() );
+        model.addGIFVisualizer( 0, "pro-inflammatory factor" ).setStubstrateIndex( 3 ).setMaxDensity( 1 ).setAgentColorer( new AgentColorerDefault() );
+        model.addGIFVisualizer( 0, "anti-inflammatory factor" ).setStubstrateIndex( 4 ).setMaxDensity( 1 ).setAgentColorer( new AgentColorerDefault() );
 
         model.init();
 

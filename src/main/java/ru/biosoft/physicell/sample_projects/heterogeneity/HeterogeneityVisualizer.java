@@ -5,9 +5,9 @@ import java.awt.Color;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.Model;
 import ru.biosoft.physicell.core.SignalBehavior;
-import ru.biosoft.physicell.ui.AgentVisualizer;
+import ru.biosoft.physicell.ui.AgentColorer;
 
-public class HeterogeneityVisualizer extends AgentVisualizer
+public class HeterogeneityVisualizer implements AgentColorer
 {
     private double pMin;
     private double pMax;

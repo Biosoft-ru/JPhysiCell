@@ -92,7 +92,7 @@ public class Main
         model.createContainer( mechanics_voxel_size );
         model.setResultFolder( resultPath );
         model.setWriteDensity( true );
-        model.addGIFVisualizer( 0, "substrate" ).setStubstrateIndex( 0 ).setMaxDensity( 1 ).setAgentVisualizer( new MechanoVisualizer() );
+        model.addGIFVisualizer( 0, "substrate" ).setStubstrateIndex( 0 ).setMaxDensity( 1 ).setAgentColorer( new MechanoVisualizer() );
 
         model.init();
         CellCSVReader.load_cells_csv( Main.class.getResourceAsStream( SHELL_PATH ), model );

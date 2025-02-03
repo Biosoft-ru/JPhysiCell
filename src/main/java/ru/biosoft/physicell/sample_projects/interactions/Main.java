@@ -5,7 +5,7 @@ import java.io.InputStream;
 import ru.biosoft.physicell.biofvm.ConstantCoefficientsLOD3D;
 import ru.biosoft.physicell.core.CellContainerParallel;
 import ru.biosoft.physicell.core.Model;
-import ru.biosoft.physicell.ui.AgentVisualizer2;
+import ru.biosoft.physicell.ui.AgentColorerDefault;
 import ru.biosoft.physicell.ui.Visualizer2D;
 import ru.biosoft.physicell.xml.ModelReader;
 
@@ -99,7 +99,7 @@ public class Main
         model.addGIFVisualizer( 0, "fig_quorum" ).setStubstrateIndex( 2 ).setMaxDensity( 1 );
         model.addGIFVisualizer( 0, "fig_pro_inflam" ).setStubstrateIndex( 3 ).setMaxDensity( 1 );
         model.addGIFVisualizer( 0, "fig_debris" ).setStubstrateIndex( 4 ).setMaxDensity( 1 );
-        model.getVisualizers().forEach( v ->  ((Visualizer2D)v).setAgentVisualizer( new AgentVisualizer2() ) );
+        model.getVisualizers().forEach( v ->  ((Visualizer2D)v).setAgentColorer( new AgentColorerDefault() ) );
         model.init();
         System.out.println( model.display() );
         model.simulate();

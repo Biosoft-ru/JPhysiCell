@@ -6,9 +6,9 @@ import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.PhysiCellConstants;
-import ru.biosoft.physicell.ui.AgentVisualizer;
+import ru.biosoft.physicell.ui.AgentColorer;
 
-public class FluorescenceAgentVisualizer extends AgentVisualizer
+public class FluorescenceAgentVisualizer implements AgentColorer
 {
     @Override
     public Color[] findColors(Cell pCell)

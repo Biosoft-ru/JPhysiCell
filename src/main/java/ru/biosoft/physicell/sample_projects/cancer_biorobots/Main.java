@@ -90,7 +90,7 @@ public class Main
             model.setWriteDensity( false );
             model.setSaveFull( false );
             model.addGIFVisualizer( 0, "figure0" ).setStubstrateIndex( 0 ).setMaxDensity( 38 )
-                    .setAgentVisualizer( new CancerBiorobotsVisualizer( model ) );
+                    .setAgentColorer( new CancerBiorobotsVisualizer( model ) );
             model.init();
             System.out.println( model.display() );
             model.simulate();

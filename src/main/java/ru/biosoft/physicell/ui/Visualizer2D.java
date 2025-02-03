@@ -18,7 +18,7 @@ import ru.biosoft.physicell.core.Cell;
 public class Visualizer2D implements Visualizer
 {
     private AgentVisualizer agentVisualizer = new AgentVisualizer();
-    private AgentColorer agentColorer = new AgentColorerDefault();
+//    private AgentColorer agentColorer = new AgentColorerDefault();
     private boolean drawTitle = true;
     private boolean drawAgents = true;
     private boolean drawGrid = false;
@@ -66,7 +66,7 @@ public class Visualizer2D implements Visualizer
         this.name = name;
         this.sec = sec;
         this.slice = slice;
-        setDefaultScheme();
+//        setDefaultScheme();
     }
 
     public static Visualizer2D createWithGIF(String folder, String name, Section sec, double slice)
@@ -77,20 +77,21 @@ public class Visualizer2D implements Visualizer
         return result;
     }
 
-    public void setAgentVisualizer(AgentVisualizer agentVisualizer)
+    public Visualizer setAgentColorer(AgentColorer agentColorer)
     {
-        this.agentVisualizer = agentVisualizer;
+        this.agentVisualizer.setAgentColorer( agentColorer );
+        return this;
     }
 
-    private void setDefaultScheme()
-    {
-        setColorPhase( "Ki67-", Color.lightGray );
-        setColorPhase( "Ki67+ (premitotic)", Color.green );
-        setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
-        setColorPhase( "Apoptotic", Color.red );
-        setColorPhase( "Necrotic (swelling)", Color.magenta );
-        setColorPhase( "Necrotic (lysed)", Color.pink );
-    }
+//    private void setDefaultScheme()
+//    {
+//        setColorPhase( "Ki67-", Color.lightGray );
+//        setColorPhase( "Ki67+ (premitotic)", Color.green );
+//        setColorPhase( "Ki67+ (postmitotic)", new Color( 0, 128, 0 ) );
+//        setColorPhase( "Apoptotic", Color.red );
+//        setColorPhase( "Necrotic (swelling)", Color.magenta );
+//        setColorPhase( "Necrotic (lysed)", Color.pink );
+//    }
 
     public void addResultGenerator(ResultGenerator generator)
     {
@@ -378,35 +379,30 @@ public class Visualizer2D implements Visualizer
         this.drawGrid = drawAgents;
     }
 
-    public void setDrawDensity(boolean drawDensity)
+    public Visualizer2D setDrawDensity(boolean drawDensity)
     {
         this.drawDensity = drawDensity;
+        return this;
     }
 
     public void setSaveImage(boolean saveImage)
     {
         this.saveImage = saveImage;
     }
-
-    public void setColorType(Integer cellType, Color color)
-    {
-        agentVisualizer.addTypeColor( cellType, color );
-    }
-
-    public void setColorPhase(String phase, Color color)
-    {
-        agentVisualizer.addPhaseColor( phase, color );
-    }
+//
+//    public void setColorType(Integer cellType, Color color)
+//    {
+//        agentVisualizer.addTypeColor( cellType, color );
+//    }
+//
+//    public void setColorPhase(String phase, Color color)
+//    {
+//        agentVisualizer.addPhaseColor( phase, color );
+//    }
 
     public Visualizer2D setMaxDensity(double density)
     {
         this.maxDensity = density;
         return this;
-    }
-
-    @Override
-    public void setAgentColorer(AgentColorer colorer)
-    {
-        this.agentColorer = colorer;
     }
 }
