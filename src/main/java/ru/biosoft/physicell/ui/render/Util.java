@@ -33,6 +33,16 @@ public class Util
         return new Vertex( ( v1.x + v2.x ) / 2, ( v1.y + v2.y ) / 2, ( v1.z + v2.z ) / 2 );
     }
     
+    public static Vertex center(Triangle t)
+    {
+        return center(t.v1, t.v2, t.v3);
+    }
+    
+    public static Vertex center(Vertex v1, Vertex v2, Vertex v3)
+    {
+        return new Vertex( ( v1.x + v2.x + v3.x ) / 3, ( v1.y + v2.y + v3.y ) / 3, ( v1.z + v2.z + v3.z ) / 3);
+    }
+    
     public static double min(double x1, double x2, double x3)
     {
         return Math.min(Math.min(x1, x2), x3);
@@ -51,8 +61,8 @@ public class Util
     public static Vertex direction(Vertex v1, Vertex v2)
     {
         return new Vertex( v2.x - v1.x, v2.y - v1.y, v2.z - v1.z );
-    }
-    
+    }  
+
     public static Vertex normal(Vertex v1, Vertex v2, Vertex v3)
     {
         Vertex ab = Util.direction( v1, v2 );
