@@ -16,15 +16,19 @@ public class Scene
     {
         meshes.clear();
     }
-    
+
     public int getMehesCount()
     {
         return meshes.size();
     }
-    
+
     public Iterable<Mesh> getMeshes()
     {
         return meshes;
     }
-    
+
+    public void sort()
+    {
+        meshes.sort( null );
+    }
 }
