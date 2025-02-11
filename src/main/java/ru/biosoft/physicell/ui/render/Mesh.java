@@ -6,11 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Mesh// implements Comparable<Mesh>
+public class Mesh implements Comparable<Mesh>
 {
     private Color color;
     List<Triangle> triangles = new ArrayList<>();
     public Vertex center;
+    public int depth;
 
     public Mesh(Vertex center)
     {
@@ -75,9 +76,14 @@ public class Mesh// implements Comparable<Mesh>
         return color;
     }
     
-//    @Override
-//    public int compareTo(Mesh o)
-//    {
-//        return Integer.compare( (int)center.z , (int)((Mesh)o).center.z);
-//    }
+    @Override
+    public int compareTo(Mesh o)
+    {
+        return -Integer.compare( depth , (int)((Mesh)o).depth);
+    }
+    
+    public void setDepth(int depth)
+    {
+        this.depth = depth;
+    }
 }
