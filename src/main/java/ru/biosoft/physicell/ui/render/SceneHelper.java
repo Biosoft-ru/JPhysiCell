@@ -33,23 +33,61 @@ public class SceneHelper
         return mesh;
     }
     
-    public static Mesh createCircle(double r, Vertex v, double d,  Color color)
+    public static final int PLANE_XY = 0;
+    public static final int PLANE_YZ = 1;
+    public static final int PLANE_XZ = 2;
+    
+    public static Mesh createDisk(double r, Vertex v, double d, int plane, Color color)
     {
-        Vertex center = new Vertex( v.x, v.y, d );
-        Mesh mesh = new Mesh();
-        mesh.setColor( color );
-        mesh.setType( Mesh.CIRCLE_TYPE );
-        mesh.center = center;
-        Vertex prev = new Vertex( center.x, center.y + r, d );
+        Vertex center = getCenter( v, d, plane );
+        Mesh mesh = new Mesh( center, Mesh.CIRCLE_TYPE, color );
+        Vertex prev = getFirst( center, r, d, plane );
         for( int i = 1; i <= 20; i++ )
         {
-            double phi = i * Math.PI / 10;
-            Vertex next = new Vertex( center.x + r * Math.sin( phi ), center.y + r * Math.cos( phi ), d );
-            Triangle t = new Triangle( center.clone(), prev, next );
-            mesh.add( t );
+            Vertex next = getNext( center, r, d, i * Math.PI / 10, plane );
+            mesh.add( new Triangle( center.clone(), prev, next ) );
             prev = next.clone();
         }
         return mesh;
+    }
+
+    private static Vertex getNext(Vertex v, double r, double d, double phi, int plane)
+    {
+        switch( plane )
+        {
+            case PLANE_XY:
+                return new Vertex( v.x + r * Math.sin( phi ), v.y + r * Math.cos( phi ), d );
+            case PLANE_YZ:
+                return new Vertex( d, v.y + r * Math.sin( phi ), v.z + r * Math.cos( phi ) );
+            default:
+                return new Vertex( v.x + r * Math.cos( phi ), d, v.z + r * Math.sin( phi ) );
+        }
+    }
+    
+    private static Vertex getFirst(Vertex v, double r, double d, int plane)
+    {
+        switch( plane )
+        {
+            case PLANE_XY:
+                return new Vertex( v.x, v.y + r, d );
+            case PLANE_YZ:
+                return new Vertex( d, v.y, v.z + r );
+            default:
+                return new Vertex( v.x + r, d, v.z );
+        }
+    }
+
+    private static Vertex getCenter(Vertex v, double d, int plane)
+    {
+        switch( plane )
+        {
+            case PLANE_XY:
+                return new Vertex( v.x, v.y, d );
+            case PLANE_YZ:
+                return new Vertex( d, v.y, v.z );
+            default:
+                return new Vertex( v.x, d, v.z );
+        }
     }
 
     public static Mesh inflate(Mesh mesh, double radius)

@@ -5,9 +5,7 @@ import java.awt.image.BufferedImage;
 public class Renderer3D
 {
     private boolean cut = true;
-    double xCutoff = 350;
-    double yCutoff = 450;
-    double zCutoff = 350;
+    Vertex cutOff = new Vertex(500, 500, 500);
     Vertex center;
     double[] zBuffer;
     Matrix3 hTransform;
@@ -38,20 +36,26 @@ public class Renderer3D
         for( Mesh mesh : scene.getSpheres() )
             paintSphere( mesh, transform, zBuffer, img );
         
-        for( Mesh mesh : scene.getCircles() )
-            paintCircle( mesh, transform, zBuffer, img );
+        for( Mesh mesh : scene.getLayer(SceneHelper.PLANE_XY) )
+            paintDisk( mesh, transform, zBuffer, img );
+        
+        for( Mesh mesh : scene.getLayer(SceneHelper.PLANE_YZ) )
+            paintDisk( mesh, transform, zBuffer, img );
+        
+        for( Mesh mesh : scene.getLayer(SceneHelper.PLANE_XZ) )
+            paintDisk( mesh, transform, zBuffer, img );
 
         return img;
     }
 
-    public void setCut(boolean cut)
+    public void setIsCutOff(boolean cut)
     {
         this.cut = cut;
     }
     
-    public void setZCut(double zCut)
+    public void setCutOff(Vertex cut)
     {
-        this.zCutoff = zCut;
+        this.cutOff = cut;
     }
 
     private void paintGrid(Matrix3 transform, BufferedImage img)
@@ -82,7 +86,7 @@ public class Renderer3D
             center = rotate( center );
             mesh.setDepth( (int)center.z );
         }
-        scene.sort();
+        scene.sortSpheres();
     }
 
     
@@ -129,7 +133,7 @@ public class Renderer3D
         }
     }
     
-    private void paintCircle(Mesh mesh, Matrix3 transform, double[] zBuffer, BufferedImage img)
+    private void paintDisk(Mesh mesh, Matrix3 transform, double[] zBuffer, BufferedImage img)
     {
         if( cut && outOfBounds( mesh.center ) )
             return;
@@ -155,11 +159,6 @@ public class Renderer3D
         maxY = (int)Math.min( img.getHeight() - 1, Math.floor( Util.max( v1.y, v2.y, v3.y ) ) );
         triangleArea = ( v1.y - v3.y ) * ( v2.x - v3.x ) + ( v2.y - v3.y ) * ( v3.x - v1.x );        
         shade = null;
-        if (!doShade)
-        {
-            shade = new Color(c.getRed()/2, c.getGreen()/2, c.getBlue()/2).getRGB();
-            shade = c.getRGB();
-        }
         for( int y = minY; y <= maxY; y++ )
         {
             for( int x = minX; x <= maxX; x++ )
@@ -186,16 +185,12 @@ public class Renderer3D
 
     public boolean outOfBounds(Vertex center)
     {
-//        return center.z > 500 && center.x > 500 && center.y < 500;
-        return center.z > zCutoff;
-//        return false;
+        return center.z > cutOff.z && center.x > cutOff.x && center.y < cutOff.y;
     }
     
     public boolean outOfBounds(Vertex center, double radius)
     {
-//        return center.z > 500 && center.x > 500 && center.y < 500;
-        return center.z-radius > zCutoff;
-//        return false;
+        return center.z-radius > cutOff.z && center.x-radius > cutOff.x && center.y+radius < cutOff.y;
     }
 
     public Integer getShade(Color color, Triangle t)

@@ -22,6 +22,14 @@ public class Mesh implements Comparable<Mesh>
     {
         this.center = center;
     }
+    
+    public Mesh(Vertex center, int type, Color color)
+    {
+        this.color = color;
+        this.center = center;
+        this.type = type;
+    }
+    
     public Mesh()
     {
         this.center = new Vertex( 0, 0, 0 );

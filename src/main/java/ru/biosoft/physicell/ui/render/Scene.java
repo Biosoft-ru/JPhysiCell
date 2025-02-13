@@ -1,33 +1,39 @@
 package ru.biosoft.physicell.ui.render;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Scene
 {
+    private Map<Integer, List<Mesh>> layers = new HashMap<>();
+
     private List<Mesh> spheres = new ArrayList<Mesh>();
-    
-    private List<Mesh> circles = new ArrayList<Mesh>();
-    
-    public void addCircle(Mesh mesh)
+
+    public void addDisk(Mesh mesh, int layerCode)
     {
-        circles.add( mesh );
+        layers.computeIfAbsent( layerCode, i -> new ArrayList<>() ).add( mesh );
     }
-    
+
     public void addSphere(Mesh mesh)
     {
         spheres.add( mesh );
     }
 
-    public void clearCircles()
+    public void clearLayer(int layerCode)
     {
-        circles.clear();
+        List<Mesh> layer = layers.get( layerCode );
+        if( layer != null )
+            layer.clear();
     }
     
     public void clear()
     {
         spheres.clear();
-        circles.clear();
+        for( List<Mesh> layer : layers.values() )
+            layer.clear();
+        layers.clear();
     }
 
     public int getSpheresCount()
@@ -40,13 +46,13 @@ public class Scene
         return spheres;
     }
 
-    public Iterable<Mesh> getCircles()
+    public Iterable<Mesh> getLayer(int layerCode)
     {
-        return circles;
+        return layers.get( layerCode );
     }
 
     
-    public void sort()
+    public void sortSpheres()
     {
         spheres.sort( null );
     }

@@ -1,18 +1,22 @@
 package ru.biosoft.physicell.ui.render;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.basic.BasicSplitPaneUI.BasicVerticalLayoutManager;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.List;
 
 public class RenderTest
 {
-
-    private static double zCut = 480;
+    private static Vertex cutoff = new Vertex(500, 500, 500);
+    
     private static int size = 1000;
     private static int quality = 3;
     public static void main(String[] args)
@@ -21,22 +25,68 @@ public class RenderTest
         Container pane = frame.getContentPane();
         pane.setLayout( new BorderLayout() );
 
-        JSlider headingSlider = new JSlider( -180, 180, 0 );
-        pane.add( headingSlider, BorderLayout.SOUTH );
-
+        JSlider sectionXSlider = new JSlider( 0, 1000, 500 );
+        JSlider sectionYSlider = new JSlider( 0, 1000, 500 );
+        JSlider sectionZSlider = new JSlider( 0, 1000, 500 );
+        
+        JSlider headingSlider = new JSlider( -180, 180, 0 );   
         JSlider pitchSlider = new JSlider( SwingConstants.VERTICAL, -90, 90, 0 );
-        pane.add( pitchSlider, BorderLayout.EAST );
-
-        Scene scene = generateScene(zCut);
+        Scene scene = generateScene();
+        
+        addDisks(scene, cutoff.z, SceneHelper.PLANE_XY);
+        addDisks(scene, cutoff.x, SceneHelper.PLANE_YZ);
+        addDisks(scene, cutoff.y, SceneHelper.PLANE_XZ);
+        
         System.out.println( "Number of cells " + scene.getSpheresCount() );
 
         RenderPanel renderPanel = new RenderPanel( headingSlider, pitchSlider );
-        renderPanel.setZCut( zCut );
+        renderPanel.setCutoff( cutoff );
         renderPanel.setScene( scene );
-        pane.add( renderPanel, BorderLayout.CENTER );
-
+      
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new GridBagLayout() );
+        GridBagConstraints con = new GridBagConstraints();
+        con.gridy = 0;
+        con.gridx = 0;
+        con.anchor = GridBagConstraints.NORTH;
+        con.ipady = 10;
+        leftPanel.add( sectionXSlider , con);
+        con.gridy = 1;
+        leftPanel.add( sectionYSlider , con);
+        con.gridy = 2;
+        leftPanel.add( sectionZSlider, con );
+        
+        sectionZSlider.addChangeListener( e -> {
+            cutoff.z = sectionZSlider.getValue();
+            renderPanel.setCutoff( cutoff );
+            addDisks( scene, cutoff.z, SceneHelper.PLANE_XY );
+            renderPanel.repaint();
+        } );
+        
+        sectionXSlider.addChangeListener( e -> {
+            cutoff.x = sectionXSlider.getValue();
+            renderPanel.setCutoff( cutoff );
+            addDisks( scene, cutoff.x, SceneHelper.PLANE_YZ );
+            renderPanel.repaint();
+        } );
+        
+        sectionYSlider.addChangeListener( e -> {
+            cutoff.y = size-sectionYSlider.getValue();
+            renderPanel.setCutoff( cutoff );
+            addDisks( scene, cutoff.y, SceneHelper.PLANE_XZ );
+            renderPanel.repaint();
+        } );
+        
         headingSlider.addChangeListener( e -> renderPanel.repaint() );
         pitchSlider.addChangeListener( e -> renderPanel.repaint() );
+
+        pane.add( renderPanel, BorderLayout.CENTER );
+        pane.add( pitchSlider, BorderLayout.EAST );
+        pane.add( headingSlider, BorderLayout.SOUTH );
+        
+        pane.add( leftPanel, BorderLayout.LINE_START );
+//        pane.add( sectionYSlider, BorderLayout.AFTER_LAST_LINE );
+//        pane.add( sectionZSlider, BorderLayout.AFTER_LAST_LINE );
 
         frame.setSize( size, size );
 
@@ -45,31 +95,55 @@ public class RenderTest
         frame.setVisible( true );
     }
 
-    public static Scene generateScene(double zCut)
+    public static void addDisks(Scene scene, double d, int plane)
+    {
+        scene.clearLayer(plane);
+        for( Mesh sphere : scene.getSpheres() )
+        {
+            double distance = getDistance(sphere.center , d, plane);
+            if( Math.abs( distance ) < sphere.getRadius() )
+            {
+                Color meshColor = new Color( 2*sphere.getColor().getRed() , 2*sphere.getColor().getGreen() ,
+                        2*sphere.getColor().getBlue() );
+                double diskRadius = Math.sqrt( sphere.getRadius() * sphere.getRadius() - distance * distance ) - 1;
+                Mesh disk = SceneHelper.createDisk( diskRadius, sphere.center, d , plane, meshColor);
+                scene.addDisk( disk, plane );
+                //                double innerRadius = circleRadius / 2;
+                //                Vertex innerCenter = new Vertex(sphere.center.x, sphere.center.y, sphere.center.z+3);
+                //                Mesh circle2 = SceneHelper.createCircle( innerRadius, innerCenter, zCut, outer );
+                //                result.add( circle2 );
+            }
+        }
+    }
+    
+    public static double getDistance(Vertex v, double d, int plane)
+    {
+        switch( plane )
+        {
+            case SceneHelper.PLANE_XY:
+                return v.z - d;
+            case SceneHelper.PLANE_YZ:
+                return v.x - d;
+            default:
+                return v.y - d;
+        }
+    }
+    
+    public static Scene generateScene()
     {
         Scene result = new Scene();
 
-        List<Vertex> positions = SceneHelper.createPositions( new Vertex( 500, 500, 500 ), 450, 10);
+        List<Vertex> positions = SceneHelper.createPositions( new Vertex( 500, 500, 500 ), 450, 30);
 //                List<Vertex> positions = new ArrayList<>();
 //        positions.add( new Vertex( 500, 500, 409 ) );
         for( Vertex v : positions )
         {
-            double radius = 10;////7 + 3 * Math.random();
+            double radius = 30;////7 + 3 * Math.random();
             
             int oncoprotein = (int)(255*Math.random());
             Color outer = new Color( oncoprotein / 2, oncoprotein / 2, ( 255 - oncoprotein ) / 2 );
-            Color inner = new Color( oncoprotein , oncoprotein , ( 255 - oncoprotein ) );
-            Mesh sphere = SceneHelper.createSphere( v.x, v.y, v.z, radius, outer , quality);
-            if( Math.abs( v.z - zCut ) < radius )
-            {
-                double circleRadius = Math.sqrt( radius * radius - ( v.z - zCut ) * ( v.z - zCut ) );
-                Mesh circle = SceneHelper.createCircle( circleRadius, v, zCut, inner );
-//                double innerRadius = circleRadius / 2;
-//                Vertex innerCenter = new Vertex(sphere.center.x, sphere.center.y, sphere.center.z+3);
-//                Mesh circle2 = SceneHelper.createCircle( innerRadius, innerCenter, zCut, outer );
-                result.addCircle( circle );
-//                result.add( circle2 );
-            }
+
+            Mesh sphere = SceneHelper.createSphere( v.x, v.y, v.z, radius, outer , quality); 
             result.addSphere( sphere );
         }
 
