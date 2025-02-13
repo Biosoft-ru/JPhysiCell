@@ -5,30 +5,49 @@ import java.util.List;
 
 public class Scene
 {
-    private List<Mesh> meshes = new ArrayList<Mesh>();
-
-    public void add(Mesh mesh)
+    private List<Mesh> spheres = new ArrayList<Mesh>();
+    
+    private List<Mesh> circles = new ArrayList<Mesh>();
+    
+    public void addCircle(Mesh mesh)
     {
-        meshes.add( mesh );
+        circles.add( mesh );
+    }
+    
+    public void addSphere(Mesh mesh)
+    {
+        spheres.add( mesh );
     }
 
+    public void clearCircles()
+    {
+        circles.clear();
+    }
+    
     public void clear()
     {
-        meshes.clear();
+        spheres.clear();
+        circles.clear();
     }
 
-    public int getMehesCount()
+    public int getSpheresCount()
     {
-        return meshes.size();
+        return spheres.size();
     }
 
-    public Iterable<Mesh> getMeshes()
+    public Iterable<Mesh> getSpheres()
     {
-        return meshes;
+        return spheres;
     }
 
+    public Iterable<Mesh> getCircles()
+    {
+        return circles;
+    }
+
+    
     public void sort()
     {
-        meshes.sort( null );
+        spheres.sort( null );
     }
 }

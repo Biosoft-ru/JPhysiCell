@@ -108,7 +108,7 @@ public class Visualizer3D implements Visualizer
                 c = Color.gray;
             Mesh sphere = SceneHelper.createSphere( cell.position, cell.getRadius(), c );
 //            Renderer3D.filter( sphere );
-            scene.add( sphere );
+            scene.addSphere( sphere );
         }
 
         return render.render( scene );

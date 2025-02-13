@@ -8,7 +8,12 @@ import java.util.Set;
 
 public class Mesh implements Comparable<Mesh>
 {
+    public static int SPHERE_TYPE = 0;
+    public static int CIRCLE_TYPE = 1;
+    
     private Color color;
+    double radius;
+    private int type = SPHERE_TYPE;
     List<Triangle> triangles = new ArrayList<>();
     public Vertex center;
     public int depth;
@@ -20,6 +25,16 @@ public class Mesh implements Comparable<Mesh>
     public Mesh()
     {
         this.center = new Vertex( 0, 0, 0 );
+    }
+    
+    public void setType(int type)
+    {
+        this.type = type;
+    }
+    
+    public int getType()
+    {
+        return type;
     }
 
     public Mesh(List<Triangle> triangles, Vertex center)
@@ -53,18 +68,6 @@ public class Mesh implements Comparable<Mesh>
             triangle.offset( x, y, z );
         center.offset( x, y, z );
     }
-
-    public void section(Mesh polygon)
-    {
-        for( Triangle triangle : polygon.triangles )
-        {
-            section( triangle );
-        }
-    }
-
-    public void section(Triangle triangle)
-    {
-    }
     
     public void setColor(Color color)
     {
@@ -74,6 +77,16 @@ public class Mesh implements Comparable<Mesh>
     public Color getColor()
     {
         return color;
+    }
+    
+    public void setRadius(double radius)
+    {
+        this.radius = radius;
+    }
+    
+    public double getRadius()
+    {
+        return radius;
     }
     
     @Override

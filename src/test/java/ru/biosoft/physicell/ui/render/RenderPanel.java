@@ -13,11 +13,11 @@ public class RenderPanel extends JPanel
     private final JSlider headingSlider;
     private final JSlider pitchSlider;
     private Scene scene;
+    private int size = 1000;
+    private double zCut = 500;
     public double[] x;
 
     Renderer3D renderer;// = new Renderer3D();
-
-
 
     BufferedImage img;
 
@@ -30,6 +30,11 @@ public class RenderPanel extends JPanel
     public void setScene(Scene scene)
     {
         this.scene = scene;
+    }
+    
+    public void setSize(int size)
+    {
+        this.size = size;
     }
 
     public BufferedImage getImage()
@@ -47,13 +52,19 @@ public class RenderPanel extends JPanel
         double heading = Math.toRadians( headingSlider.getValue() );
         double pitch = Math.toRadians( pitchSlider.getValue() );
         
-        renderer= new Renderer3D( getWidth(), getHeight() , heading, pitch );
+        renderer= new Renderer3D(size, size , heading, pitch );
         renderer.setCut( true );
+        renderer.setZCut( zCut );
         img = renderer.render( scene);
 
         g2.drawImage( img, 0, 0, null );
         System.out.println( "ELAPSED: " + ( System.currentTimeMillis() - t0 ) / 1000 );
     }
 
+
+    public void setZCut(double zCut)
+    {
+        this.zCut = zCut;
+    }
 
 }

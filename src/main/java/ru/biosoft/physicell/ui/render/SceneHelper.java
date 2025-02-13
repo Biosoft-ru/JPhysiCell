@@ -14,7 +14,7 @@ public class SceneHelper
 
     public static Mesh createSphere(double x, double y, double z, double r, Color color)
     {
-        return createSphere( x, y, z, r, color, 3);
+        return createSphere( x, y, z, r, color, 4);
     }
     
     public static Mesh createSphere(double x, double y, double z, double r, Color color, int quality)
@@ -32,29 +32,46 @@ public class SceneHelper
             mesh = inflate( mesh, r );
         return mesh;
     }
+    
+    public static Mesh createCircle(double r, Vertex v, double d,  Color color)
+    {
+        Vertex center = new Vertex( v.x, v.y, d );
+        Mesh mesh = new Mesh();
+        mesh.setColor( color );
+        mesh.setType( Mesh.CIRCLE_TYPE );
+        mesh.center = center;
+        Vertex prev = new Vertex( center.x, center.y + r, d );
+        for( int i = 1; i <= 20; i++ )
+        {
+            double phi = i * Math.PI / 10;
+            Vertex next = new Vertex( center.x + r * Math.sin( phi ), center.y + r * Math.cos( phi ), d );
+            Triangle t = new Triangle( center.clone(), prev, next );
+            mesh.add( t );
+            prev = next.clone();
+        }
+        return mesh;
+    }
 
     public static Mesh inflate(Mesh mesh, double radius)
     {
         Mesh result = new Mesh( mesh.center );
+        result.setType( Mesh.SPHERE_TYPE );
         result.setColor( mesh.getColor() );
+        result.setRadius( radius );
         for( Triangle t : mesh.getTriangles() )
         {
             Vertex c12 = Util.center( t.v1, t.v2 );
             Vertex c23 = Util.center( t.v2, t.v3 );
             Vertex c31 = Util.center( t.v3, t.v1 );
 
-            //            if( !Renderer3D.isBehind( new Triangle( t.v1, c12, c31) , mesh.center ) )
             result.add( new Triangle( t.v1, c12, c31 ) );
-            //            if( !Renderer3D.isBehind( new Triangle( t.v2, c12, c23 ), mesh.center ) )
             result.add( new Triangle( t.v2, c12, c23 ) );
-            //            if( !Ren/derer3D.isBehind(  new Triangle( t.v3, c23, c31 ), mesh.center ) )
             result.add( new Triangle( t.v3, c23, c31 ) );
-            //            if( !Re/nderer3D.isBehind( new Triangle( c12, c23, c31 ), mesh.center ) )
             result.add( new Triangle( c12, c23, c31 ) );
         }
 
         for( Vertex v : result.getVertices() )
-            Util.moveFrom( v, mesh.center, Math.sqrt( 3 ) * radius / Util.distance( v, mesh.center ) );
+            Util.moveFrom( v, mesh.center, radius / Util.distance( v, mesh.center ) );
 
         return result;
     }
@@ -84,5 +101,4 @@ public class SceneHelper
         }
         return result;
     }
-
 }
