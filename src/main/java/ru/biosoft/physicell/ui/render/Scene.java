@@ -48,7 +48,7 @@ public class Scene
 
     public Iterable<Mesh> getLayer(int layerCode)
     {
-        return layers.get( layerCode );
+        return layers.getOrDefault( layerCode , new ArrayList<>());
     }
 
     
