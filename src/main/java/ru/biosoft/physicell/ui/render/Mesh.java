@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import one.util.streamex.StreamEx;
+
 public class Mesh implements Comparable<Mesh>
 {
     public static int SPHERE_TYPE = 0;
@@ -58,11 +60,7 @@ public class Mesh implements Comparable<Mesh>
 
     public Set<Vertex> getVertices()
     {
-        Set<Vertex> result = new HashSet<>();
-        for( Triangle triangle : triangles )
-            for( Vertex vertex : triangle.getVertices() )
-                result.add( vertex );
-        return result;
+        return StreamEx.of( triangles ).flatMap( t->StreamEx.of( t.getVertices() ) ).toSet();
     }
 
     public void add(Triangle triangle)
