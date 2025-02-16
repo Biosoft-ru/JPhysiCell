@@ -29,4 +29,9 @@ public class Triangle
     {
         return v1.toString() + " ; " + v2.toString() + " ; " + v3.toString();
     }
+    
+    public Triangle clone()
+    {
+        return new Triangle(v1.clone(), v2.clone(), v3.clone());
+    }
 }
