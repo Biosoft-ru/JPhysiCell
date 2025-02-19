@@ -41,7 +41,7 @@ public class Scene
         return spheres.size();
     }
 
-    public Iterable<Mesh> getSpheres()
+    public List<Mesh> getSpheres()
     {
         return spheres;
     }
