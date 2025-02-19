@@ -14,6 +14,7 @@ public class Mesh implements Comparable<Mesh>
     public static int CIRCLE_TYPE = 1;
     
     private Color color;
+    private Color insideColor;
     double radius;
     private int type = SPHERE_TYPE;
     List<Triangle> triangles = new ArrayList<>();
@@ -31,7 +32,7 @@ public class Mesh implements Comparable<Mesh>
         this.center = center;
         this.type = type;
     }
-    
+
     public Mesh()
     {
         this.center = new Vertex( 0, 0, 0 );
@@ -58,9 +59,9 @@ public class Mesh implements Comparable<Mesh>
         return triangles;
     }
 
-    public Set<Vertex> getVertices()
+    public StreamEx<Vertex> getVertices()
     {
-        return StreamEx.of( triangles ).flatMap( t->StreamEx.of( t.getVertices() ) ).toSet();
+        return StreamEx.of( triangles ).flatMap( t->StreamEx.of( t.getVertices() ) );//.toSet();
     }
 
     public void add(Triangle triangle)
@@ -83,6 +84,16 @@ public class Mesh implements Comparable<Mesh>
     public Color getColor()
     {
         return color;
+    }
+    
+    public void setInsideColor(Color color)
+    {
+        this.insideColor = color;
+    }
+    
+    public Color getInsideColor()
+    {
+        return insideColor == null? color: insideColor;
     }
     
     public void setRadius(double radius)

@@ -106,12 +106,12 @@ public class Visualizer3D implements Visualizer
             Color c = colorer.findColors( cell )[1];
             if( c == null )
                 c = Color.gray;
-            Mesh sphere = SceneHelper.createSphere( cell.position, cell.getRadius(), c );
+            Mesh sphere = SceneHelper.createSphere( cell.position, cell.getRadius(), c, null );
 //            Renderer3D.filter( sphere );
             scene.addSphere( sphere );
         }
 
-        return render.render( scene );
+        return render.render( scene, time );
     }
 
     @Override
