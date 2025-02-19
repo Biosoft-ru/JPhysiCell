@@ -13,23 +13,25 @@ public class RenderPanel extends JPanel
     private final JSlider headingSlider;
     private final JSlider pitchSlider;
     private Scene scene;
-    private int size = 1000;
+    private int size = 1500;
     private Vertex cutOff = new Vertex(500, 500, 500);
     public double[] x;
+    private int time;
 
-    Renderer3D renderer;// = new Renderer3D();
+    private Renderer3D renderer;// = new Renderer3D();
 
-    BufferedImage img;
+    private BufferedImage img;
 
     public RenderPanel(JSlider headingSlider, JSlider pitchSlider)
     {
         this.headingSlider = headingSlider;
         this.pitchSlider = pitchSlider;
     }
-
-    public void setScene(Scene scene)
+    
+    public void setScene(Scene scene, int time)
     {
         this.scene = scene;
+        this.time = time;
     }
     
     public void setSize(int size)
@@ -46,7 +48,7 @@ public class RenderPanel extends JPanel
     {
         double t0 = System.currentTimeMillis();
         Graphics2D g2 = (Graphics2D)g;
-        g2.setColor( Color.BLACK );
+        g2.setColor( Color.white );
         g2.fillRect( 0, 0, getWidth(), getHeight() );
 
         double heading = Math.toRadians( headingSlider.getValue() );
@@ -56,7 +58,7 @@ public class RenderPanel extends JPanel
         renderer= new Renderer3D(size, size , heading, pitch );
         renderer.setIsCutOff( true );
         renderer.setCutOff( cutOff );
-        img = renderer.render( scene);
+        img = renderer.render( scene, time );
 
         g2.drawImage( img, 0, 0, null );
         System.out.println( "ELAPSED: " + ( System.currentTimeMillis() - t0 ) / 1000 );
