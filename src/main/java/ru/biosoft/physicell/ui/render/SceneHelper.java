@@ -7,29 +7,39 @@ import java.util.List;
 public class SceneHelper
 {
 
-    public static Mesh createSphere(double[] position, double r, Color color)
+    public static Mesh createSphere(double[] position, double r, Color color, Color insideColor)
     {
-        return createSphere( position[0], position[1], position[2], r, color );
+        return createSphere( position[0], position[1], position[2], r, color, insideColor );
     }
 
-    public static Mesh createSphere(double x, double y, double z, double r, Color color)
+    public static Mesh createSphere(double x, double y, double z, double r, Color color, Color insideColor)
     {
-        return createSphere( x, y, z, r, color, 4);
+        return createSphere( x, y, z, r, color, insideColor, 3);
     }
     
-    public static Mesh createSphere(double x, double y, double z, double r, Color color, int quality)
+    public static Mesh createSphere(double x, double y, double z, double r, Color color, Color insideColor, int quality)
     {
         Mesh mesh = new Mesh();
-        mesh.setColor( color );
-        mesh.add( new Triangle( new Vertex( r, r, r ), new Vertex( -r, -r, r ), new Vertex( -r, r, -r ) ) );
-        mesh.add( new Triangle( new Vertex( r, r, r ), new Vertex( -r, -r, r ), new Vertex( r, -r, -r ) ) );
-        mesh.add( new Triangle( new Vertex( -r, r, -r ), new Vertex( r, -r, -r ), new Vertex( r, r, r ) ) );
-        mesh.add( new Triangle( new Vertex( -r, r, -r ), new Vertex( r, -r, -r ), new Vertex( -r, -r, r ) ) );
-
-        mesh.offset( x, y, z );
+        Vertex r111 = new Vertex( x + r, y + r, z + r );
+        Vertex r001 = new Vertex( x - r, y - r, z + r );
+        Vertex r100 = new Vertex( x + r, y - r, z - r );
+        Vertex r010 = new Vertex( x - r, y + r, z - r );
+        mesh.add( new Triangle( r111, r001, r010 ) );
+        mesh.add( new Triangle( r111, r001, r100 ) );
+        mesh.add( new Triangle( r010, r100, r111 ) );
+        mesh.add( new Triangle( r010, r100, r001 ) );
+        mesh.center = new Vertex( x, y, z );
 
         for( int i = 0; i < quality; i++ )
-            mesh = inflate( mesh, r );
+             inflate( mesh, r );
+        
+        for( Vertex v : mesh.getVertices() )
+          Util.moveFrom( v, mesh.center, r / Util.distance( v, mesh.center ) );
+            
+        mesh.setType( Mesh.SPHERE_TYPE );
+        mesh.setColor(color);
+        mesh.setInsideColor( insideColor );
+        mesh.setRadius( r );
         return mesh;
     }
     
@@ -90,28 +100,23 @@ public class SceneHelper
         }
     }
 
-    public static Mesh inflate(Mesh mesh, double radius)
+    public static void inflate(Mesh mesh, double radius)
     {
-        Mesh result = new Mesh( mesh.center );
-        result.setType( Mesh.SPHERE_TYPE );
-        result.setColor( mesh.getColor() );
-        result.setRadius( radius );
+        List<Triangle> newTriangles = new ArrayList<>();
         for( Triangle t : mesh.getTriangles() )
         {
             Vertex c12 = Util.center( t.v1, t.v2 );
             Vertex c23 = Util.center( t.v2, t.v3 );
             Vertex c31 = Util.center( t.v3, t.v1 );
 
-            result.add( new Triangle( t.v1, c12, c31 ) );
-            result.add( new Triangle( t.v2, c12, c23 ) );
-            result.add( new Triangle( t.v3, c23, c31 ) );
-            result.add( new Triangle( c12, c23, c31 ) );
+            newTriangles.add( new Triangle( t.v1, c12, c31 ) );
+            newTriangles.add( new Triangle( t.v2, c12, c23 ) );
+            newTriangles.add( new Triangle( t.v3, c23, c31 ) );
+            t.v1 = c12;
+            t.v2 = c23;
+            t.v3 = c31;
         }
-
-        for( Vertex v : result.getVertices() )
-            Util.moveFrom( v, mesh.center, radius / Util.distance( v, mesh.center ) );
-
-        return result;
+        newTriangles.forEach( t -> mesh.add( t ) );
     }
 
     public static List<Vertex> createPositions(Vertex center, double sphereRadius, double cellRadius)
@@ -138,5 +143,39 @@ public class SceneHelper
             }
         }
         return result;
+    }
+    
+    public static void addDisks(Scene scene, double d, int plane)
+    {
+        scene.clearLayer( plane );
+        for( Mesh sphere : scene.getSpheres() )
+        {
+            double distance = getDistance( sphere.center, d, plane );
+            if( Math.abs( distance ) < sphere.getRadius() )
+            {
+                //                Color meshColor = new Color( 2 * sphere.getColor().getRed(), 2 * sphere.getColor().getGreen(),
+                //                        2 * sphere.getColor().getBlue() );
+                double diskRadius = Math.sqrt( sphere.getRadius() * sphere.getRadius() - distance * distance ) - 1;
+                Mesh disk = SceneHelper.createDisk( diskRadius, sphere.center, d, plane, sphere.getInsideColor() );
+                scene.addDisk( disk, plane );
+                //                double innerRadius = circleRadius / 2;
+                //                Vertex innerCenter = new Vertex(sphere.center.x, sphere.center.y, sphere.center.z+3);
+                //                Mesh circle2 = SceneHelper.createCircle( innerRadius, innerCenter, zCut, outer );
+                //                result.add( circle2 );
+            }
+        }
+    }
+
+    public static double getDistance(Vertex v, double d, int plane)
+    {
+        switch( plane )
+        {
+            case SceneHelper.PLANE_XY:
+                return v.z - d;
+            case SceneHelper.PLANE_YZ:
+                return v.x - d;
+            default:
+                return v.y - d;
+        }
     }
 }
