@@ -2,11 +2,8 @@ package ru.biosoft.physicell.ui.render;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import one.util.streamex.StreamEx;
+import java.util.stream.Stream;
 
 public class Mesh implements Comparable<Mesh>
 {
@@ -59,9 +56,9 @@ public class Mesh implements Comparable<Mesh>
         return triangles;
     }
 
-    public StreamEx<Vertex> getVertices()
+    public Stream<Vertex> getVertices()
     {
-        return StreamEx.of( triangles ).flatMap( t->StreamEx.of( t.getVertices() ) );//.toSet();
+        return triangles.stream().flatMap( t->Stream.of( t.getVertices() ) );
     }
 
     public void add(Triangle triangle)
