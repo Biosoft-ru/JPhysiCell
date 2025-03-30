@@ -54,7 +54,7 @@ public class RenderTest
         step = files.navigableKeySet().higher( curTime );
 
         timeSlider.setMaximum( files.navigableKeySet().last() );
-        timeSlider.setValue( curTime );
+        timeSlider.setValue( 0 );
     }
 
     private static Scene readScene(File f)
@@ -218,10 +218,6 @@ public class RenderTest
             }
         } );
 
-        initDirectory(folder);
-      
-        //        setScene( generateScene() );
-
         headingSlider.addChangeListener( e -> renderPanel.repaint() );
         pitchSlider.addChangeListener( e -> renderPanel.repaint() );
 
@@ -239,9 +235,7 @@ public class RenderTest
         //        pane.add( sectionZSlider, BorderLayout.AFTER_LAST_LINE );
 
         frame.setSize( 1500, 1000 );
-
-        headingSlider.setValue( 0 );
-        pitchSlider.setValue( 0 );
+        initDirectory(folder);
         frame.setVisible( true );
     }
 
@@ -273,12 +267,15 @@ public class RenderTest
     {
         Scene result = new Scene();
 
-        List<Vertex> positions = SceneHelper.createPositions( new Vertex( 500, 500, 500 ), 250, 10 );
-//                        List<Vertex> positions = new ArrayList<>();
-//                positions.add( new Vertex( 500, 500, 500 ) );
+//        List<Vertex> positions = SceneHelper.createPositions( new Vertex( 500, 500, 500 ), 250, 10 );
+                        List<Vertex> positions = new ArrayList<>();
+                positions.add( new Vertex( 500, 500, 500 ) );
+                positions.add( new Vertex( 500, 400, 500 ) );
+//                positions.add( new Vertex( 500, 500, 400 ) );
+//                positions.add( new Vertex( 400, 500, 500 ) );
         for( Vertex v : positions )
         {
-            double radius = 10;////7 + 3 * Math.random();
+            double radius = 50;////7 + 3 * Math.random();
 
             int oncoprotein = (int) ( 255 * Math.random() );
             Color outer = new Color( oncoprotein / 2, oncoprotein / 2, ( 255 - oncoprotein ) / 2 );
