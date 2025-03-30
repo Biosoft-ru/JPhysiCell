@@ -3,55 +3,88 @@ package ru.biosoft.physicell.ui.render;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+
+import ru.biosoft.physicell.ui.ModelData;
 
 public class Renderer3D
 {
+    private static int BLACK_RGB = Color.black.getRGB() ;
+    
+    private boolean axes = true;
+    private boolean statistics = true;
+    private Point statisticsLocation = new Point(10, 40);
     private boolean cut = true;
     private Vertex cutOff = new Vertex(500, 500, 500);
-    private Vertex center;
+//    private Vertex center;
     private double[] zBuffer;
     private Matrix3 hTransform;
     private Matrix3 pTransform;
     private Matrix3 transform;
-    
-    private BufferedImage img;
+
+    private int xMax;
+    private int yMax;
+    private int zMax;
+    private int xShift;
+    private int yShift;
+    private int zShift;
+    private Vertex shift;
     int width;
     int height;
+    int depth;
 
     public Renderer3D(int width, int height, double h, double p)
     {
-        this.width = width;
-        this.height = height;
+//        this( 0, 0, 0, width, height, height, h, p );
+        shift = new Vertex(xShift, yShift, zShift);
         zBuffer = new double[width * height];
-        center = new Vertex( width / 2, width / 2, width / 2 );
+//        center = new Vertex( width / 2, width / 2, width / 2 );
         hTransform = new Matrix3( new double[] {Math.cos( h ), 0, -Math.sin( h ), 0, 1, 0, Math.sin( h ), 0, Math.cos( h )} );
         pTransform = new Matrix3( new double[] {1, 0, 0, 0, Math.cos( p ), Math.sin( p ), 0, -Math.sin( p ), Math.cos( p )} );
 
         transform = hTransform.multiply( pTransform );
-        img = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
+    }
+    
+    public Renderer3D(ModelData data, double h, double p)
+    {
+        this.width = (int)data.getXDim().getLength();
+        this.height =  (int)data.getYDim().getLength();
+        this.depth = (int)data.getZDim().getLength();
+        this.xShift = -(int)data.getXDim().getFrom();
+        this.yShift = -(int)data.getYDim().getFrom();
+        this.zShift = -(int)data.getZDim().getFrom();
+        this.xMax = (int)data.getXDim().getTo();
+        this.yMax = (int)data.getYDim().getTo();
+        this.zMax = (int)data.getZDim().getTo();
+        shift = new Vertex(xShift, yShift, zShift);
+        zBuffer = new double[width * height];
+//        center = new Vertex( width / 2, width / 2, width / 2 );
+        hTransform = new Matrix3( new double[] {Math.cos( h ), 0, -Math.sin( h ), 0, 1, 0, Math.sin( h ), 0, Math.cos( h )} );
+        pTransform = new Matrix3( new double[] {1, 0, 0, 0, Math.cos( p ), Math.sin( p ), 0, -Math.sin( p ), Math.cos( p )} );
+
+        transform = hTransform.multiply( pTransform );
+       
     }
     
     public BufferedImage render(Scene scene, double time)
-    {  
+    {
+        BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
         for( int q = 0; q < zBuffer.length; q++ )
             zBuffer[q] = Double.NEGATIVE_INFINITY;
         orderMeshes( scene );
 
-        for( Mesh mesh : scene.getSpheres() )
-            paintSphere( mesh );
+        scene.getSpheres().parallelStream().forEach( m -> paintSphere(img,  m ) );
 
-        for( Mesh mesh : scene.getLayer( SceneHelper.PLANE_XY ) )
-            paintDisk( mesh );
+        scene.getLayer( SceneHelper.PLANE_XY ).forEach( m -> paintDisk(img,  m ) );
+        scene.getLayer( SceneHelper.PLANE_YZ ).forEach( m -> paintDisk(img,  m ) );
+        scene.getLayer( SceneHelper.PLANE_XZ ).forEach( m -> paintDisk(img,  m ) );
 
-        for( Mesh mesh : scene.getLayer( SceneHelper.PLANE_YZ ) )
-            paintDisk( mesh );
+        if( statistics )
+            drawText( scene, time, img.getGraphics() );
 
-        for( Mesh mesh : scene.getLayer( SceneHelper.PLANE_XZ ) )
-            paintDisk( mesh );
-
-        drawText(scene, time, img.getGraphics() );
-        drawLines(img.getGraphics());
+        if( axes )
+            drawLines(img );
         return img;
     }
     
@@ -59,41 +92,54 @@ public class Renderer3D
     {
         g.setFont( new Font( "TimesRoman", Font.PLAIN, 20 ) );
         g.setColor( Color.BLACK );
-        g.drawString( "Time: " + time, 10, 40 );
-        g.drawString( "Cells: " + scene.getSpheres().size() , 10, 70 );
+        g.drawString( "Time: " + time, statisticsLocation.x, statisticsLocation.y );
+        g.drawString( "Cells: " + scene.getSpheres().size() , statisticsLocation.x, statisticsLocation.y+30 );
     }
 
-    private static int BLACK_RGB = Color.black.getRGB() ;
-    
-    private void drawLines(Graphics g)
+    private boolean isValid(int x, int y)
     {
-
-        for( int i = 750; i < width; i++ )
+       return x >= 0 && x < width && y >= 0 && y < height;
+    }
+    
+    
+    private void drawLines(BufferedImage img)
+    {
+        int xLength = Math.max( xMax, 100 );
+        int yLength = Math.max( yMax, 100 );
+        int zLength = Math.max( zMax, 100 );
+        int x = 0;
+        int y = 0;
+        Vertex v = null;
+        for( int i = 0; i < xLength; i++ )
         {
-            Vertex vx = rotate( new Vertex( i, 750, 750 ) );
-            int x = (int)vx.x;// - 200;
-            int y = (int)vx.y;// - 200;
-            if( x >= 0 && x < width && y >= 0 && y <= height )
+            v = rotate( new Vertex( i, 0, 0 ) );
+            x = (int)v.x;
+            y = (int)v.y;
+            if( isValid( x, y ) )
                 img.setRGB( x, y, BLACK_RGB );
-
-            Vertex vy = rotate( new Vertex( 750, 1500-i, 750 ) );
-            x = (int)vy.x ;//- 200;
-            y = (int)vy.y ;//- 200;
-            if( x >= 0 && x < width && y >= 0 && y <= height )
-                img.setRGB( x, y, BLACK_RGB );
-            
-            Vertex vz = rotate( new Vertex( 750, 750, i ) );
-            x = (int)vz.x;// - 200;
-            y = (int)vz.y;// - 200;
-            if( x >= 0 && x < width && y >= 0 && y <= height )
-                img.setRGB(x, y, BLACK_RGB );
         }
-        paintTriangle(new Triangle(new Vertex(1500, 750, 750), new Vertex(1450, 740, 750), new Vertex(1450, 760, 750)), Color.black);
-        paintTriangle(new Triangle(new Vertex(1500, 750, 750), new Vertex(1450, 750, 740), new Vertex(1450, 750, 760)), Color.black);
-        paintTriangle(new Triangle(new Vertex(750, 0, 750), new Vertex(750, 50, 740), new Vertex(750, 50, 760)), Color.black);
-        paintTriangle(new Triangle(new Vertex(750, 0, 750), new Vertex(740, 50, 750), new Vertex(760, 50, 750)), Color.black);
-        paintTriangle(new Triangle(new Vertex(750, 750, 1500), new Vertex(740, 750, 1450), new Vertex(760, 750, 1450)), Color.black);
-        paintTriangle(new Triangle(new Vertex(750, 750, 1500), new Vertex(750, 740, 1450), new Vertex(750, 760, 1450)), Color.black);
+        for( int i = 0; i < yLength; i++ )
+        {
+            v = rotate( new Vertex( 0, yMax - i, 0 ) );
+            x = (int)v.x;
+            y = (int)v.y;
+            if( isValid( x, y ) )
+                img.setRGB( x, y, BLACK_RGB );
+        }
+        for( int i = 0; i < zLength; i++ )
+        {
+            v = rotate( new Vertex( 0, 0, i ) );
+            x = (int)v.x;
+            y = (int)v.y;
+            if( isValid( x, y ) )
+                img.setRGB( x, y, BLACK_RGB );
+        }
+        paintTriangle(img, new Triangle(new Vertex(xLength, 0, 0), new Vertex(xLength-50, -10, 0), new Vertex(xLength-50, 10, 0)), Color.black);
+        paintTriangle(img, new Triangle(new Vertex(xLength, 0, 0), new Vertex(xLength-50, 0, -10), new Vertex(xLength-50, 0, 10)), Color.black);
+        paintTriangle(img, new Triangle(new Vertex(0, yLength, 0), new Vertex(0, yLength-50, -10), new Vertex(0, yLength-50, 10)), Color.black);
+        paintTriangle(img, new Triangle(new Vertex(0, yLength, 0), new Vertex(-10, yLength-50, 0), new Vertex(10, yLength-50, 0)), Color.black);
+        paintTriangle(img, new Triangle(new Vertex(0, 0, zLength), new Vertex(-10, 0, zLength-50), new Vertex(10, 0, zLength-50)), Color.black);
+        paintTriangle(img, new Triangle(new Vertex(0, 0, zLength), new Vertex(0, -10, zLength-50), new Vertex(0, 10, zLength-50)), Color.black);
     }
     
     public void setIsCutOff(boolean cut)
@@ -111,9 +157,14 @@ public class Renderer3D
         return new Triangle( rotate( t.v1 ), rotate( t.v2 ), rotate( t.v3 ) );
     }
     
+//    private Vertex rotate(Vertex v)
+//    {
+//        return transform.transform( ( v.clone().minus( center ) ) ).offset( center );
+//    }
+    
     private Vertex rotate(Vertex v)
     {
-        return transform.transform( ( v.clone().minus( center ) ) ).offset( center );
+        return transform.transform( v.clone() ).offset( shift );
     }
     
     private void orderMeshes(Scene scene)
@@ -128,37 +179,36 @@ public class Renderer3D
     }
 
     
-    Vertex v1;
-    Vertex v2;
-    Vertex v3;
+//    Vertex v1;
+//    Vertex v2;
+//    Vertex v3;
+//    
+//    double b1;
+//    double b2;
+//    double b3;
+//    double depth;
+//    int zIndex;
+//    int minX;
+//    int maxX;
+//    int minY;
+//    int maxY;
+//    double triangleArea;
+//    Triangle temp;
+//    Integer shade;
     
-    double b1;
-    double b2;
-    double b3;
-    double depth;
-    int zIndex;
-    int minX;
-    int maxX;
-    int minY;
-    int maxY;
-    double triangleArea;
-    Triangle temp;
-    Integer shade;
+//    int red;
+//    int green;
+//    int blue;
     
-    int red;
-    int green;
-    int blue;
-    
-    private void paintSphere(Mesh mesh)
+    private void paintSphere(BufferedImage img, Mesh mesh)
     {
         if( cut && outOfBounds( mesh.center, mesh.radius ) )
             return;
 
         Vertex meshCenter = rotate( mesh.center );
+        Triangle temp;
         for( Triangle t : mesh.triangles )
         {
-//            if (outOfBounds( Util.center( t ) ))
-//                continue;
             if (outOfBounds( t.v1 ) || outOfBounds( t.v2 ) ||outOfBounds( t.v3 ))
                 continue;
             
@@ -166,18 +216,17 @@ public class Renderer3D
 
             if( Util.direction( Util.center( temp ), meshCenter ).z > 0 )
                 continue;
-            //                reatersizeB( temp, mesh.getColor(), false, true );
 
-            reatersizeB( temp, mesh.getColor(), true, true );
+            reatersizeB( img, temp, mesh.getColor(), true, true );
         }
     }
     
-    private void paintTriangle(Triangle t, Color c)
+    private void paintTriangle(BufferedImage img, Triangle t, Color c)
     {
-        reatersizeB( rotate( t ), c, true, true );
+        reatersizeB(img,  rotate( t ), c, true, true );
     }
     
-    private void paintDisk(Mesh mesh)
+    private void paintDisk(BufferedImage img, Mesh mesh)
     {
         if( cut && outOfBounds( mesh.center ) )
             return;
@@ -187,43 +236,55 @@ public class Renderer3D
             if (outOfBounds( Util.center( t ) ))
                 continue;
 
-            reatersizeB( rotate( t ), mesh.getColor(), true, false );
+            reatersizeB(img, rotate( t ), mesh.getColor(), true, false );
         }
     }
     
-    private void reatersizeB(Triangle t, Color c, boolean doShade, boolean reversePaint)
+    private void reatersizeB(BufferedImage img, Triangle t, Color c, boolean doShade, boolean reversePaint)
     {
-        v1 = t.v1;
-        v2 = t.v2;
-        v3 = t.v3;
-        depth = v1.z + v2.z + v3.z;    
-        minX = (int)Math.max( 0, Math.ceil( Util.min( v1.x, v2.x, v3.x ) ) );
-        maxX = (int)Math.min( img.getWidth() - 1, Math.floor( Util.max( v1.x, v2.x, v3.x ) ) );
-        minY = (int)Math.max( 0, Math.ceil( Util.min( v1.y, v2.y, v3.y ) ) );
-        maxY = (int)Math.min( img.getHeight() - 1, Math.floor( Util.max( v1.y, v2.y, v3.y ) ) );
-        triangleArea = ( v1.y - v3.y ) * ( v2.x - v3.x ) + ( v2.y - v3.y ) * ( v3.x - v1.x );        
-        shade = null;
+        Vertex v1 = t.v1;
+        Vertex v2 = t.v2;
+        Vertex v3 = t.v3;
+        double depth = v1.z + v2.z + v3.z;
+        int minX = (int)Math.max( 0, Math.ceil( Util.min( v1.x, v2.x, v3.x ) ) );
+        int maxX = (int)Math.min( img.getWidth() - 1, Math.floor( Util.max( v1.x, v2.x, v3.x ) ) );
+        int minY = (int)Math.max( 0, Math.ceil( Util.min( v1.y, v2.y, v3.y ) ) );
+        int maxY = (int)Math.min( img.getHeight() - 1, Math.floor( Util.max( v1.y, v2.y, v3.y ) ) );
+        double triangleArea = ( v1.y - v3.y ) * ( v2.x - v3.x ) + ( v2.y - v3.y ) * ( v3.x - v1.x );
+        Integer shade = null;
         for( int y = minY; y <= maxY; y++ )
         {
             for( int x = minX; x <= maxX; x++ )
             {
-                zIndex = y * img.getWidth() + x;
-                if( zBuffer[zIndex] < depth && isInside( x, y ) )
+                int zIndex = y * img.getWidth() + x;
+                if( zBuffer[zIndex] < depth && isInside( v1, v2, v3, x, y, triangleArea ) )
                 {
-                    if( shade == null && doShade)
+                    if( shade == null && doShade )
                         shade = getShade( c, t );
-                    img.setRGB( x/*- 200*/, y/* -200*/, shade );
-                    zBuffer[zIndex] = depth;
+                    //                    img.setRGB( x/*- 200*/, y/* -200*/, shade );
+                    setRGB( img, x, y, shade );
+                    setBuffer( zIndex, depth );
+                    //                    zBuffer[zIndex] = depth;
                 }
             }
         }
     }
     
-    public boolean isInside(double x, double y)
+   synchronized public void setRGB(BufferedImage img, int x, int y, int shade)
+   {
+       img.setRGB( x/*- 200*/, y/* -200*/, shade );
+   }
+    
+    synchronized public void setBuffer(int index, double value)
     {
-        b1 = ( ( y - v3.y ) * ( v2.x - v3.x ) + ( v2.y - v3.y ) * ( v3.x - x ) ) / triangleArea;
-        b2 = ( ( y - v1.y ) * ( v3.x - v1.x ) + ( v3.y - v1.y ) * ( v1.x - x ) ) / triangleArea;
-        b3 = ( ( y - v2.y ) * ( v1.x - v2.x ) + ( v1.y - v2.y ) * ( v2.x - x ) ) / triangleArea;
+        zBuffer[index] = value;
+    }
+    
+    public boolean isInside(Vertex v1, Vertex v2, Vertex v3, double x, double y, double triangleArea)
+    {
+       double b1 = ( ( y - v3.y ) * ( v2.x - v3.x ) + ( v2.y - v3.y ) * ( v3.x - x ) ) / triangleArea;
+       double b2 = ( ( y - v1.y ) * ( v3.x - v1.x ) + ( v3.y - v1.y ) * ( v1.x - x ) ) / triangleArea;
+       double b3 = ( ( y - v2.y ) * ( v1.x - v2.x ) + ( v1.y - v2.y ) * ( v2.x - x ) ) / triangleArea;
         return b1 >= 0 && b1 <= 1 && b2 >= 0 && b2 <= 1 && b3 >= 0 && b3 <= 1;
     }
 
@@ -244,9 +305,33 @@ public class Renderer3D
     
     public Integer getShade(Color color, double shade)
     {
-        red = (int)Math.pow( Math.pow( color.getRed(), 2.4 ) * shade, 1 / 2.4 );
-        green = (int)Math.pow( Math.pow( color.getGreen(), 2.4 ) * shade, 1 / 2.4 );
-        blue = (int)Math.pow( Math.pow( color.getBlue(), 2.4 ) * shade, 1 / 2.4 );
+        int red = (int)Math.pow( Math.pow( color.getRed(), 2.4 ) * shade, 1 / 2.4 );
+        int green = (int)Math.pow( Math.pow( color.getGreen(), 2.4 ) * shade, 1 / 2.4 );
+        int blue = (int)Math.pow( Math.pow( color.getBlue(), 2.4 ) * shade, 1 / 2.4 );
         return new Color( red, green, blue ).getRGB();
+    }
+    
+    public void setAxes(boolean axes)
+    {
+        this.axes = axes;
+    }
+    
+    public void setStatistics(boolean statistics)
+    {
+        this.statistics = statistics;
+    }
+    
+    public void setStatisticsLOcation(Point location)
+    {
+        this.statisticsLocation = location;
+    }
+    
+    public void setAngle(int heading, int pitch)
+    {
+        double h = Math.toRadians( heading );
+        double p = Math.toRadians( pitch );
+        hTransform = new Matrix3( new double[] {Math.cos( h ), 0, -Math.sin( h ), 0, 1, 0, Math.sin( h ), 0, Math.cos( h )} );
+        pTransform = new Matrix3( new double[] {1, 0, 0, 0, Math.cos( p ), Math.sin( p ), 0, -Math.sin( p ), Math.cos( p )} );
+        transform = hTransform.multiply( pTransform );
     }
 }
