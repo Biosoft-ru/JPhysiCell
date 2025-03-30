@@ -33,8 +33,7 @@ public class SceneHelper
         for( int i = 0; i < quality; i++ )
              inflate( mesh, r );
         
-        for( Vertex v : mesh.getVertices() )
-          Util.moveFrom( v, mesh.center, r / Util.distance( v, mesh.center ) );
+         mesh.getVertices().forEach( v -> Util.moveFrom( v, mesh.center, r / Util.distance( v, mesh.center ) ) );
             
         mesh.setType( Mesh.SPHERE_TYPE );
         mesh.setColor(color);
