@@ -10,7 +10,7 @@ public class Scene
     private Map<Integer, List<Mesh>> layers = new HashMap<>();
 
     private List<Mesh> spheres = new ArrayList<Mesh>();
-
+ 
     public void addDisk(Mesh mesh, int layerCode)
     {
         layers.computeIfAbsent( layerCode, i -> new ArrayList<>() ).add( mesh );
