@@ -151,9 +151,9 @@ public class Renderer3D
             if( isValid( x, y ) )
                 img.setRGB( x, y, BLACK_RGB );
         }
-        for( int i = 0; i < yLength; i++ )
+        for( int i = 0; i > -yLength; i-- )
         {
-            v = rotate( new Vertex( 0, yMax - i, 0 ) );
+            v = rotate( new Vertex( 0, i, 0 ) );
             x = (int)v.x;
             y = (int)v.y;
             if( isValid( x, y ) )
@@ -174,10 +174,10 @@ public class Renderer3D
                 new Triangle( new Vertex( xLength, 0, 0 ), new Vertex( xLength - 50, 0, -10 ), new Vertex( xLength - 50, 0, 10 ) ),
                 Color.black );
         paintTriangle( img,
-                new Triangle( new Vertex( 0, yLength, 0 ), new Vertex( 0, yLength - 50, -10 ), new Vertex( 0, yLength - 50, 10 ) ),
+                new Triangle( new Vertex( 0, -yLength, 0 ), new Vertex( 0, -yLength + 50, -10 ), new Vertex( 0, -yLength + 50, 10 ) ),
                 Color.black );
         paintTriangle( img,
-                new Triangle( new Vertex( 0, yLength, 0 ), new Vertex( -10, yLength - 50, 0 ), new Vertex( 10, yLength - 50, 0 ) ),
+                new Triangle( new Vertex( 0, -yLength, 0 ), new Vertex( -10, -yLength + 50, 0 ), new Vertex( 10, -yLength + 50, 0 ) ),
                 Color.black );
         paintTriangle( img,
                 new Triangle( new Vertex( 0, 0, zLength ), new Vertex( -10, 0, zLength - 50 ), new Vertex( 10, 0, zLength - 50 ) ),
