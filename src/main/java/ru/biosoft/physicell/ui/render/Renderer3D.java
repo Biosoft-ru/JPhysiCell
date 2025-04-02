@@ -97,6 +97,9 @@ public class Renderer3D
     {
         BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
         
+        img.getGraphics().setColor( Color.white );
+        img.getGraphics().fillRect( 0, 0, width, height );
+        
 //        if (density && densityState != null)
 //        {
 //            this.addDensity( densityState.getDensity( substrate ), scene );
