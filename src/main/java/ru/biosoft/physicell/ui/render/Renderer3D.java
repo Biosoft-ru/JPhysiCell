@@ -140,6 +140,9 @@ public class Renderer3D
 
     private void drawLines(BufferedImage img)
     {
+        Graphics g = img.getGraphics();
+        g.setFont( new Font( "TimesRoman", Font.BOLD, 20 ) );
+        g.setColor( Color.BLACK );
         int xLength = Math.max( xMax, 100 );
         int yLength = Math.max( yMax, 100 );
         int zLength = Math.max( zMax, 100 );
@@ -153,6 +156,8 @@ public class Renderer3D
             y = (int)v.y;
             if( isValid( x, y ) )
                 img.setRGB( x, y, BLACK_RGB );
+            if( i == xLength - 1 )
+                g.drawString( "X", x+10, y-10 );
         }
         for( int i = 0; i > -yLength; i-- )
         {
@@ -161,6 +166,8 @@ public class Renderer3D
             y = (int)v.y;
             if( isValid( x, y ) )
                 img.setRGB( x, y, BLACK_RGB );
+            if( i == -yLength+1 )
+                g.drawString( "Y", x+10, y-10 );
         }
         for( int i = 0; i < zLength; i++ )
         {
@@ -169,6 +176,8 @@ public class Renderer3D
             y = (int)v.y;
             if( isValid( x, y ) )
                 img.setRGB( x, y, BLACK_RGB );
+            if( i == xLength - 1 )
+                g.drawString( "Z", x-10, y-10);
         }
         paintTriangle( img,
                 new Triangle( new Vertex( xLength, 0, 0 ), new Vertex( xLength - 50, -10, 0 ), new Vertex( xLength - 50, 10, 0 ) ),
