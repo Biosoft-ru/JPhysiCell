@@ -14,6 +14,7 @@ public class Renderer3D
 {
     private static int BLACK_RGB = Color.black.getRGB();
     private boolean axes = true;
+    private boolean agents = true;
     private boolean statistics = true;
     private boolean density = true;
     private String substrate = "oxygen";
@@ -96,25 +97,28 @@ public class Renderer3D
     public BufferedImage render(Scene scene, double time)
     {
         BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
-        
+
         img.getGraphics().setColor( Color.white );
         img.getGraphics().fillRect( 0, 0, width, height );
-        
-//        if (density && densityState != null)
-//        {
-//            this.addDensity( densityState.getDensity( substrate ), scene );
-//            scene.getLayer( 4 ).forEach( m -> paintDisk( img, m ) );
-//        }
-        
-        for( int q = 0; q < zBuffer.length; q++ )
-            zBuffer[q] = Double.NEGATIVE_INFINITY;
-        orderMeshes( scene );
 
-        scene.getSpheres().parallelStream().forEach( m -> paintSphere( img, m ) );
+        //        if (density && densityState != null)
+        //        {
+        //            this.addDensity( densityState.getDensity( substrate ), scene );
+        //            scene.getLayer( 4 ).forEach( m -> paintDisk( img, m ) );
+        //        }
 
-        scene.getLayer( SceneHelper.PLANE_XY ).forEach( m -> paintDisk( img, m ) );
-        scene.getLayer( SceneHelper.PLANE_YZ ).forEach( m -> paintDisk( img, m ) );
-        scene.getLayer( SceneHelper.PLANE_XZ ).forEach( m -> paintDisk( img, m ) );
+        if( agents )
+        {
+            for( int q = 0; q < zBuffer.length; q++ )
+                zBuffer[q] = Double.NEGATIVE_INFINITY;
+            orderMeshes( scene );
+
+            scene.getSpheres().parallelStream().forEach( m -> paintSphere( img, m ) );
+
+            scene.getLayer( SceneHelper.PLANE_XY ).forEach( m -> paintDisk( img, m ) );
+            scene.getLayer( SceneHelper.PLANE_YZ ).forEach( m -> paintDisk( img, m ) );
+            scene.getLayer( SceneHelper.PLANE_XZ ).forEach( m -> paintDisk( img, m ) );
+        }
 
         if( statistics )
             drawText( scene, time, img.getGraphics() );
@@ -381,6 +385,11 @@ public class Renderer3D
     public void setAxes(boolean axes)
     {
         this.axes = axes;
+    }
+    
+    public void setAgents(boolean agents)
+    {
+        this.agents = agents;
     }
 
     public void setStatistics(boolean statistics)
