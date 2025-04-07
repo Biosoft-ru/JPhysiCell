@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-
+import java.util.Arrays;
 import ru.biosoft.physicell.ui.DensityState;
 import ru.biosoft.physicell.ui.ModelData;
 import ru.biosoft.physicell.ui.Visualizer2D.Section;
@@ -17,11 +17,11 @@ public class Renderer3D
     private boolean agents = true;
     private boolean statistics = true;
     private boolean density = true;
+    private Color densityColor = Color.red;
     private String substrate = "oxygen";
     private Point statisticsLocation = new Point( 10, 40 );
     private boolean cut = true;
     private Vertex cutOff = new Vertex( 500, 500, 500 );
-    //    private Vertex center;
     private double[] zBuffer;
     private Matrix3 hTransform;
     private Matrix3 pTransform;
@@ -42,20 +42,19 @@ public class Renderer3D
     int width;
     int height;
     int depth;
-    private Section sec = Section.Z;
+    private boolean densityX;
+    private boolean densityY;
+    private boolean densityZ;
     private int slice = 0;
 
     private DensityState densityState;
 
     public Renderer3D(int width, int height, double h, double p)
     {
-        //        this( 0, 0, 0, width, height, height, h, p );
         shift = new Vertex( xShift, yShift, zShift );
         zBuffer = new double[width * height];
-        //        center = new Vertex( width / 2, width / 2, width / 2 );
         hTransform = new Matrix3( new double[] {Math.cos( h ), 0, -Math.sin( h ), 0, 1, 0, Math.sin( h ), 0, Math.cos( h )} );
         pTransform = new Matrix3( new double[] {1, 0, 0, 0, Math.cos( p ), Math.sin( p ), 0, -Math.sin( p ), Math.cos( p )} );
-
         transform = hTransform.multiply( pTransform );
     }
 
@@ -78,7 +77,6 @@ public class Renderer3D
         zCells = (int)data.getZDim().getLength() / dx;
         shift = new Vertex( xShift, yShift, zShift );
         zBuffer = new double[width * height];
-        //        center = new Vertex( width / 2, width / 2, width / 2 );
         hTransform = new Matrix3( new double[] {Math.cos( h ), 0, -Math.sin( h ), 0, 1, 0, Math.sin( h ), 0, Math.cos( h )} );
         pTransform = new Matrix3( new double[] {1, 0, 0, 0, Math.cos( p ), Math.sin( p ), 0, -Math.sin( p ), Math.cos( p )} );
         transform = hTransform.multiply( pTransform );
@@ -97,24 +95,28 @@ public class Renderer3D
     public BufferedImage render(Scene scene, double time)
     {
         BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
-
+        Arrays.fill( zBuffer, Double.NEGATIVE_INFINITY );
+        //        for( int q = 0; q < zBuffer.length; q++ )
+        //            zBuffer[q] = Double.NEGATIVE_INFINITY;
         img.getGraphics().setColor( Color.white );
         img.getGraphics().fillRect( 0, 0, width, height );
 
-        //        if (density && densityState != null)
-        //        {
-        //            this.addDensity( densityState.getDensity( substrate ), scene );
-        //            scene.getLayer( 4 ).forEach( m -> paintDisk( img, m ) );
-        //        }
+        if( density && densityState != null )
+        {
+            scene.clearLayer( 4 );
+            if( densityX )
+                this.addDensity( densityState.getDensity( substrate ), scene, Section.X, 4 );
+            if( densityY )
+                this.addDensity( densityState.getDensity( substrate ), scene, Section.Y, 4 );
+            if( densityZ )
+                this.addDensity( densityState.getDensity( substrate ), scene, Section.Z, 4 );
+            scene.getLayer( 4 ).forEach( m -> paintDisk( img, m ) );
+        }
 
         if( agents )
         {
-            for( int q = 0; q < zBuffer.length; q++ )
-                zBuffer[q] = Double.NEGATIVE_INFINITY;
             orderMeshes( scene );
-
             scene.getSpheres().parallelStream().forEach( m -> paintSphere( img, m ) );
-
             scene.getLayer( SceneHelper.PLANE_XY ).forEach( m -> paintDisk( img, m ) );
             scene.getLayer( SceneHelper.PLANE_YZ ).forEach( m -> paintDisk( img, m ) );
             scene.getLayer( SceneHelper.PLANE_XZ ).forEach( m -> paintDisk( img, m ) );
@@ -140,7 +142,6 @@ public class Renderer3D
     {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
-
 
     private void drawLines(BufferedImage img)
     {
@@ -201,6 +202,11 @@ public class Renderer3D
         paintTriangle( img,
                 new Triangle( new Vertex( 0, 0, zLength ), new Vertex( 0, -10, zLength - 50 ), new Vertex( 0, 10, zLength - 50 ) ),
                 Color.black );
+    }
+    
+    public void setDensityColor(Color color)
+    {
+        this.densityColor = color;
     }
     
     public void setDrawDensity(boolean density)
@@ -283,30 +289,23 @@ public class Renderer3D
             if( Util.direction( Util.center( temp ), meshCenter ).z > 0 )
                 continue;
 
-            reatersizeB( img, temp, mesh.getColor(), true, true );
+            rasterizeB( img, temp, mesh.getColor(), true, true );
         }
     }
 
     private void paintTriangle(BufferedImage img, Triangle t, Color c)
     {
-        reatersizeB( img, rotate( t ), c, true, true );
+        rasterizeB( img, rotate( t ), c, true, false );
     }
 
     private void paintDisk(BufferedImage img, Mesh mesh)
     {
-        if( cut && outOfBounds( mesh.center ) )
-            return;
-
-        for( Triangle t : mesh.triangles )
-        {
-            if( outOfBounds( Util.center( t ) ) )
-                continue;
-
-            reatersizeB( img, rotate( t ), mesh.getColor(), true, true );
-        }
+        mesh.triangles.forEach( t -> rasterizeB( img, rotate( t ), mesh.getColor(), true, true ) );
+        //        for( Triangle t : mesh.triangles )
+        //            rasterizeB( img, rotate( t ), mesh.getColor(), true, true );
     }
 
-    private void reatersizeB(BufferedImage img, Triangle t, Color c, boolean doShade, boolean reversePaint)
+    private void rasterizeB(BufferedImage img, Triangle t, Color c, boolean doShade, boolean reversePaint)
     {
         Vertex v1 = t.v1;
         Vertex v2 = t.v2;
@@ -329,12 +328,10 @@ public class Renderer3D
                     {
                         if( shade == null && doShade )
                             shade = getShade( c, t );
-                        //                    img.setRGB( x/*- 200*/, y/* -200*/, shade );
                         setRGB( img, x, y, shade );
 
                         if( reversePaint )
                             setBuffer( zIndex, depth );
-                        //                    zBuffer[zIndex] = depth;
                     }
                 }
             }
@@ -343,7 +340,7 @@ public class Renderer3D
 
     synchronized public void setRGB(BufferedImage img, int x, int y, int shade)
     {
-        img.setRGB( x/*- 200*/, y/* -200*/, shade );
+        img.setRGB( x, y, shade );
     }
 
     synchronized public void setBuffer(int index, double value)
@@ -391,6 +388,11 @@ public class Renderer3D
     {
         this.agents = agents;
     }
+    
+    public void setDensity(boolean density)
+    {
+        this.density = density;
+    }
 
     public void setStatistics(boolean statistics)
     {
@@ -411,8 +413,9 @@ public class Renderer3D
         transform = hTransform.multiply( pTransform );
     }
 
-    private void addDensity(double[] densities, Scene scene)
+    private void addDensity(double[] densities, Scene scene, Section sec, int layer)
     {
+
         int from1 = -this.xShift;
         int from2 = -this.yShift;
         int n1 = xCells;
@@ -421,7 +424,7 @@ public class Renderer3D
         int size2 = dy;
         int size3 = dz;
         int shift = this.zShift;
-        double maxDensity = 1E-13;
+
         switch( sec )
         {
             case X:
@@ -448,14 +451,15 @@ public class Renderer3D
                 break;
         }
 
-        int n = ( slice + shift ) / size3;//(int) ( ( options2D.getSlice() + shift ) / size3 );
+        int n = ( slice + shift ) / size3;
 
-        double actualMaxDensity = 0;
+        double maxDensity =   Arrays.stream( densities ).max().orElse( 1 );
+        if (maxDensity == 0)
+            maxDensity = 1;
         for( int i = 0; i < n1; i++ )
         {
             for( int j = 0; j < n2; j++ )
             {
-                int red;
                 int index;
                 switch( sec )
                 {
@@ -463,34 +467,65 @@ public class Renderer3D
                         index = n + n1 * i + n1 * n2 * j;
                         break;
                     case Y:
-                        index = i + n * j + j * n1 * n2;
+                        index = i + n1 * n + j * n1 * n2;
                         break;
                     default: //Z
                         index = i + n1 * j + n * n1 * n2;
                 }
                 double density = densities[index];
-                if( density > actualMaxDensity )
-                    actualMaxDensity = density;
-
                 double ratio = ( density / maxDensity );
                 ratio = Math.min( 1, ratio );
-                red = (int) ( ( 1 - ratio ) * 255 );
 
-                Mesh square = new Mesh();
-                square.setColor( new Color( 255, red, red ) );
-                square.add( new Triangle( new Vertex( from1 + i * size1, from2+j*size2, 0), new Vertex(from1+i*size1+size1, from2+j*size2, 0), new Vertex(from1+i*size1+size1, from2+j*size2+size2,0) ) );
-                square.add( new Triangle( new Vertex(from1 + i*size1, from2+j*size2, 0), new Vertex(from1+i*size1, from2+j*size2+size2, 0), new Vertex(from1+i*size1+size1, j*size2+size2,0) ) );
-                scene.addDisk( square, 4 );
-//                scene.
-                //                g.setColor( new Color( 255, red, red ) );
-                //                g.fillRect( i * size1, j * size2, size1, size2 );
+                Color actual = new Color( (int) ( ( densityColor.getRed() - 255 ) * ratio + 255 ),
+                        (int) ( ( densityColor.getGreen() - 255 ) * ratio + 255 ),
+                        (int) ( ( densityColor.getBlue() - 255 ) * ratio + 255 ) );
+
+                Mesh square = new Mesh( new Vertex( from1 + i * size1+size1/2, from2+j*size2+size2/2, 0));
+                square.setColor(actual );
+                int x0 = from1 + i * size1;
+                int y0 = from2 + j * size2;
+                Vertex topLeft = null;
+                Vertex topRight = null;
+                Vertex bottomRight = null;
+                Vertex bottomLeft = null;
+                switch( sec )
+                {
+                    case Z:
+                        topLeft = new Vertex( x0, y0, this.cutOff.z-5 );
+                        topRight = new Vertex( x0 + size1, y0, this.cutOff.z-5 );
+                        bottomRight = new Vertex( x0 + size1, y0 + size2, this.cutOff.z-5 );
+                        bottomLeft = new Vertex( x0, y0 + size2, this.cutOff.z-5 );
+                        break;
+                    case Y:
+                        topLeft = new Vertex( x0, this.cutOff.y+5, y0 );
+                        topRight = new Vertex( x0 + size1, this.cutOff.y+5, y0 );
+                        bottomRight = new Vertex( x0 + size1, this.cutOff.y+5, y0 + size2 );
+                        bottomLeft = new Vertex( x0, this.cutOff.y+5, y0 + size2 );
+                        break;
+                    case X:
+                        topLeft = new Vertex( this.cutOff.x-5, x0, y0 );
+                        topRight = new Vertex( this.cutOff.x-5, x0 + size1, y0 );
+                        bottomRight = new Vertex( this.cutOff.x-5, x0 + size1, y0 + size2 );
+                        bottomLeft = new Vertex( this.cutOff.x-5, x0, y0 + size2 );
+                        break;
+                }
+                square.add( new Triangle( topLeft, topRight, bottomRight ) );
+                square.add( new Triangle( topLeft, bottomLeft, bottomRight ) );
+                scene.addDisk( square, layer );
             }
         }
-        if( actualMaxDensity > 0 )
-        {
-            maxDensity = actualMaxDensity;
-            if( maxDensity < 1E-20 )
-                maxDensity = 1E-20;
-        }
+    }
+    
+    public void setDensityX(boolean densityX)
+    {
+        this.densityX = densityX;
+    }
+    public void setDensityY(boolean densityY)
+    {
+        this.densityY = densityY;
+    }
+    public void setDensityZ(boolean densityZ)
+    {
+        this.densityZ = densityZ;
     }
 }
