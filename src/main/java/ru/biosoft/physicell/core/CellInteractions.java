@@ -73,11 +73,20 @@ import ru.biosoft.physicell.biofvm.VectorUtil;
 */
 public class CellInteractions implements Cloneable
 {
+    public double apoptotic_phagocytosis_rate;
+    public double necrotic_phagocytosis_rate;
+    public double other_dead_phagocytosis_rate;
+
+    public Cell pAttackTarget = null; 
+    public double total_damage_delivered = 0.0; 
+    
+    @Deprecated
     public double deadPhagocytosisRate; // phagocytosis parameters (e.g., macrophages)
     public double[] livePhagocytosisRates; // attack parameters (e.g., T cells)
     public double[] attackRates; // do I attack cell type j? 
     public double[] immunogenicities; // how immnogenic am I to cell type j?  
     public double damageRate;
+    public double attack_duration = 30; // a typical attack duration for a T cell using perforin/granzyme is ~30 minutes
     public double[] fusionRates; // cell fusion parameters 
     private String[] names;
 

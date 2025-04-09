@@ -78,7 +78,7 @@ public class CellState
     public double[] orientation;
     public double simplePressure;
     int numberNuclei;
-	public double damage;
+//	public double damage;
     double totalAttackTime;
     boolean contactWithBasementMembrane; // not implemented yet 
     
@@ -90,7 +90,7 @@ public class CellState
         simplePressure = 0.0;
         attachedCells =  new CopyOnWriteArraySet<Cell>();
         numberNuclei = 1;
-        damage = 0.0;
+//        damage = 0.0;
         totalAttackTime = 0.0;
         contactWithBasementMembrane = false;
     }

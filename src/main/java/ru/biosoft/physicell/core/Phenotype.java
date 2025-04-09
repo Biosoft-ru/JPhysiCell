@@ -84,7 +84,8 @@ public class Phenotype implements Cloneable
     public CellInteractions cellInteractions = new CellInteractions();
     public CellTransformations cellTransformations = new CellTransformations();
     public Intracellular intracellular = null;//new Intracellular();
-
+    public CellIntegrity cellIntegrity = new CellIntegrity();
+    
     /**
      * Synchronize all parts with microenvironment (densities)  
      */
@@ -132,6 +133,7 @@ public class Phenotype implements Cloneable
         result.secretion = secretion.clone();
         result.molecular = molecular.clone();
         result.cellInteractions = cellInteractions.clone();
+        result.cellIntegrity = cellIntegrity.clone();
         result.cellTransformations = cellTransformations.clone();
         if( intracellular != null )
             result.intracellular = intracellular.clone();

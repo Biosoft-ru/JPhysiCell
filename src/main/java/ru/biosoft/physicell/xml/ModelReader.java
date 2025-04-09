@@ -18,8 +18,8 @@ import org.w3c.dom.NodeList;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.MicroenvironmentOptions;
 import ru.biosoft.physicell.biofvm.VectorUtil;
-import ru.biosoft.physicell.core.CellCSVReader;
 import ru.biosoft.physicell.core.CellDefinition;
+import ru.biosoft.physicell.core.CellIntegrity;
 import ru.biosoft.physicell.core.CellInteractions;
 import ru.biosoft.physicell.core.CellTransformations;
 import ru.biosoft.physicell.core.CycleModel;
@@ -620,6 +620,9 @@ public class ModelReader extends ModelReaderSupport
                     case "cell_interactions":
                         readCellInteractions( el, cd, model );
                         break;
+                    case "cell_integrity":
+                        readCellIntegrity( el, cd, model );
+                        break;
                     case "cell_transformations":
                         readCellTransformations( el, cd, model );
                         break;
@@ -1187,22 +1190,29 @@ public class ModelReader extends ModelReaderSupport
         CellInteractions cellInteractions = cd.phenotype.cellInteractions;
         Element dprElement = findElement( el, "dead_phagocytosis_rate" );
         if( dprElement != null )
-        {
             cellInteractions.deadPhagocytosisRate = getDoubleVal( dprElement );
-        }
+
+        dprElement = findElement( el, "apoptotic_phagocytosis_rate" );
+        if( dprElement != null )
+            cellInteractions.apoptotic_phagocytosis_rate = getDoubleVal( dprElement );
+        
+        dprElement = findElement( el, "necrotic_phagocytosis_rate" );
+        if( dprElement != null )
+            cellInteractions.necrotic_phagocytosis_rate = getDoubleVal( dprElement );
+        
+        dprElement = findElement( el, "other_dead_phagocytosis_rate" );
+        if( dprElement != null )
+            cellInteractions.other_dead_phagocytosis_rate = getDoubleVal( dprElement );
+        
         Element lprsElement = findElement( el, "live_phagocytosis_rates" );
         if( lprsElement != null )
         {
             for( Element lprElement : findAllElements( lprsElement, "phagocytosis_rate" ) )
             {
-                // get the name of the target cell type
                 String target_name = getAttr( lprElement, "name" );
-                // now find its index 
                 int index = m.findCellDefinitionIndex( target_name );
-                // safety first! 
                 if( index >= 0 )
                 {
-                    // if the target is found, set the appropriate rate 
                     cellInteractions.livePhagocytosisRates[index] = getDoubleVal( lprElement );
                     //                    String units = getAttr( lprElement, "units" );
                 }
@@ -1218,9 +1228,7 @@ public class ModelReader extends ModelReaderSupport
         {
             for( Element arElement : findAllElements( attackRatesElement, "attack_rate" ) )
             {
-                // get the name of the target cell type
                 String target_name = getAttr( arElement, "name" );
-                //            // now find its index 
                 int index = m.findCellDefinitionIndex( target_name );
                 if( index >= 0 )
                 {
@@ -1238,9 +1246,7 @@ public class ModelReader extends ModelReaderSupport
         {
             for( Element drElement : findAllElements( fusionRatesElement, "fusion_rate" ) )
             {
-                // get the name of the target cell type
                 String target_name = getAttr( drElement, "name" );
-                //            // now find its index 
                 int index = m.findCellDefinitionIndex( target_name );
                 if( index >= 0 )
                 {
@@ -1253,15 +1259,29 @@ public class ModelReader extends ModelReaderSupport
                 }
             }
 
-            Element damageRateElement = findElement( el, "damage_rate" );
-            if( damageRateElement != null )
-            {
-                cellInteractions.damageRate = getDoubleVal( damageRateElement );
-                //                String units = getAttr( damageRateElement, "units" );
-            }
+            Element element = findElement( el, "damage_rate" );
+            if( element != null )
+                cellInteractions.damageRate = getDoubleVal( element );
+            element = findElement( el, "attack_damage_rate" );
+            if( element != null )
+                cellInteractions.damageRate = getDoubleVal( element );
+            element = findElement( el, "attack_duration" );
+            if( element != null )
+                cellInteractions.attack_duration = getDoubleVal( element );
         }
     }
 
+    private void readCellIntegrity(Element el, CellDefinition cd, Model m)
+    {
+        CellIntegrity cellIntegrity = cd.phenotype.cellIntegrity;
+        Element element = findElement( el, "damage_rate" );
+        if( element != null )
+            cellIntegrity.damage_rate = getDoubleVal( element );
+        element = findElement( el, "damage_repair_rate" );
+        if( element != null )
+            cellIntegrity.damage_repair_rate = getDoubleVal( element );
+    }
+    
     private void readCellTransformations(Element el, CellDefinition cd, Model m)
     {
         CellTransformations transformations = cd.phenotype.cellTransformations;

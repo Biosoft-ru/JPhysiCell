@@ -310,9 +310,9 @@ public class Cell extends BasicAgent
             child.phenotype.intracellular.inherit( this );
         }
 
-        state.damage = 0.0;
+//        state.damage = 0.0;
         state.totalAttackTime = 0;
-        child.state.damage = 0.0;
+//        child.state.damage = 0.0;
         child.state.totalAttackTime = 0.0;
         return child;
     }
@@ -824,8 +824,10 @@ public class Cell extends BasicAgent
         //        #pragma omp critical
         {
             // std::cout << this.type_name << " attacks " << pCell_to_attack.type_name << std::endl;
-            pCellToAttack.state.damage += phenotype.cellInteractions.damageRate * dt;
+            pCellToAttack.phenotype.cellIntegrity.damage += phenotype.cellInteractions.damageRate * dt;
             pCellToAttack.state.totalAttackTime += dt;
+
+            phenotype.cellInteractions.total_damage_delivered += phenotype.cellInteractions.damageRate * dt; 
         }
     }
 
@@ -1039,6 +1041,9 @@ public class Cell extends BasicAgent
         // update geometry
         phenotype.geometry.update( this, phenotype, dt );
 
+        // update integrity 
+        phenotype.cellIntegrity.advanceDamage( dt ); 
+        
         // check for new death events 
         if( phenotype.death.checkForDeath( model.getRNG(), dt ) )
         {
