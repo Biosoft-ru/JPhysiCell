@@ -81,6 +81,7 @@ public class CellFunctions
     public DistanceCalculator membraneDistanceCalculator;
     public set_orientation set_orientation;
     public Contact contact;
+    public CellDivision cellDivision;
 
     public CellFunctions clone()
     {
@@ -102,6 +103,7 @@ public class CellFunctions
             result.set_orientation = set_orientation;// == null ? null : set_orientation.getClass().newInstance();
             result.contact = contact;// == null ? null : contact.getClass().newInstance();
             result.customCellRule = customCellRule;
+            result.cellDivision = cellDivision;
         }
         catch( Exception ex )
         {
@@ -190,6 +192,11 @@ public class CellFunctions
     public static abstract class Instantiator extends Function
     {
         public abstract Cell execute(CellDefinition cd, Model model) throws Exception;
+    }
+    
+    public static abstract class CellDivision extends Function 
+    {
+        public abstract void execute(Cell pCell1, Cell pCell2) throws Exception;
     }
 
     @Override

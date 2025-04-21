@@ -66,6 +66,7 @@ public class SignalBehavior
     private int first_attack_index;
     private int first_fusion_index;
     private int first_transformation_index;
+    private int first_asymmetric_division_index;
     private int first_custom_ind;
     private int movable_ind;
     private int first_immunogenicity_index;
@@ -100,15 +101,31 @@ public class SignalBehavior
         else if( contact <= index && index < contact + n + 2 )
         {
             int[] counts = new int[n];
-            int dead_cells = 0;
-            int live_cells = 0;
+            int dead_cells = 0; 
+            int apop_cells = 0;
+            int necro_cells = 0; 
+            int other_dead_cells = 0; 
+            int live_cells = 0; 
             for( Cell pC : cell.state.neighbors ) // process all neighbors 
             {
                 if( pC.phenotype.death.dead )
+                {
                     dead_cells++;
+                    if( pC.phenotype.cycle.currentPhase().code == PhysiCellConstants.apoptotic )
+                    {
+                        apop_cells++;
+                    }
+                    if( pC.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_swelling
+                            || pC.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic_lysed
+                            || pC.phenotype.cycle.currentPhase().code == PhysiCellConstants.necrotic )
+                    {
+                        necro_cells++;
+                    }
+                }
                 else
                     live_cells++;
                 counts[pC.type] += 1;
+                other_dead_cells = dead_cells - apop_cells - necro_cells;       
             }
 
             if( index < contact + n )
@@ -117,6 +134,12 @@ public class SignalBehavior
                 return scale( live_cells, index );
             else if( index == contactDead )
                 return scale( dead_cells, index );
+            else if( index == contactApoptoticDead )
+                return scale( apop_cells, index );
+            else if( index == contactNecroticDead )
+                return scale( necro_cells, index );
+            else if( index == contactOtherDead )
+                return scale( other_dead_cells, index );
         }
         else if( index == contactBM )
             return scale( digitize( cell.state.contactWithBasementMembrane ), index );
@@ -161,6 +184,9 @@ public class SignalBehavior
         signals.add( "volume" );
         signals.add( "contact with live cell" );
         signals.add( "contact with dead cell" );
+        signals.add( "contact with apoptotic cell");
+        signals.add( "contact with necrotic cell");
+        signals.add( "contact with other dead cell"); 
         signals.add( "contact with basement membrane" );
         signals.add( "damage" );
         signals.add( "is dead" );
@@ -211,6 +237,7 @@ public class SignalBehavior
             behaviors.add( "fuse to " + cellType );
             behaviors.add( "transform to " + cellType );
             behaviors.add( "immunogenicity to " + cellType );
+            behaviors.add( "asymmetric division to " + cellType  );
         }
 
         for( String d : densities )
@@ -393,6 +420,9 @@ public class SignalBehavior
         for( CellDefinition cd : model.getCellDefinitions() )
             registerBehavior(  "transition to " + cd.name, "transform to " + cd.name, "transform to cell type " + cd.type, "transition to cell type " + cd.type );
 
+        for( CellDefinition cd : model.getCellDefinitions() )
+            registerBehavior( "asymmetric division to " + cd.name );
+        
         for( int i = 0; i < def.custom_data.variables.size(); i++ )
         {
             String varName = def.custom_data.variables.get( i ).getName();
@@ -442,6 +472,7 @@ public class SignalBehavior
         first_fusion_index = findBehaviorIndex( "fuse to " + def.name );
         first_transformation_index = findBehaviorIndex( "transform to " + def.name );
         first_custom_ind = findBehaviorIndex( "custom:" + def.custom_data.variables.get( 0 ).name );
+        first_asymmetric_division_index = findBehaviorIndex( "asymmetric division to "+ def.name );
         movable_ind = findBehaviorIndex( "is_movable" );
         first_immunogenicity_index = findBehaviorIndex( "immunogenicity to " + def.name );
         attachment_rate_ind = findBehaviorIndex( "cell attachment rate" );
@@ -519,6 +550,8 @@ public class SignalBehavior
             cell.phenotype.cellInteractions.attackRates[index - first_attack_index] = parameter;
         else if( index >= first_fusion_index && index < first_fusion_index + n )
             cell.phenotype.cellInteractions.fusionRates[index - first_fusion_index] = parameter;
+        else if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
+            cell.phenotype.cycle.getAsymmetricDivision().setProbability( index - first_asymmetric_division_index, parameter);
         else if( index >= first_transformation_index && index < first_transformation_index + n )
             cell.phenotype.cellTransformations.transformationRates[index - first_transformation_index] = parameter;
         else if( first_custom_ind >= 0 && index >= first_custom_ind && index < first_custom_ind + cell.customData.variables.size() )
@@ -630,6 +663,8 @@ public class SignalBehavior
             return cell.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         if( index >= first_transformation_index && index < first_transformation_index + n )
             return cell.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
+        else if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
+            return cell.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index);
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < first_custom_ind + cell.customData.variables.size() )
             return cell.customData.variables.get( index - first_custom_ind ).value;
         if( index == movable_ind )
@@ -790,6 +825,8 @@ public class SignalBehavior
             return cd.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         if( index >= first_transformation_index && index < first_transformation_index + n )
             return cd.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
+        else if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
+            return cd.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index);
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < first_custom_ind + cell.customData.variables.size() )
             return cd.custom_data.variables.get( index - first_custom_ind ).value;
         if( index == movable_ind )
@@ -878,6 +915,8 @@ public class SignalBehavior
             return cd.phenotype.cellInteractions.fusionRates[index - first_fusion_index];
         if( index >= first_transformation_index && index < first_transformation_index + n )
             return cd.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
+        else if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
+            return cd.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index);
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < first_custom_ind + cd.custom_data.variables.size() )
             return cd.custom_data.variables.get( index - first_custom_ind ).value;
         if( index == movable_ind )

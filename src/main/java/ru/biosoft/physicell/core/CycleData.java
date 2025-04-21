@@ -174,6 +174,12 @@ public class CycleData
     {
         transitionRates.get( phase_exit ).set( 0, rate );
     }
+    
+    public void setBasicExitRate(int phase_exit, double rate)
+    {
+        transitionRates.get( phase_exit ).set( 0, rate );
+        basicRates.get( phase_exit ).set( 0, rate );
+    }
 
     public Phase currentPhase()
     {

@@ -3,6 +3,7 @@ package ru.biosoft.physicell.core.standard;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.biosoft.physicell.core.CellFunctions.CellDivision;
 import ru.biosoft.physicell.core.CellFunctions.Contact;
 import ru.biosoft.physicell.core.CellFunctions.CustomCellRule;
 import ru.biosoft.physicell.core.CellFunctions.DistanceCalculator;
@@ -43,7 +44,7 @@ public class FunctionRegistry
         return new Function[] {new StandardVolumeUpdate(), new O2based(), new AvoidBoundariesRule(), new WrapBoundariesRule(),
                 new StandardUpdateVelocity(), new StandardElasticContact(), new StandardElasticContact(), new UpOrientation(),
                 new DomainEdgeAvoidance(), new DomainEdgeDistance(), new Chemotaxis(), new AdvancedChemotaxis(),
-                new AdvancedChemotaxisNormalized()};
+                new AdvancedChemotaxisNormalized(), new StandardAssymetricDivision(null)};
     }
 
     public static VolumeUpdate[] getVolumeFunctions()
@@ -94,5 +95,10 @@ public class FunctionRegistry
     public static DistanceCalculator[] getDistanceCalculatorFunctions()
     {
         return new DistanceCalculator[] {new DomainEdgeDistance()};
+    }
+    
+    public static CellDivision[] getDivisionFunctions()
+    {
+        return new CellDivision[] {new StandardAssymetricDivision(null)};
     }
 }

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ru.biosoft.physicell.biofvm.VectorUtil;
+
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -85,6 +87,7 @@ public class CycleModel implements Cloneable
     public List<List<PhaseLink>> phaseLinks;
     int default_phase_index;
     public CycleData data; // this will be copied to individual cell agents 
+    private AsymmetricDivision asymmetricDivision = new AsymmetricDivision();
 
     public CycleModel()
     {
@@ -95,6 +98,21 @@ public class CycleModel implements Cloneable
         data = new CycleData( this );
         code = PhysiCellConstants.custom_cycle_model;
         default_phase_index = 0;
+    }
+    
+    public void initialize(Model model)
+    {
+        this.asymmetricDivision.initialize( model );
+    }
+    
+    public void setAsymmetricDivision(AsymmetricDivision division)
+    {
+        this.asymmetricDivision = division;
+    }
+    
+    public AsymmetricDivision getAsymmetricDivision()
+    {
+        return this.asymmetricDivision;
     }
 
     public Phase currentPhase()
@@ -316,6 +334,7 @@ public class CycleModel implements Cloneable
         result.default_phase_index = this.default_phase_index;
         result.startToEndToLink = this.startToEndToLink;//TODO: check
         result.data = this.data.clone( result );
+        result.asymmetricDivision = this.asymmetricDivision.clone();
         return result;
     }
 }

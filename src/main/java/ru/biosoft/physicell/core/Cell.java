@@ -120,6 +120,11 @@ public class Cell extends BasicAgent
         container = null;
         setTotalVolume( phenotype.volume.total );
     }
+    
+    public CellDefinition getDefinition()
+    {
+        return definition;
+    }
 
     @Override
     public CellContainer get_container()
@@ -314,6 +319,10 @@ public class Cell extends BasicAgent
         state.totalAttackTime = 0;
 //        child.state.damage = 0.0;
         child.state.totalAttackTime = 0.0;
+
+        if( functions.cellDivision != null )
+            functions.cellDivision.execute( this, child );
+        
         return child;
     }
 

@@ -18,6 +18,7 @@ import org.w3c.dom.NodeList;
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.biofvm.MicroenvironmentOptions;
 import ru.biosoft.physicell.biofvm.VectorUtil;
+import ru.biosoft.physicell.core.AsymmetricDivision;
 import ru.biosoft.physicell.core.CellDefinition;
 import ru.biosoft.physicell.core.CellIntegrity;
 import ru.biosoft.physicell.core.CellInteractions;
@@ -600,7 +601,7 @@ public class ModelReader extends ModelReaderSupport
                 switch( el.getTagName() )
                 {
                     case "cycle":
-                        readCycle( el, cd );
+                        readCycle( el, cd, model  );
                         break;
                     case "death":
                         readDeath( el, p );
@@ -647,7 +648,7 @@ public class ModelReader extends ModelReaderSupport
         this.intracellularReader = reader;
     }
 
-    private void readCycle(Element el, CellDefinition cd) throws Exception
+    private void readCycle(Element el, CellDefinition cd, Model m) throws Exception
     {
         Phenotype p = cd.phenotype;
         CycleModel model = p.cycle;
@@ -734,12 +735,23 @@ public class ModelReader extends ModelReaderSupport
                 int start = getIntAttr( duration, "index" );
                 boolean fixed = getBoolAttr( duration, "fixed_duration" );
                 double value = getDoubleVal( duration );
-                p.cycle.data.setExitRate( start, 1.0 / ( value + 1e-16 ) );
+                p.cycle.data.setBasicExitRate( start, 1.0 / ( value + 1e-16 ) );
                 p.cycle.phaseLinks.get( start ).get( 0 ).fixedDuration = fixed;
             }
         }
-    }
 
+        Element asymmetricDivisionElement = findElement( el, "standard_asymmetric_division" );
+        if( asymmetricDivisionElement != null )
+        {
+            boolean isEnabled = getBoolAttr( asymmetricDivisionElement, "enabled" );
+            AsymmetricDivision division = p.cycle.getAsymmetricDivision();
+            division.setEnabled( isEnabled );
+            division.initialize( m );
+            for( Element probability : findAllElements( asymmetricDivisionElement, "asymmetric_division_probability" ) )
+                division.setProbability( getAttr( probability, "name" ), getDoubleVal( probability ) );
+        }
+    }
+    
     private void readDeath(Element el, Phenotype p) throws Exception
     {
         Death death = p.death;

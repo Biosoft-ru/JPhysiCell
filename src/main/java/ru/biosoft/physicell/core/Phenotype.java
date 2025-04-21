@@ -109,6 +109,7 @@ public class Phenotype implements Cloneable
         cellInteractions.initialize( model );
         cellTransformations.initialize( model );
         mechanics.initialize( model );
+        cycle.initialize( model );
     }
 
     public Phenotype()
