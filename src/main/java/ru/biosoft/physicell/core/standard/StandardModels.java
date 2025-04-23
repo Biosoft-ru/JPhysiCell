@@ -590,12 +590,10 @@ public class StandardModels
 
     public static void standard_cell_cell_interactions(Cell pCell, Phenotype phenotype, double dt)
     {
-        if( phenotype.death.dead == true )
-        {
+        if( phenotype.death.dead )
             return;
-        }
+
         RandomGenerator rng = pCell.getModel().getRNG();
-        //        Cell pTarget = null; 
         int type = -1;
         double probability = 0.0;
 
@@ -603,25 +601,41 @@ public class StandardModels
         boolean phagocytosed = false;
         boolean fused = false;
 
-        //        for( int n=0; n < pCell.state.neighbors.size(); n++ )
-        //        {
-        //            pTarget = pCell.state.neighbors[n]; 
         for( Cell pTarget : pCell.state.neighbors )
         {
             type = pTarget.type;
 
             if( pTarget.phenotype.volume.total < 1e-15 )
-            {
                 break;
-            }
 
             if( pTarget.phenotype.death.dead )
             {
-                // dead phagocytosis 
-                probability = phenotype.cellInteractions.deadPhagocytosisRate * dt;
-                if( rng.checkRandom( probability ) )
+                boolean apoptotic = pCell.getModel().signals.getSingleSignal( pTarget, "apoptotic" ) > 0.5;
+                boolean necrotic = pCell.getModel().signals.getSingleSignal( pTarget, "necrotic" ) > 0.5;
+                boolean other = ! ( apoptotic || necrotic ); // neither apoptotic nor necrotic 
+
+                // apoptotic phagocytosis 
+                probability = phenotype.cellInteractions.apoptotic_phagocytosis_rate * dt;
+                if( !phagocytosed && apoptotic && rng.checkRandom( probability ) ) // add the prior phago check in July 2024  
                 {
                     pCell.ingestCell( pTarget );
+                    phagocytosed = true;
+                }
+
+                // necrotic phagocytosis 
+                probability = phenotype.cellInteractions.necrotic_phagocytosis_rate * dt;
+                if( !phagocytosed && necrotic && rng.checkRandom( probability ) ) // add the prior phago check in July 2024  
+                {
+                    pCell.ingestCell( pTarget );
+                    phagocytosed = true;
+                }
+
+                // other dead phagocytosis 
+                probability = phenotype.cellInteractions.other_dead_phagocytosis_rate * dt;
+                if( other && !phagocytosed && rng.checkRandom( probability ) )
+                {
+                    pCell.ingestCell( pTarget );
+                    phagocytosed = true;
                 }
             }
             else
@@ -642,9 +656,10 @@ public class StandardModels
                 double immunogenicity_ji = pTarget.phenotype.cellInteractions.getImmunogenicity( type );
 
                 probability = attack_ij * immunogenicity_ji * dt;
-                if( !attacked && rng.checkRandom( probability ) )
+                if( !attacked && pCell.phenotype.cellInteractions.pAttackTarget == null && rng.checkRandom( probability ) )
                 {
-                    pCell.attackCell( pTarget, dt );
+                    pCell.phenotype.cellInteractions.pAttackTarget = pTarget; 
+                    Cell.attachCellsAsSpring(pCell,pTarget); 
                     attacked = true;
                 }
 
@@ -656,6 +671,21 @@ public class StandardModels
                     fused = true;
                 }
             }
+        }
+        
+        if( pCell.phenotype.cellInteractions.pAttackTarget != null ) 
+        {
+            Cell pTarget = pCell.phenotype.cellInteractions.pAttackTarget; 
+
+            pCell.attackCell(pTarget,dt); 
+            attacked = true; // attacked at least one cell in this time step 
+            probability = dt / (1e-15 + pCell.phenotype.cellInteractions.attack_duration); 
+
+            if( pTarget.phenotype.death.dead || rng.checkRandom( probability ) ) 
+            {
+                Cell.detachCellsAsSpring( pCell, pTarget );
+                pCell.phenotype.cellInteractions.pAttackTarget = null; 
+            } 
         }
     }
 
