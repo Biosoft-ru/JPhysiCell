@@ -151,8 +151,8 @@ public class SignalBehavior
             return scale( digitize( cell.phenotype.death.dead ), index );
         else if( index == totalAttackTime )
             return scale( cell.state.totalAttackTime, index );
-//        else if (index == attacking)
-//            return cell.phenotype.cellInteractions.pAttackTarget;
+        else if (index == attacking)
+            return digitize( cell.phenotype.cellInteractions.pAttackTarget!=null);
         else if( index == time )
             return scale( cell.getMicroenvironment().time, index );
         else if( startCustom > -1 && index >= startCustom && index < startCustom + cell.customData.variables.size() )
@@ -191,6 +191,7 @@ public class SignalBehavior
         signals.add( "damage" );
         signals.add( "is dead" );
         signals.add( "total attack time" );
+        signals.add( "attacking" );
         signals.add( "time" );
         signals.add( "apoptotic" );
         signals.add( "nectrotic" );
@@ -479,7 +480,7 @@ public class SignalBehavior
         detachment_rate_ind = findBehaviorIndex( "cell detachment rate" );
         max_attachments_ind = findBehaviorIndex( "maximum number of cell attachments" );
         attack_damage_rate_ind = findBehaviorIndex( "attack damage rate" );
-        attack_duration_ind = findBehaviorIndex( "attack damage rate" );
+        attack_duration_ind = findBehaviorIndex( "attack duration" );
         damage_rate_ind = findBehaviorIndex( "damage rate" );
         damage_repair_rate_ind = findBehaviorIndex( "damage repair rate" );
     }
@@ -677,8 +678,15 @@ public class SignalBehavior
             return cell.phenotype.mechanics.detachmentRate;
         if( index == max_attachments_ind )
             return cell.phenotype.mechanics.maxAttachments;
-        if( index == damage_rate_ind )
+        if( index == attack_damage_rate_ind )
             return cell.phenotype.cellInteractions.damageRate;
+        if( index == attack_duration_ind )
+            return cell.phenotype.cellInteractions.attack_duration;
+        if (index == damage_rate_ind)
+            return cell.phenotype.cellIntegrity.damage_rate;
+        if (index == damage_repair_rate_ind)
+            return cell.phenotype.cellIntegrity.damage_repair_rate;
+        
         throw new Exception( "Warning: attempted to get behavior with unknown index!" );
     }
 
@@ -839,8 +847,14 @@ public class SignalBehavior
             return cd.phenotype.mechanics.detachmentRate;
         if( index == max_attachments_ind )
             return cd.phenotype.mechanics.maxAttachments;
-        if( index == damage_rate_ind )
+        if( index == attack_damage_rate_ind )
             return cd.phenotype.cellInteractions.damageRate;
+        if( index == attack_duration_ind )
+            return cd.phenotype.cellInteractions.attack_duration;
+        if (index == damage_rate_ind)
+            return cd.phenotype.cellIntegrity.damage_rate;
+        if (index == damage_repair_rate_ind)
+            return cd.phenotype.cellIntegrity.damage_repair_rate;
         throw new IllegalArgumentException( "Warning: attempted to get behavior with unknown index !" );
     }
 
@@ -929,8 +943,14 @@ public class SignalBehavior
             return cd.phenotype.mechanics.detachmentRate;
         if( index == max_attachments_ind )
             return cd.phenotype.mechanics.maxAttachments;
-        if( index == damage_rate_ind )
+        if( index == attack_damage_rate_ind )
             return cd.phenotype.cellInteractions.damageRate;
+        if( index == attack_duration_ind )
+            return cd.phenotype.cellInteractions.attack_duration;
+        if (index == damage_rate_ind)
+            return cd.phenotype.cellIntegrity.damage_rate;
+        if (index == damage_repair_rate_ind)
+            return cd.phenotype.cellIntegrity.damage_repair_rate;
         throw new IllegalArgumentException( "Warning: attempted to get behavior with unknown index !" );
     }
 
