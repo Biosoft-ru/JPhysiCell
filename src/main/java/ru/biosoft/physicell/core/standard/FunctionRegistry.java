@@ -44,7 +44,7 @@ public class FunctionRegistry
         return new Function[] {new StandardVolumeUpdate(), new O2based(), new AvoidBoundariesRule(), new WrapBoundariesRule(),
                 new StandardUpdateVelocity(), new StandardElasticContact(), new StandardElasticContact(), new UpOrientation(),
                 new DomainEdgeAvoidance(), new DomainEdgeDistance(), new Chemotaxis(), new AdvancedChemotaxis(),
-                new AdvancedChemotaxisNormalized(), new StandardAssymetricDivision(null)};
+                new AdvancedChemotaxisNormalized(), new StandardAssymetricDivision()};
     }
 
     public static VolumeUpdate[] getVolumeFunctions()
@@ -99,6 +99,6 @@ public class FunctionRegistry
     
     public static CellDivision[] getDivisionFunctions()
     {
-        return new CellDivision[] {new StandardAssymetricDivision(null)};
+        return new CellDivision[] {new StandardAssymetricDivision()};
     }
 }
