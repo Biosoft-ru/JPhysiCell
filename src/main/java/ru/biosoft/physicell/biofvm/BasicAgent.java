@@ -191,7 +191,7 @@ public class BasicAgent
         internalizedSubstrates = VectorUtil.resize( internalizedSubstrates, length );
         substrateChange = VectorUtil.resize( substrateChange, length );
         fractionReleasedDeath = VectorUtil.resize( fractionReleasedDeath, length );
-        fractionTransferredIngested = VectorUtil.resize( fractionTransferredIngested, length );
+        fractionTransferredIngested = VectorUtil.resize( fractionTransferredIngested, length, 1.0 );
         return;
     }
 
