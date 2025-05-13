@@ -81,6 +81,7 @@ public class CellDefinition
     public CustomCellData custom_data = new CustomCellData();
     public CellFunctions functions = new CellFunctions();
     public Phenotype phenotype = new Phenotype();
+    public InitialDistribution distribution = new InitialDistribution();
 
     public CellDefinition()
     {
@@ -119,6 +120,7 @@ public class CellDefinition
         result.phenotype = phenotype.clone();
         result.functions = functions.clone();
         result.phenotype.sync( m );
+        result.distribution = distribution.clone();
         return result;
     }
 
@@ -132,6 +134,7 @@ public class CellDefinition
         result.custom_data = custom_data.clone();
         result.phenotype = phenotype.clone();
         result.functions = functions.clone();
+        result.distribution = distribution.clone();
         return result;
     }
 
@@ -142,6 +145,7 @@ public class CellDefinition
         to.custom_data = from.custom_data.clone();
         to.phenotype = from.phenotype.clone();
         to.functions = from.functions.clone();
+        to.distribution = from.distribution.clone();
     }
 
     @Override

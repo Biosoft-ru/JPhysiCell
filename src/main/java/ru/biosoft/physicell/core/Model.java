@@ -216,6 +216,9 @@ public class Model
         hasEvents = !events.isEmpty();
 
         signals.setupDictionaries( this );
+        
+        for (CellDefinition cd: getCellDefinitions())
+            cd.distribution.apply(cd, this);
     }
 
     public void init() throws Exception

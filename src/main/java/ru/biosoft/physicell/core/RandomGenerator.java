@@ -42,7 +42,14 @@ public class RandomGenerator
 
     public double UniformRandom(double min, double max)
     {
-        return min + ( max - min ) * r.nextDouble();
+        return min + ( max - min ) * UniformRandom();
+    }
+    
+    public double LogUniformRandom(double min, double max)
+    {
+        min = Math.log( min);
+        max = Math.log( max );
+        return Math.exp(min + ( max - min ) * UniformRandom());
     }
 
     public double NormalRandom()
@@ -52,12 +59,41 @@ public class RandomGenerator
 
     public double NormalRandom(double m, double var)
     {
-        return m + var * r.nextGaussian();
+        return m + var * NormalRandom();
+    }
+    
+    public double NormalRandom(double mu, double sigma, double min, double max)
+    {
+        double value = NormalRandom( mu, sigma );
+        while( value <= min || value >= max )
+            value = NormalRandom( mu, sigma );
+        return value;
+    }
+    
+    public double LogNormalRandom(double mu, double sigma, double min, double max)
+    {
+        double value = Math.exp( NormalRandom( mu, sigma) );
+        while (value <= min || value >= max)
+            value =  Math.exp( NormalRandom( mu, sigma) );
+        return value;
+    }
+    
+    public double Log10NormalRandom(double mu, double sigma, double min, double max)
+    {
+        double value = Log10NormalRandom( mu, sigma );
+        while( value <= min || value >= max )
+            value = Log10NormalRandom( mu, sigma );
+        return value;
+    }
+    
+    public double Log10NormalRandom(double mu, double sigma)
+    {
+        return Math.exp(Math.log( 10 ) * NormalRandom(mu, sigma));
     }
 
     public double NormalRestricted(double m, double var, double min, double max)
     {
-        return restrict( m + var * r.nextGaussian(), min, max );
+        return restrict( m + var * NormalRandom(), min, max );
     }
 
     public double restrict(double val, double min, double max)
@@ -82,6 +118,11 @@ public class RandomGenerator
     {
         return r.nextDouble();
     }
+    
+
+//  Uniform","LogUniform","Normal","LogNormal","Log10Normal
+    
+    
     //    public void placeInBox(double[] box, CellDefinition cd, int number, Model model)
     //    {
     //        for( int i = 0; i < number; i++ )
