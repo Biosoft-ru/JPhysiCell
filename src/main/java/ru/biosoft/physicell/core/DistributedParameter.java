@@ -25,7 +25,11 @@ public class DistributedParameter
             {
                 if( cell.type == cd.type )
                 {
-                    model.signals.setSingleBehavior( cell, parameter, model.getRNG().UniformRandom( min, max ) );
+                    double value = model.getRNG().UniformRandom( min, max );
+                    if( parameter.equals( "volume" ) )
+                        cell.setTotalVolume( value );
+                    else
+                        model.signals.setSingleBehavior( cell, parameter, value );
                 }
             }
         }
@@ -37,7 +41,11 @@ public class DistributedParameter
             {
                 if( cell.type == cd.type )
                 {
-                    model.signals.setSingleBehavior( cell, parameter, model.getRNG().LogUniformRandom( min, max ) );
+                    double value = model.getRNG().LogUniformRandom( min, max );
+                    if( parameter.equals( "volume" ) )
+                        cell.setTotalVolume( value );
+                    else
+                        model.signals.setSingleBehavior( cell, parameter, value );
                 }
             }
         }
@@ -51,7 +59,11 @@ public class DistributedParameter
             {
                 if( cell.type == cd.type )
                 {
-                    model.signals.setSingleBehavior( cell, parameter, model.getRNG().NormalRandom( mu, sigma, min, max ) );
+                    double value = model.getRNG().NormalRandom( mu, sigma, min, max );
+                    if( parameter.equals( "volume" ) )
+                        cell.setTotalVolume( value );
+                    else
+                        model.signals.setSingleBehavior( cell, parameter, value );
                 }
             }
         }
@@ -65,7 +77,11 @@ public class DistributedParameter
             {
                 if( cell.type == cd.type )
                 {
-                    model.signals.setSingleBehavior( cell, parameter, model.getRNG().LogNormalRandom( mu, sigma, min, max ) );
+                    double value = model.getRNG().LogNormalRandom( mu, sigma, min, max );
+                    if( parameter.equals( "volume" ) )
+                        cell.setTotalVolume( value );
+                    else
+                        model.signals.setSingleBehavior( cell, parameter, value );
                 }
             }
         }
@@ -80,7 +96,11 @@ public class DistributedParameter
             {
                 if( cell.type == cd.type )
                 {
-                    model.signals.setSingleBehavior( cell, parameter, model.getRNG().Log10NormalRandom( mu, sigma, min, max ) );
+                    double value = model.getRNG().Log10NormalRandom( mu, sigma, min, max );
+                    if( parameter.equals( "volume" ) )
+                        cell.setTotalVolume( value );
+                    else
+                        model.signals.setSingleBehavior( cell, parameter, value );
                 }
             }
         }
