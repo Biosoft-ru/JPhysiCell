@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
@@ -562,6 +563,12 @@ public class Model
 
         for( CellDefinition cd : getCellDefinitions() )
             sb.append( "\n\n" + cd.display() );
+        sb.append( "\n\n================================" );
+        sb.append( "\nGlobal parameters" );
+        sb.append( "\n================================" );
+        for( Entry<String, UserParameter> e : parameters.entrySet() )
+            sb.append( "\n" + e.getKey() + " " + e.getValue().getValue() );
+
         return sb.toString();
     }
 
