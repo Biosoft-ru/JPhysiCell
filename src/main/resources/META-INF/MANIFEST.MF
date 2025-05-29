@@ -17,5 +17,6 @@ Export-Package: ru.biosoft.physicell,
  ru.biosoft.physicell.core.standard,
  ru.biosoft.physicell.xml,
  ru.biosoft.physicell.ode,
- ru.biosoft.physicell.fba
+ ru.biosoft.physicell.fba,
+ ru.biosoft.physicell.covid
 

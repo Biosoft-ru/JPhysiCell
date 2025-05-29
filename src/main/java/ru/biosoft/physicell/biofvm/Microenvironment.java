@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import ru.biosoft.physicell.core.Cell;
+import ru.biosoft.physicell.core.CellContainer;
+
 /*
 #############################################################################
 # If you use BioFVM in your project, please cite BioFVM and the version     #
@@ -82,6 +85,8 @@ public class Microenvironment
 
     public void addAgent(BasicAgent agent)
     {
+        if( CellContainer.cycle )
+            System.out.println( "ADD agent " + ( (Cell)agent ).getDefinition().name + " flag" + CellContainer.cycle );
         agents.add( agent );
     }
 
@@ -465,7 +470,7 @@ public class Microenvironment
         return density[voxel_index];
     }
 
-    int nearestVoxelIndex(double[] position)
+    public int nearestVoxelIndex(double[] position)
     {
         return mesh.nearestVoxelIndex( position );
     }

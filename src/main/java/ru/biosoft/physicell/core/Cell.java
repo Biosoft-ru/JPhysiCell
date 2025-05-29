@@ -94,12 +94,12 @@ public class Cell extends BasicAgent
     public CellState state = new CellState();
     public Phenotype phenotype;// = new Phenotype();
     public boolean isOutOfDomain;
-    boolean isMovable;
+    public boolean isMovable;
     public double[] displacement; // this should be moved to state, or made private
 
     public Cell(CellDefinition cd, Model model)
     {
-        super( model );
+        super( );
         type = cd.type;
         typeName = cd.name;
         customData = cd.custom_data.clone();
@@ -116,6 +116,7 @@ public class Cell extends BasicAgent
         isOutOfDomain = false;
         displacement = new double[3];// state? 
 
+        register(model);
         assignOrientation();
         container = null;
         setTotalVolume( phenotype.volume.total );
@@ -405,7 +406,7 @@ public class Cell extends BasicAgent
         functions = copyMe.functions.clone();
     }
 
-    void updateVoxelInContainer()
+    public void updateVoxelInContainer()
     {
         // call the method from BioFVM_basic_agent to update microenvironment's voxel index
         updateVoxelIndex();

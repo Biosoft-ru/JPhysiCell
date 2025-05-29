@@ -69,7 +69,7 @@ public class BasicAgent
     protected double[] prevVelocity;
 
     double[] substrateChange;
-    protected boolean isActive;
+    public boolean isActive;
 
     public double[] secretionRates;
     public double[] saturationDensities;
@@ -92,7 +92,23 @@ public class BasicAgent
 
     public BasicAgent(Model model)
     {
-        this.model = model;
+        init();
+        register( model);
+    }
+    
+    protected void register(Model model)
+    {
+        this.model = model; 
+        registerMicroenvironment( model.getMicroenvironment() );
+    }
+    
+    public BasicAgent()
+    {
+        init();
+    }
+    
+    private void init()
+    {
         ID = maxBasicAgentId;
         maxBasicAgentId++;
         isActive = true;
@@ -109,7 +125,6 @@ public class BasicAgent
         internalizedSubstrates = new double[0];
         fractionReleasedDeath = new double[0];
         fractionTransferredIngested = new double[0];
-        registerMicroenvironment( model.getMicroenvironment() );
     }
 
     public void setRadius(double radius)

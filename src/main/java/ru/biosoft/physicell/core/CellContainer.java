@@ -79,6 +79,8 @@ import ru.biosoft.physicell.core.standard.StandardModels;
 */
 public class CellContainer extends AgentContainer
 {
+    public static boolean cycle = false;
+    
     public static String DEFAULT_NAME = "Default";
     protected String name = DEFAULT_NAME;
 
@@ -209,11 +211,13 @@ public class CellContainer extends AgentContainer
             // checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
             //                #pragma omp parallel for 
             double tPhen = System.nanoTime();
+            cycle = true;
             for( Cell cell : cells )
             {
                 if( !cell.isOutOfDomain )
                     cell.advanceBundledPhenotype( timeSinceLastCycle, rulesEnabled );
             }
+            cycle = false;
             tPhen = System.nanoTime() - tPhen;
             tPhenotype += tPhen;
 

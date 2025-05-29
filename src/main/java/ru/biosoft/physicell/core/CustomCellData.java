@@ -158,6 +158,11 @@ public class CustomCellData
         return variables.get( i ).value;
     }
 
+    public void modify(int i, double summand)
+    {
+         variables.get( i ).value += summand;
+    }
+
     public double get(String name)
     {
         return variables.get( nameToIndex.get( name ) ).value;

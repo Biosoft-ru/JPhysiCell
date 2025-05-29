@@ -12,6 +12,7 @@ import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.Microenvironment;
 import ru.biosoft.physicell.core.standard.StandardModels;
+import ru.biosoft.physicell.ui.AgentColorer;
 import ru.biosoft.physicell.ui.Visualizer;
 import ru.biosoft.physicell.ui.Visualizer2D;
 import ru.biosoft.physicell.ui.Visualizer2D.Section;
@@ -200,7 +201,12 @@ public class Model
 
         writeReport( modelFile, display() );
     }
-
+    
+    public void setupInitial() throws Exception
+    {
+        //Nothing by default
+    }
+    
     public void init(boolean outputFiles) throws Exception
     {
         curTime = 0;
@@ -269,6 +275,16 @@ public class Model
     {
         return curTime;
     }
+    
+    public void stepBeforeCells()
+    {
+        //do nothing by default
+    }
+    
+    public void stepAfterCells() throws Exception
+    {
+        //do nothing by default
+    }
 
     public void doStep() throws Exception
     {
@@ -276,7 +292,9 @@ public class Model
         m.simulateDiffusionDecay( diffusionStep );
         tDiff = System.nanoTime() - tDiff;
         tDiffusion += tDiff;
+        stepBeforeCells();
         ( (CellContainer)m.agentContainer ).updateAllCells( this, curTime, phenotypeStep, mechanicsStep, diffusionStep );
+        stepAfterCells();
         updateIntracellular();
         curTime += diffusionStep;
         m.time = curTime;
@@ -693,5 +711,10 @@ public class Model
         if( cd != null )
             return cd.type;
         return -1;
+    }
+    
+    public AgentColorer getDefaultColorer()
+    {
+        return null;
     }
 }

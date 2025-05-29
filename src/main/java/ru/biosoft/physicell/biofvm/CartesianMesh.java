@@ -61,7 +61,7 @@ public class CartesianMesh extends GeneralMesh
     public double dy;
     public double dz;
 
-    double dV;
+    public double dV;
     double dS;
 
     double dS_xy;

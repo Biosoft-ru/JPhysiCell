@@ -105,10 +105,17 @@ public class ModelReaderSupport extends Constants
 
     public static Color readColor(String str)
     {
+        if( str.startsWith( "rgb" ) )
+        {
+            String[] rgb = str.substring( 4, str.length() - 1 ).split( "," );
+            return new Color( Integer.parseInt( rgb[0] ), Integer.parseInt( rgb[1] ), Integer.parseInt( rgb[2] ) );
+        }
         switch( str )
         {
             case "green":
                 return Color.green;
+            case "lime":
+                return new Color( 192, 255, 0 );
             case "red":
                 return Color.red;
             case "blue":
@@ -119,6 +126,22 @@ public class ModelReaderSupport extends Constants
                 return Color.magenta;
             case "cyan":
                 return Color.cyan;
+            case "deeppink":
+                return new Color( 255, 20, 147 );
+            case "orange":
+                return Color.orange;
+            case "darkorange":
+                return new Color( 199, 110, 0 );
+            case "blueviolet":
+                return new Color( 138, 43, 226 );
+            case "forestgreen":
+                return new Color( 34, 139, 34 );
+            case "darkred":
+                return new Color( 139, 0, 0 );
+            case "rosybrown":
+                return new Color( 188, 143, 143 );
+            case "black":
+                return Color.black;
             default:
                 return Color.white;
         }
