@@ -23,11 +23,12 @@ public class FunctionRegistry
     private static Map<String, Function> mapping;
     private static boolean isInit = false;
 
-    public static Function getFunction(String name)
+    public static Function getFunction(String name) throws Exception
     {
         if( !isInit )
             initMapping();
-        return mapping.get( name );
+        Function f =  mapping.get( name );
+        return f.getClass().getConstructor( ).newInstance( );
     }
 
     public static void initMapping()
