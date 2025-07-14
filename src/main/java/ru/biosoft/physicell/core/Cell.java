@@ -622,7 +622,7 @@ public class Cell extends BasicAgent
             }
             else
             {
-                randvec = PhysiCellUtilities.UniformOnUnitCircle( model );
+                randvec = PhysiCellUtilities.UniformOnUnitSphere( model );
             }
 
             // if the update_bias_vector function is set, use it  
