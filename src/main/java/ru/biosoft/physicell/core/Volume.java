@@ -208,4 +208,18 @@ public class Volume implements Cloneable
 
         rupture_volume = relative_rupture_volume * total; // in volumee units 
     }
+    
+    
+    public String display()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "Volume:" );
+        sb.append( "\n--------------------------------" );
+        sb.append( "\n\ttotal volume: " + total + "\n" + "\tnuclear: "
+                + nuclear + "\n" + "\tfluid fraction: " + fluid_fraction + "\n"
+                + "\tfluid change rate: " + fluid_change_rate + "\n" + "\tcytoplasmic biomass change_rate: "
+                + cytoplasmic_biomass_change_rate + "\n" + "\tnuclear biomass_change rate: " + nuclear_biomass_change_rate + "\n"
+                + "\tcalcification rate: " + calcification_rate + "\n" + "\trelative rupture volume: " + rupture_volume );
+        return sb.toString();
+    }
 }

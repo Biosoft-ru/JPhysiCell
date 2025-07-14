@@ -61,7 +61,7 @@ public class SignalBehavior
     private int dead_phago_index;
     private int phagocytose_apoptotic_cell;
     private int phagocytose_necrotic_cell;
-    private int phagocytose_other_dead_cell;   
+    private int phagocytose_other_dead_cell;
     private int first_phagocytosis_index;
     private int first_attack_index;
     private int first_fusion_index;
@@ -101,11 +101,11 @@ public class SignalBehavior
         else if( contact <= index && index < contact + n + 2 )
         {
             int[] counts = new int[n];
-            int dead_cells = 0; 
+            int dead_cells = 0;
             int apop_cells = 0;
-            int necro_cells = 0; 
-            int other_dead_cells = 0; 
-            int live_cells = 0; 
+            int necro_cells = 0;
+            int other_dead_cells = 0;
+            int live_cells = 0;
             for( Cell pC : cell.state.neighbors ) // process all neighbors 
             {
                 if( pC.phenotype.death.dead )
@@ -125,7 +125,7 @@ public class SignalBehavior
                 else
                     live_cells++;
                 counts[pC.type] += 1;
-                other_dead_cells = dead_cells - apop_cells - necro_cells;       
+                other_dead_cells = dead_cells - apop_cells - necro_cells;
             }
 
             if( index < contact + n )
@@ -145,14 +145,14 @@ public class SignalBehavior
             return scale( digitize( cell.state.contactWithBasementMembrane ), index );
         else if( index == damage )
             return scale( cell.phenotype.cellIntegrity.damage, index );
-        else if (index == damageDelivered)
+        else if( index == damageDelivered )
             return scale( cell.phenotype.cellInteractions.total_damage_delivered, index );
         else if( index == dead )
             return scale( digitize( cell.phenotype.death.dead ), index );
         else if( index == totalAttackTime )
             return scale( cell.state.totalAttackTime, index );
-        else if (index == attacking)
-            return digitize( cell.phenotype.cellInteractions.pAttackTarget!=null);
+        else if( index == attacking )
+            return digitize( cell.phenotype.cellInteractions.pAttackTarget != null );
         else if( index == time )
             return scale( cell.getMicroenvironment().time, index );
         else if( startCustom > -1 && index >= startCustom && index < startCustom + cell.customData.variables.size() )
@@ -184,9 +184,9 @@ public class SignalBehavior
         signals.add( "volume" );
         signals.add( "contact with live cell" );
         signals.add( "contact with dead cell" );
-        signals.add( "contact with apoptotic cell");
-        signals.add( "contact with necrotic cell");
-        signals.add( "contact with other dead cell"); 
+        signals.add( "contact with apoptotic cell" );
+        signals.add( "contact with necrotic cell" );
+        signals.add( "contact with other dead cell" );
         signals.add( "contact with basement membrane" );
         signals.add( "damage" );
         signals.add( "is dead" );
@@ -238,7 +238,7 @@ public class SignalBehavior
             behaviors.add( "fuse to " + cellType );
             behaviors.add( "transform to " + cellType );
             behaviors.add( "immunogenicity to " + cellType );
-            behaviors.add( "asymmetric division to " + cellType  );
+            behaviors.add( "asymmetric division to " + cellType );
         }
 
         for( String d : densities )
@@ -323,12 +323,12 @@ public class SignalBehavior
         registerSignal( "contact with live cell", "contact with live cells" );
         registerSignal( "contact with dead cell", "contact with dead cells" );
         registerSignal( "contact with apoptotic cell", "contact with apoptotic cells" );
-        registerSignal( "contact with necrotic cell", "contact with necrotic cells");
-        registerSignal( "contact with other dead cell", "contact with other dead cells"); 
+        registerSignal( "contact with necrotic cell", "contact with necrotic cells" );
+        registerSignal( "contact with other dead cell", "contact with other dead cells" );
         registerSignal( "contact with basement membrane", "contact with BM" );
         registerSignal( "damage" );
         registerSignal( "damage delivered", "total damage delivered" );
-        registerSignal( "attacking" , "is attacking");
+        registerSignal( "attacking", "is attacking" );
         registerSignal( "dead", "is dead" );
         registerSignal( "total attack time" );
         registerSignal( "time", "current time", "global time" );
@@ -343,10 +343,12 @@ public class SignalBehavior
         registerSignal( "apoptotic", "is_apoptotic" );
         registerSignal( "necrotic", "is_necrotic" );
 
-
-        startSubstrate = findSignalIndex( m.densityNames[0] );
-        startSubstrateIntra = findSignalIndex( "intracellular " + m.densityNames[0] );
-        startSubstrateGrad = findSignalIndex( m.densityNames[0] + " gradient" );
+        if( m.densityNames.length > 0 )
+        {
+            startSubstrate = findSignalIndex( m.densityNames[0] );
+            startSubstrateIntra = findSignalIndex( "intracellular " + m.densityNames[0] );
+            startSubstrateGrad = findSignalIndex( m.densityNames[0] + " gradient" );
+        }
         pressure = findSignalIndex( "pressure" );
         volume = findSignalIndex( "volume" );
         contact = findSignalIndex( "contact with " + def.name );
@@ -357,12 +359,13 @@ public class SignalBehavior
         contactOtherDead = findSignalIndex( "contact with other dead cell" );
         contactBM = findSignalIndex( "contact with basement membrane" );
         damage = findSignalIndex( "damage" );
-        damageDelivered = findSignalIndex("damage delivered");
-        attacking = findSignalIndex("attacking");
+        damageDelivered = findSignalIndex( "damage delivered" );
+        attacking = findSignalIndex( "attacking" );
         dead = findSignalIndex( "dead" );
         totalAttackTime = findSignalIndex( "total attack time" );
         time = findSignalIndex( "time" );
-        startCustom = findSignalIndex( "custom:" + def.custom_data.variables.get( 0 ).name );
+        if( def.custom_data.variables.size() > 0 )
+            startCustom = findSignalIndex( "custom:" + def.custom_data.variables.get( 0 ).name );
         apoptotic = findSignalIndex( "apoptotic" );
         necrotic = findSignalIndex( "necrotic" );
 
@@ -405,10 +408,10 @@ public class SignalBehavior
         registerBehavior( "cell-BM adhesion", "cell-membrane adhesion" );
         registerBehavior( "cell-BM repulsion", "cell-membrane repulsion" );
         registerBehavior( "phagocytose dead cell", "phagocytosis of dead cell", "phagocytosis of dead cells" );
-        registerBehavior( "phagocytose apoptotic cell",  "phagocytosis of apoptotic cell", "phagocytosis of apoptotic cells");
-        registerBehavior( "phagocytose necrotic cell",  "phagocytosis of necrotic cell", "phagocytosis of necrotic cells");
-        registerBehavior( "phagocytose other dead cell",  "phagocytosis of other dead cell", "phagocytosis of other dead cells");
-        
+        registerBehavior( "phagocytose apoptotic cell", "phagocytosis of apoptotic cell", "phagocytosis of apoptotic cells" );
+        registerBehavior( "phagocytose necrotic cell", "phagocytosis of necrotic cell", "phagocytosis of necrotic cells" );
+        registerBehavior( "phagocytose other dead cell", "phagocytosis of other dead cell", "phagocytosis of other dead cells" );
+
         for( CellDefinition cd : model.getCellDefinitions() )
             registerBehavior( "phagocytose " + cd.name, "phagocytose cell type " + cd.type, "phagocytosis of " + cd.type );
 
@@ -419,11 +422,12 @@ public class SignalBehavior
             registerBehavior( "fuse to " + cd.name, "fuse to cell type " + cd.type );
 
         for( CellDefinition cd : model.getCellDefinitions() )
-            registerBehavior(  "transition to " + cd.name, "transform to " + cd.name, "transform to cell type " + cd.type, "transition to cell type " + cd.type );
+            registerBehavior( "transition to " + cd.name, "transform to " + cd.name, "transform to cell type " + cd.type,
+                    "transition to cell type " + cd.type );
 
         for( CellDefinition cd : model.getCellDefinitions() )
             registerBehavior( "asymmetric division to " + cd.name );
-        
+
         for( int i = 0; i < def.custom_data.variables.size(); i++ )
         {
             String varName = def.custom_data.variables.get( i ).getName();
@@ -438,25 +442,29 @@ public class SignalBehavior
         registerBehavior( "cell attachment rate" );
         registerBehavior( "cell detachment rate" );
         registerBehavior( "maximum number of cell attachments" );
-        registerBehavior("attack damage rate", "damage rate" );
+        registerBehavior( "attack damage rate", "damage rate" );
 
-        registerBehavior("attack duration" );
-        registerBehavior("damage rate");
-        registerBehavior("damage repair rate" );
-        
+        registerBehavior( "attack duration" );
+        registerBehavior( "damage rate" );
+        registerBehavior( "damage repair rate" );
+
         signalScales = VectorUtil.resize( signalScales, indexToSignal.size(), 1.0 );
 
-        first_secretion_index = findBehaviorIndex( m.densityNames[0] + " secretion" );
-        first_secretion_target_index = findBehaviorIndex( m.densityNames[0] + " secretion target" );
-        first_uptake_index = findBehaviorIndex( m.densityNames[0] + " uptake" );
-        first_export_index = findBehaviorIndex( m.densityNames[0] + " export" );
+        if( densNumber > 0 )
+        {
+            first_secretion_index = findBehaviorIndex( m.densityNames[0] + " secretion" );
+            first_secretion_target_index = findBehaviorIndex( m.densityNames[0] + " secretion target" );
+            first_uptake_index = findBehaviorIndex( m.densityNames[0] + " uptake" );
+            first_export_index = findBehaviorIndex( m.densityNames[0] + " export" );
+            first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + m.densityNames[0] );
+        }
         first_cycle_index = findBehaviorIndex( "cycle entry" );
         apoptosis_parameter_index = findBehaviorIndex( "apoptosis" );
         necrosis_parameter_index = findBehaviorIndex( "necrosis" );
         migration_speed_index = findBehaviorIndex( "migration speed" );
         migration_bias_index = findBehaviorIndex( "migration bias" );
         persistence_time_index = findBehaviorIndex( "migration persistence time" );
-        first_chemotaxis_index = findBehaviorIndex( "chemotactic response to " + m.densityNames[0] );
+
         cca_index = findBehaviorIndex( "cell-cell adhesion" );
         elastic_index = findBehaviorIndex( "cell-cell adhesion elastic constant" );
         first_affinity_index = findBehaviorIndex( "adhesive affinity to " + def.name );
@@ -472,8 +480,9 @@ public class SignalBehavior
         first_attack_index = findBehaviorIndex( "attack " + def.name );
         first_fusion_index = findBehaviorIndex( "fuse to " + def.name );
         first_transformation_index = findBehaviorIndex( "transform to " + def.name );
-        first_custom_ind = findBehaviorIndex( "custom:" + def.custom_data.variables.get( 0 ).name );
-        first_asymmetric_division_index = findBehaviorIndex( "asymmetric division to "+ def.name );
+        if( def.custom_data.variables.size() > 0 )
+            first_custom_ind = findBehaviorIndex( "custom:" + def.custom_data.variables.get( 0 ).name );
+        first_asymmetric_division_index = findBehaviorIndex( "asymmetric division to " + def.name );
         movable_ind = findBehaviorIndex( "is_movable" );
         first_immunogenicity_index = findBehaviorIndex( "immunogenicity to " + def.name );
         attachment_rate_ind = findBehaviorIndex( "cell attachment rate" );
@@ -544,7 +553,7 @@ public class SignalBehavior
         else if( index == phagocytose_necrotic_cell )
             cell.phenotype.cellInteractions.necrotic_phagocytosis_rate = parameter;
         else if( index == phagocytose_other_dead_cell )
-            cell.phenotype.cellInteractions.other_dead_phagocytosis_rate = parameter;              
+            cell.phenotype.cellInteractions.other_dead_phagocytosis_rate = parameter;
         else if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
             cell.phenotype.cellInteractions.livePhagocytosisRates[index - first_phagocytosis_index] = parameter;
         else if( index >= first_attack_index && index < first_attack_index + n )
@@ -552,7 +561,7 @@ public class SignalBehavior
         else if( index >= first_fusion_index && index < first_fusion_index + n )
             cell.phenotype.cellInteractions.fusionRates[index - first_fusion_index] = parameter;
         else if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-            cell.phenotype.cycle.getAsymmetricDivision().setProbability( index - first_asymmetric_division_index, parameter);
+            cell.phenotype.cycle.getAsymmetricDivision().setProbability( index - first_asymmetric_division_index, parameter );
         else if( index >= first_transformation_index && index < first_transformation_index + n )
             cell.phenotype.cellTransformations.transformationRates[index - first_transformation_index] = parameter;
         else if( first_custom_ind >= 0 && index >= first_custom_ind && index < first_custom_ind + cell.customData.variables.size() )
@@ -571,9 +580,9 @@ public class SignalBehavior
             cell.phenotype.cellInteractions.damageRate = parameter;
         else if( index == attack_duration_ind )
             cell.phenotype.cellInteractions.attack_duration = parameter;
-        else if (index == damage_rate_ind)
+        else if( index == damage_rate_ind )
             cell.phenotype.cellIntegrity.damage_rate = parameter;
-        else if (index == damage_repair_rate_ind)
+        else if( index == damage_repair_rate_ind )
             cell.phenotype.cellIntegrity.damage_repair_rate = parameter;
         else
             throw new IllegalArgumentException( "Incorrect signal with index " + index );
@@ -665,7 +674,7 @@ public class SignalBehavior
         if( index >= first_transformation_index && index < first_transformation_index + n )
             return cell.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
         else if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-            return cell.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index);
+            return cell.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index );
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < first_custom_ind + cell.customData.variables.size() )
             return cell.customData.variables.get( index - first_custom_ind ).value;
         if( index == movable_ind )
@@ -682,11 +691,11 @@ public class SignalBehavior
             return cell.phenotype.cellInteractions.damageRate;
         if( index == attack_duration_ind )
             return cell.phenotype.cellInteractions.attack_duration;
-        if (index == damage_rate_ind)
+        if( index == damage_rate_ind )
             return cell.phenotype.cellIntegrity.damage_rate;
-        if (index == damage_repair_rate_ind)
+        if( index == damage_repair_rate_ind )
             return cell.phenotype.cellIntegrity.damage_repair_rate;
-        
+
         throw new Exception( "Warning: attempted to get behavior with unknown index!" );
     }
 
@@ -834,7 +843,7 @@ public class SignalBehavior
         if( index >= first_transformation_index && index < first_transformation_index + n )
             return cd.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
         else if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-            return cd.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index);
+            return cd.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index );
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < first_custom_ind + cell.customData.variables.size() )
             return cd.custom_data.variables.get( index - first_custom_ind ).value;
         if( index == movable_ind )
@@ -851,9 +860,9 @@ public class SignalBehavior
             return cd.phenotype.cellInteractions.damageRate;
         if( index == attack_duration_ind )
             return cd.phenotype.cellInteractions.attack_duration;
-        if (index == damage_rate_ind)
+        if( index == damage_rate_ind )
             return cd.phenotype.cellIntegrity.damage_rate;
-        if (index == damage_repair_rate_ind)
+        if( index == damage_repair_rate_ind )
             return cd.phenotype.cellIntegrity.damage_repair_rate;
         throw new IllegalArgumentException( "Warning: attempted to get behavior with unknown index !" );
     }
@@ -930,7 +939,7 @@ public class SignalBehavior
         if( index >= first_transformation_index && index < first_transformation_index + n )
             return cd.phenotype.cellTransformations.transformationRates[index - first_transformation_index];
         else if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-            return cd.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index);
+            return cd.phenotype.cycle.getAsymmetricDivision().getProbability( index - first_asymmetric_division_index );
         if( first_custom_ind >= 0 && index >= first_custom_ind && index < first_custom_ind + cd.custom_data.variables.size() )
             return cd.custom_data.variables.get( index - first_custom_ind ).value;
         if( index == movable_ind )
@@ -947,9 +956,9 @@ public class SignalBehavior
             return cd.phenotype.cellInteractions.damageRate;
         if( index == attack_duration_ind )
             return cd.phenotype.cellInteractions.attack_duration;
-        if (index == damage_rate_ind)
+        if( index == damage_rate_ind )
             return cd.phenotype.cellIntegrity.damage_rate;
-        if (index == damage_repair_rate_ind)
+        if( index == damage_repair_rate_ind )
             return cd.phenotype.cellIntegrity.damage_repair_rate;
         throw new IllegalArgumentException( "Warning: attempted to get behavior with unknown index !" );
     }
