@@ -567,7 +567,7 @@ public class Model
         sb.append( "\nGlobal parameters" );
         sb.append( "\n================================" );
         for( Entry<String, UserParameter> e : parameters.entrySet() )
-            sb.append( "\n" + e.getKey() + " " + e.getValue().getValue() );
+            sb.append( "\n\t" + e.getKey() + " " + e.getValue().getValue() );
 
         return sb.toString();
     }
