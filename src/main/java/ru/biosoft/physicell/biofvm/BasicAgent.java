@@ -108,11 +108,8 @@ public class BasicAgent
     }
     
     private void init()
-    {
-        ID = maxBasicAgentId;
-        maxBasicAgentId++;
+    {   
         isActive = true;
-
         volume = 1.0;
         position = new double[3];
         velocity = new double[3];
@@ -187,6 +184,7 @@ public class BasicAgent
     public void registerMicroenvironment(Microenvironment microenvironment)
     {
         this.m = microenvironment;
+        ID = m.getAgentsCount();
         microenvironment.addAgent( this );
         double[] density = microenvironment.getDensity( 0 );
         int length = density.length;
