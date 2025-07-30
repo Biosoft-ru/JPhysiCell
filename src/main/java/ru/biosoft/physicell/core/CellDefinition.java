@@ -180,6 +180,7 @@ public class CellDefinition
         sb.append( "\n" + phenotype.cellInteractions.display() + "\n" );
         sb.append( "\n" + phenotype.cellTransformations.display() + "\n" );
         sb.append( "\n" + phenotype.mechanics.display() + "\n" );
+        sb.append( "\n" + phenotype.volume.display() + "\n" );
         sb.append( "\n" + functions.display() + "\n" );
 
         //        if( phenotype.intracellular != null )
