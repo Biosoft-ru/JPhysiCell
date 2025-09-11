@@ -19,6 +19,9 @@ public class O2based extends UpdatePhenotype
             return;
 
         int oxygenIndex = pCell.getMicroenvironment().findDensityIndex( "oxygen" );
+        
+        if (oxygenIndex == -1)
+            throw new Exception("Can not find oxygen substrate!");
 
         if( !indicesInitiated )
             init( phenotype );
