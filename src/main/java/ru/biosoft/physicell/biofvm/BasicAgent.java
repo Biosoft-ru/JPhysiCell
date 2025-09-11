@@ -50,9 +50,8 @@ import ru.biosoft.physicell.core.Model;
 #                                                                           #
 #############################################################################
 */
-public class BasicAgent
+public class BasicAgent implements Comparable
 {
-    static int maxBasicAgentId = 0;
 
     protected Model model;
     protected Microenvironment m;
@@ -308,6 +307,13 @@ public class BasicAgent
     public double[] nearest_gradient(int substrate_index)
     {
         return null;///microenvironment.gradient_vector( currentVoxelIndex )[substrate_index];
+    }
+
+    @Override
+    public int compareTo(Object o)
+    {
+        int otherID = ((BasicAgent)o).ID;
+        return ID > otherID? 1: ID < otherID? -1: 0;
     }
 
 }
