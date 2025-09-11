@@ -4,14 +4,11 @@ import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.Phenotype;
 import ru.biosoft.physicell.core.CellFunctions.CustomCellRule;
 
-// (Adrianne) CD4 mechanics function
 public class CD4_Tcell_mechanics extends CustomCellRule
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        //    void CD4_Tcell_mechanics(Cell pCell, Phenotype phenotype, double dt)
-        //    {
         int debris_index = pCell.getMicroenvironment().findDensityIndex( "debris" );
 
         if( phenotype.death.dead )
@@ -25,14 +22,8 @@ public class CD4_Tcell_mechanics extends CustomCellRule
 
         // bounds check 
         if( ModelCovid.check_for_out_of_bounds( pCell, 10.0 ) )
-        {
-            //            #pragma omp critical 
-            //                {
             ( (ModelCovid)pCell.getModel() ).cells_to_move_from_edge.add( pCell );
-            //                }
-            // replace_out_of_bounds_cell( pCell, 10.0 );
-            // return; 
-        }
+
 
         //  // death check 
         //  if( phenotype.death.dead == true ) 

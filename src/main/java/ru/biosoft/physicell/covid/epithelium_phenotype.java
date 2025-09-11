@@ -91,15 +91,6 @@ public class epithelium_phenotype extends UpdatePhenotype
 
         if( pCell.customData.get( "TCell_contact_time" ) > pCell.customData.get( "TCell_contact_death_threshold" ) )
         {
-            // make sure to get rid of all adhesions! 
-            // detach all attached cells 
-            // remove_all_adhesions( pCell ); 
-
-            //            #pragma omp critical
-            //            {
-            //            std::cout << "\t\t\t\t" << pCell << " (of type " << pCell.type_name <<  ") died from T cell contact" << std::endl; 
-            //            }
-
             // induce death 
             pCell.startDeath( apoptosis_index );
 
@@ -125,16 +116,6 @@ public class epithelium_phenotype extends UpdatePhenotype
 
         if( pCell.getModel().getRNG().UniformRandom() < prob_apoptosis )
         {
-            //            std::cout<<ROS_amount<<" "<<epsilon_ROS<<std::endl;
-            // make sure to get rid of all adhesions! 
-            // detach all attached cells 
-            // remove_all_adhesions( pCell ); 
-
-            //            #pragma omp critical
-            //            {
-            //            std::cout << "\t\t\t\t" << pCell << " (of type " << pCell.type_name <<  ") died from ROS" << std::endl; 
-            //            }
-
             // induce death 
             pCell.startDeath( apoptosis_index );
 

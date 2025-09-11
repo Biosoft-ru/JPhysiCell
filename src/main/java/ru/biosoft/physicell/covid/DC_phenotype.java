@@ -8,15 +8,11 @@ import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.standard.StandardModels;
 
-// (Adrianne) DC phenotype function
 public class DC_phenotype extends UpdatePhenotype
 {
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt)
     {
-        //    void DC_phenotype(Cell pCell, Phenotype phenotype, double dt)
-        //    {
-        // (Adrianne) get type of CD8+ T cell
         int CD8_Tcell_type = pCell.getModel().getCellDefinition( "CD8 Tcell" ).type;
 
         /* // (Adrianne) if DC is already activated, then check whether it leaves the tissue
@@ -35,11 +31,6 @@ public class DC_phenotype extends UpdatePhenotype
         {
 
             Set<Cell> neighbors = pCell.cells_in_my_container(); // (Adrianne) find cells in a neighbourhood of DCs
-            //            int n = 0; 
-            //            Cell pTestCell = neighbors[n]; 
-            //            while( n < neighbors.size() )
-            //            {
-            //                pTestCell = neighbors[n]; 
             for( Cell pTestCell : neighbors )
             {
                 // (Adrianne) find the euclidean distance between the DC and the cell it's testing
@@ -55,21 +46,16 @@ public class DC_phenotype extends UpdatePhenotype
                                 * ( radius_DC + radius_test_cell ) )
                 {
 
-                    pTestCell.customData.set( "cell_attachment_rate",
-                            pCell.getModel().getParameterDouble( "DC_induced_CD8_attachment" ) ); // (Adrianne) DC induced T cell attachement rate
+                    pTestCell.customData.set( "cell_attachment_rate", pCell.getModel().getParameterDouble( "DC_induced_CD8_attachment" ) ); // (Adrianne) DC induced T cell attachement rate
 
                     // (Adrianne) finding the G0G1 and S phase index and setting the transition rate to be non zero so that CD8 T cells start proliferating after interacting with DC
                     int cycle_G0G1_index = StandardModels.flow_cytometry_separated_cycle_model
                             .findPhaseIndex( PhysiCellConstants.G0G1_phase );
-                    int cycle_S_index = StandardModels.flow_cytometry_separated_cycle_model
-                            .findPhaseIndex( PhysiCellConstants.S_phase );
+                    int cycle_S_index = StandardModels.flow_cytometry_separated_cycle_model.findPhaseIndex( PhysiCellConstants.S_phase );
                     pTestCell.phenotype.cycle.data.setTransitionRate( cycle_G0G1_index, cycle_S_index,
                             pCell.getModel().getParameterDouble( "DC_induced_CD8_proliferation" ) );
-                    //                    pTestCell.phenotype.cycle.data.transition_rate(cycle_G0G1_index,cycle_S_index) = pCell.getModel().getParameterDouble("DC_induced_CD8_proliferation");           
-                    //                    n = neighbors.size();                
                     break;
                 }
-                //                n++;              
             }
             return;
         }
@@ -83,16 +69,10 @@ public class DC_phenotype extends UpdatePhenotype
             {
 
                 pCell.customData.set( "activated_immune_cell", 1.0 ); // (Adrianne) DC becomes activated
-System.out.println( "Activated virions" );
+                //System.out.println( "Activated virions" );
             }
-            else //(Adrianne) check for infected cells nearby
+            else
             {
-                //                Set<Cell> neighbors = pCell.cells_in_my_container();
-                //                int n = 0; 
-                //                Cell pTestCell = neighbors[n]; 
-                //(Adrianne) finding the viral protein inside cells
-                //                while( n < neighbors.size() )
-                //                {
                 for( Cell pTestCell : pCell.cells_in_my_container() )
                 {
                     //                    pTestCell = neighbors[n]; 
@@ -101,18 +81,12 @@ System.out.println( "Activated virions" );
                     if( pTestCell != pCell && pTestCell.phenotype.death.dead == false && pTestCell.customData.get( nP ) > 1 )
                     {
                         pCell.customData.set( "activated_immune_cell", 1.0 );
-                        System.out.println( "Activated protein" );
+                        //                        System.out.println( "Activated protein" );
                         break;
-                        //                        n = neighbors.size();
-
                     }
-
-                    //                    n++; 
                 }
                 return;
             }
         }
-
-        return;
     }
 }

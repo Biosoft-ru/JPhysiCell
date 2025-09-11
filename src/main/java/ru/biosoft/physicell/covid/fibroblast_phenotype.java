@@ -42,7 +42,7 @@ public class fibroblast_phenotype extends UpdatePhenotype
             if( TGF_beta2 > 0 )
             {
                 pCell.customData.set( "activated_immune_cell", 1.0 );
-                System.out.println( "Activated TGF" );
+//                System.out.println( "Activated TGF" );
                 return;
             }
         }

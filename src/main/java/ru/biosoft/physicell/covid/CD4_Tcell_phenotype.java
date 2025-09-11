@@ -6,7 +6,6 @@ import ru.biosoft.physicell.core.PhysiCellConstants;
 import ru.biosoft.physicell.core.CellFunctions.UpdatePhenotype;
 import ru.biosoft.physicell.core.standard.StandardModels;
 
-// (Adrianne CD4 phenotype function
 public class CD4_Tcell_phenotype extends UpdatePhenotype
 {
     public void execute(Cell pCell, Phenotype phenotype, double dt)
@@ -14,8 +13,8 @@ public class CD4_Tcell_phenotype extends UpdatePhenotype
         int cycle_G0G1_index = StandardModels.flow_cytometry_separated_cycle_model.findPhaseIndex( PhysiCellConstants.G0G1_phase );
         int cycle_S_index = StandardModels.flow_cytometry_separated_cycle_model.findPhaseIndex( PhysiCellConstants.S_phase );
         int virus_index = pCell.getMicroenvironment().findDensityIndex( "virion" );
-        int nV_external = virus_index;
-        double virus_amount = pCell.nearest_density_vector()[virus_index];
+//        int nV_external = virus_index;
+//        double virus_amount = pCell.nearest_density_vector()[virus_index];
 
 
         int apoptosis_index = pCell.phenotype.death.findDeathModelIndex( "apoptosis" );

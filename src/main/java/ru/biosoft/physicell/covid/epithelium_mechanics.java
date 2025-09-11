@@ -9,8 +9,6 @@ public class epithelium_mechanics extends CustomCellRule
     @Override
     public void execute(Cell pCell, Phenotype phenotype, double dt) throws Exception
     {
-        //    void epithelium_mechanics(Cell pCell, Phenotype phenotype, double dt)
-        //    {
         int debris_index = pCell.getMicroenvironment().findDensityIndex( "debris" );
 
         pCell.isMovable = false;

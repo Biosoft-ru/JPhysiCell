@@ -14,8 +14,8 @@ public class CD8_Tcell_phenotype extends UpdatePhenotype
         int cycle_G0G1_index = StandardModels.flow_cytometry_separated_cycle_model.findPhaseIndex( PhysiCellConstants.G0G1_phase );
         int cycle_S_index = StandardModels.flow_cytometry_separated_cycle_model.findPhaseIndex( PhysiCellConstants.S_phase );
         int virus_index = pCell.getMicroenvironment().findDensityIndex( "virion" );
-        int nV_external = virus_index;
-        double virus_amount = pCell.nearest_density_vector()[virus_index];
+//        int nV_external = virus_index;
+//        double virus_amount = pCell.nearest_density_vector()[virus_index];
 
 
         int apoptosis_index = pCell.phenotype.death.findDeathModelIndex( "apoptosis" );

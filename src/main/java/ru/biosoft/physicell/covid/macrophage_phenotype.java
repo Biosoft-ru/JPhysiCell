@@ -170,7 +170,7 @@ public class macrophage_phenotype extends UpdatePhenotype
                 phenotype.secretion.uptakeRates[virus_index] = pCell.getModel().getParameterDouble( "phagocytes_virus_uptake_rate" );
 
                 pCell.customData.set( "activated_immune_cell", 1.0 );
-                System.out.println( "Activated dead" );
+//                System.out.println( "Activated dead" );
 
                 return;
             }
@@ -203,7 +203,7 @@ public class macrophage_phenotype extends UpdatePhenotype
                 phenotype.motility.migrationSpeed = pCell.customData.get( "activated_speed" );
 
                 pCell.customData.set( "activated_immune_cell", 1.0 );
-                System.out.println( "Activated alice" );
+//                System.out.println( "Activated alice" );
 
                 return;
             }
