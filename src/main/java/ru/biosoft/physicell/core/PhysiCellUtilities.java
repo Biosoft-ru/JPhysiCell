@@ -3,7 +3,10 @@ package ru.biosoft.physicell.core;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import ru.biosoft.physicell.biofvm.GeneralMesh;
 import ru.biosoft.physicell.biofvm.Microenvironment;
@@ -194,5 +197,14 @@ public class PhysiCellUtilities
             }
         }
         return neighbors;
+    }
+    
+    public static boolean strictOrder = false;
+
+    public static <T> Set<T> createSet(Class<T> clazz)
+    {
+        if( strictOrder )
+            return new TreeSet<>();
+        return new HashSet<T>();
     }
 }
