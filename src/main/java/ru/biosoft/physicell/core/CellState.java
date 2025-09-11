@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.core;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -84,8 +83,8 @@ public class CellState
     
     public CellState()
     {
-        neighbors = new HashSet<Cell>();
-        springAttachments = new HashSet<>();
+        neighbors =  PhysiCellUtilities.createSet( Cell.class );
+        springAttachments = PhysiCellUtilities.createSet( Cell.class );
         orientation = new double[3];
         simplePressure = 0.0;
         attachedCells =  new CopyOnWriteArraySet<Cell>();

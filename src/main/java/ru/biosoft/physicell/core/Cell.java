@@ -1,6 +1,5 @@
 package ru.biosoft.physicell.core;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import ru.biosoft.physicell.biofvm.BasicAgent;
@@ -1136,7 +1135,7 @@ public class Cell extends BasicAgent
 
     Set<Cell> find_nearby_interacting_cells(Cell pCell)
     {
-        Set<Cell> neighbors = new HashSet<>();
+        Set<Cell> neighbors =  PhysiCellUtilities.createSet( Cell.class );
 
         for( Cell neighbor : pCell.get_container().agentGrid.get( pCell.get_current_mechanics_voxel_index() ) )
         {

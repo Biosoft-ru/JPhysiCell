@@ -1,7 +1,6 @@
 package ru.biosoft.physicell.core;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -105,8 +104,8 @@ public class CellContainer extends AgentContainer
     public CellContainer()
     {
         boundary_condition_for_pushed_out_agents = PhysiCellConstants.default_boundary_condition_for_pushed_out_agents;
-        cellsReadyToDivide = new HashSet<>();
-        cellsReadyToDie = new HashSet<>();
+        cellsReadyToDivide = PhysiCellUtilities.createSet( Cell.class );
+        cellsReadyToDie =  PhysiCellUtilities.createSet( Cell.class );
     }
 
     public String getName()
@@ -128,17 +127,17 @@ public class CellContainer extends AgentContainer
             double dz)
     {
         boundary_condition_for_pushed_out_agents = PhysiCellConstants.default_boundary_condition_for_pushed_out_agents;
-        cellsReadyToDivide = new HashSet<>();
-        cellsReadyToDie = new HashSet<>();
+        cellsReadyToDivide = PhysiCellUtilities.createSet( Cell.class );
+        cellsReadyToDie = PhysiCellUtilities.createSet( Cell.class );
         mesh.resize( x_start, x_end, y_start, y_end, z_start, z_end, dx, dy, dz );
         max_cell_interactive_distance_in_voxel = new double[mesh.voxels.length];
         agentGrid = new ArrayList<>();
         for( int i = 0; i < mesh.voxels.length; i++ )
-            agentGrid.add( new HashSet<Cell>() );
+            agentGrid.add( PhysiCellUtilities.createSet( Cell.class ) );
         max_cell_interactive_distance_in_voxel = new double[mesh.voxels.length];
         agents_in_outer_voxels = new ArrayList<>( 6 );
         for( int i = 0; i < 6; i++ )
-            agents_in_outer_voxels.add( new HashSet<Cell>() );
+            agents_in_outer_voxels.add( PhysiCellUtilities.createSet( Cell.class ) );
     }
 
     public void updateAllCells(Model model, double t, double dt) throws Exception

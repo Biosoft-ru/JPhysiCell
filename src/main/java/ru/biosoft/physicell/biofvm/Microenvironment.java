@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +12,7 @@ import java.util.stream.IntStream;
 
 import ru.biosoft.physicell.core.Cell;
 import ru.biosoft.physicell.core.CellContainer;
+import ru.biosoft.physicell.core.PhysiCellUtilities;
 
 /*
 #############################################################################
@@ -63,10 +63,16 @@ import ru.biosoft.physicell.core.CellContainer;
 */
 public class Microenvironment
 {
-    private Set<BasicAgent> agents = new HashSet<>();
+    private Set<BasicAgent> agents = PhysiCellUtilities.createSet( BasicAgent.class ) ;
     private Map<String, Integer> substrateToIndex;
     public MicroenvironmentOptions options;
-  
+    
+    public void setStrictAgentsOrder(boolean val)
+    {
+        PhysiCellUtilities.strictOrder = val;
+//        this.agents =  PhysiCellUtilities.createSet( BasicAgent.class );//
+    }
+    
     @SuppressWarnings ( "unchecked" )
     public <T extends BasicAgent> Set<T> getAgents(Class<T> clazz)
     {
