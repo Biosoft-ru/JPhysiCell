@@ -364,11 +364,11 @@ public class HypothesisRule
             return -9e99;
 
         // up-regulation part 
-        double hu = BasicSignaling.multivariate_Hill_response_function( upSignal, upHalfMaxes, upHillPowers );
+        double hu = BasicSignaling.multivariateHillResponse( upSignal, upHalfMaxes, upHillPowers );
         double u = baseValue + ( maxValue - baseValue ) * hu;
 
         // then the down-regulation part 
-        double du = BasicSignaling.multivariate_Hill_response_function( downSignal, downHalfMaxes, downHillPowers );
+        double du = BasicSignaling.multivariateHillResponse( downSignal, downHalfMaxes, downHillPowers );
         double output = u + ( minValue - u ) * du;
 
         return output;

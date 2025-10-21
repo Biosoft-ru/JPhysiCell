@@ -71,152 +71,115 @@ import java.util.List;
 
 public class BasicSignaling
 {
-    //    #include "./PhysiCell_basic_signaling.h"
-    //
-    //    using namespace BioFVM; 
-    //
-    //    namespace PhysiCell{
 
-    public static double Hill_response_function(double s, double half_max, double hill_power)
+    /**
+     * Hill response function
+     * @param s
+     * @param halfMax
+     * @param hillPower
+     * @return S / (S+1), where S = (s / hm)^hp
+     */
+    public static double hillResponse(double s, double halfMax, double hillPower)
     {
-        // newer. only one expensive a^b operation. 45% less computationl expense. 
-
         // give an early exit possibility to cut cost on "empty" rules
         if( s < 1e-16 ) // maybe also try a dynamic threshold: 0.0001 * half_max 
-        {
             return 0.0;
-        }
 
-        // operations to reduce a^b operations and minimize hidden memory allocation / deallocation / copy operations. 
-        // Hill = (s/half_max)^hill_power / ( 1 + (s/half_max)^hill_power  )
-        double temp = s; // s 
-        temp /= half_max; // s/half_max 
-        double temp1 = Math.pow( temp, hill_power ); // (s/half_max)^h 
-        temp = temp1; // (s/half_max)^h 
-        temp += 1; // (1+(s/half_max)^h ); 
-        temp1 /= temp; // (s/half_max)^h / ( 1 + s/half_max)^h) 
-        return temp1;
+        double result = Math.pow( s / halfMax, hillPower );
+        return result / ( result + 1 );
     }
 
 
-    public static double linear_response_function(double s, double s_min, double s_max)
+    /**
+     * Linear response function
+     */
+    public static double linearResponse(double s, double sMin, double sMax)
     {
-        if( s <= s_min )
-        {
+        if( s <= sMin )
             return 0.0;
-        }
-        if( s >= s_max )
-        {
+        if( s >= sMax )
             return 1.0;
-        }
-        s -= s_min; // overwrite s with s - s_min 
-        s_max -= s_min; // overwrite s_max with s_max - s_min 
-        s /= s_max; // now we have (s-s_min)/(s_max-s_min
-        return s;
+        return ( s - sMin ) / ( sMax - sMin );
     }
 
-    public static double decreasing_linear_response_function(double s, double s_min, double s_max)
+    public static double decreasingLinearResponse(double s, double sMin, double sMax)
     {
-        if( s <= s_min )
-        {
+        if( s <= sMin )
             return 1.0;
-        }
-        if( s >= s_max )
-        {
+        if( s >= sMax )
             return 0.0;
-        }
-        // (smax-s)/(smax-smin); 
-        // = -(s-smax)/(smax-smin)
-        s -= s_max; // replace s by s-s_max 
-        s_max -= s_min; // replace s_max = s_max - s_min 
-        s /= s_max; // this is (s-s_max)/(s_max-s_min)
-        s *= -1; // this is (s_max-s)/(s_max-s_min)
-        return s;
+        return ( sMax - s ) / ( sMax - sMin );
     }
 
-    public static double interpolate_behavior(double base_value, double max_changed_value, double response)
+    public static double interpolateBehavior(double baseValue, double maxChangedValue, double response)
     {
-        double output = max_changed_value; // bM
-        output -= base_value; // (bM-b0); 
-        output *= response; // R*(bM-b0); 
-        output += base_value; // b0 + (bM-b0)*R; 
-        return output;
+        return baseValue + ( maxChangedValue - baseValue ) * response + baseValue;
     }
 
-    public static double multivariate_Hill_response_function(List<Double> signals, List<Double> half_maxes, List<Double> hill_powers)
+    /**
+     * Multivariate Hill response function
+     * @return S / (1 + S), where S = is sum of Hill responses 
+     */
+    public static double multivariateHillResponse(List<Double> signals, List<Double> halfMaxes, List<Double> hillPowers)
     {
-        double temp1 = 0.0;
-        double temp2 = 0.0;
-        double temp3 = 0.0;
-        // create the generalized (s^h), stored in temp1; 
+        double result = 0.0;
         for( int j = 0; j < signals.size(); j++ )
-        {
-            temp2 = signals.get( j ); // s
-            temp2 /= half_maxes.get( j ); // s/s_half 
-            temp3 = Math.pow( temp2, hill_powers.get( j ) ); // (s/s_half)^h 
-            temp1 += temp3;
-        }
-        temp2 = temp1; // numerator (S^h)
-        temp1 += 1.0; // denominator (1+S^h)
-        temp2 /= temp1; // numerator/denominator = S^h / (1+S^h)
-        return temp2;
+            result += Math.pow( signals.get( j ) / halfMaxes.get( j ), hillPowers.get( j ) );
+        return result / ( result + 1 );
     }
 
-    public static double multivariate_linear_response_function(double[] signals, double[] min_thresholds, double[] max_thresholds)
+    /**
+     * Multivariate Linear response function
+     * @return sum of responses (signal - min)/ (max - min)
+     */
+    public static double multivariateLinearResponse(double[] signals, double[] min, double[] max)
     {
         double output = 0.0;
-
         for( int j = 0; j < signals.length; j++ )
-        {
-            output += linear_response_function( signals[j], min_thresholds[j], max_thresholds[j] );
-        }
-
+            output += linearResponse( signals[j], min[j], max[j] );
         if( output > 1.0 )
-        {
             return 1.0;
-        }
-
         return output;
     }
 
-    public static double[] linear_response_to_Hill_parameters(double s0, double s1)
+    /**
+     * Converts parameters of linear response to parameters of Hilll response
+     * @param s0
+     * @param s1
+     * @return half max, and hill power
+     */
+    public static double[] linearToHill(double s0, double s1)
     {
         double tol = 0.1;
-        double param1 = ( 1 - tol ) / tol;
-        double param2 = Math.log( param1 );
 
         // half max, then hill power 
         double hm = 0.5 * ( s0 + s1 );
 
         // hp so that H(s1) ~ (1-tol)
+        double param2 = Math.log( ( 1 - tol ) / tol );
         double hp = Math.round( param2 / Math.log( s1 / hm ) );
 
         return new double[] {hm, hp};
-        //    std::vector<double>output=
-        //    { hm , hp };
-        //
-        //    return output;
     }
 
-    public static double[] Hill_response_to_linear_parameters(double half_max, double Hill_power)
+    /**
+     * Converts parameters of Hill response to parameters of Linear response
+     * @param halfMax
+     * @param hillPower
+     * @return s0, and s1
+     */
+    public static double[] hillToLinear(double halfMax, double hillPower)
     {
         double tol = 0.1;
-        double param1 = ( 1 - tol ) / tol;
-        double param2 = Math.pow( param1, 1.0 / Hill_power );
 
         // s1 such that H(s1) ~ (1-tol)
-        double s1 = half_max * param2;
+        double s1 = halfMax * Math.pow( ( 1 - tol ) / tol, 1.0 / hillPower );
 
         // s0 for symmetry
-        double s0 = 2 * half_max - s1;
+        double s0 = 2 * halfMax - s1;
         if( s0 < 0 )
-        {
             s0 = 0.0;
-        }
+
         return new double[] {s0, s1};
-        //    std::vector<double>output=
-        //    {s0,s1};
-        //
-        //    return output;
     }
 }

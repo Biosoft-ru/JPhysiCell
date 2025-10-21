@@ -64,7 +64,7 @@ public class StemPhenotype extends UpdatePhenotype
         double max = maxStemDiff; // 0.0075;
         double signal = numStem;
         double halfMax = stemDiffHalfmax; // 0.1; 
-        double hill = BasicSignaling.Hill_response_function( signal, halfMax, 1.5 );
+        double hill = BasicSignaling.hillResponse( signal, halfMax, 1.5 );
         phenotype.cellTransformations.transformationRates[diffType] = base + ( max - base ) * hill;
 
         // contact with a differentiated cell reduces proliferation 
@@ -74,7 +74,7 @@ public class StemPhenotype extends UpdatePhenotype
         max = 0.0;
         signal = numDifferentiated;
         halfMax = stemCyclingHalfmax; //  0.1; 
-        hill = BasicSignaling.Hill_response_function( signal, halfMax, 1.5 );
+        hill = BasicSignaling.hillResponse( signal, halfMax, 1.5 );
         phenotype.cycle.data.setExitRate( 0, base + ( max - base ) * hill );
 
         // resource reduces necrotic death 
@@ -83,7 +83,7 @@ public class StemPhenotype extends UpdatePhenotype
         double stemSaturationNecrosis = pCD.custom_data.get( "necrosis_saturation_resource" );
         double stemThresholdNecrosis = pCD.custom_data.get( "necrosis_threshold_resource" );
         phenotype.death.rates.set( nNecrosis,
-                max * BasicSignaling.decreasing_linear_response_function( r, stemSaturationNecrosis, stemThresholdNecrosis ) );
+                max * BasicSignaling.decreasingLinearResponse( r, stemSaturationNecrosis, stemThresholdNecrosis ) );
 
         // toxin increases apoptotic death 
         int nApoptosis = phenotype.death.findDeathModelIndex( PhysiCellConstants.apoptosis_death_model );
@@ -92,7 +92,7 @@ public class StemPhenotype extends UpdatePhenotype
         signal = toxin;
         base = pCD.phenotype.death.rates.get( nApoptosis );
         max = base * relativeMaxToxicity; // 100*base_val;
-        hill = BasicSignaling.Hill_response_function( signal, toxicityHalfmax, 1.5 );
+        hill = BasicSignaling.hillResponse( signal, toxicityHalfmax, 1.5 );
         phenotype.death.rates.set( nApoptosis, base + ( max - base ) * hill );
     }
 
