@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+
 import ru.biosoft.physicell.ui.DensityState;
 import ru.biosoft.physicell.ui.ModelData;
 import ru.biosoft.physicell.ui.Visualizer2D.Section;
@@ -20,6 +21,7 @@ public class Renderer3D
     private Color densityColor = Color.red;
     private String substrate = "oxygen";
     private Point statisticsLocation = new Point( 10, 40 );
+    private Font statisticsFont = new Font( "TimesRoman", Font.PLAIN, 20 );
     private boolean cut = true;
     private Vertex cutOff = new Vertex( 500, 500, 500 );
     private double[] zBuffer;
@@ -132,7 +134,7 @@ public class Renderer3D
 
     private void drawText(Scene scene, double time, Graphics g)
     {
-        g.setFont( new Font( "TimesRoman", Font.PLAIN, 20 ) );
+        g.setFont( statisticsFont );
         g.setColor( Color.BLACK );
         g.drawString( "Time: " + time, statisticsLocation.x, statisticsLocation.y );
         g.drawString( "Cells: " + scene.getSpheres().size(), statisticsLocation.x, statisticsLocation.y + 30 );
@@ -399,11 +401,16 @@ public class Renderer3D
         this.statistics = statistics;
     }
 
-    public void setStatisticsLOcation(Point location)
+    public void setStatisticsLocation(Point location)
     {
         this.statisticsLocation = location;
     }
 
+    public void setStatisticsFont(Font font)
+    {
+        this.statisticsFont = font;
+    }
+    
     public void setAngle(int heading, int pitch)
     {
         double h = Math.toRadians( heading );
