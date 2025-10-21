@@ -287,7 +287,7 @@ public class ModelReader extends ModelReaderSupport
                     {
                         model.setSaveFull( getBoolVal( enabledElement ) );
                     }
-                    if( intervalElement != null && model.isEnableFullSaves() )
+                    if( intervalElement != null )
                     {
                         double interval = getDoubleVal( intervalElement );
                         //                        String intervalUnits = getAttr( intervalElement, "units" );
