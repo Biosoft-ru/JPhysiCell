@@ -96,8 +96,7 @@ public class BasicAgent implements Comparable
     }
     
     protected void register(Model model)
-    {
-        this.model = model; 
+    { 
         registerMicroenvironment( model.getMicroenvironment() );
     }
     
@@ -182,7 +181,7 @@ public class BasicAgent implements Comparable
 
     public void registerMicroenvironment(Microenvironment microenvironment)
     {
-        this.m = microenvironment;
+
         ID = m.getAgentsCount();
         microenvironment.addAgent( this );
         double[] density = microenvironment.getDensity( 0 );

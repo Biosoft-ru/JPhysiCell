@@ -98,6 +98,11 @@ public class Cell extends BasicAgent
 
     public Cell(CellDefinition cd, Model model)
     {
+        this(cd, model, true);
+    }
+    
+    public Cell(CellDefinition cd, Model model, boolean register)
+    {
         super( );
         type = cd.type;
         typeName = cd.name;
@@ -107,20 +112,23 @@ public class Cell extends BasicAgent
         phenotype = cd.phenotype.clone();
         phenotype.molecular.sync( this );
         this.definition = cd;
-        // cell state should be fine by the default constructor 
         currentMechanicsVoxelIndex = -1;
         updated_current_mechanics_voxel_index = 0;
-
         isMovable = cd.isMovable;
         isOutOfDomain = false;
         displacement = new double[3];// state? 
-
-        register(model);
-        assignOrientation();
         container = null;
         setTotalVolume( phenotype.volume.total );
+        
+        this.model = model; //it may be used by custom scripts even if we do not want to add cell to the model
+        this.m = model.getMicroenvironment();
+        
+        if( register )
+            register( model );
+        
+        assignOrientation( model );
     }
-    
+   
     public CellDefinition getDefinition()
     {
         return definition;
@@ -171,7 +179,7 @@ public class Cell extends BasicAgent
         }
     }
 
-    void assignOrientation()
+    void assignOrientation(Model model)
     {
         state.orientation = new double[3];
         //TODO: check if function should be used at all
@@ -1006,7 +1014,7 @@ public class Cell extends BasicAgent
         // is_movable = true;
         // is_out_of_domain = false;
         // displacement.resize(3,0.0); // state? 
-        assignOrientation();
+        assignOrientation(model);
         setTotalVolume( phenotype.volume.total );
     }
 
