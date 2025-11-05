@@ -18,9 +18,11 @@ public class Renderer3D
     private boolean agents = true;
     private boolean statistics = true;
     private boolean density = true;
+    private boolean showLegend = true;
     private Color densityColor = Color.red;
     private String substrate = "oxygen";
     private Point statisticsLocation = new Point( 10, 40 );
+    private Point legendLocation = new Point(1400, 40);
     private Font statisticsFont = new Font( "TimesRoman", Font.PLAIN, 20 );
     private boolean cut = true;
     private Vertex cutOff = new Vertex( 500, 500, 500 );
@@ -43,11 +45,13 @@ public class Renderer3D
     private Vertex shift;
     int width;
     int height;
+    int imgWidth;
     int depth;
     private boolean densityX;
     private boolean densityY;
     private boolean densityZ;
     private int slice = 0;
+    private BufferedImage legend = null;
 
     private DensityState densityState;
 
@@ -96,7 +100,10 @@ public class Renderer3D
 
     public BufferedImage render(Scene scene, double time)
     {
-        BufferedImage img = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
+        imgWidth = width;
+        if (showLegend && legend != null)
+            imgWidth += legend.getWidth();
+        BufferedImage img = new BufferedImage( imgWidth, height, BufferedImage.TYPE_INT_ARGB );
         Arrays.fill( zBuffer, Double.NEGATIVE_INFINITY );
         //        for( int q = 0; q < zBuffer.length; q++ )
         //            zBuffer[q] = Double.NEGATIVE_INFINITY;
@@ -129,6 +136,10 @@ public class Renderer3D
 
         if( axes )
             drawLines( img );
+        
+        if (showLegend && legend != null)
+            drawLegend(legend, img.getGraphics());
+        
         return img;
     }
 
@@ -534,5 +545,25 @@ public class Renderer3D
     public void setDensityZ(boolean densityZ)
     {
         this.densityZ = densityZ;
+    }
+    
+    public void setLegend(BufferedImage legend)
+    {
+        this.legend = legend;
+    }
+    
+    public void setShowLegend(boolean showLegend)
+    {
+        this.showLegend = showLegend;
+    }
+    
+    public void setLegendLocation(Point location)
+    {
+        this.legendLocation = location;
+    }
+    
+    private void drawLegend(BufferedImage legend, Graphics g)
+    {
+        g.drawImage( legend, (int)legendLocation.getX(), (int)legendLocation.getY(), null );
     }
 }
