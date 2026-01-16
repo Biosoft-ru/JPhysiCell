@@ -140,6 +140,8 @@ public class ModelReaderSupport extends Constants
                 return new Color( 139, 0, 0 );
             case "rosybrown":
                 return new Color( 188, 143, 143 );
+            case "yellow":
+                return new Color( 255, 255, 0 );
             case "black":
                 return Color.black;
             default:
