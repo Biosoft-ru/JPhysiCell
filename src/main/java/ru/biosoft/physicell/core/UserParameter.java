@@ -18,6 +18,11 @@ public class UserParameter
         return name;
     }
     
+    public void setValue(String value)
+    {
+        this.value = value;
+    }
+    
     public String getValue()
     {
         return value;
