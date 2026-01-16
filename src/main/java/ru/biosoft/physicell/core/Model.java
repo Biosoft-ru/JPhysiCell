@@ -277,9 +277,9 @@ public class Model
         return curTime;
     }
     
-    public void stepBeforeCells()
+    public void stepBeforeCells() throws Exception
     {
-        //do nothing by default
+        //do nothing by default 
     }
     
     public void stepAfterCells() throws Exception
